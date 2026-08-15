@@ -1,0 +1,17 @@
+# エディタ設定
+.vscode/
+
+# 依存関係
+node_modules/
+
+# ビルド成果物
+dist/
+.astro/
+
+# 環境変数
+.env
+.env.*
+!.env.example
+
+# OS 生成ファイル
+.DS_Store
