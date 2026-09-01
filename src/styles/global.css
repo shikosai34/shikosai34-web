@@ -6,6 +6,8 @@
   --color-text: #e8e8e8;
   --color-main: #ff9933;
   --color-accent: #00ffcc;
+
+  --font-primary: "Kiwi Maru", sans-serif;
 }
 
 @layer base {
