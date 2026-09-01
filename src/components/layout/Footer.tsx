@@ -36,10 +36,10 @@ export default function Footer({ logoSrc, kosenLogoSrc }: Props) {
 	return (
 		<footer
 			className="mt-14 border-t border-accent/20 bg-base px-6 pb-8 pt-10"
-			style={{ borderRadius: '50% 50% 0 0 / 40px 40px 0 0' }}
+			style={{ borderRadius: '50% 50% 0 0 / 80px 80px 0 0' }}
 		>
 			<div className="flex flex-col items-center">
-				<img src={logoSrc} alt="茨香祭" className="h-10 w-auto" />
+				<img src={logoSrc} alt="茨香祭" className="h-16 w-56 object-contain" />
 				<p className="mt-3 text-center text-xs text-text/60">
 					© 2026 Shikousai Extention Committee All Rights Reserved.
 				</p>

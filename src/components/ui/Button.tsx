@@ -18,7 +18,7 @@ export default function Button({ href, children, variant = 'accent', className =
 	return (
 		<a
 			href={href}
-			className={`inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-medium transition-colors ${variantClass[variant]} ${className}`}
+			className={`inline-flex items-center gap-1.5 rounded-xl px-5 py-2.5 text-sm font-medium transition-colors ${variantClass[variant]} ${className}`}
 		>
 			{children}
 		</a>
