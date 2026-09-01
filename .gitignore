@@ -7,6 +7,7 @@ node_modules/
 # ビルド成果物
 dist/
 .astro/
+.wrangler/
 
 # 環境変数
 .env
