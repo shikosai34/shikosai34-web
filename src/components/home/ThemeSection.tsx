@@ -12,7 +12,7 @@ function CrossMark({ className = '' }: { className?: string }) {
 export default function ThemeSection() {
 	return (
 		<section className="mx-4 mt-8 rounded-2xl bg-base p-6 text-text">
-			<div className="w-72 justify-start text-white text-3xl font-normal font-['Kiwi_Maru']">This year's theme</div>
+			<div className="w-72 justify-start font-primary text-3xl font-normal text-white">This year's theme</div>
 
 			<div className="mt-2 flex flex-col items-start gap-2">
 				<CrossMark />
@@ -20,7 +20,7 @@ export default function ThemeSection() {
 				<CrossMark className="self-end rotate-180" />
 			</div>
 
-			<div className="mt-4 text-xs font-normal leading-[17px] text-white font-['Kiwi_Maru']">
+			<div className="mt-4 font-primary text-xs font-normal leading-[17px] text-white">
 				和を基調とした、新しさと挑戦を表現するテーマです。
 				<br />
 				<br />
