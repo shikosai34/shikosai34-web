@@ -16,7 +16,7 @@ export default function BreakingNewsHero({
 	posterAlt,
 }: Props) {
 	return (
-		<section className="mx-4 mt-6 rounded-3xl bg-main p-4 pt-6">
+		<section className="mx-4 mt-6 rounded-2xl bg-main p-4 pt-6">
 			<SectionHeading title="茨香祭速報" />
 
 			<div className="rounded-2xl">

@@ -23,7 +23,7 @@ export default function FooterLinkColumn({ heading, links }: Props) {
 					<li key={link.href}>
 						<a
 							href={link.href}
-							className="inline-flex items-center gap-1.5 text-sm text-text/85 transition-colors hover:text-accent"
+							className="inline-flex items-center gap-1.5 text-sm underline underline-offset-2 text-text/85 transition-colors hover:text-accent"
 						>
 							{link.icon}
 							{link.label}
