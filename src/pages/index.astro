@@ -1,0 +1,37 @@
+---
+import { getImage } from 'astro:assets';
+import posterAsset from '../assets/poster/sokuhou/01-poster.png';
+import logoW from '../assets/logo/yokogaki/HOL_W-trimmed.png';
+import logoG from '../assets/logo/yokogaki/HOL_G-trimmed.png';
+import kosenLogo from '../assets/logo/kosen/footer.svg';
+import Header from '../components/layout/Header';
+import Footer from '../components/layout/Footer';
+import BreakingNewsHero from '../components/home/BreakingNewsHero';
+import ThemeSection from '../components/home/ThemeSection';
+import NewsSection from '../components/home/NewsSection';
+import Layout from '../layouts/Layout.astro';
+
+const posterImage = await getImage({
+	src: posterAsset,
+	width: 800,
+	format: 'webp',
+});
+---
+
+<Layout title="茨香祭速報 | 第34回 茨香祭">
+	<Header client:load logoSrc={logoW.src} />
+
+	<main class="mx-auto w-full max-w-2xl pb-16">
+		<BreakingNewsHero
+			posterSrc={posterImage.src}
+			posterWidth={posterImage.attributes.width}
+			posterHeight={posterImage.attributes.height}
+			posterAlt="茨香祭速報 第一号：第34回茨香祭テーマ「守破離」決定、ロゴ完成のお知らせ"
+		/>
+
+		<ThemeSection />
+		<NewsSection />
+	</main>
+
+	<Footer logoSrc={logoG.src} kosenLogoSrc={kosenLogo.src} />
+</Layout>
