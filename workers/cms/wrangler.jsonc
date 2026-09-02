@@ -1,0 +1,29 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "shikosai34-cms",
+	"main": "src/index.ts",
+	"account_id": "617bef5ab8279861ced319f362981d45",
+	"compatibility_date": "2024-11-01",
+	"observability": { "enabled": true },
+
+	// サイトと同一ゾーンの /cms/* に割り当てる（/admin と同一オリジン）。
+	"routes": [{ "pattern": "34.shikosai.net/cms/*", "zone_name": "shikosai.net" }],
+
+	"images": { "binding": "IMAGES" },
+
+	// コードは env.MEDIA_BUCKET を使う。`wrangler dev` から本番バケットを
+	// 直接触りたい場合は "remote": true を足す。
+	"r2_buckets": [{ "binding": "MEDIA_BUCKET", "bucket_name": "shikosai34-cms-media" }],
+
+	// 秘密でない識別子はここに置く。秘密鍵は `wrangler secret put GITHUB_APP_PRIVATE_KEY`。
+	"vars": {
+		"GITHUB_REPO": "shikosai34/shikosai34-web",
+		"GITHUB_BRANCH": "main",
+		"CF_ACCESS_TEAM_DOMAIN": "shikosai.cloudflareaccess.com",
+		"CF_ACCESS_AUD": "7cdca2ac0c2bdc964816d2b42166c16e79b633b47077d32b928fb96cbd30d652",
+		"GITHUB_APP_ID": "4801354",
+		"GITHUB_APP_INSTALLATION_ID": "158405949",
+		// R2 バケット shikosai34-cms-media のカスタムドメイン。
+		"ASSETS_BASE_URL": "https://assets.34.shikosai.net"
+	}
+}

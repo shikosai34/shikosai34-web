@@ -10,12 +10,22 @@ import BreakingNewsHero from '../components/home/BreakingNewsHero';
 import ThemeSection from '../components/home/ThemeSection';
 import NewsSection from '../components/home/NewsSection';
 import Layout from '../layouts/Layout.astro';
+import { formatNewsDate } from '../lib/news';
+import { getVisibleNews } from '../lib/news-collection';
 
 const posterImage = await getImage({
 	src: posterAsset,
 	width: 800,
 	format: 'webp',
 });
+
+const latestNews = (await getVisibleNews()).slice(0, 3).map((entry) => ({
+	href: `/news/${entry.id}`,
+	title: entry.data.title,
+	date: formatNewsDate(entry.data.publishedAt),
+	category: entry.data.category,
+	image: entry.data.image,
+}));
 ---
 
 <Layout title="茨香祭速報 | 第34回 茨香祭">
@@ -30,7 +40,7 @@ const posterImage = await getImage({
 		/>
 
 		<ThemeSection />
-		<NewsSection />
+		<NewsSection items={latestNews} />
 	</main>
 
 	<Footer logoSrc={logoG.src} kosenLogoSrc={kosenLogo.src} />
