@@ -1,0 +1,43 @@
+---
+import { CIRCLE_CATEGORY_LABELS, type CircleCategory } from "../../lib/circles";
+
+interface Props {
+    name: string;
+    category: CircleCategory;
+    location: string;
+    image?: string | undefined;
+}
+
+const { name, category, location, image } = Astro.props;
+---
+
+<article
+    class="flex h-full flex-col overflow-hidden rounded-xl border border-base bg-base text-text transition-transform hover:-translate-y-0.5"
+>
+    {
+        image ? (
+            <img
+                src={image}
+                alt=""
+                loading="lazy"
+                class="aspect-video w-full object-cover"
+            />
+        ) : (
+            <div
+                class="flex aspect-video w-full items-center justify-center bg-text text-xs text-base"
+                aria-hidden="true"
+            >
+                画像準備中
+            </div>
+        )
+    }
+    <div class="flex flex-1 flex-col gap-1.5 p-3">
+        <span
+            class="self-start rounded border border-text px-1.5 py-0.5 text-xs text-text"
+        >
+            {CIRCLE_CATEGORY_LABELS[category]}
+        </span>
+        <h3 class="font-medium text-text">{name}</h3>
+        <p class="mt-auto text-sm text-text">{location}</p>
+    </div>
+</article>
