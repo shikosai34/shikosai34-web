@@ -1,5 +1,6 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { CIRCLE_CATEGORIES } from './lib/circles';
 import { NEWS_CATEGORIES } from './lib/news';
 
 /**
@@ -38,4 +39,46 @@ const news = defineCollection({
 	}),
 });
 
-export const collections = { news };
+/**
+ * サークル情報（`/circle`）。
+ *
+ * お知らせと同じく Decap CMS から Markdown で管理する。紹介文は本文（body）。
+ * リポジトリ直下の `content/circles/` に置く。
+ */
+const circles = defineCollection({
+	loader: glob({ pattern: '**/[^_]*.md', base: './content/circles' }),
+	schema: z.object({
+		/** 団体名 */
+		name: z.string().min(1),
+		/** 団体名（かな）。並び順に使用。 */
+		nameKana: z.string().min(1),
+		/**
+		 * URL 識別子（任意）。Decap CMS が書き込む。
+		 * 未指定のときはファイル名がそのまま `/circle/[slug]` の slug になる。
+		 */
+		slug: z.string().optional(),
+		category: z.enum(CIRCLE_CATEGORIES),
+		/** 実施場所（教室名など） */
+		location: z.string().min(1),
+		/** 実施時間（自由記述） */
+		schedule: z.string().min(1),
+		/** FesFlow 導入予定（各団体の申告）。詳細ページのリンク表示判定に使う。 */
+		fesflowPlanned: z.boolean(),
+		/**
+		 * サムネイル画像（任意項目。未提出のサークルがある）。
+		 * ローカルパスまたは R2 の配信 URL。
+		 */
+		image: z.string().optional(),
+		snsLinks: z
+			.array(z.object({ label: z.string().min(1), url: z.string().url() }))
+			.default([]),
+
+		// 以下は実行委員会が後から付与する（§2.9.3）。収集時点では値がない。
+		/** 実際の FesFlow ページ URL */
+		fesflowUrl: z.string().url().optional(),
+		/** 掲載順を手動指定する場合の並び順 */
+		order: z.number().optional(),
+	}),
+});
+
+export const collections = { news, circles };

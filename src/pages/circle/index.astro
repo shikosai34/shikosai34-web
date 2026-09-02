@@ -1,0 +1,222 @@
+---
+import { getCollection } from 'astro:content';
+import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
+import logoW from '../../assets/logo/yokogaki/HOL_W-trimmed.png';
+import kosenLogo from '../../assets/logo/kosen/footer.svg';
+import CircleCard from '../../components/circle/CircleCard.astro';
+import SearchIcon from '../../components/icons/SearchIcon';
+import Footer from '../../components/layout/Footer';
+import Header from '../../components/layout/Header';
+import SectionHeading from '../../components/ui/SectionHeading';
+import Layout from '../../layouts/Layout.astro';
+import {
+	CIRCLE_CATEGORY_GROUPS,
+	CIRCLE_CATEGORY_LABELS,
+	normalizeForSearch,
+} from '../../lib/circles';
+
+const circles = (await getCollection('circles')).sort((a, b) => {
+	const ao = a.data.order ?? Number.POSITIVE_INFINITY;
+	const bo = b.data.order ?? Number.POSITIVE_INFINITY;
+	if (ao !== bo) return ao - bo;
+	return a.data.nameKana.localeCompare(b.data.nameKana, 'ja');
+});
+
+const countByCategory = new Map<string, number>();
+for (const circle of circles) {
+	countByCategory.set(circle.data.category, (countByCategory.get(circle.data.category) ?? 0) + 1);
+}
+
+// 学年（1〜5年生）・種別のボタンは常に全て出す。該当0のときは「該当なし」を表示する。
+const filterGroups = CIRCLE_CATEGORY_GROUPS;
+
+const searchTextById = new Map<string, string>();
+for (const circle of circles) {
+	const { name, nameKana, location, schedule, category } = circle.data;
+	searchTextById.set(
+		circle.id,
+		normalizeForSearch(
+			[name, nameKana, circle.body ?? '', location, schedule, CIRCLE_CATEGORY_LABELS[category]].join(
+				' ',
+			),
+		),
+	);
+}
+---
+
+<Layout title="サークル一覧 | 第34回 茨香祭">
+	<Header client:load logoSrc={logoW.src} />
+
+	<main class="mx-auto w-full max-w-3xl px-4 pb-16">
+		<section class="mt-8">
+			<div class="flex items-baseline justify-between gap-4">
+				<SectionHeading title="Circle" tone="dark" />
+				<a href="#circle-list" class="shrink-0 text-sm text-base underline hover:no-underline">
+					このページの目次
+				</a>
+			</div>
+
+			{
+				circles.length === 0 ? (
+					<p class="py-8 text-center text-sm text-base">サークル情報は準備中です。</p>
+				) : (
+					<div id="circle-list">
+						<label class="search-box mb-4 flex items-center gap-2 rounded-xl border border-base px-3 py-2">
+							<SearchIcon className="h-4 w-4 shrink-0 text-base" />
+							<input
+								type="search"
+								name="q"
+								placeholder="キーワードで検索（例: たこ焼き）"
+								class="w-full bg-transparent text-sm text-base focus:outline-none"
+								autocomplete="off"
+							/>
+						</label>
+
+						<div class="flex flex-col gap-2">
+							{filterGroups.map((group) => (
+								<div
+									class="flex flex-wrap gap-2"
+									role="group"
+									aria-label={`${group.label}で絞り込み`}
+								>
+									{group.options.map((option) => (
+										<button
+											type="button"
+											class="rounded-full border border-base px-3 py-1 text-sm text-base transition-colors aria-pressed:border-main aria-pressed:bg-main aria-pressed:font-medium"
+											data-filter={option.value}
+											aria-pressed="false"
+										>
+											{option.label}
+										</button>
+									))}
+								</div>
+							))}
+						</div>
+
+						<div class="mt-4 flex items-center gap-3">
+							<p class="circle-count text-sm text-base">全 {circles.length} 件</p>
+							<button
+								type="button"
+								class="circle-clear text-sm text-base underline hover:no-underline"
+								hidden
+							>
+								絞り込みを解除
+							</button>
+						</div>
+
+						<p class="circle-empty mt-6 text-sm text-base" role="status" hidden>
+							該当するサークルはありません。
+						</p>
+
+						<ul class="circle-grid mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+							{circles.map((circle) => (
+								<li data-category={circle.data.category} data-search={searchTextById.get(circle.id)}>
+									<a href={`/circle/${circle.id}`} class="block h-full rounded-xl">
+										<CircleCard
+											name={circle.data.name}
+											category={circle.data.category}
+											location={circle.data.location}
+											image={circle.data.image}
+										/>
+									</a>
+								</li>
+							))}
+						</ul>
+					</div>
+				)
+			}
+		</section>
+	</main>
+
+	<Footer logoSrc={logoG.src} kosenLogoSrc={kosenLogo.src} />
+</Layout>
+
+<script is:inline>
+	document.documentElement.classList.add('js');
+</script>
+
+<style>
+	/* 検索はスクリプト前提。JS 無効時は隠す（絞り込みボタンは残るが全件表示のまま）。 */
+	.search-box {
+		display: none;
+	}
+	html.js .search-box {
+		display: flex;
+	}
+</style>
+
+<script>
+	// カテゴリ絞り込み（学年 / 種別のどちらか1つ）＋ キーワード検索。
+	// JS が動かない場合は全カード表示のまま（docs/design §4.1 / F-04）。
+	const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('button[data-filter]'));
+	const items = Array.from(document.querySelectorAll<HTMLLIElement>('.circle-grid > li'));
+	const input = document.querySelector<HTMLInputElement>('.search-box input');
+	const empty = document.querySelector<HTMLElement>('.circle-empty');
+	const count = document.querySelector<HTMLElement>('.circle-count');
+	const clearButton = document.querySelector<HTMLButtonElement>('.circle-clear');
+	const total = items.length;
+
+	if (buttons.length > 0 && items.length > 0) {
+		let category = '';
+		let query = '';
+
+		const normalize = (value: string) => value.normalize('NFKC').toLowerCase();
+
+		const render = () => {
+			let shown = 0;
+			for (const item of items) {
+				const matchCategory = category === '' || item.dataset.category === category;
+				const matchQuery = query === '' || (item.dataset.search ?? '').includes(query);
+				const visible = matchCategory && matchQuery;
+				item.hidden = !visible;
+				if (visible) shown += 1;
+			}
+
+			for (const button of buttons) {
+				button.setAttribute('aria-pressed', String(button.dataset.filter === category));
+			}
+
+			const filtered = category !== '' || query !== '';
+			if (count) count.textContent = filtered ? `${shown} 件` : `全 ${total} 件`;
+			if (empty) empty.hidden = shown !== 0;
+			if (clearButton) clearButton.hidden = !filtered;
+
+			const params = new URLSearchParams();
+			if (category) params.set('category', category);
+			if (query && input) params.set('q', input.value);
+			const qs = params.toString();
+			history.replaceState(null, '', qs ? `?${qs}` : location.pathname);
+		};
+
+		for (const button of buttons) {
+			button.addEventListener('click', () => {
+				category = button.dataset.filter === category ? '' : (button.dataset.filter ?? '');
+				render();
+			});
+		}
+
+		input?.addEventListener('input', () => {
+			query = normalize(input.value.trim());
+			render();
+		});
+
+		clearButton?.addEventListener('click', () => {
+			category = '';
+			query = '';
+			if (input) input.value = '';
+			render();
+		});
+
+		const params = new URLSearchParams(location.search);
+		const initialCategory = params.get('category') ?? '';
+		if (buttons.some((button) => button.dataset.filter === initialCategory)) {
+			category = initialCategory;
+		}
+		const initialQuery = params.get('q') ?? '';
+		if (initialQuery && input) {
+			input.value = initialQuery;
+			query = normalize(initialQuery.trim());
+		}
+		if (category || query) render();
+	}
+</script>
