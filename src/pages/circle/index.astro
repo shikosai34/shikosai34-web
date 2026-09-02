@@ -109,14 +109,16 @@ for (const circle of circles) {
 							該当するサークルはありません。
 						</p>
 
-						<ul class="circle-grid mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+						<ul class="circle-grid mt-4 flex flex-col gap-3">
 							{circles.map((circle) => (
 								<li data-category={circle.data.category} data-search={searchTextById.get(circle.id)}>
 									<CircleCard
 										name={circle.data.name}
-										category={circle.data.category}
 										location={circle.data.location}
+										schedule={circle.data.schedule}
+										description={circle.data.description}
 										image={circle.data.image}
+										snsLinks={circle.data.snsLinks}
 									/>
 								</li>
 							))}
