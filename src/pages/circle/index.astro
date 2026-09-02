@@ -4,6 +4,7 @@ import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
 import logoW from '../../assets/logo/yokogaki/HOL_W-trimmed.png';
 import kosenLogo from '../../assets/logo/kosen/footer.svg';
 import CircleCard from '../../components/circle/CircleCard.astro';
+import SearchIcon from '../../components/icons/SearchIcon';
 import Footer from '../../components/layout/Footer';
 import Header from '../../components/layout/Header';
 import SectionHeading from '../../components/ui/SectionHeading';
@@ -26,6 +27,12 @@ for (const circle of circles) {
 	countByCategory.set(circle.data.category, (countByCategory.get(circle.data.category) ?? 0) + 1);
 }
 
+// 該当のあるカテゴリだけ絞り込みボタンを出す（空カテゴリの無効表示を作らない）。
+const filterGroups = CIRCLE_CATEGORY_GROUPS.map((group) => ({
+	label: group.label,
+	options: group.options.filter((option) => countByCategory.get(option.value)),
+})).filter((group) => group.options.length > 0);
+
 const searchTextById = new Map<string, string>();
 for (const circle of circles) {
 	const { name, nameKana, description, location, schedule, category } = circle.data;
@@ -45,43 +52,40 @@ for (const circle of circles) {
 		<section class="mt-8">
 			<div class="flex items-baseline justify-between gap-4">
 				<SectionHeading title="Circle" tone="dark" />
-				<a href="#circle-list" class="shrink-0 text-sm text-base/60 hover:text-base">
+				<a href="#circle-list" class="shrink-0 text-sm text-base underline hover:no-underline">
 					このページの目次
 				</a>
 			</div>
 
 			{
 				circles.length === 0 ? (
-					<p class="py-8 text-center text-sm text-base/60">サークル情報は準備中です。</p>
+					<p class="py-8 text-center text-sm text-base">サークル情報は準備中です。</p>
 				) : (
 					<div id="circle-list">
-						<label class="search-box mb-4 flex items-center gap-2 rounded-xl border border-base/15 bg-base/5 px-3 py-2">
-							<span class="text-base/40" aria-hidden="true">
-								🔍
-							</span>
+						<label class="search-box mb-4 flex items-center gap-2 rounded-xl border border-base px-3 py-2">
+							<SearchIcon className="h-4 w-4 shrink-0 text-base" />
 							<input
 								type="search"
 								name="q"
 								placeholder="キーワードで検索（例: たこ焼き）"
-								class="w-full bg-transparent text-sm text-base placeholder:text-base/40 focus:outline-none"
+								class="w-full bg-transparent text-sm text-base focus:outline-none"
 								autocomplete="off"
 							/>
 						</label>
 
 						<div class="flex flex-col gap-2">
-							{CIRCLE_CATEGORY_GROUPS.map((group) => (
+							{filterGroups.map((group) => (
 								<div
-									class="circle-filter flex flex-wrap gap-2"
+									class="flex flex-wrap gap-2"
 									role="group"
 									aria-label={`${group.label}で絞り込み`}
 								>
 									{group.options.map((option) => (
 										<button
 											type="button"
-											class="circle-filter__btn"
+											class="rounded-full border border-base px-3 py-1 text-sm text-base transition-colors aria-pressed:border-main aria-pressed:bg-main aria-pressed:font-medium"
 											data-filter={option.value}
 											aria-pressed="false"
-											disabled={!countByCategory.get(option.value)}
 										>
 											{option.label}
 										</button>
@@ -91,13 +95,17 @@ for (const circle of circles) {
 						</div>
 
 						<div class="mt-4 flex items-center gap-3">
-							<p class="circle-count text-sm text-base/60">全 {circles.length} 件</p>
-							<button type="button" class="circle-clear text-sm text-base underline hover:no-underline" hidden>
+							<p class="circle-count text-sm text-base">全 {circles.length} 件</p>
+							<button
+								type="button"
+								class="circle-clear text-sm text-base underline hover:no-underline"
+								hidden
+							>
 								絞り込みを解除
 							</button>
 						</div>
 
-						<p class="circle-empty mt-6 text-sm text-base/60" role="status" hidden>
+						<p class="circle-empty mt-6 text-sm text-base" role="status" hidden>
 							該当するサークルはありません。
 						</p>
 
@@ -127,39 +135,19 @@ for (const circle of circles) {
 </script>
 
 <style>
-	/* 検索はスクリプト前提。JS 無効時は隠し、絞り込みは全件表示のまま（§4.1 / F-04）。 */
+	/* 検索はスクリプト前提。JS 無効時は隠す（絞り込みボタンは残るが全件表示のまま）。 */
 	.search-box {
 		display: none;
 	}
 	html.js .search-box {
 		display: flex;
 	}
-
-	.circle-filter__btn {
-		border: 1px solid color-mix(in srgb, var(--color-base) 25%, transparent);
-		border-radius: 9999px;
-		padding: 0.25rem 0.75rem;
-		font-size: 0.875rem;
-		color: color-mix(in srgb, var(--color-base) 75%, transparent);
-		transition:
-			background-color 0.15s,
-			color 0.15s,
-			border-color 0.15s;
-	}
-	.circle-filter__btn:disabled {
-		opacity: 0.35;
-	}
-	.circle-filter__btn.is-active {
-		background: var(--color-main);
-		border-color: var(--color-main);
-		color: var(--color-base);
-	}
 </style>
 
 <script>
 	// カテゴリ絞り込み（学年 / 種別のどちらか1つ）＋ キーワード検索。
 	// JS が動かない場合は全カード表示のまま（docs/design §4.1 / F-04）。
-	const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('.circle-filter__btn'));
+	const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('button[data-filter]'));
 	const items = Array.from(document.querySelectorAll<HTMLLIElement>('.circle-grid > li'));
 	const input = document.querySelector<HTMLInputElement>('.search-box input');
 	const empty = document.querySelector<HTMLElement>('.circle-empty');
@@ -184,9 +172,7 @@ for (const circle of circles) {
 			}
 
 			for (const button of buttons) {
-				const active = button.dataset.filter === category;
-				button.classList.toggle('is-active', active);
-				button.setAttribute('aria-pressed', String(active));
+				button.setAttribute('aria-pressed', String(button.dataset.filter === category));
 			}
 
 			const filtered = category !== '' || query !== '';
@@ -196,7 +182,7 @@ for (const circle of circles) {
 
 			const params = new URLSearchParams();
 			if (category) params.set('category', category);
-			if (query) params.set('q', input?.value ?? '');
+			if (query && input) params.set('q', input.value);
 			const qs = params.toString();
 			history.replaceState(null, '', qs ? `?${qs}` : location.pathname);
 		};
@@ -222,7 +208,9 @@ for (const circle of circles) {
 
 		const params = new URLSearchParams(location.search);
 		const initialCategory = params.get('category') ?? '';
-		if (buttons.some((button) => button.dataset.filter === initialCategory)) category = initialCategory;
+		if (buttons.some((button) => button.dataset.filter === initialCategory)) {
+			category = initialCategory;
+		}
 		const initialQuery = params.get('q') ?? '';
 		if (initialQuery && input) {
 			input.value = initialQuery;
