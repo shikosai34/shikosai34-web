@@ -1,19 +1,22 @@
 # Decap CMS 設定 — お知らせ（/news）専用
 #
-# アクセス制御:
-#   /admin/* と CMS Backend API は Cloudflare Zero Trust Access で保護する（Issue #17）。
-#   編集者に GitHub ログインは求めない。実際の GitHub への書き込みは
-#   CMS Backend Worker + GitHub App が行う。
-#   その Worker を導入する段階で backend.name を custom backend へ、
-#   もしくは base_url / auth_endpoint を Worker のエンドポイントへ差し替える。
+# アクセス制御と GitHub 書き込み:
+#   /admin/* と /cms/*（CMS Backend Worker）を Cloudflare Zero Trust Access で保護する。
+#   編集者に GitHub ログインは求めない。base_url / api_root を workers/cms の Worker に
+#   向け、Worker が installation token で GitHub REST API を代行する（Issue #17）。
 #
 # ローカルプレビュー:
 #   `npx decap-server` を起動し、`bun dev` の http://localhost:4321/admin/ を開く。
+#   （local_backend が有効な間は下の base_url / api_root は使われない）
 
 backend:
   name: github
   repo: shikosai34/shikosai34-web
   branch: main # TODO(#17): Cloudflare のデプロイ対象ブランチに合わせて確認する
+  # CMS Backend Worker（workers/cms）。TODO(#17): 本番ホスト名を確定する。
+  base_url: https://34.shikosai.net
+  api_root: https://34.shikosai.net/cms/github
+  auth_endpoint: cms/auth
   commit_messages:
     create: 'cms: add news/{{slug}}'
     update: 'cms: update news/{{slug}}'

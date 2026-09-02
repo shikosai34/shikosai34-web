@@ -8,6 +8,7 @@ node_modules/
 dist/
 .astro/
 .wrangler/
+.unlighthouse/
 
 # 環境変数・シークレット
 .env
