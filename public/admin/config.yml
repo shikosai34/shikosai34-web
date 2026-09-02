@@ -1,0 +1,94 @@
+# Decap CMS 設定 — お知らせ（/news）専用
+#
+# アクセス制御と GitHub 書き込み:
+#   /admin/* と /cms/*（CMS Backend Worker）を Cloudflare Zero Trust Access で保護する。
+#   編集者に GitHub ログインは求めない。base_url / api_root を workers/cms の Worker に
+#   向け、Worker が installation token で GitHub REST API を代行する（Issue #17）。
+#
+# ローカルプレビュー:
+#   `npx decap-server` を起動し、`bun dev` の http://localhost:4321/admin/ を開く。
+#   （local_backend が有効な間は下の base_url / api_root は使われない）
+
+backend:
+  name: github
+  repo: shikosai34/shikosai34-web
+  branch: main # TODO(#17): Cloudflare のデプロイ対象ブランチに合わせて確認する
+  # CMS Backend Worker（workers/cms）。34.shikosai.net/cms/* にマウント。
+  base_url: https://34.shikosai.net
+  api_root: https://34.shikosai.net/cms/github
+  auth_endpoint: cms/auth
+  commit_messages:
+    create: 'cms: add news/{{slug}}'
+    update: 'cms: update news/{{slug}}'
+    delete: 'cms: delete news/{{slug}}'
+    openAuthoring: 'cms: {{message}}'
+
+# `npx decap-server` を使ったローカル編集を許可する（本番には影響しない）
+local_backend: true
+
+locale: ja
+
+# 見出し画像は image-r2 ウィジェット経由で R2 へアップロードする（下記フィールド定義）。
+# ここの media_folder は本文（Markdown）中に挿入する画像用で、リポジトリへコミットされる。
+media_folder: public/uploads
+public_folder: /uploads
+
+collections:
+  - name: news
+    label: お知らせ
+    label_singular: お知らせ
+    description: 'ここで公開したお知らせは main へコミットされ、サイトのビルド後に /news へ反映されます。'
+    folder: content/news
+    create: true
+    slug: '{{fields.slug}}'
+    identifier_field: title
+    sortable_fields: [publishedAt, title]
+    fields:
+      - { label: タイトル, name: title, widget: string }
+      - label: URL 識別子
+        name: slug
+        widget: string
+        hint: 'URL の末尾に使う半角英数字とハイフン（例: opening-hours）。公開後は変更しないでください。'
+        pattern:
+          ['^[a-z0-9]+(?:-[a-z0-9]+)*$', '半角の英小文字・数字・ハイフンのみで入力してください']
+      - label: 公開日時
+        name: publishedAt
+        widget: datetime
+        date_format: 'YYYY-MM-DD'
+        time_format: 'HH:mm'
+        format: 'YYYY-MM-DD[T]HH:mm:ss[+09:00]'
+        picker_utc: false
+      - label: 更新日時
+        name: updatedAt
+        widget: datetime
+        required: false
+        date_format: 'YYYY-MM-DD'
+        time_format: 'HH:mm'
+        format: 'YYYY-MM-DD[T]HH:mm:ss[+09:00]'
+        picker_utc: false
+      - label: カテゴリ
+        name: category
+        widget: select
+        default: news
+        options:
+          - { label: お知らせ, value: news }
+          - { label: イベント, value: event }
+          - { label: メディア掲載, value: press }
+          - { label: 更新情報, value: update }
+      - label: 見出し画像
+        name: image
+        widget: image-r2
+        required: false
+        hint: 'スマホの写真をそのままで大丈夫です。自動でリサイズ・WebP 変換して R2 に保存します。'
+      - label: 要約
+        name: description
+        widget: text
+        required: false
+        hint: '一覧や SNS 共有時に表示される短い説明文。'
+      - label: 下書き
+        name: draft
+        widget: boolean
+        default: false
+        hint: 'オンにしている間は本番サイトに表示されません。'
+      - { label: 重要なお知らせ, name: important, widget: boolean, default: false }
+      - { label: 本文, name: body, widget: markdown }

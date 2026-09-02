@@ -1,0 +1,46 @@
+---
+import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
+import logoW from '../../assets/logo/yokogaki/HOL_W-trimmed.png';
+import kosenLogo from '../../assets/logo/kosen/footer.svg';
+import Footer from '../../components/layout/Footer';
+import Header from '../../components/layout/Header';
+import NewsListItem from '../../components/news/NewsListItem';
+import SectionHeading from '../../components/ui/SectionHeading';
+import Layout from '../../layouts/Layout.astro';
+import { formatNewsDate } from '../../lib/news';
+import { getVisibleNews } from '../../lib/news-collection';
+
+const items = (await getVisibleNews()).map((entry) => ({
+	href: `/news/${entry.id}`,
+	title: entry.data.title,
+	date: formatNewsDate(entry.data.publishedAt),
+	category: entry.data.category,
+	image: entry.data.image,
+}));
+---
+
+<Layout title="お知らせ | 第34回 茨香祭">
+	<Header client:load logoSrc={logoW.src} />
+
+	<main class="mx-auto w-full max-w-2xl px-4 pb-16">
+		<section class="mt-8 rounded-2xl bg-base p-4 pt-6 pb-6">
+			<SectionHeading title="News" />
+
+			<div class="border-t border-text/40 pt-2">
+				{
+					items.length === 0 ? (
+						<p class="py-6 text-center text-sm text-text/70">現在お知らせはありません。</p>
+					) : (
+						<ul class="divide-y divide-text/10">
+							{items.map((item) => (
+								<NewsListItem {...item} />
+							))}
+						</ul>
+					)
+				}
+			</div>
+		</section>
+	</main>
+
+	<Footer logoSrc={logoG.src} kosenLogoSrc={kosenLogo.src} />
+</Layout>

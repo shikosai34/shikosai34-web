@@ -1,0 +1,15 @@
+# workers/cms のローカル用シークレット。
+# `cp .dev.vars.example .dev.vars` して値を埋める。`.dev.vars` はコミットしない。
+# 秘密でない値（App ID / Installation ID / Access team / AUD / repo / branch）は
+# wrangler.jsonc の "vars" にあるので、ここでは秘密鍵だけ設定すればよい。
+
+# GitHub App「decap-cms-shikosai34-web」の秘密鍵（PKCS#8 PEM）。
+# GitHub がダウンロードさせる .pem は PKCS#1 なので変換する:
+#   openssl pkcs8 -topk8 -nocrypt \
+#     -in decap-cms-shikosai34-web.2026-09-01.private-key.pem \
+#     -out cms-private-key.pkcs8.pem
+# 変換後のファイル内容をそのまま貼る（複数行可）。本番は `wrangler secret put`。
+GITHUB_APP_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+
+# 別オリジンの /admin から呼ぶ場合のみ設定（同一ゾーンの /cms/* なら不要）。
+# ALLOWED_ORIGIN=https://34.shikosai.net
