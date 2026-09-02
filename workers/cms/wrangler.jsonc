@@ -2,12 +2,13 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "shikosai34-cms",
 	"main": "src/index.ts",
+	"account_id": "617bef5ab8279861ced319f362981d45",
 	"compatibility_date": "2024-11-01",
 	"observability": { "enabled": true },
 
-	// 本番デプロイ後、サイトと同一ゾーンの /cms/* に割り当てる。
-	// TODO(#17): 本番ホスト名を確定する。
-	// "routes": [{ "pattern": "34.shikosai.net/cms/*", "zone_name": "shikosai.net" }],
+	// サイトと同一ゾーンの /cms/* に割り当てる。
+	// TODO(#17): 本番ホスト名を確定して有効化する（scripts/setup-infra.sh が sed で置換）。
+	// "routes": [{ "pattern": "PLACEHOLDER_SITE_HOST/cms/*", "zone_name": "PLACEHOLDER_ZONE_NAME" }],
 
 	"images": { "binding": "IMAGES" },
 

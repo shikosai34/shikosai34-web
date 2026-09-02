@@ -48,14 +48,25 @@ bun run dev
 bunx wrangler secret put GITHUB_APP_PRIVATE_KEY   # PKCS#8 PEM を貼り付け
 ```
 
-## R2（画像）
+## インフラ構築（`scripts/setup-infra.sh`）
+
+R2 バケット・カスタムドメイン・Worker route・`wrangler.jsonc` / `config.yml` の
+ホスト名置換をまとめて行う（冪等）。`wrangler` ログイン済みが前提。
 
 ```sh
-bunx wrangler r2 bucket create shikosai34-cms-media
+cd workers/cms
+SITE_HOST=34.shikosai.net \
+ZONE_NAME=shikosai.net \
+CF_ZONE_ID=<ゾーンID> \
+ASSETS_HOST=assets.shikosai.net \
+ALLOWED_EMAIL_DOMAIN=shikosai.net \
+CF_API_TOKEN=<Access編集権限のトークン> \
+./scripts/setup-infra.sh
 ```
 
-- バケットにカスタムドメイン（例 `assets.shikosai.net`）を割り当て、公開配信を有効化。
-- `wrangler.jsonc` の `ASSETS_BASE_URL` をそのドメインに合わせる。
+- `CF_ZONE_ID`: ダッシュボード → 対象ゾーン → Overview → API の "Zone ID"。
+- `CF_API_TOKEN`: Zero Trust Access は wrangler の OAuth スコープ外なので別途必要
+  （Account → Access: Apps and Policies → Edit）。未指定なら Access アプリ作成のみスキップ。
 - Images バインディング（`IMAGES`）は追加設定不要。
 
 ## デプロイ
