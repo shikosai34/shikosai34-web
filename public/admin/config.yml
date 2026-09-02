@@ -1,4 +1,4 @@
-# Decap CMS 設定 — お知らせ（/news）専用
+# Decap CMS 設定 — お知らせ（/news）とサークル（/circle）
 #
 # アクセス制御と GitHub 書き込み:
 #   /admin/* と /cms/*（CMS Backend Worker）を Cloudflare Zero Trust Access で保護する。
@@ -18,9 +18,9 @@ backend:
   api_root: https://34.shikosai.net/cms/github
   auth_endpoint: cms/auth
   commit_messages:
-    create: 'cms: add news/{{slug}}'
-    update: 'cms: update news/{{slug}}'
-    delete: 'cms: delete news/{{slug}}'
+    create: 'cms: add {{collection}}/{{slug}}'
+    update: 'cms: update {{collection}}/{{slug}}'
+    delete: 'cms: delete {{collection}}/{{slug}}'
     openAuthoring: 'cms: {{message}}'
 
 # `npx decap-server` を使ったローカル編集を許可する（本番には影響しない）
@@ -92,3 +92,73 @@ collections:
         hint: 'オンにしている間は本番サイトに表示されません。'
       - { label: 重要なお知らせ, name: important, widget: boolean, default: false }
       - { label: 本文, name: body, widget: markdown }
+
+  - name: circles
+    label: サークル
+    label_singular: サークル
+    description: 'ここで作成・編集したサークルは main へコミットされ、ビルド後に /circle へ反映されます。'
+    folder: content/circles
+    create: true
+    extension: json
+    format: json
+    slug: '{{fields.slug}}'
+    identifier_field: name
+    sortable_fields: [nameKana, order, name]
+    fields:
+      - { label: 団体名, name: name, widget: string }
+      - label: 団体名（かな）
+        name: nameKana
+        widget: string
+        hint: 'ひらがな。一覧の並び順に使います。'
+      - label: URL 識別子
+        name: slug
+        widget: string
+        hint: 'URL の末尾に使う半角英数字とハイフン（例: robotics）。公開後は変更しないでください。'
+        pattern:
+          ['^[a-z0-9]+(?:-[a-z0-9]+)*$', '半角の英小文字・数字・ハイフンのみで入力してください']
+      - label: カテゴリ
+        name: category
+        widget: select
+        options:
+          - { label: 1年生, value: grade1 }
+          - { label: 2年生, value: grade2 }
+          - { label: 3年生, value: grade3 }
+          - { label: 4年生, value: grade4 }
+          - { label: 5年生, value: grade5 }
+          - { label: 運動部, value: sports }
+          - { label: 文化部, value: culture }
+          - { label: 同好会, value: society }
+          - { label: その他, value: other }
+      - { label: 実施場所, name: location, widget: string, hint: '教室名など。' }
+      - { label: 実施時間, name: schedule, widget: string, hint: '例: 両日 10:00〜16:00' }
+      - { label: 紹介文, name: description, widget: text }
+      - { label: FesFlow 導入予定, name: fesflowPlanned, widget: boolean, default: false }
+      - label: サムネイル画像
+        name: image
+        widget: image-r2
+        required: false
+        hint: 'スマホの写真をそのままで大丈夫です。自動でリサイズ・WebP 変換して R2 に保存します。'
+      - label: SNS リンク
+        name: snsLinks
+        widget: list
+        required: false
+        label_singular: SNS リンク
+        summary: '{{fields.label}}'
+        fields:
+          - { label: ラベル, name: label, widget: string, hint: '例: X / Instagram / 公式サイト' }
+          - label: URL
+            name: url
+            widget: string
+            pattern: ['^https?://', 'http:// または https:// で始まる URL を入力してください']
+      - label: FesFlow ページ URL
+        name: fesflowUrl
+        widget: string
+        required: false
+        pattern: ['^https?://', 'http:// または https:// で始まる URL を入力してください']
+        hint: '実行委員会が後から入力します。'
+      - label: 掲載順
+        name: order
+        widget: number
+        required: false
+        value_type: int
+        hint: '小さいほど前に表示。未入力なら「かな」順。'

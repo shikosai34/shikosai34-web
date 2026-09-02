@@ -53,6 +53,11 @@ const circles = defineCollection({
 		name: z.string().min(1),
 		/** 団体名（かな）。並び順に使用。 */
 		nameKana: z.string().min(1),
+		/**
+		 * URL 識別子（任意）。Decap CMS が書き込む。
+		 * 未指定のときはファイル名がそのまま `/circle/[slug]` の slug になる。
+		 */
+		slug: z.string().optional(),
 		category: z.enum(CIRCLE_CATEGORIES),
 		/** 実施場所（教室名など） */
 		location: z.string().min(1),
