@@ -8,7 +8,11 @@ import Footer from '../../components/layout/Footer';
 import Header from '../../components/layout/Header';
 import SectionHeading from '../../components/ui/SectionHeading';
 import Layout from '../../layouts/Layout.astro';
-import { CIRCLE_CATEGORIES, CIRCLE_CATEGORY_LABELS } from '../../lib/circles';
+import {
+	CIRCLE_CATEGORY_GROUPS,
+	CIRCLE_CATEGORY_LABELS,
+	normalizeForSearch,
+} from '../../lib/circles';
 
 const circles = (await getCollection('circles')).sort((a, b) => {
 	const ao = a.data.order ?? Number.POSITIVE_INFINITY;
@@ -21,7 +25,17 @@ const countByCategory = new Map<string, number>();
 for (const circle of circles) {
 	countByCategory.set(circle.data.category, (countByCategory.get(circle.data.category) ?? 0) + 1);
 }
-const activeCategories = CIRCLE_CATEGORIES.filter((category) => countByCategory.get(category));
+
+const searchTextById = new Map<string, string>();
+for (const circle of circles) {
+	const { name, nameKana, description, location, schedule, category } = circle.data;
+	searchTextById.set(
+		circle.id,
+		normalizeForSearch(
+			[name, nameKana, description, location, schedule, CIRCLE_CATEGORY_LABELS[category]].join(' '),
+		),
+	);
+}
 ---
 
 <Layout title="サークル一覧 | 第34回 茨香祭">
@@ -29,7 +43,12 @@ const activeCategories = CIRCLE_CATEGORIES.filter((category) => countByCategory.
 
 	<main class="mx-auto w-full max-w-3xl px-4 pb-16">
 		<section class="mt-8">
-			<SectionHeading title="Circle" />
+			<div class="flex items-baseline justify-between gap-4">
+				<SectionHeading title="Circle" />
+				<a href="#circle-list" class="shrink-0 text-sm text-text/70 hover:text-accent">
+					このページの目次
+				</a>
+			</div>
 
 			{
 				circles.length === 0 ? (
@@ -37,39 +56,56 @@ const activeCategories = CIRCLE_CATEGORIES.filter((category) => countByCategory.
 						サークル情報は準備中です。
 					</p>
 				) : (
-					<div>
-						<div
-							class="circle-filter flex flex-wrap gap-2"
-							role="group"
-							aria-label="カテゴリで絞り込み"
-						>
-							<button
-								type="button"
-								class="circle-filter__btn is-active"
-								data-filter="all"
-								aria-pressed="true"
-							>
-								すべて（{circles.length}）
-							</button>
-							{activeCategories.map((category) => (
-								<button
-									type="button"
-									class="circle-filter__btn"
-									data-filter={category}
-									aria-pressed="false"
+					<div id="circle-list">
+						<label class="search-box mb-4 flex items-center gap-2 rounded-xl bg-base px-3 py-2">
+							<span class="text-text/50" aria-hidden="true">
+								🔍
+							</span>
+							<input
+								type="search"
+								name="q"
+								placeholder="キーワードで検索（例: たこ焼き）"
+								class="w-full bg-transparent text-sm text-text placeholder:text-text/40 focus:outline-none"
+								autocomplete="off"
+							/>
+						</label>
+
+						<div class="flex flex-col gap-2">
+							{CIRCLE_CATEGORY_GROUPS.map((group) => (
+								<div
+									class="circle-filter flex flex-wrap gap-2"
+									role="group"
+									aria-label={`${group.label}で絞り込み`}
 								>
-									{CIRCLE_CATEGORY_LABELS[category]}（{countByCategory.get(category)}）
-								</button>
+									{group.options.map((option) => (
+										<button
+											type="button"
+											class="circle-filter__btn"
+											data-filter={option.value}
+											aria-pressed="false"
+											disabled={!countByCategory.get(option.value)}
+										>
+											{option.label}
+										</button>
+									))}
+								</div>
 							))}
+						</div>
+
+						<div class="mt-4 flex items-center gap-3">
+							<p class="circle-count text-sm text-text/70">全 {circles.length} 件</p>
+							<button type="button" class="circle-clear text-sm text-accent hover:underline" hidden>
+								絞り込みを解除
+							</button>
 						</div>
 
 						<p class="circle-empty mt-6 text-sm text-text/70" role="status" hidden>
 							該当するサークルはありません。
 						</p>
 
-						<ul class="circle-grid mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+						<ul class="circle-grid mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
 							{circles.map((circle) => (
-								<li data-category={circle.data.category}>
+								<li data-category={circle.data.category} data-search={searchTextById.get(circle.id)}>
 									<CircleCard
 										name={circle.data.name}
 										category={circle.data.category}
@@ -88,7 +124,19 @@ const activeCategories = CIRCLE_CATEGORIES.filter((category) => countByCategory.
 	<Footer logoSrc={logoG.src} kosenLogoSrc={kosenLogo.src} />
 </Layout>
 
+<script is:inline>
+	document.documentElement.classList.add('js');
+</script>
+
 <style>
+	/* 検索はスクリプト前提。JS 無効時は隠し、絞り込みは全件表示のまま（§4.1 / F-04）。 */
+	.search-box {
+		display: none;
+	}
+	html.js .search-box {
+		display: flex;
+	}
+
 	.circle-filter__btn {
 		border: 1px solid color-mix(in srgb, var(--color-text) 30%, transparent);
 		border-radius: 9999px;
@@ -100,6 +148,9 @@ const activeCategories = CIRCLE_CATEGORIES.filter((category) => countByCategory.
 			color 0.15s,
 			border-color 0.15s;
 	}
+	.circle-filter__btn:disabled {
+		opacity: 0.4;
+	}
 	.circle-filter__btn.is-active {
 		background: var(--color-accent);
 		border-color: var(--color-accent);
@@ -108,42 +159,77 @@ const activeCategories = CIRCLE_CATEGORIES.filter((category) => countByCategory.
 </style>
 
 <script>
-	// カテゴリ絞り込み（F-04）。JS が動かない場合は全件表示のまま（docs/design §4.1）。
-	const buttons = Array.from(
-		document.querySelectorAll<HTMLButtonElement>('.circle-filter__btn'),
-	);
+	// カテゴリ絞り込み（学年 / 種別のどちらか1つ）＋ キーワード検索。
+	// JS が動かない場合は全カード表示のまま（docs/design §4.1 / F-04）。
+	const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('.circle-filter__btn'));
 	const items = Array.from(document.querySelectorAll<HTMLLIElement>('.circle-grid > li'));
+	const input = document.querySelector<HTMLInputElement>('.search-box input');
 	const empty = document.querySelector<HTMLElement>('.circle-empty');
+	const count = document.querySelector<HTMLElement>('.circle-count');
+	const clearButton = document.querySelector<HTMLButtonElement>('.circle-clear');
+	const total = items.length;
 
 	if (buttons.length > 0 && items.length > 0) {
-		const apply = (filter: string) => {
+		let category = '';
+		let query = '';
+
+		const normalize = (value: string) => value.normalize('NFKC').toLowerCase();
+
+		const render = () => {
 			let shown = 0;
 			for (const item of items) {
-				const match = filter === 'all' || item.dataset.category === filter;
-				item.hidden = !match;
-				if (match) shown += 1;
+				const matchCategory = category === '' || item.dataset.category === category;
+				const matchQuery = query === '' || (item.dataset.search ?? '').includes(query);
+				const visible = matchCategory && matchQuery;
+				item.hidden = !visible;
+				if (visible) shown += 1;
 			}
+
 			for (const button of buttons) {
-				const active = button.dataset.filter === filter;
+				const active = button.dataset.filter === category;
 				button.classList.toggle('is-active', active);
 				button.setAttribute('aria-pressed', String(active));
 			}
-			if (empty) empty.hidden = shown !== 0;
 
-			const params = new URLSearchParams(location.search);
-			if (filter === 'all') params.delete('category');
-			else params.set('category', filter);
-			const query = params.toString();
-			history.replaceState(null, '', query ? `?${query}` : location.pathname);
+			const filtered = category !== '' || query !== '';
+			if (count) count.textContent = filtered ? `${shown} 件` : `全 ${total} 件`;
+			if (empty) empty.hidden = shown !== 0;
+			if (clearButton) clearButton.hidden = !filtered;
+
+			const params = new URLSearchParams();
+			if (category) params.set('category', category);
+			if (query) params.set('q', input?.value ?? '');
+			const qs = params.toString();
+			history.replaceState(null, '', qs ? `?${qs}` : location.pathname);
 		};
 
 		for (const button of buttons) {
-			button.addEventListener('click', () => apply(button.dataset.filter ?? 'all'));
+			button.addEventListener('click', () => {
+				category = button.dataset.filter === category ? '' : (button.dataset.filter ?? '');
+				render();
+			});
 		}
 
-		const initial = new URLSearchParams(location.search).get('category');
-		if (initial && buttons.some((button) => button.dataset.filter === initial)) {
-			apply(initial);
+		input?.addEventListener('input', () => {
+			query = normalize(input.value.trim());
+			render();
+		});
+
+		clearButton?.addEventListener('click', () => {
+			category = '';
+			query = '';
+			if (input) input.value = '';
+			render();
+		});
+
+		const params = new URLSearchParams(location.search);
+		const initialCategory = params.get('category') ?? '';
+		if (buttons.some((button) => button.dataset.filter === initialCategory)) category = initialCategory;
+		const initialQuery = params.get('q') ?? '';
+		if (initialQuery && input) {
+			input.value = initialQuery;
+			query = normalize(initialQuery.trim());
 		}
+		if (category || query) render();
 	}
 </script>
