@@ -1,5 +1,5 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
 import logoW from '../../assets/logo/yokogaki/HOL_W-trimmed.png';
 import kosenLogo from '../../assets/logo/kosen/footer.svg';
@@ -17,7 +17,8 @@ export async function getStaticPaths() {
 }
 
 const { circle } = Astro.props;
-const { name, category, location, schedule, description, image, snsLinks, fesflowPlanned, fesflowUrl } =
+const { Content } = await render(circle);
+const { name, category, location, schedule, image, snsLinks, fesflowPlanned, fesflowUrl } =
 	circle.data;
 ---
 
@@ -55,7 +56,9 @@ const { name, category, location, schedule, description, image, snsLinks, fesflo
 				<dd>{location}</dd>
 			</dl>
 
-			<p class="mt-4 whitespace-pre-line text-text">{description}</p>
+			<div class="circle-body mt-4 flex flex-col gap-3 text-text">
+				<Content />
+			</div>
 
 			{
 				snsLinks.length > 0 && (
@@ -99,3 +102,20 @@ const { name, category, location, schedule, description, image, snsLinks, fesflo
 
 	<Footer logoSrc={logoG.src} kosenLogoSrc={kosenLogo.src} />
 </Layout>
+
+<style>
+	.circle-body :global(a) {
+		text-decoration: underline;
+	}
+	.circle-body :global(strong) {
+		font-weight: 700;
+	}
+	.circle-body :global(ul) {
+		list-style: disc;
+		padding-left: 1.25rem;
+	}
+	.circle-body :global(ol) {
+		list-style: decimal;
+		padding-left: 1.25rem;
+	}
+</style>

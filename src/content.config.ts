@@ -42,12 +42,11 @@ const news = defineCollection({
 /**
  * サークル情報（`/circle`）。
  *
- * Google フォームで集めた原稿、または Decap CMS の circles コレクションから
- * 確認のうえ JSON 化する（docs/design/03-design.md §2.9.3）。
- * 本文を持たないため JSON。リポジトリ直下の `content/circles/` で管理する。
+ * お知らせと同じく Decap CMS から Markdown で管理する。紹介文は本文（body）。
+ * リポジトリ直下の `content/circles/` に置く。
  */
 const circles = defineCollection({
-	loader: glob({ pattern: '**/[^_]*.json', base: './content/circles' }),
+	loader: glob({ pattern: '**/[^_]*.md', base: './content/circles' }),
 	schema: z.object({
 		/** 団体名 */
 		name: z.string().min(1),
@@ -63,8 +62,6 @@ const circles = defineCollection({
 		location: z.string().min(1),
 		/** 実施時間（自由記述） */
 		schedule: z.string().min(1),
-		/** 紹介文 */
-		description: z.string().min(1),
 		/** FesFlow 導入予定（各団体の申告）。詳細ページのリンク表示判定に使う。 */
 		fesflowPlanned: z.boolean(),
 		/**

@@ -99,8 +99,6 @@ collections:
     description: 'ここで作成・編集したサークルは main へコミットされ、ビルド後に /circle へ反映されます。'
     folder: content/circles
     create: true
-    extension: json
-    format: json
     slug: '{{fields.slug}}'
     identifier_field: name
     sortable_fields: [nameKana, order, name]
@@ -131,7 +129,6 @@ collections:
           - { label: その他, value: other }
       - { label: 実施場所, name: location, widget: string, hint: '教室名など。' }
       - { label: 実施時間, name: schedule, widget: string, hint: '例: 両日 10:00〜16:00' }
-      - { label: 紹介文, name: description, widget: text }
       - { label: FesFlow 導入予定, name: fesflowPlanned, widget: boolean, default: false }
       - label: サムネイル画像
         name: image
@@ -162,3 +159,4 @@ collections:
         required: false
         value_type: int
         hint: '小さいほど前に表示。未入力なら「かな」順。'
+      - { label: 紹介文, name: body, widget: markdown }

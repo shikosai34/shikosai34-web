@@ -32,11 +32,13 @@ const filterGroups = CIRCLE_CATEGORY_GROUPS;
 
 const searchTextById = new Map<string, string>();
 for (const circle of circles) {
-	const { name, nameKana, description, location, schedule, category } = circle.data;
+	const { name, nameKana, location, schedule, category } = circle.data;
 	searchTextById.set(
 		circle.id,
 		normalizeForSearch(
-			[name, nameKana, description, location, schedule, CIRCLE_CATEGORY_LABELS[category]].join(' '),
+			[name, nameKana, circle.body ?? '', location, schedule, CIRCLE_CATEGORY_LABELS[category]].join(
+				' ',
+			),
 		),
 	);
 }
