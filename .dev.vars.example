@@ -1,0 +1,15 @@
+# CMS Backend Worker のローカル用シークレット（Wrangler が `wrangler dev` で自動読み込み）。
+# このファイルをコピーして `.dev.vars` を作り、値を埋める。`.dev.vars` はコミットしない。
+# 本番は `wrangler secret put <NAME>` で Cloudflare 側に登録する。
+
+# GitHub App「decap-cms-shikosai34-web」
+GITHUB_APP_ID=4801354
+# リポジトリへインストール後に取得: gh api /repos/shikosai34/shikosai34-web/installation --jq .id
+GITHUB_APP_INSTALLATION_ID=
+# .pem を base64 で1行にしたもの: base64 -w0 decap-cms-shikosai34-web.*.private-key.pem
+GITHUB_APP_PRIVATE_KEY_BASE64=
+
+# Cloudflare Zero Trust Access（/admin と CMS API の保護）
+# https://<team>.cloudflareaccess.com/cdn-cgi/access/certs で公開鍵を取得して JWT を検証する
+CF_ACCESS_TEAM_DOMAIN=
+CF_ACCESS_AUD=
