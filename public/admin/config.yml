@@ -28,8 +28,8 @@ local_backend: true
 
 locale: ja
 
-# 画像は将来 Cloudflare R2 へアップロードする custom widget に置き換える（Issue #17）。
-# それまでの暫定として public/uploads に保存する。
+# 見出し画像は image-r2 ウィジェット経由で R2 へアップロードする（下記フィールド定義）。
+# ここの media_folder は本文（Markdown）中に挿入する画像用で、リポジトリへコミットされる。
 media_folder: public/uploads
 public_folder: /uploads
 
@@ -77,9 +77,9 @@ collections:
           - { label: 更新情報, value: update }
       - label: 見出し画像
         name: image
-        widget: image
+        widget: image-r2
         required: false
-        hint: '一覧と記事の上部に表示されます。将来は自動でリサイズ・WebP 変換されます。'
+        hint: 'スマホの写真をそのままで大丈夫です。自動でリサイズ・WebP 変換して R2 に保存します。'
       - label: 要約
         name: description
         widget: text

@@ -16,6 +16,13 @@ export interface Env {
 	/** コミット先ブランチ */
 	GITHUB_BRANCH: string;
 
+	/** 変換済み画像を置く R2 バケット */
+	MEDIA_BUCKET: R2Bucket;
+	/** Cloudflare Images バインディング（リサイズ・WebP 変換） */
+	IMAGES: ImagesBinding;
+	/** R2 の公開配信ドメイン。例: https://assets.shikosai.net */
+	ASSETS_BASE_URL: string;
+
 	/**
 	 * 別オリジンの /admin から呼ぶ場合の CORS 許可オリジン。
 	 * 同一ゾーンの /cms/* にマウントするなら未設定でよい。

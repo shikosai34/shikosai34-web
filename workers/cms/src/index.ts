@@ -1,6 +1,7 @@
 import { AccessError, verifyAccessJwt } from './access';
 import { authPage } from './auth-page';
 import type { Env } from './env';
+import { handleMediaUpload } from './media';
 import { handleGithubProxy } from './proxy';
 
 export default {
@@ -24,6 +25,17 @@ export default {
 			return new Response(authPage(crypto.randomUUID()), {
 				headers: { 'Content-Type': 'text/html; charset=utf-8' },
 			});
+		}
+
+		if (path === '/media') {
+			try {
+				return withCors(env, await handleMediaUpload(request, env));
+			} catch (err) {
+				return withCors(
+					env,
+					new Response(`media error: ${(err as Error).message}`, { status: 502 }),
+				);
+			}
 		}
 
 		if (path === '/github' || path.startsWith('/github/')) {

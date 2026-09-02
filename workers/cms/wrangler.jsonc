@@ -9,6 +9,9 @@
 	// TODO(#17): 本番ホスト名を確定する。
 	// "routes": [{ "pattern": "34.shikosai.net/cms/*", "zone_name": "shikosai.net" }],
 
+	"images": { "binding": "IMAGES" },
+	"r2_buckets": [{ "binding": "MEDIA_BUCKET", "bucket_name": "shikosai34-cms-media" }],
+
 	// 秘密でない識別子はここに置く。秘密鍵は `wrangler secret put GITHUB_APP_PRIVATE_KEY`。
 	"vars": {
 		"GITHUB_REPO": "shikosai34/shikosai34-web",
@@ -16,6 +19,8 @@
 		"CF_ACCESS_TEAM_DOMAIN": "shikosai.cloudflareaccess.com",
 		"CF_ACCESS_AUD": "7cdca2ac0c2bdc964816d2b42166c16e79b633b47077d32b928fb96cbd30d652",
 		"GITHUB_APP_ID": "4801354",
-		"GITHUB_APP_INSTALLATION_ID": "158405949"
+		"GITHUB_APP_INSTALLATION_ID": "158405949",
+		// TODO(#17): R2 バケット shikosai34-cms-media のカスタムドメインを設定する。
+		"ASSETS_BASE_URL": "https://assets.shikosai.net"
 	}
 }

@@ -10,6 +10,10 @@
   GitHub App の installation token を付けて `api.github.com` へ中継する。
   `GET /user` と権限チェックだけは bot トークンで応答できないため Worker が合成する。
 - コミットの `message` に `Editor: <メールアドレス>` を追記する（本文には出さない）。
+- **画像アップロード**（`/cms/media`）: multipart で受けた画像を MIME / サイズ検証し、
+  Images バインディングで長辺 1920px へ縮小（拡大はしない）+ WebP 変換、R2 へ保存し、
+  `ASSETS_BASE_URL` 配下の公開 URL を返す。`/admin` 側は `image-r2` カスタムウィジェット
+  （`public/admin/r2-image-widget.js`）がこれを呼ぶ。
 
 ```
 編集者 → Cloudflare Access → /admin (Decap)
@@ -44,6 +48,16 @@ bun run dev
 bunx wrangler secret put GITHUB_APP_PRIVATE_KEY   # PKCS#8 PEM を貼り付け
 ```
 
+## R2（画像）
+
+```sh
+bunx wrangler r2 bucket create shikosai34-cms-media
+```
+
+- バケットにカスタムドメイン（例 `assets.shikosai.net`）を割り当て、公開配信を有効化。
+- `wrangler.jsonc` の `ASSETS_BASE_URL` をそのドメインに合わせる。
+- Images バインディング（`IMAGES`）は追加設定不要。
+
 ## デプロイ
 
 1. `wrangler.jsonc` の `routes` を有効化し、本番ホスト名（`34.shikosai.net` 等）を確定。
@@ -54,10 +68,12 @@ bunx wrangler secret put GITHUB_APP_PRIVATE_KEY   # PKCS#8 PEM を貼り付け
 
 ## 未完了・注意（WIP）
 
-- 実ホストが未確定のため未デプロイ・未検証。`base_url` 等は仮の `34.shikosai.net`。
-- 画像は当面 `public/uploads` へコミットされる。R2 + Images Binding への差し替えは後続。
+- 実ホストが未確定のため未デプロイ・未検証。`base_url` / `ASSETS_BASE_URL` 等は仮値。
+- Images バインディングの `transform().output()` の戻り値の扱いは実接続で要確認。
+- Markdown 本文中に挿入する画像は従来どおり `public/uploads` へコミットされる
+  （見出し画像フィールドのみ R2）。
 - Decap の GitHub backend が初期化時に呼ぶエンドポイントは実接続で要確認
   （`/user`・`/repos/:repo`・権限チェックは対応済み）。
+- `image-r2` ウィジェットは `local_backend`（`npx decap-server`）では `/cms/media` が無いため
+  アップロードできない。実機確認はデプロイ後。
 - editorial workflow（下書きの PR 化）は未対応。`config.yml` は simple mode。
-- ローカルで Access JWT を用意できないため、`bun run dev` 単体でのプロキシ検証は限定的。
-  当面は `local_backend`（`npx decap-server`）でコンテンツ編集を確認する。
