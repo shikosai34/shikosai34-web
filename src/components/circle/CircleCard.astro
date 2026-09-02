@@ -29,7 +29,7 @@ function snsIcon(label: string) {
 }
 ---
 
-<article class="flex gap-3 rounded-xl border border-base p-3">
+<article class="flex gap-3 rounded-xl bg-base p-3">
 	{
 		image ? (
 			<img
@@ -40,7 +40,7 @@ function snsIcon(label: string) {
 			/>
 		) : (
 			<div
-				class="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg bg-base text-[0.625rem] text-text"
+				class="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg bg-text text-[0.625rem] text-base"
 				aria-hidden="true"
 			>
 				画像準備中
@@ -49,18 +49,18 @@ function snsIcon(label: string) {
 	}
 
 	<div class="flex min-w-0 flex-1 flex-col gap-1">
-		<h3 class="font-bold text-base">{name}</h3>
+		<h3 class="font-bold text-text">{name}</h3>
 
-		<p class="flex items-center gap-1.5 text-sm text-base">
+		<p class="flex items-center gap-1.5 text-sm text-text">
 			<CalendarIcon className="h-3.5 w-3.5 shrink-0" />
 			<span class="truncate">{schedule}</span>
 		</p>
-		<p class="flex items-center gap-1.5 text-sm text-base">
+		<p class="flex items-center gap-1.5 text-sm text-text">
 			<MapPinIcon className="h-3.5 w-3.5 shrink-0" />
 			<span class="truncate">{location}</span>
 		</p>
 
-		<p class="line-clamp-2 text-sm text-base">{description}</p>
+		<p class="line-clamp-2 text-sm text-text">{description}</p>
 
 		{
 			snsLinks.length > 0 && (
@@ -72,7 +72,7 @@ function snsIcon(label: string) {
 								href={link.url}
 								target="_blank"
 								rel="noopener noreferrer"
-								class="text-base"
+								class="text-text"
 								aria-label={link.label}
 							>
 								<Icon className="h-4 w-4" />
