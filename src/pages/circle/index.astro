@@ -42,7 +42,7 @@ for (const circle of circles) {
 	<Header client:load logoSrc={logoW.src} />
 
 	<main class="mx-auto w-full max-w-3xl px-4 pb-16">
-		<section class="mt-8">
+		<section class="mt-8 rounded-2xl bg-base p-4 pt-6 pb-6">
 			<div class="flex items-baseline justify-between gap-4">
 				<SectionHeading title="Circle" />
 				<a href="#circle-list" class="shrink-0 text-sm text-text/70 hover:text-accent">
@@ -52,12 +52,10 @@ for (const circle of circles) {
 
 			{
 				circles.length === 0 ? (
-					<p class="rounded-2xl bg-base p-8 text-center text-sm text-text/70">
-						サークル情報は準備中です。
-					</p>
+					<p class="py-8 text-center text-sm text-text/70">サークル情報は準備中です。</p>
 				) : (
 					<div id="circle-list">
-						<label class="search-box mb-4 flex items-center gap-2 rounded-xl bg-base px-3 py-2">
+						<label class="search-box mb-4 flex items-center gap-2 rounded-xl bg-text/10 px-3 py-2">
 							<span class="text-text/50" aria-hidden="true">
 								🔍
 							</span>
