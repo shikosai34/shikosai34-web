@@ -4,8 +4,8 @@
 
 # GitHub App「decap-cms-shikosai34-web」
 GITHUB_APP_ID=4801354
-# リポジトリへインストール後に取得: gh api /repos/shikosai34/shikosai34-web/installation --jq .id
-GITHUB_APP_INSTALLATION_ID=
+# gh api /orgs/shikosai34/installations --jq '.installations[] | select(.app_slug=="decap-cms-shikosai34-web").id'
+GITHUB_APP_INSTALLATION_ID=158405949
 # .pem を base64 で1行にしたもの: base64 -w0 decap-cms-shikosai34-web.*.private-key.pem
 GITHUB_APP_PRIVATE_KEY_BASE64=
 
