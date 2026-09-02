@@ -42,28 +42,28 @@ for (const circle of circles) {
 	<Header client:load logoSrc={logoW.src} />
 
 	<main class="mx-auto w-full max-w-3xl px-4 pb-16">
-		<section class="mt-8 rounded-2xl bg-base p-4 pt-6 pb-6">
+		<section class="mt-8">
 			<div class="flex items-baseline justify-between gap-4">
-				<SectionHeading title="Circle" />
-				<a href="#circle-list" class="shrink-0 text-sm text-text/70 hover:text-accent">
+				<SectionHeading title="Circle" tone="dark" />
+				<a href="#circle-list" class="shrink-0 text-sm text-base/60 hover:text-base">
 					このページの目次
 				</a>
 			</div>
 
 			{
 				circles.length === 0 ? (
-					<p class="py-8 text-center text-sm text-text/70">サークル情報は準備中です。</p>
+					<p class="py-8 text-center text-sm text-base/60">サークル情報は準備中です。</p>
 				) : (
 					<div id="circle-list">
-						<label class="search-box mb-4 flex items-center gap-2 rounded-xl bg-text/10 px-3 py-2">
-							<span class="text-text/50" aria-hidden="true">
+						<label class="search-box mb-4 flex items-center gap-2 rounded-xl border border-base/15 bg-base/5 px-3 py-2">
+							<span class="text-base/40" aria-hidden="true">
 								🔍
 							</span>
 							<input
 								type="search"
 								name="q"
 								placeholder="キーワードで検索（例: たこ焼き）"
-								class="w-full bg-transparent text-sm text-text placeholder:text-text/40 focus:outline-none"
+								class="w-full bg-transparent text-sm text-base placeholder:text-base/40 focus:outline-none"
 								autocomplete="off"
 							/>
 						</label>
@@ -91,13 +91,13 @@ for (const circle of circles) {
 						</div>
 
 						<div class="mt-4 flex items-center gap-3">
-							<p class="circle-count text-sm text-text/70">全 {circles.length} 件</p>
-							<button type="button" class="circle-clear text-sm text-accent hover:underline" hidden>
+							<p class="circle-count text-sm text-base/60">全 {circles.length} 件</p>
+							<button type="button" class="circle-clear text-sm text-base underline hover:no-underline" hidden>
 								絞り込みを解除
 							</button>
 						</div>
 
-						<p class="circle-empty mt-6 text-sm text-text/70" role="status" hidden>
+						<p class="circle-empty mt-6 text-sm text-base/60" role="status" hidden>
 							該当するサークルはありません。
 						</p>
 
@@ -136,22 +136,22 @@ for (const circle of circles) {
 	}
 
 	.circle-filter__btn {
-		border: 1px solid color-mix(in srgb, var(--color-text) 30%, transparent);
+		border: 1px solid color-mix(in srgb, var(--color-base) 25%, transparent);
 		border-radius: 9999px;
 		padding: 0.25rem 0.75rem;
 		font-size: 0.875rem;
-		color: color-mix(in srgb, var(--color-text) 80%, transparent);
+		color: color-mix(in srgb, var(--color-base) 75%, transparent);
 		transition:
 			background-color 0.15s,
 			color 0.15s,
 			border-color 0.15s;
 	}
 	.circle-filter__btn:disabled {
-		opacity: 0.4;
+		opacity: 0.35;
 	}
 	.circle-filter__btn.is-active {
-		background: var(--color-accent);
-		border-color: var(--color-accent);
+		background: var(--color-main);
+		border-color: var(--color-main);
 		color: var(--color-base);
 	}
 </style>
