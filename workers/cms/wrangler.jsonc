@@ -10,6 +10,9 @@
 	// "routes": [{ "pattern": "34.shikosai.net/cms/*", "zone_name": "shikosai.net" }],
 
 	"images": { "binding": "IMAGES" },
+
+	// コードは env.MEDIA_BUCKET を使う。`wrangler dev` から本番バケットを
+	// 直接触りたい場合は "remote": true を足す。
 	"r2_buckets": [{ "binding": "MEDIA_BUCKET", "bucket_name": "shikosai34-cms-media" }],
 
 	// 秘密でない識別子はここに置く。秘密鍵は `wrangler secret put GITHUB_APP_PRIVATE_KEY`。
