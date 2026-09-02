@@ -1,0 +1,101 @@
+---
+import { getCollection } from 'astro:content';
+import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
+import logoW from '../../assets/logo/yokogaki/HOL_W-trimmed.png';
+import kosenLogo from '../../assets/logo/kosen/footer.svg';
+import Footer from '../../components/layout/Footer';
+import Header from '../../components/layout/Header';
+import Layout from '../../layouts/Layout.astro';
+import { CIRCLE_CATEGORY_LABELS } from '../../lib/circles';
+
+export async function getStaticPaths() {
+	const circles = await getCollection('circles');
+	return circles.map((circle) => ({
+		params: { slug: circle.id },
+		props: { circle },
+	}));
+}
+
+const { circle } = Astro.props;
+const { name, category, location, schedule, description, image, snsLinks, fesflowPlanned, fesflowUrl } =
+	circle.data;
+---
+
+<Layout title={`${name} | サークル | 第34回 茨香祭`}>
+	<Header client:load logoSrc={logoW.src} />
+
+	<main class="mx-auto w-full max-w-2xl px-4 pb-16">
+		<article class="mt-8 rounded-2xl border border-base bg-base p-5 text-text">
+			<a href="/circle" class="text-sm text-text underline hover:no-underline">← サークル一覧へ</a>
+
+			<div class="mt-4 overflow-hidden rounded-xl">
+				{
+					image ? (
+						<img src={image} alt="" class="aspect-video w-full object-cover" />
+					) : (
+						<div
+							class="flex aspect-video w-full items-center justify-center bg-text text-sm text-base"
+							aria-hidden="true"
+						>
+							画像準備中
+						</div>
+					)
+				}
+			</div>
+
+			<span class="mt-4 inline-block rounded border border-text px-2 py-0.5 text-xs text-text">
+				{CIRCLE_CATEGORY_LABELS[category]}
+			</span>
+			<h1 class="mt-2 text-2xl font-bold text-text">{name}</h1>
+
+			<dl class="mt-4 grid grid-cols-[4rem_1fr] gap-y-2 text-sm text-text">
+				<dt class="font-medium">日時</dt>
+				<dd>{schedule}</dd>
+				<dt class="font-medium">場所</dt>
+				<dd>{location}</dd>
+			</dl>
+
+			<p class="mt-4 whitespace-pre-line text-text">{description}</p>
+
+			{
+				snsLinks.length > 0 && (
+					<ul class="mt-4 flex flex-wrap gap-4 text-sm">
+						{snsLinks.map((link) => (
+							<li>
+								<a
+									href={link.url}
+									target="_blank"
+									rel="noopener noreferrer"
+									class="text-text underline hover:no-underline"
+								>
+									{link.label}
+								</a>
+							</li>
+						))}
+					</ul>
+				)
+			}
+
+			<div class="mt-6 border-t border-text pt-4">
+				{
+					fesflowPlanned && fesflowUrl ? (
+						<a
+							href={fesflowUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="inline-block rounded-lg bg-accent px-4 py-2 text-sm font-bold text-base"
+						>
+							FesFlow で見る
+						</a>
+					) : fesflowPlanned ? (
+						<p class="text-sm text-text">FesFlow ページは準備中です。</p>
+					) : (
+						<p class="text-sm text-text">当日は会場でのご案内となります。</p>
+					)
+				}
+			</div>
+		</article>
+	</main>
+
+	<Footer logoSrc={logoG.src} kosenLogoSrc={kosenLogo.src} />
+</Layout>

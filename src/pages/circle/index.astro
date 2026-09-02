@@ -27,11 +27,8 @@ for (const circle of circles) {
 	countByCategory.set(circle.data.category, (countByCategory.get(circle.data.category) ?? 0) + 1);
 }
 
-// 該当のあるカテゴリだけ絞り込みボタンを出す（空カテゴリの無効表示を作らない）。
-const filterGroups = CIRCLE_CATEGORY_GROUPS.map((group) => ({
-	label: group.label,
-	options: group.options.filter((option) => countByCategory.get(option.value)),
-})).filter((group) => group.options.length > 0);
+// 学年（1〜5年生）・種別のボタンは常に全て出す。該当0のときは「該当なし」を表示する。
+const filterGroups = CIRCLE_CATEGORY_GROUPS;
 
 const searchTextById = new Map<string, string>();
 for (const circle of circles) {
@@ -112,12 +109,14 @@ for (const circle of circles) {
 						<ul class="circle-grid mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
 							{circles.map((circle) => (
 								<li data-category={circle.data.category} data-search={searchTextById.get(circle.id)}>
-									<CircleCard
-										name={circle.data.name}
-										category={circle.data.category}
-										location={circle.data.location}
-										image={circle.data.image}
-									/>
+									<a href={`/circle/${circle.id}`} class="block h-full rounded-xl">
+										<CircleCard
+											name={circle.data.name}
+											category={circle.data.category}
+											location={circle.data.location}
+											image={circle.data.image}
+										/>
+									</a>
 								</li>
 							))}
 						</ul>
