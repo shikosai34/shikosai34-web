@@ -1,8 +1,8 @@
 ---
 title: 公式ロゴが完成しました
-slug: logo
+slug: logo-released
 publishedAt: 2026-09-02T16:15:00+09:00
-updatedAt: ""
+updatedAt: 2026-09-02T16:22:00+09:00
 category: update
 description: 第34回茨香祭の公式ロゴが完成しました。
 draft: false
