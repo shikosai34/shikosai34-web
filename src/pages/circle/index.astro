@@ -1,0 +1,149 @@
+---
+import { getCollection } from 'astro:content';
+import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
+import logoW from '../../assets/logo/yokogaki/HOL_W-trimmed.png';
+import kosenLogo from '../../assets/logo/kosen/footer.svg';
+import CircleCard from '../../components/circle/CircleCard.astro';
+import Footer from '../../components/layout/Footer';
+import Header from '../../components/layout/Header';
+import SectionHeading from '../../components/ui/SectionHeading';
+import Layout from '../../layouts/Layout.astro';
+import { CIRCLE_CATEGORIES, CIRCLE_CATEGORY_LABELS } from '../../lib/circles';
+
+const circles = (await getCollection('circles')).sort((a, b) => {
+	const ao = a.data.order ?? Number.POSITIVE_INFINITY;
+	const bo = b.data.order ?? Number.POSITIVE_INFINITY;
+	if (ao !== bo) return ao - bo;
+	return a.data.nameKana.localeCompare(b.data.nameKana, 'ja');
+});
+
+const countByCategory = new Map<string, number>();
+for (const circle of circles) {
+	countByCategory.set(circle.data.category, (countByCategory.get(circle.data.category) ?? 0) + 1);
+}
+const activeCategories = CIRCLE_CATEGORIES.filter((category) => countByCategory.get(category));
+---
+
+<Layout title="サークル一覧 | 第34回 茨香祭">
+	<Header client:load logoSrc={logoW.src} />
+
+	<main class="mx-auto w-full max-w-3xl px-4 pb-16">
+		<section class="mt-8">
+			<SectionHeading title="Circle" />
+
+			{
+				circles.length === 0 ? (
+					<p class="rounded-2xl bg-base p-8 text-center text-sm text-text/70">
+						サークル情報は準備中です。
+					</p>
+				) : (
+					<div>
+						<div
+							class="circle-filter flex flex-wrap gap-2"
+							role="group"
+							aria-label="カテゴリで絞り込み"
+						>
+							<button
+								type="button"
+								class="circle-filter__btn is-active"
+								data-filter="all"
+								aria-pressed="true"
+							>
+								すべて（{circles.length}）
+							</button>
+							{activeCategories.map((category) => (
+								<button
+									type="button"
+									class="circle-filter__btn"
+									data-filter={category}
+									aria-pressed="false"
+								>
+									{CIRCLE_CATEGORY_LABELS[category]}（{countByCategory.get(category)}）
+								</button>
+							))}
+						</div>
+
+						<p class="circle-empty mt-6 text-sm text-text/70" role="status" hidden>
+							該当するサークルはありません。
+						</p>
+
+						<ul class="circle-grid mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+							{circles.map((circle) => (
+								<li data-category={circle.data.category}>
+									<CircleCard
+										name={circle.data.name}
+										category={circle.data.category}
+										location={circle.data.location}
+										image={circle.data.image}
+									/>
+								</li>
+							))}
+						</ul>
+					</div>
+				)
+			}
+		</section>
+	</main>
+
+	<Footer logoSrc={logoG.src} kosenLogoSrc={kosenLogo.src} />
+</Layout>
+
+<style>
+	.circle-filter__btn {
+		border: 1px solid color-mix(in srgb, var(--color-text) 30%, transparent);
+		border-radius: 9999px;
+		padding: 0.25rem 0.75rem;
+		font-size: 0.875rem;
+		color: color-mix(in srgb, var(--color-text) 80%, transparent);
+		transition:
+			background-color 0.15s,
+			color 0.15s,
+			border-color 0.15s;
+	}
+	.circle-filter__btn.is-active {
+		background: var(--color-accent);
+		border-color: var(--color-accent);
+		color: var(--color-base);
+	}
+</style>
+
+<script>
+	// カテゴリ絞り込み（F-04）。JS が動かない場合は全件表示のまま（docs/design §4.1）。
+	const buttons = Array.from(
+		document.querySelectorAll<HTMLButtonElement>('.circle-filter__btn'),
+	);
+	const items = Array.from(document.querySelectorAll<HTMLLIElement>('.circle-grid > li'));
+	const empty = document.querySelector<HTMLElement>('.circle-empty');
+
+	if (buttons.length > 0 && items.length > 0) {
+		const apply = (filter: string) => {
+			let shown = 0;
+			for (const item of items) {
+				const match = filter === 'all' || item.dataset.category === filter;
+				item.hidden = !match;
+				if (match) shown += 1;
+			}
+			for (const button of buttons) {
+				const active = button.dataset.filter === filter;
+				button.classList.toggle('is-active', active);
+				button.setAttribute('aria-pressed', String(active));
+			}
+			if (empty) empty.hidden = shown !== 0;
+
+			const params = new URLSearchParams(location.search);
+			if (filter === 'all') params.delete('category');
+			else params.set('category', filter);
+			const query = params.toString();
+			history.replaceState(null, '', query ? `?${query}` : location.pathname);
+		};
+
+		for (const button of buttons) {
+			button.addEventListener('click', () => apply(button.dataset.filter ?? 'all'));
+		}
+
+		const initial = new URLSearchParams(location.search).get('category');
+		if (initial && buttons.some((button) => button.dataset.filter === initial)) {
+			apply(initial);
+		}
+	}
+</script>
