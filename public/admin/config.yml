@@ -13,7 +13,7 @@ backend:
   name: github
   repo: shikosai34/shikosai34-web
   branch: main # TODO(#17): Cloudflare のデプロイ対象ブランチに合わせて確認する
-  # CMS Backend Worker（workers/cms）。TODO(#17): 本番ホスト名を確定する。
+  # CMS Backend Worker（workers/cms）。34.shikosai.net/cms/* にマウント。
   base_url: https://34.shikosai.net
   api_root: https://34.shikosai.net/cms/github
   auth_endpoint: cms/auth

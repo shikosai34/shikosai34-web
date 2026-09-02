@@ -50,24 +50,24 @@ bunx wrangler secret put GITHUB_APP_PRIVATE_KEY   # PKCS#8 PEM を貼り付け
 
 ## インフラ構築（`scripts/setup-infra.sh`）
 
-R2 バケット・カスタムドメイン・Worker route・`wrangler.jsonc` / `config.yml` の
-ホスト名置換をまとめて行う（冪等）。`wrangler` ログイン済みが前提。
+確定済みの構成:
+
+| 項目 | 値 |
+| --- | --- |
+| サイト | `34.shikosai.net`（ゾーン `shikosai.net`）、`/cms/*` に Worker route |
+| 画像配信 | `assets.34.shikosai.net`（R2 `shikosai34-cms-media`） |
+| Access | `/admin` は設定済み。`/cms` を同じ Access アプリの destination に追加する |
+
+R2 バケットとカスタムドメインを冪等に作る（`wrangler` ログイン済みが前提）:
 
 ```sh
 cd workers/cms
-SITE_HOST=34.shikosai.net \
-ZONE_NAME=shikosai.net \
-CF_ZONE_ID=<ゾーンID> \
-ASSETS_HOST=assets.shikosai.net \
-ALLOWED_EMAIL_DOMAIN=shikosai.net \
-CF_API_TOKEN=<Access編集権限のトークン> \
-./scripts/setup-infra.sh
+CF_ZONE_ID=<shikosai.net の Zone ID> ./scripts/setup-infra.sh
 ```
 
-- `CF_ZONE_ID`: ダッシュボード → 対象ゾーン → Overview → API の "Zone ID"。
-- `CF_API_TOKEN`: Zero Trust Access は wrangler の OAuth スコープ外なので別途必要
-  （Account → Access: Apps and Policies → Edit）。未指定なら Access アプリ作成のみスキップ。
+- `CF_ZONE_ID`: ダッシュボード → `shikosai.net` → Overview → API の "Zone ID"。
 - Images バインディング（`IMAGES`）は追加設定不要。
+- Zero Trust Access は wrangler の OAuth スコープ外。`/cms` の追加はダッシュボードで行う。
 
 ## デプロイ
 

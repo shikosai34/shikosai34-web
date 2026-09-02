@@ -6,9 +6,8 @@
 	"compatibility_date": "2024-11-01",
 	"observability": { "enabled": true },
 
-	// サイトと同一ゾーンの /cms/* に割り当てる。
-	// TODO(#17): 本番ホスト名を確定して有効化する（scripts/setup-infra.sh が sed で置換）。
-	// "routes": [{ "pattern": "PLACEHOLDER_SITE_HOST/cms/*", "zone_name": "PLACEHOLDER_ZONE_NAME" }],
+	// サイトと同一ゾーンの /cms/* に割り当てる（/admin と同一オリジン）。
+	"routes": [{ "pattern": "34.shikosai.net/cms/*", "zone_name": "shikosai.net" }],
 
 	"images": { "binding": "IMAGES" },
 
@@ -24,7 +23,7 @@
 		"CF_ACCESS_AUD": "7cdca2ac0c2bdc964816d2b42166c16e79b633b47077d32b928fb96cbd30d652",
 		"GITHUB_APP_ID": "4801354",
 		"GITHUB_APP_INSTALLATION_ID": "158405949",
-		// TODO(#17): R2 バケット shikosai34-cms-media のカスタムドメインを設定する。
-		"ASSETS_BASE_URL": "https://assets.shikosai.net"
+		// R2 バケット shikosai34-cms-media のカスタムドメイン。
+		"ASSETS_BASE_URL": "https://assets.34.shikosai.net"
 	}
 }
