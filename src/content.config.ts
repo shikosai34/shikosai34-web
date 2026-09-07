@@ -1,6 +1,7 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { CIRCLE_CATEGORIES } from './lib/circles';
+import { EVENT_GENRES, EVENT_STATUSES, FESTIVAL_DAYS, getEventDayKey } from './lib/events';
 import { NEWS_CATEGORIES } from './lib/news';
 
 /**
@@ -81,4 +82,55 @@ const circles = defineCollection({
 	}),
 });
 
-export const collections = { news, circles };
+/**
+ * 体育館ステージの企画（`/event`、`/timetable`）。
+ *
+ * CMS では開始・終了をタイムゾーン付き日時として入力する。会場は体育館のみのため
+ * 編集項目にはせず、コンテンツ側で固定値を補う。
+ */
+const events = defineCollection({
+	loader: glob({ pattern: '**/[^_]*.md', base: './content/events' }),
+	schema: z
+		.object({
+			title: z.string().min(1),
+			slug: z.string().optional(),
+			/** 出演団体名。個人名や連絡先は掲載しない。 */
+			performer: z.string().min(1),
+			startAt: z.coerce.date(),
+			endAt: z.coerce.date(),
+			genre: z.enum(EVENT_GENRES).default('other'),
+			status: z.enum(EVENT_STATUSES).default('scheduled'),
+			venue: z.literal('体育館').default('体育館'),
+			image: z.string().optional(),
+			description: z.string().optional(),
+			draft: z.boolean().default(false),
+		})
+		.superRefine((event, ctx) => {
+			if (event.endAt <= event.startAt) {
+				ctx.addIssue({
+					code: 'custom',
+					path: ['endAt'],
+					message: '終了日時は開始日時より後にしてください。',
+				});
+			}
+
+			const startDay = getEventDayKey(event.startAt);
+			const endDay = getEventDayKey(event.endAt);
+			if (!FESTIVAL_DAYS.some((day) => day.date === startDay)) {
+				ctx.addIssue({
+					code: 'custom',
+					path: ['startAt'],
+					message: '開始日時は開催日（2026年10月24日または25日）を指定してください。',
+				});
+			}
+			if (startDay !== endDay) {
+				ctx.addIssue({
+					code: 'custom',
+					path: ['endAt'],
+					message: '開始日時と終了日時は同じ開催日にしてください。',
+				});
+			}
+		}),
+});
+
+export const collections = { news, circles, events };

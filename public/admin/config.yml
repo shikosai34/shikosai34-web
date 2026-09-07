@@ -1,4 +1,4 @@
-# Decap CMS 設定 — お知らせ（/news）とサークル（/circle）
+# Decap CMS 設定 — お知らせ、サークル、体育館ステージ企画
 #
 # アクセス制御と GitHub 書き込み:
 #   /admin/* と /cms/*（CMS Backend Worker）を Cloudflare Zero Trust Access で保護する。
@@ -160,3 +160,83 @@ collections:
         value_type: int
         hint: '小さいほど前に表示。未入力なら「かな」順。'
       - { label: 紹介文, name: body, widget: markdown }
+
+  - name: events
+    label: ステージ企画
+    label_singular: ステージ企画
+    description: '体育館ステージの企画を管理します。開始日時順に /event と /timetable へ反映されます。'
+    folder: content/events
+    create: true
+    slug: '{{fields.slug}}'
+    identifier_field: title
+    summary: '{{fields.startAt}}｜{{fields.title}}'
+    sortable_fields: [startAt, endAt, title, performer]
+    view_filters:
+      - { label: 1日目（10月24日）, field: startAt, pattern: '^2026-10-24' }
+      - { label: 2日目（10月25日）, field: startAt, pattern: '^2026-10-25' }
+      - { label: 時間変更あり, field: status, pattern: 'changed' }
+      - { label: 中止, field: status, pattern: 'cancelled' }
+    fields:
+      - { label: 企画名, name: title, widget: string }
+      - label: URL 識別子
+        name: slug
+        widget: string
+        hint: 'URL の末尾に使う半角英数字とハイフン（例: brass-band）。公開後は変更しないでください。'
+        pattern:
+          ['^[a-z0-9]+(?:-[a-z0-9]+)*$', '半角の英小文字・数字・ハイフンのみで入力してください']
+      - label: 出演団体
+        name: performer
+        widget: string
+        hint: '公開する団体名を入力してください。個人名や連絡先は入力しないでください。'
+      - label: 開始日時
+        name: startAt
+        widget: datetime
+        date_format: 'YYYY-MM-DD'
+        time_format: 'HH:mm'
+        format: 'YYYY-MM-DD[T]HH:mm:ss[+09:00]'
+        picker_utc: false
+        hint: '開催日の2026年10月24日または25日を選んでください。'
+      - label: 終了日時
+        name: endAt
+        widget: datetime
+        date_format: 'YYYY-MM-DD'
+        time_format: 'HH:mm'
+        format: 'YYYY-MM-DD[T]HH:mm:ss[+09:00]'
+        picker_utc: false
+        hint: '開始日時と同じ日で、開始より後の時刻を選んでください。'
+      - label: ジャンル
+        name: genre
+        widget: select
+        default: other
+        options:
+          - { label: 音楽, value: music }
+          - { label: ダンス, value: dance }
+          - { label: パフォーマンス, value: performance }
+          - { label: 大会・コンテスト, value: contest }
+          - { label: 式典, value: ceremony }
+          - { label: その他, value: other }
+      - label: 当日の状態
+        name: status
+        widget: select
+        default: scheduled
+        options:
+          - { label: 予定どおり, value: scheduled }
+          - { label: 時間変更あり, value: changed }
+          - { label: 中止, value: cancelled }
+        hint: '直前の変更を来場者へ目立たせたい場合に切り替えます。'
+      - label: 見出し画像
+        name: image
+        widget: image-r2
+        required: false
+        hint: '未入力でも公開できます。画像がある場合は自動でリサイズ・WebP 変換して R2 に保存します。'
+      - label: 短い説明
+        name: description
+        widget: text
+        required: false
+        hint: '詳細ページの冒頭に表示する1〜2文の説明です。'
+      - label: 下書き
+        name: draft
+        widget: boolean
+        default: false
+        hint: 'オンにしている間は本番サイトに表示されません。'
+      - { label: 詳細, name: body, widget: markdown }

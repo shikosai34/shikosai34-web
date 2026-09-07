@@ -1,0 +1,55 @@
+---
+import {
+	EVENT_GENRE_LABELS,
+	EVENT_STATUS_LABELS,
+	formatEventDate,
+	formatEventTimeRange,
+	type EventGenre,
+	type EventStatus,
+} from '../../lib/events';
+
+interface Props {
+	title: string;
+	performer: string;
+	startAt: Date;
+	endAt: Date;
+	genre: EventGenre;
+	status: EventStatus;
+	image?: string | undefined;
+}
+
+const { title, performer, startAt, endAt, genre, status, image } = Astro.props;
+---
+
+<article
+	class="flex h-full flex-col overflow-hidden rounded-xl border border-base bg-base text-text transition-transform hover:-translate-y-0.5"
+>
+	{
+		image ? (
+			<img src={image} alt="" loading="lazy" class="aspect-video w-full object-cover" />
+		) : (
+			<div
+				class="flex aspect-video w-full items-center justify-center bg-text text-xs text-base"
+				aria-hidden="true"
+			>
+				画像準備中
+			</div>
+		)
+	}
+	<div class="flex flex-1 flex-col gap-2 p-4">
+		<div class="flex flex-wrap gap-2 text-xs">
+			<span class="rounded border border-text px-2 py-0.5">{EVENT_GENRE_LABELS[genre]}</span>
+			{
+				status !== 'scheduled' && (
+					<span class="rounded bg-main px-2 py-0.5 font-medium text-base">
+						{EVENT_STATUS_LABELS[status]}
+					</span>
+				)
+			}
+		</div>
+		<p class="text-sm text-accent">{formatEventDate(startAt)} {formatEventTimeRange(startAt, endAt)}</p>
+		<h2 class:list={['text-lg font-medium', status === 'cancelled' && 'line-through']}>{title}</h2>
+		<p class="mt-auto text-sm text-text/80">{performer}</p>
+		<p class="text-xs text-text/70">体育館ステージ</p>
+	</div>
+</article>

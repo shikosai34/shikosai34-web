@@ -354,8 +354,8 @@ Issue の確認事項「`/event` と `/circle` の関係」に対する回答は
 
 - `news` — お知らせ。Markdown（本文を持つため）
 - `circles` — サークル情報。JSON
-- `events` — ステージ企画情報。JSON
-- `timetable` — タイムテーブル。JSON
+- `events` — ステージ企画情報。Markdown（詳細本文を持つため）。開始・終了日時もこのコレクションで管理する
+- タイムテーブルは `events` の開始・終了日時から生成し、同じ予定を二重管理しない
 - `sponsors` — 協賛企業情報。JSON
 - `staff` — 実行委員情報。JSON
 - `goods` — グッズ情報。JSON

@@ -12,7 +12,7 @@ function CrossMark({ className = '' }: { className?: string }) {
 export default function ThemeSection() {
 	return (
 		<section className="mx-4 mt-8 rounded-2xl bg-base p-6 text-text">
-			<div className="w-72 justify-start font-primary text-3xl font-normal text-white">This year's theme</div>
+			<div className="w-72 max-w-full justify-start font-primary text-3xl font-normal text-white">This year's theme</div>
 
 			<div className="mt-2 flex flex-col items-start gap-2">
 				<CrossMark />
