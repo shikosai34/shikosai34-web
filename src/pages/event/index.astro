@@ -1,0 +1,53 @@
+---
+import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
+import logoW from '../../assets/logo/yokogaki/HOL_W-trimmed.png';
+import kosenLogo from '../../assets/logo/kosen/footer.svg';
+import EventCard from '../../components/event/EventCard.astro';
+import Footer from '../../components/layout/Footer';
+import Header from '../../components/layout/Header';
+import SectionHeading from '../../components/ui/SectionHeading';
+import Layout from '../../layouts/Layout.astro';
+import { getVisibleEvents } from '../../lib/events';
+
+const events = await getVisibleEvents();
+---
+
+<Layout title="ステージ企画 | 第34回 茨香祭">
+	<Header client:load logoSrc={logoW.src} />
+
+	<main class="mx-auto w-full max-w-3xl px-4 pb-16">
+		<section class="mt-8">
+			<div class="flex flex-wrap items-baseline justify-between gap-3">
+				<SectionHeading title="Stage Events" tone="dark" />
+				<a href="/timetable" class="text-sm text-base underline hover:no-underline">
+					時系列で見る
+				</a>
+			</div>
+
+			<p class="mb-5 text-sm leading-relaxed text-base/80">
+				体育館ステージで行われる企画の一覧です。時間は変更になる場合があります。
+			</p>
+
+			{
+				events.length === 0 ? (
+					<div class="rounded-2xl border border-base px-5 py-10 text-center">
+						<p class="font-medium text-base">ステージ企画は準備中です。</p>
+						<p class="mt-2 text-sm text-base/70">公開までしばらくお待ちください。</p>
+					</div>
+				) : (
+					<ul class="grid gap-4 sm:grid-cols-2">
+						{events.map((event) => (
+							<li>
+								<a href={`/event/${event.id}`} class="block h-full rounded-xl focus:outline-2 focus:outline-offset-2 focus:outline-base">
+									<EventCard {...event.data} />
+								</a>
+							</li>
+						))}
+					</ul>
+				)
+			}
+		</section>
+	</main>
+
+	<Footer logoSrc={logoG.src} kosenLogoSrc={kosenLogo.src} />
+</Layout>
