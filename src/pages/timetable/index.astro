@@ -28,18 +28,18 @@ const events = await getVisibleEvents();
 				<a href="/event" class="text-sm text-base underline hover:no-underline">企画一覧で見る</a>
 			</div>
 
-			<div class="rounded-2xl bg-base p-4 text-text">
-				<p class="text-sm leading-relaxed text-text/80">
+			<div>
+				<p class="text-sm leading-relaxed text-base/80">
 					体育館ステージの予定を開始時刻順に掲載しています。当日の変更は各企画にも表示します。
 				</p>
-				<nav class="mt-4 grid grid-cols-2 gap-2" aria-label="開催日">
+				<nav class="mt-4 flex flex-wrap gap-2" aria-label="開催日">
 					{FESTIVAL_DAYS.map((day) => (
 						<a
 							href={`#${day.id}`}
-							class="rounded-lg border border-text/50 px-3 py-2 text-center text-sm transition-colors hover:border-accent hover:text-accent focus:outline-2 focus:outline-offset-2 focus:outline-accent"
+							class="rounded-full border border-base px-3 py-1 text-sm text-base transition-colors hover:border-accent hover:text-accent focus:outline-2 focus:outline-offset-2 focus:outline-accent"
 						>
-							<span class="block font-medium">{day.shortLabel}</span>
-							<span class="text-xs text-text/70">{day.label}</span>
+							<span class="font-medium">{day.shortLabel}</span>
+							<span class="ml-1 text-xs text-base/70">{day.label}</span>
 						</a>
 					))}
 				</nav>
@@ -75,17 +75,28 @@ const events = await getVisibleEvents();
 												</div>
 												<a
 													href={`/event/${event.id}`}
-													class="relative rounded-xl border border-base bg-base p-4 text-text transition-transform hover:-translate-y-0.5 focus:outline-2 focus:outline-offset-2 focus:outline-base"
+													data-event-detail
+													class="flex overflow-hidden rounded-xl border border-base bg-base text-text transition-transform hover:-translate-y-0.5 focus:outline-2 focus:outline-offset-2 focus:outline-base"
 												>
-													<span class="absolute top-5 -left-2.5 h-4 w-4 rounded-full border-4 border-text bg-accent" aria-hidden="true" />
-													<div class="flex flex-wrap gap-2 text-xs">
-														<span class="rounded border border-text/60 px-2 py-0.5">{EVENT_GENRE_LABELS[event.data.genre]}</span>
-														{event.data.status !== 'scheduled' && (
-															<span class="rounded bg-main px-2 py-0.5 font-medium text-base">{EVENT_STATUS_LABELS[event.data.status]}</span>
+													<div class="w-24 shrink-0 bg-text sm:w-32">
+														{event.data.image ? (
+															<img src={event.data.image} alt="" loading="lazy" class="h-full w-full object-cover" />
+														) : (
+															<div class="flex h-full min-h-28 items-center justify-center px-2 text-center text-xs text-base" aria-hidden="true">
+																画像準備中
+															</div>
 														)}
 													</div>
-													<h3 class:list={['mt-2 font-medium', event.data.status === 'cancelled' && 'line-through']}>{event.data.title}</h3>
-													<p class="mt-1 text-sm text-text/70">{event.data.performer}</p>
+													<div class="min-w-0 flex-1 p-4">
+														<div class="flex flex-wrap gap-2 text-xs">
+															<span class="rounded border border-text/60 px-2 py-0.5">{EVENT_GENRE_LABELS[event.data.genre]}</span>
+															{event.data.status !== 'scheduled' && (
+																<span class="rounded bg-main px-2 py-0.5 font-medium text-base">{EVENT_STATUS_LABELS[event.data.status]}</span>
+															)}
+														</div>
+														<h3 class:list={['mt-2 font-medium', event.data.status === 'cancelled' && 'line-through']}>{event.data.title}</h3>
+														<p class="mt-1 text-sm text-text/70">{event.data.performer}</p>
+													</div>
 												</a>
 											</li>
 										))}
@@ -101,3 +112,37 @@ const events = await getVisibleEvents();
 
 	<Footer logoSrc={logoG.src} kosenLogoSrc={kosenLogo.src} />
 </Layout>
+
+<script>
+	const scrollKey = `stage-scroll:${location.pathname}${location.search}${location.hash}`;
+	const returnScrollValue = new URLSearchParams(location.search).get('returnScrollY');
+	const returnScrollY = returnScrollValue === null ? Number.NaN : Number(returnScrollValue);
+
+	if (Number.isFinite(returnScrollY)) {
+		requestAnimationFrame(() => window.scrollTo(0, returnScrollY));
+		const url = new URL(location.href);
+		url.searchParams.delete('returnScrollY');
+		history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
+	}
+
+	window.addEventListener('pagehide', () => {
+		sessionStorage.setItem(scrollKey, String(window.scrollY));
+	});
+
+	window.addEventListener('pageshow', (event) => {
+		const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+		if (!event.persisted && navigation?.type !== 'back_forward') return;
+
+		const savedY = Number(sessionStorage.getItem(scrollKey));
+		if (Number.isFinite(savedY)) requestAnimationFrame(() => window.scrollTo(0, savedY));
+	});
+
+	for (const link of document.querySelectorAll<HTMLAnchorElement>('a[data-event-detail]')) {
+		link.addEventListener('click', () => {
+			const url = new URL(link.href);
+			url.searchParams.set('returnTo', `${location.pathname}${location.search}${location.hash}`);
+			url.searchParams.set('returnScrollY', String(Math.round(window.scrollY)));
+			link.href = url.toString();
+		});
+	}
+</script>

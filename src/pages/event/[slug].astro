@@ -30,7 +30,7 @@ const { title, performer, startAt, endAt, genre, status, venue, image, descripti
 
 	<main class="mx-auto w-full max-w-2xl px-4 pb-16">
 		<article class="mt-8 rounded-2xl border border-base bg-base p-5 text-text">
-			<a href="/event" class="text-sm text-text underline hover:no-underline">← ステージ企画一覧へ</a>
+			<a href="/event" data-return-link class="text-sm text-text underline hover:no-underline">← ステージ企画一覧へ</a>
 
 			{
 				image && (
@@ -67,7 +67,7 @@ const { title, performer, startAt, endAt, genre, status, venue, image, descripti
 				<Content />
 			</div>
 
-			<a href="/timetable" class="mt-6 inline-block text-sm text-accent underline hover:no-underline">
+			<a href="/timetable" data-history-back class="mt-6 inline-block text-sm text-accent underline hover:no-underline">
 				タイムテーブルを見る
 			</a>
 		</article>
@@ -75,6 +75,43 @@ const { title, performer, startAt, endAt, genre, status, venue, image, descripti
 
 	<Footer logoSrc={logoG.src} kosenLogoSrc={kosenLogo.src} />
 </Layout>
+
+<script>
+	const referrer = document.referrer ? new URL(document.referrer) : undefined;
+	const returnLink = document.querySelector<HTMLAnchorElement>('a[data-return-link]');
+	const params = new URLSearchParams(location.search);
+	const returnTo = params.get('returnTo');
+	const returnScrollY = params.get('returnScrollY');
+	const returnUrl = returnTo ? new URL(returnTo, location.origin) : undefined;
+
+	if (
+		returnLink &&
+		returnUrl?.origin === location.origin &&
+		(returnUrl.pathname === '/event' || returnUrl.pathname === '/timetable')
+	) {
+		if (returnScrollY) returnUrl.searchParams.set('returnScrollY', returnScrollY);
+		returnLink.href = `${returnUrl.pathname}${returnUrl.search}${returnUrl.hash}`;
+		returnLink.textContent = returnUrl.pathname === '/timetable' ? '← タイムテーブルへ戻る' : '← ステージ企画一覧へ戻る';
+	} else if (
+		returnLink &&
+		referrer?.origin === location.origin &&
+		(referrer.pathname === '/event' || referrer.pathname === '/timetable')
+	) {
+		returnLink.href = `${referrer.pathname}${referrer.search}${referrer.hash}`;
+		returnLink.textContent = referrer.pathname === '/timetable' ? '← タイムテーブルへ戻る' : '← ステージ企画一覧へ戻る';
+		returnLink.dataset.historyBack = '';
+	}
+
+	for (const link of document.querySelectorAll<HTMLAnchorElement>('a[data-history-back]')) {
+		const target = new URL(link.href);
+		if (referrer?.origin !== location.origin || referrer.pathname !== target.pathname) continue;
+
+		link.addEventListener('click', (event) => {
+			event.preventDefault();
+			history.back();
+		});
+	}
+</script>
 
 <style>
 	.event-body :global(a) { text-decoration: underline; }

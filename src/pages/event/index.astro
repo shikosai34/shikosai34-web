@@ -3,13 +3,15 @@ import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
 import logoW from '../../assets/logo/yokogaki/HOL_W-trimmed.png';
 import kosenLogo from '../../assets/logo/kosen/footer.svg';
 import EventCard from '../../components/event/EventCard.astro';
+import SearchIcon from '../../components/icons/SearchIcon';
 import Footer from '../../components/layout/Footer';
 import Header from '../../components/layout/Header';
 import SectionHeading from '../../components/ui/SectionHeading';
 import Layout from '../../layouts/Layout.astro';
-import { getVisibleEvents } from '../../lib/events';
+import { EVENT_GENRE_LABELS, EVENT_GENRES, getVisibleEvents } from '../../lib/events';
 
 const events = await getVisibleEvents();
+const genreFilters = EVENT_GENRES.map((value) => ({ value, label: EVENT_GENRE_LABELS[value] }));
 ---
 
 <Layout title="ステージ企画 | 第34回 茨香祭">
@@ -35,15 +37,60 @@ const events = await getVisibleEvents();
 						<p class="mt-2 text-sm text-base/70">公開までしばらくお待ちください。</p>
 					</div>
 				) : (
-					<ul class="grid gap-4 sm:grid-cols-2">
-						{events.map((event) => (
-							<li>
-								<a href={`/event/${event.id}`} class="block h-full rounded-xl focus:outline-2 focus:outline-offset-2 focus:outline-base">
-									<EventCard {...event.data} />
-								</a>
-							</li>
-						))}
-					</ul>
+					<div id="event-list">
+						<label class="event-search mb-4 flex items-center gap-2 rounded-xl border border-base px-3 py-2">
+							<SearchIcon className="h-4 w-4 shrink-0 text-base" />
+							<input
+								type="search"
+								name="q"
+								placeholder="企画名・出演団体を完全一致で検索"
+								class="w-full bg-transparent text-sm text-base focus:outline-none"
+								autocomplete="off"
+							/>
+						</label>
+
+						<div class="flex flex-wrap gap-2" role="group" aria-label="ジャンルで絞り込み">
+							{genreFilters.map((genre) => (
+								<button
+									type="button"
+									class="rounded-full border border-base px-3 py-1 text-sm text-base transition-colors aria-pressed:border-main aria-pressed:bg-main aria-pressed:font-medium"
+									data-filter={genre.value}
+									aria-pressed="false"
+								>
+									{genre.label}
+								</button>
+							))}
+						</div>
+
+						<div class="mt-4 flex items-center gap-3">
+							<p class="event-count text-sm text-base">全 {events.length} 件</p>
+							<button
+								type="button"
+								class="event-clear text-sm text-base underline hover:no-underline"
+								hidden
+							>
+								絞り込みを解除
+							</button>
+						</div>
+
+						<p class="event-empty mt-6 text-sm text-base" role="status" hidden>
+							該当するステージ企画はありません。
+						</p>
+
+						<ul class="event-grid mt-4 grid gap-4 sm:grid-cols-2">
+							{events.map((event) => (
+								<li
+									data-genre={event.data.genre}
+									data-title={event.data.title}
+									data-performer={event.data.performer}
+								>
+									<a href={`/event/${event.id}`} data-event-detail class="block h-full rounded-xl focus:outline-2 focus:outline-offset-2 focus:outline-base">
+										<EventCard {...event.data} />
+									</a>
+								</li>
+							))}
+						</ul>
+					</div>
 				)
 			}
 		</section>
@@ -51,3 +98,126 @@ const events = await getVisibleEvents();
 
 	<Footer logoSrc={logoG.src} kosenLogoSrc={kosenLogo.src} />
 </Layout>
+
+<script is:inline>
+	document.documentElement.classList.add('js');
+</script>
+
+<style>
+	/* 検索欄はスクリプト前提。JS 無効時でも企画一覧そのものは全件表示する。 */
+	.event-search {
+		display: none;
+	}
+	html.js .event-search {
+		display: flex;
+	}
+</style>
+
+<script>
+	const scrollKey = `stage-scroll:${location.pathname}${location.search}${location.hash}`;
+	const returnScrollValue = new URLSearchParams(location.search).get('returnScrollY');
+	const returnScrollY = returnScrollValue === null ? Number.NaN : Number(returnScrollValue);
+
+	if (Number.isFinite(returnScrollY)) {
+		requestAnimationFrame(() => window.scrollTo(0, returnScrollY));
+		const url = new URL(location.href);
+		url.searchParams.delete('returnScrollY');
+		history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
+	}
+
+	window.addEventListener('pagehide', () => {
+		sessionStorage.setItem(scrollKey, String(window.scrollY));
+	});
+
+	window.addEventListener('pageshow', (event) => {
+		const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+		if (!event.persisted && navigation?.type !== 'back_forward') return;
+
+		const savedY = Number(sessionStorage.getItem(scrollKey));
+		if (Number.isFinite(savedY)) requestAnimationFrame(() => window.scrollTo(0, savedY));
+	});
+
+	for (const link of document.querySelectorAll<HTMLAnchorElement>('a[data-event-detail]')) {
+		link.addEventListener('click', () => {
+			const url = new URL(link.href);
+			url.searchParams.set('returnTo', `${location.pathname}${location.search}${location.hash}`);
+			url.searchParams.set('returnScrollY', String(Math.round(window.scrollY)));
+			link.href = url.toString();
+		});
+	}
+
+	const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('button[data-filter]'));
+	const items = Array.from(document.querySelectorAll<HTMLLIElement>('.event-grid > li'));
+	const input = document.querySelector<HTMLInputElement>('.event-search input');
+	const empty = document.querySelector<HTMLElement>('.event-empty');
+	const count = document.querySelector<HTMLElement>('.event-count');
+	const clearButton = document.querySelector<HTMLButtonElement>('.event-clear');
+	const total = items.length;
+
+	if (buttons.length > 0 && items.length > 0) {
+		let genre = '';
+		let query = '';
+
+		const normalize = (value: string) => value.normalize('NFKC').toLowerCase();
+
+		const render = () => {
+			let shown = 0;
+			for (const item of items) {
+				const matchGenre = genre === '' || item.dataset.genre === genre;
+				const matchQuery =
+					query === '' ||
+					normalize(item.dataset.title ?? '') === query ||
+					normalize(item.dataset.performer ?? '') === query;
+				const visible = matchGenre && matchQuery;
+				item.hidden = !visible;
+				if (visible) shown += 1;
+			}
+
+			for (const button of buttons) {
+				button.setAttribute('aria-pressed', String(button.dataset.filter === genre));
+			}
+
+			const filtered = genre !== '' || query !== '';
+			if (count) count.textContent = filtered ? `${shown} 件` : `全 ${total} 件`;
+			if (empty) empty.hidden = shown !== 0;
+			if (clearButton) clearButton.hidden = !filtered;
+
+			const params = new URLSearchParams();
+			if (genre) params.set('genre', genre);
+			if (query && input) params.set('q', input.value);
+			const qs = params.toString();
+			history.replaceState(null, '', qs ? `?${qs}` : location.pathname);
+		};
+
+		for (const button of buttons) {
+			button.addEventListener('click', () => {
+				genre = button.dataset.filter === genre ? '' : (button.dataset.filter ?? '');
+				render();
+			});
+		}
+
+		input?.addEventListener('input', () => {
+			query = normalize(input.value.trim());
+			render();
+		});
+
+		clearButton?.addEventListener('click', () => {
+			genre = '';
+			query = '';
+			if (input) input.value = '';
+			render();
+		});
+
+		const params = new URLSearchParams(location.search);
+		const initialGenre = params.get('genre') ?? '';
+		if (buttons.some((button) => button.dataset.filter === initialGenre)) {
+			genre = initialGenre;
+		}
+		const initialQuery = params.get('q') ?? '';
+		if (initialQuery && input) {
+			input.value = initialQuery;
+			query = normalize(initialQuery.trim());
+		}
+		if (genre || query) render();
+	}
+</script>
