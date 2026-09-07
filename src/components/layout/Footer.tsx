@@ -21,8 +21,8 @@ const circleLinks = [
 ];
 
 const eventLinks = [
-	{ label: '1日目（10月24日）', href: '/timetable?day=1' },
-	{ label: '2日目（10月25日）', href: '/timetable?day=2' },
+	{ label: '1日目（10月24日）', href: '/timetable#day-1' },
+	{ label: '2日目（10月25日）', href: '/timetable#day-2' },
 ];
 
 const otherLinks = [

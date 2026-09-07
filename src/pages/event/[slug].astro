@@ -1,0 +1,121 @@
+---
+import { getCollection, render } from 'astro:content';
+import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
+import logoW from '../../assets/logo/yokogaki/HOL_W-trimmed.png';
+import kosenLogo from '../../assets/logo/kosen/footer.svg';
+import Footer from '../../components/layout/Footer';
+import Header from '../../components/layout/Header';
+import Layout from '../../layouts/Layout.astro';
+import {
+	EVENT_GENRE_LABELS,
+	EVENT_STATUS_LABELS,
+	formatEventDate,
+	formatEventTimeRange,
+} from '../../lib/events';
+
+export async function getStaticPaths() {
+	const events = await getCollection('events', ({ data }) =>
+		import.meta.env.PROD ? !data.draft : true,
+	);
+	return events.map((event) => ({ params: { slug: event.id }, props: { event } }));
+}
+
+const { event } = Astro.props;
+const { Content } = await render(event);
+const { title, performer, startAt, endAt, genre, status, venue, image, description } = event.data;
+---
+
+<Layout title={`${title} | ステージ企画 | 第34回 茨香祭`}>
+	<Header client:load logoSrc={logoW.src} />
+
+	<main class="mx-auto w-full max-w-2xl px-4 pb-16">
+		<article class="mt-8 rounded-2xl border border-base bg-base p-5 text-text">
+			<a href="/event" data-return-link class="text-sm text-text underline hover:no-underline">← ステージ企画一覧へ</a>
+
+			{
+				image && (
+					<div class="mt-4 overflow-hidden rounded-xl">
+						<img src={image} alt="" class="aspect-video w-full object-cover" />
+					</div>
+				)
+			}
+
+			<div class="mt-4 flex flex-wrap gap-2 text-xs">
+				<span class="rounded border border-text px-2 py-0.5">{EVENT_GENRE_LABELS[genre]}</span>
+				{
+					status !== 'scheduled' && (
+						<span class="rounded bg-main px-2 py-0.5 font-medium text-base">
+							{EVENT_STATUS_LABELS[status]}
+						</span>
+					)
+				}
+			</div>
+
+			<h1 class:list={['mt-2 text-2xl font-bold', status === 'cancelled' && 'line-through']}>{title}</h1>
+			{description && <p class="mt-3 text-sm leading-relaxed text-text/80">{description}</p>}
+
+			<dl class="mt-5 grid grid-cols-[5rem_1fr] gap-y-2 border-y border-text/20 py-4 text-sm">
+				<dt class="font-medium">出演</dt>
+				<dd>{performer}</dd>
+				<dt class="font-medium">日時</dt>
+				<dd>{formatEventDate(startAt)} {formatEventTimeRange(startAt, endAt)}</dd>
+				<dt class="font-medium">会場</dt>
+				<dd>{venue}ステージ</dd>
+			</dl>
+
+			<div class="event-body mt-5 flex flex-col gap-3 leading-relaxed">
+				<Content />
+			</div>
+
+			<a href="/timetable" data-history-back class="mt-6 inline-block text-sm text-accent underline hover:no-underline">
+				タイムテーブルを見る
+			</a>
+		</article>
+	</main>
+
+	<Footer logoSrc={logoG.src} kosenLogoSrc={kosenLogo.src} />
+</Layout>
+
+<script>
+	const referrer = document.referrer ? new URL(document.referrer) : undefined;
+	const returnLink = document.querySelector<HTMLAnchorElement>('a[data-return-link]');
+	const params = new URLSearchParams(location.search);
+	const returnTo = params.get('returnTo');
+	const returnScrollY = params.get('returnScrollY');
+	const returnUrl = returnTo ? new URL(returnTo, location.origin) : undefined;
+
+	if (
+		returnLink &&
+		returnUrl?.origin === location.origin &&
+		(returnUrl.pathname === '/event' || returnUrl.pathname === '/timetable')
+	) {
+		if (returnScrollY) returnUrl.searchParams.set('returnScrollY', returnScrollY);
+		returnLink.href = `${returnUrl.pathname}${returnUrl.search}${returnUrl.hash}`;
+		returnLink.textContent = returnUrl.pathname === '/timetable' ? '← タイムテーブルへ戻る' : '← ステージ企画一覧へ戻る';
+	} else if (
+		returnLink &&
+		referrer?.origin === location.origin &&
+		(referrer.pathname === '/event' || referrer.pathname === '/timetable')
+	) {
+		returnLink.href = `${referrer.pathname}${referrer.search}${referrer.hash}`;
+		returnLink.textContent = referrer.pathname === '/timetable' ? '← タイムテーブルへ戻る' : '← ステージ企画一覧へ戻る';
+		returnLink.dataset.historyBack = '';
+	}
+
+	for (const link of document.querySelectorAll<HTMLAnchorElement>('a[data-history-back]')) {
+		const target = new URL(link.href);
+		if (referrer?.origin !== location.origin || referrer.pathname !== target.pathname) continue;
+
+		link.addEventListener('click', (event) => {
+			event.preventDefault();
+			history.back();
+		});
+	}
+</script>
+
+<style>
+	.event-body :global(a) { text-decoration: underline; }
+	.event-body :global(strong) { font-weight: 700; }
+	.event-body :global(ul) { list-style: disc; padding-left: 1.25rem; }
+	.event-body :global(ol) { list-style: decimal; padding-left: 1.25rem; }
+</style>

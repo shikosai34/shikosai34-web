@@ -9,7 +9,9 @@ import Footer from '../components/layout/Footer';
 import BreakingNewsHero from '../components/home/BreakingNewsHero';
 import ThemeSection from '../components/home/ThemeSection';
 import NewsSection from '../components/home/NewsSection';
+import StageEventSection from '../components/home/StageEventSection';
 import Layout from '../layouts/Layout.astro';
+import { getVisibleEvents } from '../lib/events';
 import { formatNewsDate } from '../lib/news';
 import { getVisibleNews } from '../lib/news-collection';
 
@@ -26,6 +28,15 @@ const latestNews = (await getVisibleNews()).slice(0, 3).map((entry) => ({
 	category: entry.data.category,
 	image: entry.data.image,
 }));
+
+const stageEvents = (await getVisibleEvents()).map((entry) => ({
+	href: `/event/${entry.id}`,
+	title: entry.data.title,
+	performer: entry.data.performer,
+	startAt: entry.data.startAt.toISOString(),
+	endAt: entry.data.endAt.toISOString(),
+	status: entry.data.status,
+}));
 ---
 
 <Layout title="茨香祭速報 | 第34回 茨香祭">
@@ -40,6 +51,7 @@ const latestNews = (await getVisibleNews()).slice(0, 3).map((entry) => ({
 		/>
 
 		<ThemeSection />
+		<StageEventSection client:load events={stageEvents} />
 		<NewsSection items={latestNews} />
 	</main>
 

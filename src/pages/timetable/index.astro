@@ -1,0 +1,148 @@
+---
+import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
+import logoW from '../../assets/logo/yokogaki/HOL_W-trimmed.png';
+import kosenLogo from '../../assets/logo/kosen/footer.svg';
+import Footer from '../../components/layout/Footer';
+import Header from '../../components/layout/Header';
+import SectionHeading from '../../components/ui/SectionHeading';
+import Layout from '../../layouts/Layout.astro';
+import {
+	EVENT_GENRE_LABELS,
+	EVENT_STATUS_LABELS,
+	FESTIVAL_DAYS,
+	formatEventTime,
+	getEventDayKey,
+	getVisibleEvents,
+} from '../../lib/events';
+
+const events = await getVisibleEvents();
+---
+
+<Layout title="タイムテーブル | 第34回 茨香祭">
+	<Header client:load logoSrc={logoW.src} />
+
+	<main class="mx-auto w-full max-w-3xl px-4 pb-16">
+		<section class="mt-8">
+			<div class="flex flex-wrap items-baseline justify-between gap-3">
+				<SectionHeading title="Timetable" tone="dark" />
+				<a href="/event" class="text-sm text-base underline hover:no-underline">企画一覧で見る</a>
+			</div>
+
+			<div>
+				<p class="text-sm leading-relaxed text-base/80">
+					体育館ステージの予定を開始時刻順に掲載しています。当日の変更は各企画にも表示します。
+				</p>
+				<nav class="mt-4 flex flex-wrap gap-2" aria-label="開催日">
+					{FESTIVAL_DAYS.map((day) => (
+						<a
+							href={`#${day.id}`}
+							class="rounded-full border border-base px-3 py-1 text-sm text-base transition-colors hover:border-accent hover:text-accent focus:outline-2 focus:outline-offset-2 focus:outline-accent"
+						>
+							<span class="font-medium">{day.shortLabel}</span>
+							<span class="ml-1 text-xs text-base/70">{day.label}</span>
+						</a>
+					))}
+				</nav>
+			</div>
+
+			<div class="mt-8 space-y-12">
+				{
+					FESTIVAL_DAYS.map((day) => {
+						const dayEvents = events.filter((event) => getEventDayKey(event.data.startAt) === day.date);
+						return (
+							<section id={day.id} class="scroll-mt-24" aria-labelledby={`${day.id}-heading`}>
+								<div class="mb-5 flex items-end justify-between gap-4 border-b-2 border-base pb-2">
+									<div>
+										<p class="text-sm font-medium text-main">{day.shortLabel}</p>
+										<h2 id={`${day.id}-heading`} class="text-xl font-medium text-base">{day.label}</h2>
+									</div>
+									<span class="rounded-full bg-base px-3 py-1 text-xs text-text">体育館</span>
+								</div>
+
+								{dayEvents.length === 0 ? (
+									<div class="rounded-xl border border-base/40 px-5 py-8 text-center text-sm text-base/70">
+										この日の予定は準備中です。
+									</div>
+								) : (
+									<ol class="space-y-3">
+										{dayEvents.map((event) => (
+											<li class="grid grid-cols-[4.5rem_1fr] gap-3 sm:grid-cols-[6rem_1fr]">
+												<div class="pt-4 text-right">
+													<time datetime={event.data.startAt.toISOString()} class="block font-medium text-base">
+														{formatEventTime(event.data.startAt)}
+													</time>
+													<span class="text-xs text-base/60">〜{formatEventTime(event.data.endAt)}</span>
+												</div>
+												<a
+													href={`/event/${event.id}`}
+													data-event-detail
+													class="flex overflow-hidden rounded-xl border border-base bg-base text-text transition-transform hover:-translate-y-0.5 focus:outline-2 focus:outline-offset-2 focus:outline-base"
+												>
+													<div class="w-24 shrink-0 bg-text sm:w-32">
+														{event.data.image ? (
+															<img src={event.data.image} alt="" loading="lazy" class="h-full w-full object-cover" />
+														) : (
+															<div class="flex h-full min-h-28 items-center justify-center px-2 text-center text-xs text-base" aria-hidden="true">
+																画像準備中
+															</div>
+														)}
+													</div>
+													<div class="min-w-0 flex-1 p-4">
+														<div class="flex flex-wrap gap-2 text-xs">
+															<span class="rounded border border-text/60 px-2 py-0.5">{EVENT_GENRE_LABELS[event.data.genre]}</span>
+															{event.data.status !== 'scheduled' && (
+																<span class="rounded bg-main px-2 py-0.5 font-medium text-base">{EVENT_STATUS_LABELS[event.data.status]}</span>
+															)}
+														</div>
+														<h3 class:list={['mt-2 font-medium', event.data.status === 'cancelled' && 'line-through']}>{event.data.title}</h3>
+														<p class="mt-1 text-sm text-text/70">{event.data.performer}</p>
+													</div>
+												</a>
+											</li>
+										))}
+									</ol>
+								)}
+							</section>
+						);
+					})
+				}
+			</div>
+		</section>
+	</main>
+
+	<Footer logoSrc={logoG.src} kosenLogoSrc={kosenLogo.src} />
+</Layout>
+
+<script>
+	const scrollKey = `stage-scroll:${location.pathname}${location.search}${location.hash}`;
+	const returnScrollValue = new URLSearchParams(location.search).get('returnScrollY');
+	const returnScrollY = returnScrollValue === null ? Number.NaN : Number(returnScrollValue);
+
+	if (Number.isFinite(returnScrollY)) {
+		requestAnimationFrame(() => window.scrollTo(0, returnScrollY));
+		const url = new URL(location.href);
+		url.searchParams.delete('returnScrollY');
+		history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
+	}
+
+	window.addEventListener('pagehide', () => {
+		sessionStorage.setItem(scrollKey, String(window.scrollY));
+	});
+
+	window.addEventListener('pageshow', (event) => {
+		const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+		if (!event.persisted && navigation?.type !== 'back_forward') return;
+
+		const savedY = Number(sessionStorage.getItem(scrollKey));
+		if (Number.isFinite(savedY)) requestAnimationFrame(() => window.scrollTo(0, savedY));
+	});
+
+	for (const link of document.querySelectorAll<HTMLAnchorElement>('a[data-event-detail]')) {
+		link.addEventListener('click', () => {
+			const url = new URL(link.href);
+			url.searchParams.set('returnTo', `${location.pathname}${location.search}${location.hash}`);
+			url.searchParams.set('returnScrollY', String(Math.round(window.scrollY)));
+			link.href = url.toString();
+		});
+	}
+</script>
