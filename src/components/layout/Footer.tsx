@@ -41,7 +41,7 @@ export default function Footer({ logoSrc, kosenLogoSrc }: Props) {
 			<div className="flex flex-col items-center">
 				<img src={logoSrc} alt="茨香祭" className="h-16 w-56 object-contain" />
 				<p className="mt-3 text-center text-xs text-text/60">
-					© 2026 Shikousai Extention Committee All Rights Reserved.
+					© 2026 Shikousai Executive Committee All Rights Reserved.
 				</p>
 			</div>
 
