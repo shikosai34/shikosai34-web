@@ -2,6 +2,9 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "shikosai34-web",
 	"compatibility_date": "2025-02-14",
+	"routes": [
+		{ "pattern": "34.shikosai.net", "custom_domain": true }
+	],
 	"assets": {
 		"directory": "./dist",
 		"not_found_handling": "404-page"

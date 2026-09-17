@@ -5,9 +5,15 @@ import '../styles/global.css';
 
 interface Props {
 	title?: string;
+	description?: string;
 }
 
-const { title = '茨香祭 | 第34回 茨城工業高等専門学校 文化祭' } = Astro.props;
+const { 
+	title = '茨香祭 | 第34回 茨城工業高等専門学校 文化祭',
+	description = '第34回 茨城工業高等専門学校 文化祭（茨香祭）の公式Webサイトです。テーマ「守破離」のもと、和風×サイバーパンクの新しい文化祭をお届けします。'
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!doctype html>
@@ -19,6 +25,17 @@ const { title = '茨香祭 | 第34回 茨城工業高等専門学校 文化祭' 
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
+		
+		<!-- SEO & OGP -->
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonicalURL} />
+		<meta property="og:site_name" content="第34回 茨香祭" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={canonicalURL} />
+		<meta property="og:image" content={new URL('/ogp.png', Astro.site)} />
+		<meta name="twitter:card" content="summary_large_image" />
 	</head>
 	<body class="bg-text text-base">
 		<slot />
