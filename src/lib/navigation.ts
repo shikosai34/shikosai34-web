@@ -43,6 +43,8 @@ export const navGroups: NavGroupItem[] = [
 			{ label: '装飾', href: '/decoration' },
 			{ label: '実行委員紹介', href: '/staff' },
 			{ label: '協賛', href: '/sponsor' },
+			{ label: 'プライバシーポリシー', href: '/privacy' },
+			{ label: 'お問い合わせ', href: '/contact' },
 		],
 	},
 ];

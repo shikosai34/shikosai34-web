@@ -1,0 +1,37 @@
+---
+/**
+ * 未作成ページ用の仮ページ。
+ * /circle の「サークル情報は準備中です。」と同じ体裁で「〜は準備中です。」を表示する。
+ */
+import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
+import logoW from '../../assets/logo/yokogaki/HOL_W-trimmed.png';
+import kosenLogo from '../../assets/logo/kosen/footer.svg';
+import Footer from '../layout/Footer';
+import Header from '../layout/Header';
+import SectionHeading from './SectionHeading';
+import Layout from '../../layouts/Layout.astro';
+
+interface Props {
+	/** ページタイトル（日本語）。<title> に「| 第34回 茨香祭」を付けて使う。 */
+	title: string;
+	/** セクション見出し（英語）。SectionHeading に渡す。 */
+	heading: string;
+	/** 準備中メッセージ。省略時は「{title}は準備中です。」 */
+	message?: string;
+}
+
+const { title, heading, message = `${title}は準備中です。` } = Astro.props;
+---
+
+<Layout title={`${title} | 第34回 茨香祭`}>
+	<Header client:load logoSrc={logoW.src} />
+
+	<main class="mx-auto w-full max-w-3xl px-4 pb-16">
+		<section class="mt-8">
+			<SectionHeading title={heading} tone="dark" />
+			<p class="py-8 text-center text-sm text-base">{message}</p>
+		</section>
+	</main>
+
+	<Footer logoSrc={logoG.src} kosenLogoSrc={kosenLogo.src} />
+</Layout>
