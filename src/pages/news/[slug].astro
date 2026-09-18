@@ -1,5 +1,5 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { render } from 'astro:content';
 import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
 import logoW from '../../assets/logo/yokogaki/HOL_W-trimmed.png';
 import kosenLogo from '../../assets/logo/kosen/footer.svg';
@@ -7,10 +7,11 @@ import CalendarIcon from '../../components/icons/CalendarIcon';
 import Footer from '../../components/layout/Footer';
 import Header from '../../components/layout/Header';
 import Layout from '../../layouts/Layout.astro';
+import { getCollectionOrEmpty } from '../../lib/content';
 import { NEWS_CATEGORY_LABELS, formatNewsDate } from '../../lib/news';
 
 export async function getStaticPaths() {
-	const entries = await getCollection('news', ({ data }) =>
+	const entries = await getCollectionOrEmpty('news', ({ data }) =>
 		import.meta.env.PROD ? !data.draft : true,
 	);
 

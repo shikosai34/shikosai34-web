@@ -1,11 +1,12 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { render } from 'astro:content';
 import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
 import logoW from '../../assets/logo/yokogaki/HOL_W-trimmed.png';
 import kosenLogo from '../../assets/logo/kosen/footer.svg';
 import Footer from '../../components/layout/Footer';
 import Header from '../../components/layout/Header';
 import Layout from '../../layouts/Layout.astro';
+import { getCollectionOrEmpty } from '../../lib/content';
 import {
 	EVENT_GENRE_LABELS,
 	EVENT_STATUS_LABELS,
@@ -14,7 +15,7 @@ import {
 } from '../../lib/events';
 
 export async function getStaticPaths() {
-	const events = await getCollection('events', ({ data }) =>
+	const events = await getCollectionOrEmpty('events', ({ data }) =>
 		import.meta.env.PROD ? !data.draft : true,
 	);
 	return events.map((event) => ({ params: { slug: event.id }, props: { event } }));

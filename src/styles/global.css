@@ -13,6 +13,12 @@
 @layer base {
   html {
     overflow-x: hidden;
+    /*
+     * オーバースクロール（バウンス）時に見えるページ外側のキャンバスを紺色にする。
+     * Safari はこの領域に html の background-color しか描かないため、
+     * グラデーション等ではなく単色で指定する。ページ本体の明色は body 側で塗る。
+     */
+    background-color: var(--color-base);
   }
 
   body {
