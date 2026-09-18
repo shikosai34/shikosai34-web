@@ -13,7 +13,11 @@ const {
 	description = '第34回 茨城工業高等専門学校 文化祭（茨香祭）の公式Webサイトです。テーマ「守破離」のもと、和風×サイバーパンクの新しい文化祭をお届けします。'
 } = Astro.props;
 
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+// astro.config.mjs の site を基準に絶対 URL を組み立てる。
+// site 未設定の環境（古い設定で起動した dev サーバーなど）でも落ちないようリクエスト元にフォールバックする。
+const siteOrigin = Astro.site ?? Astro.url;
+const canonicalURL = new URL(Astro.url.pathname, siteOrigin);
+const ogImageURL = new URL('/ogp.png', siteOrigin);
 ---
 
 <!doctype html>
@@ -34,7 +38,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 		<meta property="og:description" content={description} />
 		<meta property="og:type" content="website" />
 		<meta property="og:url" content={canonicalURL} />
-		<meta property="og:image" content={new URL('/ogp.png', Astro.site)} />
+		<meta property="og:image" content={ogImageURL} />
 		<meta name="twitter:card" content="summary_large_image" />
 	</head>
 	<body class="bg-text text-base">
