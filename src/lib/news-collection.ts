@@ -1,4 +1,5 @@
-import { getCollection, type CollectionEntry } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import { getCollectionOrEmpty } from './content';
 
 export type NewsEntry = CollectionEntry<'news'>;
 
@@ -9,7 +10,7 @@ export type NewsEntry = CollectionEntry<'news'>;
  * 開発サーバーでは下書きもプレビューできるよう残す。
  */
 export async function getVisibleNews(): Promise<NewsEntry[]> {
-	const entries = await getCollection('news', ({ data }) =>
+	const entries = await getCollectionOrEmpty('news', ({ data }) =>
 		import.meta.env.PROD ? !data.draft : true,
 	);
 

@@ -1,5 +1,4 @@
 ---
-import { getCollection } from 'astro:content';
 import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
 import logoW from '../../assets/logo/yokogaki/HOL_W-trimmed.png';
 import kosenLogo from '../../assets/logo/kosen/footer.svg';
@@ -14,8 +13,9 @@ import {
 	CIRCLE_CATEGORY_LABELS,
 	normalizeForSearch,
 } from '../../lib/circles';
+import { getCollectionOrEmpty } from '../../lib/content';
 
-const circles = (await getCollection('circles')).sort((a, b) => {
+const circles = (await getCollectionOrEmpty('circles')).sort((a, b) => {
 	const ao = a.data.order ?? Number.POSITIVE_INFINITY;
 	const bo = b.data.order ?? Number.POSITIVE_INFINITY;
 	if (ao !== bo) return ao - bo;

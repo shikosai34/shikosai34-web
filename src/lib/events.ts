@@ -1,4 +1,5 @@
-import { getCollection, type CollectionEntry } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import { getCollectionOrEmpty } from './content';
 
 export const EVENT_GENRES = [
 	'music',
@@ -75,7 +76,7 @@ export function formatEventTimeRange(startAt: Date, endAt: Date): string {
 }
 
 export async function getVisibleEvents(): Promise<EventEntry[]> {
-	const events = await getCollection('events', ({ data }) =>
+	const events = await getCollectionOrEmpty('events', ({ data }) =>
 		import.meta.env.PROD ? !data.draft : true,
 	);
 	return events.sort((a, b) => a.data.startAt.getTime() - b.data.startAt.getTime());
