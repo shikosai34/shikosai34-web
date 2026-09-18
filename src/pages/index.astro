@@ -7,6 +7,7 @@ import kosenLogo from '../assets/logo/kosen/footer.svg';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import BreakingNewsHero from '../components/home/BreakingNewsHero';
+import ThemeModel from '../components/home/ThemeModel';
 import ThemeSection from '../components/home/ThemeSection';
 import NewsSection from '../components/home/NewsSection';
 import StageEventSection from '../components/home/StageEventSection';
@@ -50,7 +51,9 @@ const stageEvents = (await getVisibleEvents()).map((entry) => ({
 			posterAlt="茨香祭速報 第一号：第34回茨香祭テーマ「守破離」決定、ロゴ完成のお知らせ"
 		/>
 
-		<ThemeSection />
+		<ThemeSection>
+			<ThemeModel slot="mark" client:only="react" />
+		</ThemeSection>
 		<StageEventSection client:load events={stageEvents} />
 		<NewsSection items={latestNews} />
 	</main>
