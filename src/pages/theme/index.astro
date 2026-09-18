@@ -4,6 +4,7 @@ import logoW from '../../assets/logo/yokogaki/HOL_W-trimmed.png';
 import kosenLogo from '../../assets/logo/kosen/footer.svg';
 import Footer from '../../components/layout/Footer';
 import Header from '../../components/layout/Header';
+import ThemeModel from '../../components/home/ThemeModel';
 import ThemeSection from '../../components/home/ThemeSection';
 import Layout from '../../layouts/Layout.astro';
 ---
@@ -12,7 +13,9 @@ import Layout from '../../layouts/Layout.astro';
 	<Header client:load logoSrc={logoW.src} />
 
 	<main class="mx-auto w-full max-w-2xl pb-16">
-		<ThemeSection />
+		<ThemeSection>
+			<ThemeModel slot="mark" client:only="react" />
+		</ThemeSection>
 	</main>
 
 	<Footer logoSrc={logoG.src} kosenLogoSrc={kosenLogo.src} />

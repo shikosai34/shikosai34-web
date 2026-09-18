@@ -17,18 +17,22 @@
     "@astrojs/react": "^6.0.4",
     "@astrojs/sitemap": "^3.7.4",
     "@fontsource/kiwi-maru": "^5.3.0",
+    "@react-three/drei": "^10.7.8",
+    "@react-three/fiber": "^9.7.0",
     "@tailwindcss/vite": "^4.3.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",
     "astro": "^7.2.8",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "tailwindcss": "^4.3.3"
+    "tailwindcss": "^4.3.3",
+    "three": "^0.186.0"
   },
   "allowScripts": {
     "esbuild": true
   },
   "devDependencies": {
+    "@types/three": "^0.186.0",
     "wrangler": "^4.128.0"
   }
 }

@@ -11,6 +11,11 @@ export default defineConfig({
   integrations: [react(), sitemap()],
 
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    build: {
+      // トップページの 3D ヒーロー（three.js + React Three Fiber）は 1 チャンクで約 1MB になるため、
+      // 既定の 500kB 警告を抑える。client:only で遅延読み込みされ、他ページには影響しない。
+      chunkSizeWarningLimit: 1200
+    }
   }
 });

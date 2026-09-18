@@ -1,4 +1,4 @@
-
+import type { ReactNode } from 'react';
 
 function CrossMark({ className = '' }: { className?: string }) {
 	return (
@@ -26,14 +26,31 @@ function ShuhariMark({ className = '' }: { className?: string }) {
 	);
 }
 
-export default function ThemeSection() {
+interface Props {
+	/**
+	 * ロゴ「守破離」の位置に差し込む要素（Astro からは slot="mark" で渡す）。
+	 * トップ・テーマページでは 3D モデル（ThemeModel）を入れる。未指定なら静的な SVG を表示する。
+	 */
+	mark?: ReactNode;
+}
+
+export default function ThemeSection({ mark }: Props) {
 	return (
 		<section className="mx-4 mt-8 rounded-2xl bg-base p-6 text-text">
 			<div className="w-72 max-w-full justify-start font-primary text-3xl font-normal text-white">This year's theme</div>
 
 			<div className="mt-2 flex flex-col items-start gap-2">
 				<CrossMark />
-				<ShuhariMark className="h-auto w-full max-w-[18rem] self-center" />
+				{mark ? (
+					<div className="relative h-44 w-full max-w-[20rem] self-center bg-radial from-accent/10 to-transparent to-70% sm:h-52">
+						{mark}
+						<noscript>
+							<ShuhariMark className="absolute inset-0 m-auto h-auto w-[90%]" />
+						</noscript>
+					</div>
+				) : (
+					<ShuhariMark className="h-auto w-full max-w-[18rem] self-center" />
+				)}
 				<CrossMark className="self-end rotate-180" />
 			</div>
 
