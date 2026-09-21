@@ -17,6 +17,7 @@ export const navGroups: NavGroupItem[] = [
 			{ label: 'お知らせ', href: '/news' },
 			{ label: '茨香祭について', href: '/about' },
 			{ label: 'テーマ', href: '/theme' },
+			{ label: 'メインビジュアル', href: '/main-visual' },
 		],
 	},
 	{
