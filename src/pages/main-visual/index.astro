@@ -68,8 +68,11 @@ const groups = [
 			 * 作品ごとに縦横比が異なるため、正方形に収めず元の比率のまま並べる。
 			 * multi-column だと縦方向に流れて読み順が崩れるので、grid で左上から並べ、
 			 * 高さは各画像の aspect-ratio に任せる（行ごとに上端が揃う）。
+			 *
+			 * PC でも 2 列のままにして 1 点あたりを大きく見せる（3 列だと小さく、
+			 * 4 点では 2 行目が埋まらず間延びする）。
 			 */}
-			<ul class="mt-6 grid grid-cols-2 items-start gap-3 lg:grid-cols-3">
+			<ul class="mt-6 grid grid-cols-2 items-start gap-3">
 				{
 					visualItems.map((item, index) => (
 						<li>
@@ -86,7 +89,7 @@ const groups = [
 									height={item.height}
 									loading="lazy"
 									decoding="async"
-									class="w-full rounded-xl"
+									class="w-full rounded-xl border border-text/80"
 								/>
 							</a>
 						</li>
@@ -103,13 +106,13 @@ const groups = [
 			</p>
 
 			{/*
-			 * 立ち絵（縦長）と三面図（横長）の組み合わせ。PC では三面図に 2 列分を
-			 * 与えると、横幅の比が実寸に近くなり収まりがよい。
+			 * 立ち絵（縦長）と三面図（横長）は縦横比の差が大きく、横に並べると
+			 * 高さが揃わない。無理に並べず上下に積み、横幅だけを揃える。
 			 */}
-			<ul class="mt-6 grid grid-cols-2 items-start gap-3 lg:grid-cols-3">
+			<ul class="mt-6 flex flex-col items-center gap-3">
 				{
 					characterItems.map((item, index) => (
-						<li class={item.width > item.height ? 'lg:col-span-2' : ''}>
+						<li class="w-full max-w-md">
 							<a
 								href={item.src}
 								data-lightbox-group="character"
@@ -123,7 +126,7 @@ const groups = [
 									height={item.height}
 									loading="lazy"
 									decoding="async"
-									class="w-full rounded-xl"
+									class="w-full rounded-xl border border-text/80"
 								/>
 							</a>
 						</li>
