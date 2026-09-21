@@ -53,10 +53,13 @@ const groups = [
 	<Header client:load logoSrc={logoW.src} />
 
 	<main class="mx-auto w-full max-w-3xl px-4 pb-16">
-		<section class="mt-8">
-			<SectionHeading title="Visual" tone="dark" />
+		{/*
+		 * セクションごとに独立したパネルに載せて括りを分ける（`/news` と同じ意匠）。
+		 */}
+		<section class="mt-8 rounded-2xl bg-base p-4 pt-6 pb-6">
+			<SectionHeading title="Visual" />
 
-			<p class="text-sm leading-relaxed text-base">
+			<p class="text-sm leading-relaxed text-text">
 				第34回 茨香祭のビジュアルとして応募いただいた作品を掲載しています。
 				画像を選ぶと拡大して表示されます。
 			</p>
@@ -92,17 +95,21 @@ const groups = [
 			</ul>
 		</section>
 
-		<section class="mt-12">
-			<SectionHeading title="Original Character" tone="dark" />
+		<section class="mt-6 rounded-2xl bg-base p-4 pt-6 pb-6">
+			<SectionHeading title="Original Character" />
 
-			<p class="text-sm leading-relaxed text-base">
+			<p class="text-sm leading-relaxed text-text">
 				茨香祭のオリジナルキャラクターです。
 			</p>
 
-			<ul class="mt-6 grid grid-cols-2 items-start gap-3">
+			{/*
+			 * 立ち絵（縦長）と三面図（横長）の組み合わせ。PC では三面図に 2 列分を
+			 * 与えると、横幅の比が実寸に近くなり収まりがよい。
+			 */}
+			<ul class="mt-6 grid grid-cols-2 items-start gap-3 lg:grid-cols-3">
 				{
 					characterItems.map((item, index) => (
-						<li>
+						<li class={item.width > item.height ? 'lg:col-span-2' : ''}>
 							<a
 								href={item.src}
 								data-lightbox-group="character"
