@@ -32,33 +32,37 @@ export default function BreakingNewsHero({
 			</div>
 
 			{/*
-			 * ポスターを円形の台座に載せる（参考サイトの丸いヒーローの見せ方）。
-			 * ただし円で切り抜くと四隅の開催日・QR コード・学校名が欠けるため、
-			 * 切り抜かずに円の内側へ全体を収める。
+			 * 参考サイトに倣い、紙面を円でそのまま切り抜く。
+			 * 円の内側いっぱいに広がるよう object-cover で埋める。
 			 *
-			 * 縦長（約 1:1.41）なので、円の直径は紙面の「高さ」に合わせる。
-			 * そのぶん左右に余白ができるので、そこに走査線と亀甲を覗かせる。
+			 * 円は縦長だと上下が切れすぎるので、横長（5:4）の楕円ではなく
+			 * 正円にし、紙面の上寄り（object-top）を見せる。ポスターは
+			 * 人物と日付が上半分に集まっているため。
 			 */}
-			{/*
-			 * 円はパネルの左右の余白ぶんまで広げたいので、負のマージンで
-			 * px-4 を打ち消して目一杯の直径を取る。
-			 */}
-			<div className="relative -mx-2 flex aspect-square items-center justify-center sm:mx-auto sm:max-w-md">
-				{/*
-				 * 円は紙面より大きく取りたいが、幅いっぱいだとパネルの縁で
-				 * 左右が切れる。
-				 */}
-				<div className="kikko absolute inset-0 rounded-full border-2 border-accent/60 bg-base shadow-[0_0_24px_rgba(0,255,204,0.18)]" />
-				{/* 円周に沿ったシアンの細い環。参考サイトの縁取りに倣う。 */}
-				<div className="absolute inset-[5%] rounded-full border border-accent/25" />
+			<div className="relative -mx-2 aspect-square overflow-hidden rounded-full border-2 border-accent/50 shadow-[0_0_28px_rgba(0,255,204,0.16)] sm:mx-auto sm:max-w-md">
 				<img
 					src={posterSrc}
 					width={posterWidth}
 					height={posterHeight}
 					alt={posterAlt}
-					className="relative max-h-[88%] w-auto rounded-lg border border-text/15"
+					className="h-full w-full object-cover object-top"
 				/>
 			</div>
+
+			{/*
+			 * 円から外れる情報（開催日時・QR コード・学校名）は紙面の四隅に
+			 * あるため、切り抜くと読めなくなる。全体を見られる導線を必ず添える。
+			 */}
+			<p className="mt-3 text-center text-xs text-text/70">
+				<a
+					href={posterSrc}
+					target="_blank"
+					rel="noopener noreferrer"
+					className="underline underline-offset-2 transition-colors hover:text-accent"
+				>
+					ポスター全体を見る
+				</a>
+			</p>
 
 			{/*
 			 * 紙面の下に、ポスターのマゼンタの斜線とハーフトーンを重ねた区切りを敷く。
