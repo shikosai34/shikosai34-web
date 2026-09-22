@@ -39,13 +39,21 @@ export default function BreakingNewsHero({
 			 * 正円にし、紙面の上寄り（object-top）を見せる。ポスターは
 			 * 人物と日付が上半分に集まっているため。
 			 */}
-			<div className="relative -mx-2 aspect-square overflow-hidden rounded-full border-2 border-accent/50 shadow-[0_0_28px_rgba(0,255,204,0.16)] sm:mx-auto sm:max-w-md">
+			<div className="kikko relative -mx-2 flex aspect-square items-center justify-center overflow-hidden rounded-full border-2 border-accent/50 bg-base shadow-[0_0_28px_rgba(0,255,204,0.16)] sm:mx-auto sm:max-w-md">
+				{/*
+				 * 紙面は円より小さく置く。object-cover で埋めると倍率が上がって
+				 * 四隅が大きく欠けるため、縮めて端の情報を残す。
+				 *
+				 * ただし縮めすぎると円の中で紙面が浮いてしまうので、
+				 * 上下は円からわずかに外れるくらい（高さ 106%）に留める。
+				 * 左右は円の内側に収まる幅にして、隅が環をはみ出さないようにする。
+				 */}
 				<img
 					src={posterSrc}
 					width={posterWidth}
 					height={posterHeight}
 					alt={posterAlt}
-					className="h-full w-full object-cover object-top"
+					className="h-[106%] w-auto max-w-none"
 				/>
 			</div>
 
