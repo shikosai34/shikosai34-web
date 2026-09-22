@@ -107,31 +107,53 @@
    */
   .bracket-frame {
     position: relative;
-    border: 1px solid color-mix(in srgb, var(--color-accent) 35%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
   }
 
+  /*
+   * 四隅の鉤括弧は、短辺・長辺の比を付けた L 字にする（参考サイトは
+   * 角から辺に沿って長く伸びる形）。左上と右下を擬似要素で描く。
+   */
   .bracket-frame::before,
   .bracket-frame::after {
     content: "";
     position: absolute;
-    width: 14px;
-    height: 14px;
-    border: 2px solid var(--color-accent);
+    width: 28px;
+    height: 12px;
+    border-color: var(--color-accent);
+    border-style: solid;
     pointer-events: none;
   }
 
   .bracket-frame::before {
     top: -1px;
     left: -1px;
-    border-right: 0;
-    border-bottom: 0;
+    border-width: 2px 0 0 2px;
   }
 
   .bracket-frame::after {
     right: -1px;
     bottom: -1px;
-    border-top: 0;
-    border-left: 0;
+    border-width: 0 2px 2px 0;
+  }
+
+  /*
+   * 斜めのハザード帯。参考サイトが告知パネルの右下に敷いている意匠。
+   */
+  .hazard-stripes {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      var(--color-accent) 0 3px,
+      transparent 3px 7px
+    );
+  }
+
+  /*
+   * 縁取りした白抜き文字。参考サイトの見出しは濃い縁で地から浮かせている。
+   */
+  .outlined-text {
+    paint-order: stroke fill;
+    -webkit-text-stroke: 4px var(--color-base);
   }
 
   /*

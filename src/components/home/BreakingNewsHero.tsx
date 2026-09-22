@@ -69,13 +69,25 @@ export default function BreakingNewsHero({
 			 * 告知のパネル。参考サイトに倣い、円の下端に少し重ねて置く。
 			 * 円と重ねるぶん、地は不透明にして紙面が透けないようにする。
 			 */}
-			<div className="bracket-frame relative z-10 -mt-5 bg-base px-4 py-3 sm:mx-auto sm:max-w-md">
-				<p className="text-center text-lg font-medium tracking-wide text-main">
+			<div className="bracket-frame relative z-10 -mt-5 bg-base/85 px-4 py-3 backdrop-blur-sm sm:mx-auto sm:max-w-md">
+				{/* 日付＋注記。参考サイトは大きな日付の右に小さく添える。 */}
+				<div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+					<p className="outlined-text text-2xl font-bold tracking-tight text-accent">
+						10月24日(土)
+					</p>
+					<p className="text-xs text-text/80">※25日(日)は学内限定</p>
+				</div>
+
+				{/* 主文。地から浮かせるため縁取りする。 */}
+				<p className="outlined-text mt-1 text-xl font-bold tracking-tight text-text">
 					新ポスター解禁！
 				</p>
-				<p className="mt-1 text-center text-xs leading-relaxed text-text/80">
-					第34回 茨香祭のポスターが完成しました
-				</p>
+
+				{/* 補足とハザード帯。 */}
+				<div className="mt-2 flex items-center gap-3">
+					<p className="shrink-0 text-xs text-text/75">第34回 茨香祭 一般公開</p>
+					<span className="hazard-stripes h-3 flex-1 opacity-70" aria-hidden="true" />
+				</div>
 			</div>
 
 			{/*
