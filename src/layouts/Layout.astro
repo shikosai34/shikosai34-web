@@ -6,11 +6,17 @@ import '../styles/global.css';
 interface Props {
 	title?: string;
 	description?: string;
+	/**
+	 * body の地色を差し替えるクラス。既定は明るいグレー（bg-text）。
+	 * ポスターに合わせた濃紺で見せるトップページのみ bg-base を渡している。
+	 */
+	bodyClass?: string;
 }
 
-const { 
+const {
 	title = '茨香祭 | 第34回 茨城工業高等専門学校 文化祭',
-	description = '第34回 茨城工業高等専門学校 文化祭（茨香祭）の公式Webサイトです。テーマ「守破離」のもと、和風×サイバーパンクの新しい文化祭をお届けします。'
+	description = '第34回 茨城工業高等専門学校 文化祭（茨香祭）の公式Webサイトです。テーマ「守破離」のもと、和風×サイバーパンクの新しい文化祭をお届けします。',
+	bodyClass
 } = Astro.props;
 
 // astro.config.mjs の site を基準に絶対 URL を組み立てる。
@@ -41,7 +47,7 @@ const ogImageURL = new URL('/ogp.png', siteOrigin);
 		<meta property="og:image" content={ogImageURL} />
 		<meta name="twitter:card" content="summary_large_image" />
 	</head>
-	<body class="bg-text text-base">
+	<body class:list={[bodyClass ?? 'bg-text text-base']}>
 		<slot />
 	</body>
 </html>

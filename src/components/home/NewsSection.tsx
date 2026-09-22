@@ -9,7 +9,7 @@ interface Props {
 
 export default function NewsSection({ items = [] }: Props) {
 	return (
-		<section className="mx-4 mt-8 rounded-2xl bg-base p-4 pt-6 pb-6">
+		<section className="surface-panel mx-4 mt-8 rounded-2xl p-4 pt-6 pb-6">
 			<SectionHeading title="News" />
 
 			<div className="border-t border-text/40 pt-2">
