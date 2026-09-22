@@ -28,7 +28,7 @@ export default function BreakingNewsHero({
 					className="w-full rounded-xl"
 				/>
 				<div className="flex justify-end pt-3">
-					<Button href="/news?category=sokuhou" variant="primary-dark">
+					<Button href="/poster/backnumber" variant="primary-dark">
 						バックナンバーを見る
 						<ArrowRightIcon className="h-4 w-4" />
 					</Button>
