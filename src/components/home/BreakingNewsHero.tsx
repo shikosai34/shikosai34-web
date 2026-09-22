@@ -1,5 +1,6 @@
 import ArrowRightIcon from '../icons/ArrowRightIcon';
 import Button from '../ui/Button';
+import type { ReactNode } from 'react';
 import KumoLine from '../ui/KumoLine';
 import SectionHeading from '../ui/SectionHeading';
 
@@ -8,6 +9,12 @@ interface Props {
 	posterWidth: number;
 	posterHeight: number;
 	posterAlt: string;
+	/**
+	 * 円の下に添える「ポスター全体を見る」。
+	 * ヒーロー自体は静的なままにしたいので、対話が要るこの部分だけ
+	 * Astro 側から client:load 付きで差し込む（slot="dialog"）。
+	 */
+	dialog?: ReactNode;
 }
 
 export default function BreakingNewsHero({
@@ -15,6 +22,7 @@ export default function BreakingNewsHero({
 	posterWidth,
 	posterHeight,
 	posterAlt,
+	dialog,
 }: Props) {
 	return (
 		/*
@@ -61,16 +69,7 @@ export default function BreakingNewsHero({
 			 * 円から外れる情報（開催日時・QR コード・学校名）は紙面の四隅に
 			 * あるため、切り抜くと読めなくなる。全体を見られる導線を必ず添える。
 			 */}
-			<p className="mt-3 text-center text-xs text-text/70">
-				<a
-					href={posterSrc}
-					target="_blank"
-					rel="noopener noreferrer"
-					className="underline underline-offset-2 transition-colors hover:text-accent"
-				>
-					ポスター全体を見る
-				</a>
-			</p>
+			{dialog}
 
 			{/*
 			 * 紙面の下に、ポスターのマゼンタの斜線とハーフトーンを重ねた区切りを敷く。
