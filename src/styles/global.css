@@ -138,6 +138,19 @@
   }
 
   /*
+   * 横縞の走査線。半透明の面に重ねて、ブラウン管の走査線のように見せる。
+   * 背景そのものに縞を敷く（::before / ::after は .bracket-frame が
+   * 四隅の鉤括弧で使っているため、擬似要素とは併用できない）。
+   */
+  .stripes {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-base) 55%, transparent) 0 2px,
+      transparent 2px 5px
+    );
+  }
+
+  /*
    * 斜めのハザード帯。参考サイトが告知パネルの右下に敷いている意匠。
    */
   .hazard-stripes {

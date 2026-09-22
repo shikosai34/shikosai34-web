@@ -69,7 +69,7 @@ export default function BreakingNewsHero({
 			 * 告知のパネル。参考サイトに倣い、円の下端に少し重ねて置く。
 			 * 円と重ねるぶん、地は不透明にして紙面が透けないようにする。
 			 */}
-			<div className="bracket-frame relative z-10 -mt-5 bg-base/85 px-4 py-3 backdrop-blur-sm sm:mx-auto sm:max-w-md">
+			<div className="bracket-frame stripes relative z-10 -mt-5 bg-base/55 px-4 py-3 backdrop-blur-[2px] sm:mx-auto sm:max-w-md">
 				{/* 日付＋注記。参考サイトは大きな日付の右に小さく添える。 */}
 				<div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
 					<p className="outlined-text text-2xl font-bold tracking-tight text-accent">
