@@ -105,7 +105,7 @@
     position: relative;
     overflow: hidden;
     /*
-     * 完全な不透明だと地の麻の葉が完全に隠れるため、わずかに透かす。
+     * 完全な不透明だと地の亀甲が完全に隠れるため、わずかに透かす。
      */
     background-color: color-mix(in srgb, var(--color-text) 6%, color-mix(in srgb, var(--color-base) 92%, transparent));
     border: 1px solid color-mix(in srgb, var(--color-text) 14%, transparent);
@@ -132,33 +132,26 @@
   }
 
   /*
-   * 和の意匠（麻の葉）を線画で薄く敷く。
-   * 60deg / 120deg / 縦の 3 方向の細線を重ねて菱形の格子を作る。
+   * 亀甲（六角形）の格子。ポスターで振袖の袖に入っている柄に倣う。
+   * 和の意匠でありながら電子回路にも見えるため、テーマとよく合う。
+   *
+   * 六角形は直線グラデーションでは作れないので SVG のタイルを敷く。
+   * 平頂六角形（辺 16）を隙間なく並べるには、タイルを
+   * 幅 3*辺 = 48、高さ √3*辺 ≒ 27.713 にして、角と中央に half/quarter を
+   * 置く必要がある。この比を崩すと継ぎ目に線の切れ端が出る。
+   * 色は currentColor ではなく決め打ちの rgb を使う（background-image の
+   * data URI 内では CSS 変数も currentColor も解決されないため）。
    */
-  .asanoha {
-    background-image:
-      repeating-linear-gradient(
-        60deg,
-        color-mix(in srgb, var(--color-accent) 14%, transparent) 0 1px,
-        transparent 1px 22px
-      ),
-      repeating-linear-gradient(
-        120deg,
-        color-mix(in srgb, var(--color-accent) 14%, transparent) 0 1px,
-        transparent 1px 22px
-      ),
-      repeating-linear-gradient(
-        to right,
-        color-mix(in srgb, var(--color-main) 10%, transparent) 0 1px,
-        transparent 1px 38px
-      );
+  .kikko {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='27.713' viewBox='0 0 48 27.713'%3E%3Cg fill='none' stroke='%2300ffcc' stroke-opacity='0.18' stroke-width='1.2'%3E%3Cpath d='M16 0 L8 13.86 L-8 13.86 L-16 0'/%3E%3Cpath d='M16 27.71 L8 13.86'/%3E%3Cpath d='M64 0 L56 13.86 L40 13.86 L32 0'/%3E%3Cpath d='M64 27.71 L56 13.86'/%3E%3Cpath d='M40 13.86 L32 27.71 L16 27.71'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 48px 27.713px;
   }
 
   /*
    * 地として敷くときだけ、スクロールで柄が流れないよう貼り付ける。
    * 小さな要素（記事サムネの代替など）に当てると柄が出ないため body 限定。
    */
-  body.asanoha {
+  body.kikko {
     background-attachment: fixed;
   }
 
