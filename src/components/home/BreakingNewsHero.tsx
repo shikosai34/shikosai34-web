@@ -66,6 +66,19 @@ export default function BreakingNewsHero({
 			</div>
 
 			{/*
+			 * 告知のパネル。参考サイトに倣い、円の下端に少し重ねて置く。
+			 * 円と重ねるぶん、地は不透明にして紙面が透けないようにする。
+			 */}
+			<div className="bracket-frame relative z-10 -mt-5 bg-base px-4 py-3 sm:mx-auto sm:max-w-md">
+				<p className="text-center text-lg font-medium tracking-wide text-main">
+					新ポスター解禁！
+				</p>
+				<p className="mt-1 text-center text-xs leading-relaxed text-text/80">
+					第34回 茨香祭のポスターが完成しました
+				</p>
+			</div>
+
+			{/*
 			 * 円から外れる情報（開催日時・QR コード・学校名）は紙面の四隅に
 			 * あるため、切り抜くと読めなくなる。全体を見られる導線を必ず添える。
 			 */}

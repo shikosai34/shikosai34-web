@@ -100,6 +100,41 @@
   }
 
   /*
+   * 四隅に鉤括弧を出した枠。参考サイトの告知パネルの意匠。
+   * 枠線そのものは薄く引き、四隅だけシアンを濃くして留め具に見せる。
+   * 角は ::before / ::after を左上・右下に置き、内側の span で
+   * 右上・左下を補う（.bracket-frame > .bracket-corner）。
+   */
+  .bracket-frame {
+    position: relative;
+    border: 1px solid color-mix(in srgb, var(--color-accent) 35%, transparent);
+  }
+
+  .bracket-frame::before,
+  .bracket-frame::after {
+    content: "";
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--color-accent);
+    pointer-events: none;
+  }
+
+  .bracket-frame::before {
+    top: -1px;
+    left: -1px;
+    border-right: 0;
+    border-bottom: 0;
+  }
+
+  .bracket-frame::after {
+    right: -1px;
+    bottom: -1px;
+    border-top: 0;
+    border-left: 0;
+  }
+
+  /*
    * ポスターの縦帯にならい、左端にオレンジの帯を入れる。
    * border ではなく擬似要素で描く。border-left にすると、
    * 左右に帯を出したいトップのヒーロー（border-x-4）と competing して
