@@ -7,6 +7,7 @@ import kosenLogo from '../assets/logo/kosen/footer.svg';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import BreakingNewsHero from '../components/home/BreakingNewsHero';
+import PosterDialog from '../components/home/PosterDialog';
 import ThemeModel from '../components/home/ThemeModel';
 import ThemeSection from '../components/home/ThemeSection';
 import NewsSection from '../components/home/NewsSection';
@@ -21,6 +22,17 @@ const posterImage = await getImage({
 	width: 800,
 	format: 'webp',
 });
+
+// 拡大表示用。円で切り抜くヒーローでは四隅が欠けるため、
+// ダイアログでは文字が読める大きさのものを渡す。
+const posterFull = await getImage({
+	src: posterAsset,
+	width: 1600,
+	format: 'webp',
+});
+
+const posterAltText =
+	'茨香祭2026 ポスター。第34回茨香祭 テーマ「守破離」。一般公開は10月24日（土）9:00〜17:00、25日（日）は学内限定。茨城工業高等専門学校。';
 
 const latestNews = (await getVisibleNews()).slice(0, 3).map((entry) => ({
 	href: `/news/${entry.id}`,
@@ -40,7 +52,7 @@ const stageEvents = (await getVisibleEvents()).map((entry) => ({
 }));
 ---
 
-<Layout title="茨香祭速報 | 第34回 茨香祭" bodyClass="kikko bg-base text-text">
+<Layout title="茨香祭速報 | 第34回 茨香祭">
 	<Header client:load logoSrc={logoW.src} />
 
 	<main class="mx-auto w-full max-w-2xl pb-16">
@@ -48,8 +60,17 @@ const stageEvents = (await getVisibleEvents()).map((entry) => ({
 			posterSrc={posterImage.src}
 			posterWidth={posterImage.attributes.width}
 			posterHeight={posterImage.attributes.height}
-			posterAlt="茨香祭2026 ポスター。第34回茨香祭 テーマ「守破離」。一般公開は10月24日（土）9:00〜17:00、25日（日）は学内限定。茨城工業高等専門学校。"
-		/>
+			posterAlt={posterAltText}
+		>
+			<PosterDialog
+				slot="dialog"
+				client:load
+				src={posterFull.src}
+				width={Number(posterFull.attributes.width)}
+				height={Number(posterFull.attributes.height)}
+				alt={posterAltText}
+			/>
+		</BreakingNewsHero>
 
 		<ThemeSection>
 			<ThemeModel slot="mark" client:only="react" />

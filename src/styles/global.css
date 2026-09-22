@@ -15,6 +15,22 @@
   --color-glitch: #e7386f;
 
   --font-primary: "Kiwi Maru", sans-serif;
+
+  /*
+   * 文字寸法（モバイル基準）。
+   * 既定の Tailwind は xs=12px / sm=14px だが、日本語は同じ px でも
+   * 英字より小さく見えるうえ、本文の多くが sm・注記が xs で組まれている。
+   * 一段ずつ上げて、最小を 13px、本文を 16px に引き上げる。
+   * 各所の text-xs / text-sm を書き換える代わりに、尺度側を定義し直す。
+   */
+  --text-xs: 0.8125rem;   /* 13px（旧 12px）*/
+  --text-xs--line-height: 1.6;
+  --text-sm: 0.9375rem;   /* 15px（旧 14px）*/
+  --text-sm--line-height: 1.7;
+  --text-base: 1rem;      /* 16px（据え置き）*/
+  --text-base--line-height: 1.8;
+  --text-lg: 1.1875rem;   /* 19px（旧 18px）*/
+  --text-xl: 1.375rem;    /* 22px（旧 20px）*/
 }
 
 @layer base {
@@ -41,34 +57,6 @@
 }
 
 @layer components {
-  /*
-   * ポスターの紙面にかかる走査線。天地に薄い横縞を重ねる。
-   * 1px 未満の縞はディスプレイ次第でモアレになるため 3px 周期に留める。
-   */
-  .scanlines {
-    position: relative;
-  }
-
-  .scanlines::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    background-image: repeating-linear-gradient(
-      to bottom,
-      color-mix(in srgb, var(--color-text) 7%, transparent) 0 1px,
-      transparent 1px 3px
-    );
-  }
-
-  /* 走査線は背景側に敷き、中身は必ずその上に載せる。 */
-  .scanlines > * {
-    position: relative;
-    z-index: 1;
-  }
-
   /*
    * ポスター下部のハーフトーン（オレンジの点描）。
    * 面全体に敷くと煩いので、当てる側で高さを絞って使う。
@@ -109,6 +97,116 @@
      */
     background-color: color-mix(in srgb, var(--color-text) 6%, color-mix(in srgb, var(--color-base) 92%, transparent));
     border: 1px solid color-mix(in srgb, var(--color-text) 14%, transparent);
+  }
+
+  /*
+   * 四隅に鉤括弧を出した枠。参考サイトの告知パネルの意匠。
+   * 枠線そのものは薄く引き、四隅だけシアンを濃くして留め具に見せる。
+   * 角は ::before / ::after を左上・右下に置き、内側の span で
+   * 右上・左下を補う（.bracket-frame > .bracket-corner）。
+   */
+  .bracket-frame {
+    position: relative;
+    border: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+  }
+
+  /*
+   * 四隅の鉤括弧は、短辺・長辺の比を付けた L 字にする（参考サイトは
+   * 角から辺に沿って長く伸びる形）。左上と右下を擬似要素で描く。
+   */
+  .bracket-frame::before,
+  .bracket-frame::after {
+    content: "";
+    position: absolute;
+    width: 28px;
+    height: 12px;
+    border-color: var(--color-accent);
+    border-style: solid;
+    pointer-events: none;
+  }
+
+  .bracket-frame::before {
+    top: -1px;
+    left: -1px;
+    border-width: 2px 0 0 2px;
+  }
+
+  .bracket-frame::after {
+    right: -1px;
+    bottom: -1px;
+    border-width: 0 2px 2px 0;
+  }
+
+  /*
+   * 横縞の走査線。半透明の面に重ねて、ブラウン管の走査線のように見せる。
+   * 背景そのものに縞を敷く（::before / ::after は .bracket-frame が
+   * 四隅の鉤括弧で使っているため、擬似要素とは併用できない）。
+   */
+  .stripes {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-base) 55%, transparent) 0 2px,
+      transparent 2px 5px
+    );
+  }
+
+  /*
+   * 斜めのハザード帯。参考サイトが告知パネルの右下に敷いている意匠。
+   */
+  .hazard-stripes {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      var(--color-accent) 0 3px,
+      transparent 3px 7px
+    );
+  }
+
+  /*
+   * 縁取りした白抜き文字。参考サイトの見出しは濃い縁で地から浮かせている。
+   */
+  .outlined-text {
+    paint-order: stroke fill;
+    -webkit-text-stroke: 4px var(--color-base);
+  }
+
+  /*
+   * ポスターの縦帯にならい、左端にオレンジの帯を入れる。
+   * border ではなく擬似要素で描く。border-left にすると、
+   * 左右に帯を出したいトップのヒーロー（border-x-4）と competing して
+   * 片側が消えるため。
+   */
+  .surface-panel::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 0;
+    width: 3px;
+    pointer-events: none;
+    background-color: var(--color-main);
+  }
+
+  /*
+   * パネルに走査線（ポスターの紙面にかかる横縞）を重ねる。
+   * 1px 未満の縞はディスプレイ次第でモアレになるため 3px 周期に留める。
+   */
+  .surface-panel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-text) 5%, transparent) 0 1px,
+      transparent 1px 3px
+    );
+  }
+
+  .surface-panel > * {
+    position: relative;
+    z-index: 1;
   }
 
   /*

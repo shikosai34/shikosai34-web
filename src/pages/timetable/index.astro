@@ -22,24 +22,24 @@ const events = await getVisibleEvents();
 	<Header client:load logoSrc={logoW.src} />
 
 	<main class="mx-auto w-full max-w-3xl px-4 pb-16">
-		<section class="mt-8">
+		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6">
 			<div class="flex flex-wrap items-baseline justify-between gap-3">
-				<SectionHeading title="Timetable" tone="dark" />
-				<a href="/event" class="text-sm text-base underline hover:no-underline">企画一覧で見る</a>
+				<SectionHeading title="Timetable" />
+				<a href="/event" class="text-sm text-text underline hover:no-underline">企画一覧で見る</a>
 			</div>
 
 			<div>
-				<p class="text-sm leading-relaxed text-base/80">
+				<p class="text-sm leading-relaxed text-text/80">
 					体育館ステージの予定を開始時刻順に掲載しています。当日の変更は各企画にも表示します。
 				</p>
 				<nav class="mt-4 flex flex-wrap gap-2" aria-label="開催日">
 					{FESTIVAL_DAYS.map((day) => (
 						<a
 							href={`#${day.id}`}
-							class="rounded-full border border-base px-3 py-1 text-sm text-base transition-colors hover:border-accent hover:text-accent focus:outline-2 focus:outline-offset-2 focus:outline-accent"
+							class="rounded-full border border-text/30 px-3 py-1 text-sm text-text transition-colors hover:border-accent hover:text-accent focus:outline-2 focus:outline-offset-2 focus:outline-accent"
 						>
 							<span class="font-medium">{day.shortLabel}</span>
-							<span class="ml-1 text-xs text-base/70">{day.label}</span>
+							<span class="ml-1 text-xs text-text/60">{day.label}</span>
 						</a>
 					))}
 				</nav>
@@ -51,16 +51,16 @@ const events = await getVisibleEvents();
 						const dayEvents = events.filter((event) => getEventDayKey(event.data.startAt) === day.date);
 						return (
 							<section id={day.id} class="scroll-mt-24" aria-labelledby={`${day.id}-heading`}>
-								<div class="mb-5 flex items-end justify-between gap-4 border-b-2 border-base pb-2">
+								<div class="mb-5 flex items-end justify-between gap-4 border-b-2 border-text/25 pb-2">
 									<div>
 										<p class="text-sm font-medium text-main">{day.shortLabel}</p>
-										<h2 id={`${day.id}-heading`} class="text-xl font-medium text-base">{day.label}</h2>
+										<h2 id={`${day.id}-heading`} class="text-xl font-medium text-text">{day.label}</h2>
 									</div>
-									<span class="rounded-full bg-base px-3 py-1 text-xs text-text">体育館</span>
+									<span class="rounded-full border border-text/25 bg-text/10 px-3 py-1 text-xs text-text">体育館</span>
 								</div>
 
 								{dayEvents.length === 0 ? (
-									<div class="rounded-xl border border-base/40 px-5 py-8 text-center text-sm text-base/70">
+									<div class="rounded-xl border border-text/20 px-5 py-8 text-center text-sm text-text/70">
 										この日の予定は準備中です。
 									</div>
 								) : (
@@ -68,21 +68,21 @@ const events = await getVisibleEvents();
 										{dayEvents.map((event) => (
 											<li class="grid grid-cols-[4.5rem_1fr] gap-3 sm:grid-cols-[6rem_1fr]">
 												<div class="pt-4 text-right">
-													<time datetime={event.data.startAt.toISOString()} class="block font-medium text-base">
+													<time datetime={event.data.startAt.toISOString()} class="block font-medium text-text">
 														{formatEventTime(event.data.startAt)}
 													</time>
-													<span class="text-xs text-base/60">〜{formatEventTime(event.data.endAt)}</span>
+													<span class="text-xs text-text/60">〜{formatEventTime(event.data.endAt)}</span>
 												</div>
 												<a
 													href={`/event/${event.id}`}
 													data-event-detail
-													class="flex overflow-hidden rounded-xl border border-base bg-base text-text transition-transform hover:-translate-y-0.5 focus:outline-2 focus:outline-offset-2 focus:outline-base"
+													class="flex overflow-hidden rounded-xl border border-text/20 bg-base text-text transition-transform hover:-translate-y-0.5 focus:outline-2 focus:outline-offset-2 focus:outline-accent"
 												>
-													<div class="w-24 shrink-0 bg-text sm:w-32">
+													<div class="kikko w-24 shrink-0 bg-text/5 sm:w-32">
 														{event.data.image ? (
 															<img src={event.data.image} alt="" loading="lazy" class="h-full w-full object-cover" />
 														) : (
-															<div class="flex h-full min-h-28 items-center justify-center px-2 text-center text-xs text-base" aria-hidden="true">
+															<div class="flex h-full min-h-28 items-center justify-center px-2 text-center text-xs text-text/60" aria-hidden="true">
 																画像準備中
 															</div>
 														)}
