@@ -1,5 +1,4 @@
 import { navGroups } from '../../lib/navigation';
-import CloseIcon from '../icons/CloseIcon';
 import DiamondRule from '../ui/DiamondRule';
 
 interface Props {
@@ -25,22 +24,11 @@ export default function MobileNav({ isOpen, onClose }: Props) {
 				className="absolute inset-0 flex flex-col overflow-y-auto px-5 py-5"
 				aria-label="サイト内メニュー"
 			>
-				{/* 閉じる。×の下に CLOSE を置き、上下を罫線で挟む。 */}
-				<div className="flex justify-end">
-					<button
-						type="button"
-						aria-label="メニューを閉じる"
-						onClick={onClose}
-						className="w-24 text-text transition-colors hover:text-accent"
-					>
-						<DiamondRule />
-						<span className="flex flex-col items-center gap-0.5 py-1.5">
-							<CloseIcon className="h-5 w-5" />
-							<span className="text-[10px] tracking-[0.25em]">CLOSE</span>
-						</span>
-						<DiamondRule />
-					</button>
-				</div>
+				{/*
+				 * 閉じる導線はヘッダーの MENU ボタンが兼ねる（開くと×に変わる）。
+				 * ここではその丸い面と重ならないよう、上端を空けておく。
+				 */}
+				<div aria-hidden="true" className="h-16" />
 
 				<div className="mt-6 flex-1">
 					<DiamondRule className="mb-6" />
