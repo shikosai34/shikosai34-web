@@ -35,8 +35,10 @@ interface Props {
 }
 
 export default function ThemeSection({ mark }: Props) {
+	// ポスターでテーマ「守破離」が最も強い要素なので、走査線を重ねて
+	// 他のセクションより紙面に近い見せ方にする。
 	return (
-		<section className="mx-4 mt-8 rounded-2xl bg-base p-6 text-text">
+		<section className="surface-panel scanlines mx-4 mt-8 rounded-2xl p-6 text-text">
 			<div className="w-72 max-w-full justify-start font-primary text-3xl font-normal text-white">This year's theme</div>
 
 			<div className="mt-2 flex flex-col items-start gap-2">

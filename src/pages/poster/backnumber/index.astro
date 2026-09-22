@@ -1,0 +1,87 @@
+---
+import { getImage } from 'astro:assets';
+import logoG from '../../../assets/logo/yokogaki/HOL_G-trimmed.png';
+import logoW from '../../../assets/logo/yokogaki/HOL_W-trimmed.png';
+import kosenLogo from '../../../assets/logo/kosen/footer.svg';
+import sokuhou01 from '../../../assets/poster/backnumber/sokuhou-01.png';
+import Footer from '../../../components/layout/Footer';
+import Header from '../../../components/layout/Header';
+import SectionHeading from '../../../components/ui/SectionHeading';
+import Layout from '../../../layouts/Layout.astro';
+
+// 号ごとの情報。新しいものを先頭に積んでいく。
+const entries = [
+	{
+		src: sokuhou01,
+		issue: '第一号',
+		publishedAt: '2026年10月',
+		title: '第34回茨香祭テーマ「守破離」決定、ロゴ完成のお知らせ',
+		alt: '茨香祭速報 第一号。第34回茨香祭のテーマ「守破離」の決定と、その意味の解説。あわせて縦横2パターンのロゴ完成と、機材の到着を伝える紙面。',
+	},
+];
+
+// 原寸は 3708×5242 と重いので、一覧用と拡大用の 2 段階に縮小して webp へ変換する
+// （トップページのポスターや `/main-visual` と同じ `getImage` の使い方）。
+const items = await Promise.all(
+	entries.map(async (entry) => {
+		const [thumb, full] = await Promise.all([
+			getImage({ src: entry.src, width: 800, format: 'webp' }),
+			getImage({ src: entry.src, width: 1600, format: 'webp' }),
+		]);
+		return {
+			...entry,
+			thumb: thumb.src,
+			full: full.src,
+			width: Number(thumb.attributes.width ?? thumb.options.width ?? 800),
+			height: Number(thumb.attributes.height ?? thumb.options.height ?? 800),
+		};
+	}),
+);
+---
+
+<Layout title="茨香祭速報 バックナンバー | 第34回 茨香祭">
+	<Header client:load logoSrc={logoW.src} />
+
+	<main class="mx-auto w-full max-w-2xl px-4 pb-16">
+		<section class="mt-8 rounded-2xl bg-base p-4 pt-6 pb-6">
+			<SectionHeading title="バックナンバー" />
+
+			<p class="text-sm leading-relaxed text-text">
+				これまでに発行した茨香祭速報を掲載しています。画像を選ぶと拡大して表示されます。
+			</p>
+
+			{/*
+			 * 号数は多くないので 1 列で大きく見せる。紙面は文字が細かく、
+			 * 格子に詰めると読めないため。
+			 */}
+			<ul class="mt-6 space-y-8">
+				{
+					items.map((item) => (
+						<li>
+							<a href={item.full} target="_blank" rel="noopener noreferrer">
+								<img
+									src={item.thumb}
+									width={item.width}
+									height={item.height}
+									alt={item.alt}
+									loading="lazy"
+									decoding="async"
+									class="w-full rounded-xl border border-text/15"
+								/>
+							</a>
+							<div class="pt-3">
+								<p class="text-sm font-medium text-text">
+									{item.issue}
+									<span class="pl-2 font-normal text-text/60">{item.publishedAt}</span>
+								</p>
+								<p class="pt-1 text-sm leading-relaxed text-text/80">{item.title}</p>
+							</div>
+						</li>
+					))
+				}
+			</ul>
+		</section>
+	</main>
+
+	<Footer logoSrc={logoG.src} kosenLogoSrc={kosenLogo.src} />
+</Layout>

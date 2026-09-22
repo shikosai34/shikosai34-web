@@ -26,7 +26,8 @@ export default function NewsListItem({ href, title, date, category, image }: New
 						className="h-14 w-14 shrink-0 rounded-lg object-cover"
 					/>
 				) : (
-					<span className="h-14 w-14 shrink-0 rounded-lg bg-text" />
+					/* 画像がない記事の代替。地色に馴染むよう、塗りではなく細枠と麻の葉で示す。 */
+					<span className="kikko h-14 w-14 shrink-0 rounded-lg border border-current/20 bg-current/5 bg-[length:24px_13.86px]" />
 				)}
 				<span className="min-w-0 flex-1 flex flex-col gap-0.5">
 					<span className="flex items-center gap-2 text-xs text-text">

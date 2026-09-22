@@ -1,11 +1,18 @@
 @import "tailwindcss";
 
 @theme {
-  /* Color (docs/design/03-design.md 3.2) — この4色のみを使用する */
+  /* Color (docs/design/03-design.md 3.2) — 基本はこの4色を使用する */
   --color-base: #0b3041;
   --color-text: #e8e8e8;
   --color-main: #ff9933;
   --color-accent: #00ffcc;
+
+  /*
+   * ポスターのマゼンタ（実物から抽出した #e7386f）。
+   * グリッチの色ずれと斜めのスイープにのみ使う差し色で、
+   * 文字色や面の塗りには使わない。
+   */
+  --color-glitch: #e7386f;
 
   --font-primary: "Kiwi Maru", sans-serif;
 }
@@ -24,7 +31,145 @@
   body {
     max-width: 100vw;
     font-family: var(--font-primary);
+    /*
+     * 既定は明るい地色。ポスターに合わせて濃紺で見せるページは
+     * Layout の bodyClass で bg-base に差し替える。
+     */
     background-color: var(--color-text);
     color: var(--color-base);
+  }
+}
+
+@layer components {
+  /*
+   * ポスターの紙面にかかる走査線。天地に薄い横縞を重ねる。
+   * 1px 未満の縞はディスプレイ次第でモアレになるため 3px 周期に留める。
+   */
+  .scanlines {
+    position: relative;
+  }
+
+  .scanlines::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-text) 7%, transparent) 0 1px,
+      transparent 1px 3px
+    );
+  }
+
+  /* 走査線は背景側に敷き、中身は必ずその上に載せる。 */
+  .scanlines > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  /*
+   * ポスター下部のハーフトーン（オレンジの点描）。
+   * 面全体に敷くと煩いので、当てる側で高さを絞って使う。
+   */
+  .halftone {
+    background-image: radial-gradient(
+      var(--color-main) 1px,
+      transparent 1.4px
+    );
+    background-size: 7px 7px;
+  }
+
+  /*
+   * 紙面を斜めに走るマゼンタのスイープ。
+   * 装飾のみなので、当てる要素には aria-hidden を付ける。
+   */
+  .glitch-sweep {
+    background-image: linear-gradient(
+      100deg,
+      transparent 0%,
+      transparent 42%,
+      color-mix(in srgb, var(--color-glitch) 85%, transparent) 42%,
+      color-mix(in srgb, var(--color-glitch) 85%, transparent) 44%,
+      transparent 44%,
+      transparent 100%
+    );
+  }
+
+  /*
+   * セクションを載せる面。地色と同じ濃紺のままだと境界が消えるので、
+   * わずかに持ち上げた明度と細い縁で紙面の重なりを作る。
+   */
+  .surface-panel {
+    position: relative;
+    overflow: hidden;
+    /*
+     * 完全な不透明だと地の亀甲が完全に隠れるため、わずかに透かす。
+     */
+    background-color: color-mix(in srgb, var(--color-text) 6%, color-mix(in srgb, var(--color-base) 92%, transparent));
+    border: 1px solid color-mix(in srgb, var(--color-text) 14%, transparent);
+  }
+
+  /*
+   * 角を落としたシアンの細枠。サイバーパンクな HUD の体で、
+   * ニュース一覧などの囲みに使う（参考サイトの枠の作りに倣う）。
+   * clip-path で角を斜めに切り、内側にもう一枚薄い枠を重ねる。
+   */
+  .hud-frame {
+    position: relative;
+    --hud-cut: 14px;
+    clip-path: polygon(
+      var(--hud-cut) 0,
+      100% 0,
+      100% calc(100% - var(--hud-cut)),
+      calc(100% - var(--hud-cut)) 100%,
+      0 100%,
+      0 var(--hud-cut)
+    );
+    background-color: color-mix(in srgb, var(--color-base) 70%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
+  }
+
+  /*
+   * 亀甲（六角形）の格子。ポスターで振袖の袖に入っている柄に倣う。
+   * 和の意匠でありながら電子回路にも見えるため、テーマとよく合う。
+   *
+   * 六角形は直線グラデーションでは作れないので SVG のタイルを敷く。
+   * 平頂六角形（辺 16）を隙間なく並べるには、タイルを
+   * 幅 3*辺 = 48、高さ √3*辺 ≒ 27.713 にして、角と中央に half/quarter を
+   * 置く必要がある。この比を崩すと継ぎ目に線の切れ端が出る。
+   * 色は currentColor ではなく決め打ちの rgb を使う（background-image の
+   * data URI 内では CSS 変数も currentColor も解決されないため）。
+   */
+  .kikko {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='27.713' viewBox='0 0 48 27.713'%3E%3Cg fill='none' stroke='%2300ffcc' stroke-opacity='0.18' stroke-width='1.2'%3E%3Cpath d='M16 0 L8 13.86 L-8 13.86 L-16 0'/%3E%3Cpath d='M16 27.71 L8 13.86'/%3E%3Cpath d='M64 0 L56 13.86 L40 13.86 L32 0'/%3E%3Cpath d='M64 27.71 L56 13.86'/%3E%3Cpath d='M40 13.86 L32 27.71 L16 27.71'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 48px 27.713px;
+  }
+
+  /*
+   * 地として敷くときだけ、スクロールで柄が流れないよう貼り付ける。
+   * 小さな要素（記事サムネの代替など）に当てると柄が出ないため body 限定。
+   */
+  body.kikko {
+    background-attachment: fixed;
+  }
+
+  /*
+   * 雲（青海波ではなく流雲）を思わせるネオンの線。
+   * 余白に置く装飾なので、当てる要素には aria-hidden を付ける。
+   */
+  .neon-line {
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--color-accent) 60%, transparent));
+  }
+
+  /*
+   * 縦書き。参考サイトのナビや見出しに倣い、日付や短いラベルに使う。
+   * 長文に当てるとモバイルで読み幅が破綻するため、短い語のみ。
+   */
+  .tategaki {
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    font-feature-settings: "vkna" 1;
   }
 }
