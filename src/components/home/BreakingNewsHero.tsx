@@ -21,7 +21,7 @@ export default function BreakingNewsHero({
 		 * ポスターの構図に合わせ、左右のオレンジの帯で濃紺の面を挟む。
 		 * 帯は border で引く（要素を足すとレイアウトが増えるため）。
 		 */
-		<section className="surface-panel scanlines mx-4 mt-6 rounded-2xl border-x-4 border-x-main px-4 pt-6 pb-4">
+		<section className="surface-panel mx-4 mt-6 rounded-2xl border-x-4 border-x-main px-4 pt-6 pb-4">
 			{/*
 			 * 見出しの右の余白に流雲を流す。狭い画面では場所がないので
 			 * sm 以上でのみ出す。

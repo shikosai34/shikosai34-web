@@ -42,34 +42,6 @@
 
 @layer components {
   /*
-   * ポスターの紙面にかかる走査線。天地に薄い横縞を重ねる。
-   * 1px 未満の縞はディスプレイ次第でモアレになるため 3px 周期に留める。
-   */
-  .scanlines {
-    position: relative;
-  }
-
-  .scanlines::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    background-image: repeating-linear-gradient(
-      to bottom,
-      color-mix(in srgb, var(--color-text) 7%, transparent) 0 1px,
-      transparent 1px 3px
-    );
-  }
-
-  /* 走査線は背景側に敷き、中身は必ずその上に載せる。 */
-  .scanlines > * {
-    position: relative;
-    z-index: 1;
-  }
-
-  /*
    * ポスター下部のハーフトーン（オレンジの点描）。
    * 面全体に敷くと煩いので、当てる側で高さを絞って使う。
    */
@@ -109,6 +81,46 @@
      */
     background-color: color-mix(in srgb, var(--color-text) 6%, color-mix(in srgb, var(--color-base) 92%, transparent));
     border: 1px solid color-mix(in srgb, var(--color-text) 14%, transparent);
+  }
+
+  /*
+   * ポスターの縦帯にならい、左端にオレンジの帯を入れる。
+   * border ではなく擬似要素で描く。border-left にすると、
+   * 左右に帯を出したいトップのヒーロー（border-x-4）と competing して
+   * 片側が消えるため。
+   */
+  .surface-panel::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 0;
+    width: 3px;
+    pointer-events: none;
+    background-color: var(--color-main);
+  }
+
+  /*
+   * パネルに走査線（ポスターの紙面にかかる横縞）を重ねる。
+   * 1px 未満の縞はディスプレイ次第でモアレになるため 3px 周期に留める。
+   */
+  .surface-panel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-text) 5%, transparent) 0 1px,
+      transparent 1px 3px
+    );
+  }
+
+  .surface-panel > * {
+    position: relative;
+    z-index: 1;
   }
 
   /*
