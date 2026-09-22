@@ -32,16 +32,33 @@ export default function BreakingNewsHero({
 			</div>
 
 			{/*
-			 * ポスター本体。スイープは紙面に重ねると作品自身のピンクの線と
-			 * ぶつかって読めないため、見出し側と下の区切りに逃がしている。
+			 * ポスターを円形の台座に載せる（参考サイトの丸いヒーローの見せ方）。
+			 * ただし円で切り抜くと四隅の開催日・QR コード・学校名が欠けるため、
+			 * 切り抜かずに円の内側へ全体を収める。
+			 *
+			 * 縦長（約 1:1.41）なので、円の直径は紙面の「高さ」に合わせる。
+			 * そのぶん左右に余白ができるので、そこに走査線と亀甲を覗かせる。
 			 */}
-			<img
-				src={posterSrc}
-				width={posterWidth}
-				height={posterHeight}
-				alt={posterAlt}
-				className="w-full rounded-xl border border-text/15"
-			/>
+			{/*
+			 * 円はパネルの左右の余白ぶんまで広げたいので、負のマージンで
+			 * px-4 を打ち消して目一杯の直径を取る。
+			 */}
+			<div className="relative -mx-2 flex aspect-square items-center justify-center sm:mx-auto sm:max-w-md">
+				{/*
+				 * 円は紙面より大きく取りたいが、幅いっぱいだとパネルの縁で
+				 * 左右が切れる。
+				 */}
+				<div className="kikko absolute inset-0 rounded-full border-2 border-accent/60 bg-base shadow-[0_0_24px_rgba(0,255,204,0.18)]" />
+				{/* 円周に沿ったシアンの細い環。参考サイトの縁取りに倣う。 */}
+				<div className="absolute inset-[5%] rounded-full border border-accent/25" />
+				<img
+					src={posterSrc}
+					width={posterWidth}
+					height={posterHeight}
+					alt={posterAlt}
+					className="relative max-h-[88%] w-auto rounded-lg border border-text/15"
+				/>
+			</div>
 
 			{/*
 			 * 紙面の下に、ポスターのマゼンタの斜線とハーフトーンを重ねた区切りを敷く。
