@@ -12,11 +12,16 @@ export interface MainVisualItem {
 }
 
 interface Props {
+	/**
+	 * 対応するサムネイル群の識別子（`data-lightbox-group` と一致させる）。
+	 * セクションごとにこのコンポーネントを置き、送りをその中で完結させる。
+	 */
+	group: string;
 	items: MainVisualItem[];
 }
 
 /**
- * メインビジュアル応募作品のライトボックス。
+ * 応募作品のライトボックス。
  *
  * 格子（サムネイル）は Astro 側で静的に出力し、このコンポーネントは
  * 拡大表示だけを担う。JS が動かない場合は格子の <a> が原寸画像を直接開く
@@ -25,7 +30,7 @@ interface Props {
  * ネイティブの <dialog> を使うことで、フォーカストラップと Esc での
  * クローズをブラウザに任せている。
  */
-export default function MainVisualLightbox({ items }: Props) {
+export default function MainVisualLightbox({ group, items }: Props) {
 	const dialogRef = useRef<HTMLDialogElement>(null);
 	const [index, setIndex] = useState<number | null>(null);
 
@@ -53,7 +58,9 @@ export default function MainVisualLightbox({ items }: Props) {
 	// 格子のサムネイルは Astro が出力した静的な <a>。ここで拾って乗っ取る。
 	useEffect(() => {
 		const links = Array.from(
-			document.querySelectorAll<HTMLAnchorElement>('[data-main-visual-index]'),
+			document.querySelectorAll<HTMLAnchorElement>(
+				`[data-lightbox-group="${group}"][data-lightbox-index]`,
+			),
 		);
 		if (links.length === 0) return;
 
@@ -61,7 +68,7 @@ export default function MainVisualLightbox({ items }: Props) {
 			// 修飾キー付きクリック（新しいタブで開く）はブラウザ既定の挙動を尊重する。
 			if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
 			const target = event.currentTarget as HTMLAnchorElement;
-			const next = Number(target.dataset.mainVisualIndex);
+			const next = Number(target.dataset.lightboxIndex);
 			if (Number.isNaN(next)) return;
 			event.preventDefault();
 			show(next);
@@ -75,7 +82,7 @@ export default function MainVisualLightbox({ items }: Props) {
 				link.removeEventListener('click', onClick);
 			}
 		};
-	}, [show]);
+	}, [group, show]);
 
 	useEffect(() => {
 		const onKeyDown = (event: KeyboardEvent) => {
