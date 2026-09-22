@@ -18,33 +18,33 @@ const genreFilters = EVENT_GENRES.map((value) => ({ value, label: EVENT_GENRE_LA
 	<Header client:load logoSrc={logoW.src} />
 
 	<main class="mx-auto w-full max-w-3xl px-4 pb-16">
-		<section class="mt-8">
+		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6">
 			<div class="flex flex-wrap items-baseline justify-between gap-3">
-				<SectionHeading title="Stage Events" tone="dark" />
-				<a href="/timetable" class="text-sm text-base underline hover:no-underline">
+				<SectionHeading title="Stage Events" />
+				<a href="/timetable" class="text-sm text-text underline hover:no-underline">
 					時系列で見る
 				</a>
 			</div>
 
-			<p class="mb-5 text-sm leading-relaxed text-base/80">
+			<p class="mb-5 text-sm leading-relaxed text-text/80">
 				体育館ステージで行われる企画の一覧です。時間は変更になる場合があります。
 			</p>
 
 			{
 				events.length === 0 ? (
-					<div class="rounded-2xl border border-base px-5 py-10 text-center">
-						<p class="font-medium text-base">ステージ企画は準備中です。</p>
-						<p class="mt-2 text-sm text-base/70">公開までしばらくお待ちください。</p>
+					<div class="hud-frame px-5 py-10 text-center">
+						<p class="font-medium text-text">ステージ企画は準備中です。</p>
+						<p class="mt-2 text-sm text-text/70">公開までしばらくお待ちください。</p>
 					</div>
 				) : (
 					<div id="event-list">
-						<label class="event-search mb-4 flex items-center gap-2 rounded-xl border border-base px-3 py-2">
-							<SearchIcon className="h-4 w-4 shrink-0 text-base" />
+						<label class="event-search mb-4 flex items-center gap-2 rounded-xl border border-text/30 px-3 py-2">
+							<SearchIcon className="h-4 w-4 shrink-0 text-text/70" />
 							<input
 								type="search"
 								name="q"
 								placeholder="企画名・出演団体を完全一致で検索"
-								class="w-full bg-transparent text-sm text-base focus:outline-none"
+								class="w-full bg-transparent text-sm text-text placeholder:text-text/50 focus:outline-none"
 								autocomplete="off"
 							/>
 						</label>
@@ -53,7 +53,7 @@ const genreFilters = EVENT_GENRES.map((value) => ({ value, label: EVENT_GENRE_LA
 							{genreFilters.map((genre) => (
 								<button
 									type="button"
-									class="rounded-full border border-base px-3 py-1 text-sm text-base transition-colors aria-pressed:border-main aria-pressed:bg-main aria-pressed:font-medium"
+									class="rounded-full border border-text/30 px-3 py-1 text-sm text-text transition-colors aria-pressed:border-main aria-pressed:bg-main aria-pressed:font-medium aria-pressed:text-base"
 									data-filter={genre.value}
 									aria-pressed="false"
 								>
@@ -63,17 +63,17 @@ const genreFilters = EVENT_GENRES.map((value) => ({ value, label: EVENT_GENRE_LA
 						</div>
 
 						<div class="mt-4 flex items-center gap-3">
-							<p class="event-count text-sm text-base">全 {events.length} 件</p>
+							<p class="event-count text-sm text-text/70">全 {events.length} 件</p>
 							<button
 								type="button"
-								class="event-clear text-sm text-base underline hover:no-underline"
+								class="event-clear text-sm text-text underline hover:no-underline"
 								hidden
 							>
 								絞り込みを解除
 							</button>
 						</div>
 
-						<p class="event-empty mt-6 text-sm text-base" role="status" hidden>
+						<p class="event-empty mt-6 text-sm text-text/70" role="status" hidden>
 							該当するステージ企画はありません。
 						</p>
 

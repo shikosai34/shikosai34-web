@@ -27,9 +27,9 @@ const { title, heading, message = `${title}は準備中です。` } = Astro.prop
 	<Header client:load logoSrc={logoW.src} />
 
 	<main class="mx-auto w-full max-w-3xl px-4 pb-16">
-		<section class="mt-8">
-			<SectionHeading title={heading} tone="dark" />
-			<p class="py-8 text-center text-sm text-base">{message}</p>
+		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6">
+			<SectionHeading title={heading} />
+			<p class="py-8 text-center text-sm text-text/70">{message}</p>
 		</section>
 	</main>
 

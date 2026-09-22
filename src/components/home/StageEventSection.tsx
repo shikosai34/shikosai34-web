@@ -74,13 +74,14 @@ export default function StageEventSection({ events = [] }: Props) {
 	const event = state.kind === 'next' || state.kind === 'current' ? state.event : null;
 
 	return (
-		<section className="mx-4 mt-8 rounded-2xl bg-base p-4 pt-6 pb-6 text-text">
+		<section className="surface-panel mx-4 mt-8 rounded-2xl p-4 pt-6 pb-6 text-text">
 			<SectionHeading title="Stage Events" />
 			<p className="text-sm leading-relaxed text-text/80">
 				体育館ステージのイベント情報はこちらから確認できます。
 			</p>
 
-			<div className="mt-4 rounded-xl border border-accent/50 bg-text/5 p-4" aria-live="polite">
+			{/* 直近の演目は HUD 風の枠で囲って、他の要素より前に出す。 */}
+			<div className="hud-frame mt-4 p-4" aria-live="polite">
 				<div className="flex flex-wrap items-center justify-between gap-2 text-xs">
 					<p className="font-medium text-accent">
 						{state.kind === 'next'
