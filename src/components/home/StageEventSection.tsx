@@ -80,7 +80,8 @@ export default function StageEventSection({ events = [] }: Props) {
 				体育館ステージのイベント情報はこちらから確認できます。
 			</p>
 
-			<div className="mt-4 rounded-xl border border-accent/50 bg-text/5 p-4" aria-live="polite">
+			{/* 直近の演目は HUD 風の枠で囲って、他の要素より前に出す。 */}
+			<div className="hud-frame mt-4 p-4" aria-live="polite">
 				<div className="flex flex-wrap items-center justify-between gap-2 text-xs">
 					<p className="font-medium text-accent">
 						{state.kind === 'next'

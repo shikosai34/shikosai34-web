@@ -104,7 +104,79 @@
   .surface-panel {
     position: relative;
     overflow: hidden;
-    background-color: color-mix(in srgb, var(--color-text) 6%, var(--color-base));
+    /*
+     * 完全な不透明だと地の麻の葉が完全に隠れるため、わずかに透かす。
+     */
+    background-color: color-mix(in srgb, var(--color-text) 6%, color-mix(in srgb, var(--color-base) 92%, transparent));
     border: 1px solid color-mix(in srgb, var(--color-text) 14%, transparent);
+  }
+
+  /*
+   * 角を落としたシアンの細枠。サイバーパンクな HUD の体で、
+   * ニュース一覧などの囲みに使う（参考サイトの枠の作りに倣う）。
+   * clip-path で角を斜めに切り、内側にもう一枚薄い枠を重ねる。
+   */
+  .hud-frame {
+    position: relative;
+    --hud-cut: 14px;
+    clip-path: polygon(
+      var(--hud-cut) 0,
+      100% 0,
+      100% calc(100% - var(--hud-cut)),
+      calc(100% - var(--hud-cut)) 100%,
+      0 100%,
+      0 var(--hud-cut)
+    );
+    background-color: color-mix(in srgb, var(--color-base) 70%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
+  }
+
+  /*
+   * 和の意匠（麻の葉）を線画で薄く敷く。
+   * 60deg / 120deg / 縦の 3 方向の細線を重ねて菱形の格子を作る。
+   */
+  .asanoha {
+    background-image:
+      repeating-linear-gradient(
+        60deg,
+        color-mix(in srgb, var(--color-accent) 14%, transparent) 0 1px,
+        transparent 1px 22px
+      ),
+      repeating-linear-gradient(
+        120deg,
+        color-mix(in srgb, var(--color-accent) 14%, transparent) 0 1px,
+        transparent 1px 22px
+      ),
+      repeating-linear-gradient(
+        to right,
+        color-mix(in srgb, var(--color-main) 10%, transparent) 0 1px,
+        transparent 1px 38px
+      );
+  }
+
+  /*
+   * 地として敷くときだけ、スクロールで柄が流れないよう貼り付ける。
+   * 小さな要素（記事サムネの代替など）に当てると柄が出ないため body 限定。
+   */
+  body.asanoha {
+    background-attachment: fixed;
+  }
+
+  /*
+   * 雲（青海波ではなく流雲）を思わせるネオンの線。
+   * 余白に置く装飾なので、当てる要素には aria-hidden を付ける。
+   */
+  .neon-line {
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--color-accent) 60%, transparent));
+  }
+
+  /*
+   * 縦書き。参考サイトのナビや見出しに倣い、日付や短いラベルに使う。
+   * 長文に当てるとモバイルで読み幅が破綻するため、短い語のみ。
+   */
+  .tategaki {
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    font-feature-settings: "vkna" 1;
   }
 }
