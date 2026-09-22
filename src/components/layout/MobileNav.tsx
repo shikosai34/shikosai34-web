@@ -58,13 +58,17 @@ export default function MobileNav({ isOpen, onClose }: Props) {
 										{group.heading}
 									</p>
 								) : null}
+								{/*
+								 * 縦書きは字数で高さが決まるため、2 文字の項目（装飾・協賛）は
+								 * そのままだと 37px しかない。指で押せるよう min-h / w で下限を敷く。
+								 */}
 								<ul className="flex flex-row-reverse flex-wrap items-start justify-start gap-x-4 gap-y-5">
 									{group.links.map((item) => (
 										<li key={item.href}>
 											<a
 												href={item.href}
 												onClick={onClose}
-												className="tategaki block py-1 text-base tracking-[0.15em] whitespace-nowrap text-text transition-colors hover:text-accent"
+												className="tategaki block min-h-28 w-11 py-1 text-base tracking-[0.15em] whitespace-nowrap text-text transition-colors hover:text-accent"
 											>
 												{item.label}
 											</a>

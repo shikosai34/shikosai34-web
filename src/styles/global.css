@@ -15,6 +15,22 @@
   --color-glitch: #e7386f;
 
   --font-primary: "Kiwi Maru", sans-serif;
+
+  /*
+   * 文字寸法（モバイル基準）。
+   * 既定の Tailwind は xs=12px / sm=14px だが、日本語は同じ px でも
+   * 英字より小さく見えるうえ、本文の多くが sm・注記が xs で組まれている。
+   * 一段ずつ上げて、最小を 13px、本文を 16px に引き上げる。
+   * 各所の text-xs / text-sm を書き換える代わりに、尺度側を定義し直す。
+   */
+  --text-xs: 0.8125rem;   /* 13px（旧 12px）*/
+  --text-xs--line-height: 1.6;
+  --text-sm: 0.9375rem;   /* 15px（旧 14px）*/
+  --text-sm--line-height: 1.7;
+  --text-base: 1rem;      /* 16px（据え置き）*/
+  --text-base--line-height: 1.8;
+  --text-lg: 1.1875rem;   /* 19px（旧 18px）*/
+  --text-xl: 1.375rem;    /* 22px（旧 20px）*/
 }
 
 @layer base {

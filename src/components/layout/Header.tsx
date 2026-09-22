@@ -20,9 +20,9 @@ export default function Header({ logoSrc }: Props) {
 				aria-label="メニューを開く"
 				aria-expanded={isNavOpen}
 				onClick={() => setIsNavOpen(true)}
-				className="rounded-full p-2 text-text transition-colors hover:bg-text/10 hover:text-accent"
+				className="-mr-1 rounded-full p-2.5 text-text transition-colors hover:bg-text/10 hover:text-accent"
 			>
-				<HamburgerIcon className="h-6 w-6" />
+				<HamburgerIcon className="h-7 w-7" />
 			</button>
 
 			<MobileNav isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
