@@ -3,6 +3,7 @@ import '@fontsource/kiwi-maru/400.css';
 import '@fontsource/kiwi-maru/500.css';
 import '../styles/global.css';
 import LoadingScreen from '../components/layout/LoadingScreen.astro';
+import EdgeKasumi from '../components/layout/EdgeKasumi';
 
 interface Props {
 	title?: string;
@@ -12,12 +13,18 @@ interface Props {
 	 * 既定はポスターに合わせた濃紺＋亀甲で、全ページがこれを使う。
 	 */
 	bodyClass?: string;
+	/**
+	 * 画面の左右端に霞の雲（EdgeKasumi）を出すか。
+	 * 既定で全ページに出す。全画面の演出を持つページ（404 など）では切る。
+	 */
+	edgeKasumi?: boolean;
 }
 
 const {
 	title = '茨香祭 | 第34回 茨城工業高等専門学校 文化祭',
 	description = '第34回 茨城工業高等専門学校 文化祭（茨香祭）の公式Webサイトです。テーマ「守破離」のもと、和風×サイバーパンクの新しい文化祭をお届けします。',
-	bodyClass = 'kikko bg-base text-text'
+	bodyClass = 'kikko bg-base text-text',
+	edgeKasumi = true
 } = Astro.props;
 
 // astro.config.mjs の site を基準に絶対 URL を組み立てる。
@@ -54,6 +61,8 @@ const ogImageURL = new URL('/ogp.png', siteOrigin);
 		 * これを Layout に置くだけでページ遷移のたびに出る。
 		 */}
 		<LoadingScreen />
+		{/* 画面の左右端に固定する霞。スクロールしても残る。 */}
+		{edgeKasumi && <EdgeKasumi />}
 		<slot />
 	</body>
 </html>
