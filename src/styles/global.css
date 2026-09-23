@@ -415,7 +415,7 @@
   }
 
   .loading-art {
-    width: min(62vw, 260px);
+    width: min(80vw, 360px);
   }
 
   .loading-art svg {
@@ -424,7 +424,10 @@
     overflow: visible;
   }
 
-  /* 月をゆっくり明滅させ、止まって見えないようにする。 */
+  /*
+   * 月をゆっくり明滅させ、止まって見えないようにする。
+   * 三日月は塗りで見せるため、stroke ではなく要素ごと薄くする。
+   */
   .loading-moon {
     animation: loading-moon-pulse 2.6s ease-in-out infinite;
   }
@@ -432,10 +435,10 @@
   @keyframes loading-moon-pulse {
     0%,
     100% {
-      stroke-opacity: 0.85;
+      opacity: 1;
     }
     50% {
-      stroke-opacity: 0.45;
+      opacity: 0.62;
     }
   }
 
