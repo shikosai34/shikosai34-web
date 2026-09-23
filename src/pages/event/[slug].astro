@@ -1,6 +1,6 @@
 ---
 import { render } from 'astro:content';
-import logoW from '../../assets/logo/yokogaki/HOL_W-trimmed.png';
+import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
 import Header from '../../components/layout/Header';
 import Layout from '../../layouts/Layout.astro';
@@ -25,7 +25,7 @@ const { title, performer, startAt, endAt, genre, status, venue, image, descripti
 ---
 
 <Layout title={`${title} | ステージ企画 | 第34回 茨香祭`}>
-	<Header client:load logoSrc={logoW.src} />
+	<Header client:load logoSrc={logoG.src} />
 
 	<main class="mx-auto w-full max-w-2xl px-4 pb-16">
 		<article class="surface-panel mt-8 rounded-2xl p-5 text-text">

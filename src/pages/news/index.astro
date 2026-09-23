@@ -1,5 +1,5 @@
 ---
-import logoW from '../../assets/logo/yokogaki/HOL_W-trimmed.png';
+import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
 import Header from '../../components/layout/Header';
 import NewsListItem from '../../components/news/NewsListItem';
@@ -18,7 +18,7 @@ const items = (await getVisibleNews()).map((entry) => ({
 ---
 
 <Layout title="お知らせ | 第34回 茨香祭">
-	<Header client:load logoSrc={logoW.src} />
+	<Header client:load logoSrc={logoG.src} />
 
 	<main class="mx-auto w-full max-w-2xl px-4 pb-16">
 		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6">
