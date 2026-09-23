@@ -6,6 +6,7 @@ import logoG from '../assets/logo/yokogaki/HOL_G-trimmed.png';
 import kosenLogo from '../assets/logo/kosen/footer.svg';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
+import EdgeKasumi from '../components/layout/EdgeKasumi';
 import WagasaRow from '../components/layout/WagasaRow';
 import BreakingNewsHero from '../components/home/BreakingNewsHero';
 import PosterDialog from '../components/home/PosterDialog';
@@ -54,6 +55,9 @@ const stageEvents = (await getVisibleEvents()).map((entry) => ({
 ---
 
 <Layout title="茨香祭速報 | 第34回 茨香祭">
+	{/* 画面の左右端に固定する霞。スクロールしても残る。 */}
+	<EdgeKasumi />
+
 	<Header client:load logoSrc={logoW.src} />
 
 	<main class="mx-auto w-full max-w-2xl pb-16">
