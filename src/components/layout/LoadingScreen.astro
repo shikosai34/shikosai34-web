@@ -25,57 +25,152 @@
 
 <div id="loading-screen" class="loading-screen" role="status" aria-live="polite" aria-label="読み込み中">
 	<div class="loading-art" aria-hidden="true">
-		<svg viewBox="0 0 240 210" fill="none">
+		{/*
+		 * viewBox はいただいた鳥居の座標系（横 1200）をそのまま使い、
+		 * 上へ伸ばして月の場所を作る。こうすると鳥居のパスを
+		 * 一切いじらずに済む。下は根巻の下端（1066）で切る。
+		 */}
+		<svg viewBox="0 -378 1200 1464" fill="none">
 			<defs>
 				<radialGradient id="loading-moon-glow">
 					<stop offset="0%" stop-color="var(--color-accent)" stop-opacity="0.5"></stop>
 					<stop offset="45%" stop-color="var(--color-accent)" stop-opacity="0.14"></stop>
 					<stop offset="100%" stop-color="var(--color-accent)" stop-opacity="0"></stop>
 				</radialGradient>
+
+				{/* 線をにじませて発光させる。 */}
+				<filter id="loading-torii-glow" x="-10%" y="-10%" width="120%" height="120%">
+					<feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur"></feGaussianBlur>
+					<feMerge>
+						<feMergeNode in="blur"></feMergeNode>
+						<feMergeNode in="SourceGraphic"></feMergeNode>
+					</feMerge>
+				</filter>
+
+				{/*
+				 * 月の弧の先端。交点から延ばして、細くなりながら消える。
+				 * 座標は元の SVG（400x400）のままなので、
+				 * gradientUnits="userSpaceOnUse" の指す先も元の座標系。
+				 */}
+				<linearGradient
+					id="loading-moon-fade-top"
+					gradientUnits="userSpaceOnUse"
+					x1="265.30"
+					y1="64.96"
+					x2="287.75"
+					y2="78.35"
+				>
+					<stop offset="0" stop-color="#eef3f8" stop-opacity="1"></stop>
+					<stop offset="1" stop-color="#eef3f8" stop-opacity="0.15"></stop>
+				</linearGradient>
+				<linearGradient
+					id="loading-moon-fade-right"
+					gradientUnits="userSpaceOnUse"
+					x1="335.04"
+					y1="134.70"
+					x2="318.52"
+					y2="108.05"
+				>
+					<stop offset="0" stop-color="#eef3f8" stop-opacity="1"></stop>
+					<stop offset="1" stop-color="#eef3f8" stop-opacity="0.15"></stop>
+				</linearGradient>
+
+				<filter id="loading-moon-glow-filter" x="-20%" y="-20%" width="140%" height="140%">
+					<feGaussianBlur in="SourceGraphic" stdDeviation="1.6" result="blur"></feGaussianBlur>
+					<feMerge>
+						<feMergeNode in="blur"></feMergeNode>
+						<feMergeNode in="SourceGraphic"></feMergeNode>
+					</feMerge>
+				</filter>
 			</defs>
 
 			{/* 月のにじみ */}
-			<circle cx="120" cy="62" r="95" fill="url(#loading-moon-glow)"></circle>
+			<circle cx="555" cy="-150" r="330" fill="url(#loading-moon-glow)"></circle>
 
 			{/*
-			 * 三日月。円を2つ重ねて欠けさせるのではなく、
-			 * 外周の弧（月の縁）と内側の弧（影の境目）をつないだ
-			 * 1本の閉じたパスで描く。こうすると縁に線を引ける。
-			 * 内側の弧を右へずらすほど、光っている部分が太くなる。
+			 * 月。いただいた SVG は 400x400 の座標系で描かれているので、
+			 * パスには触れず、transform でこの座標系に載せる。
+			 * 中心 (200,200)・外円 R150 を、中心 (555,-150)・R187 に移す。
+			 *
+			 * 鳥居の中（柱の間）に置くと笠木と貫に横切られて
+			 * 弧の断片に見えるため、笠木より上に出している。
 			 */}
-			<path
-				class="loading-moon"
-				d="M 146.5 19.6 A 50 50 0 1 0 146.5 104.4 A 48.5 48.5 0 1 1 146.5 19.6 Z"
-				fill="#dff7f1"
-				fill-opacity="0.92"
-				stroke="var(--color-text)"
-				stroke-opacity="0.9"
-				stroke-width="1"
-				stroke-linejoin="round"></path>
-
-			{/*
-			 * 鳥居。月と重ねて手前に置く。
-			 * 面は地色で塗って、月を隠すシルエットにする。
-			 */}
-			<g
-				class="loading-torii"
-				fill="var(--color-base)"
-				stroke="var(--color-text)"
-				stroke-width="1.8"
-				stroke-linejoin="round"
-			>
-				{/* 笠木（反った横木） */}
-				<path d="M26 96 Q120 82 214 96 L214 106 Q120 92 26 106 Z"></path>
-				{/* 島木 */}
-				<rect x="40" y="109" width="160" height="9"></rect>
-				{/* 貫 */}
-				<rect x="56" y="144" width="128" height="8"></rect>
-				{/* 額束 */}
-				<rect x="112" y="118" width="16" height="26"></rect>
-				{/* 柱 */}
-				<path d="M64 118 L58 200 L78 200 L74 118 Z"></path>
-				<path d="M176 118 L182 200 L162 200 L166 118 Z"></path>
+			<g class="loading-moon" transform="translate(305 -400) scale(1.25)">
+				<g filter="url(#loading-moon-glow-filter)">
+					{/* 外側の弧：上の交点から左・下を通って右の交点まで */}
+					<path
+						class="loading-moon-arc"
+						d="M265.30 64.96 A150.00 150.00 0 1 0 335.04 134.70"></path>
+					{/* 内側の弧：外円の内側にある部分だけ */}
+					<path
+						class="loading-moon-arc"
+						d="M265.30 64.96 A93.17 93.17 0 1 0 335.04 134.70"></path>
+					{/* 先端（上） */}
+					<path
+						fill="url(#loading-moon-fade-top)"
+						d="M265.86 63.79 L266.44 64.10 L267.03 64.41 L267.60 64.73 L268.18 65.05 L268.76 65.37 L269.33 65.70 L269.91 66.03 L270.48 66.36 L271.05 66.69 L271.61 67.03 L272.18 67.36 L272.75 67.70 L273.31 68.05 L273.87 68.39 L274.43 68.74 L274.99 69.09 L275.54 69.45 L276.10 69.80 L276.65 70.16 L277.20 70.52 L277.75 70.89 L278.30 71.25 L278.84 71.62 L279.38 71.99 L279.92 72.37 L280.46 72.74 L281.00 73.12 L281.54 73.51 L282.07 73.89 L282.60 74.28 L283.13 74.67 L283.65 75.06 L284.18 75.46 L284.70 75.86 L285.22 76.26 L285.74 76.67 L286.25 77.08 L286.76 77.49 L287.26 77.91 L287.75 78.35 L287.75 78.35 L287.18 78.02 L286.62 77.68 L286.06 77.34 L285.50 77.00 L284.94 76.67 L284.38 76.33 L283.82 75.99 L283.26 75.66 L282.69 75.33 L282.13 74.99 L281.56 74.67 L281.00 74.34 L280.43 74.01 L279.86 73.69 L279.30 73.37 L278.73 73.05 L278.15 72.74 L277.58 72.42 L277.01 72.11 L276.44 71.80 L275.86 71.50 L275.28 71.19 L274.71 70.89 L274.13 70.59 L273.55 70.29 L272.97 70.00 L272.39 69.71 L271.80 69.42 L271.22 69.13 L270.64 68.84 L270.05 68.56 L269.46 68.28 L268.87 68.00 L268.29 67.73 L267.70 67.45 L267.10 67.18 L266.51 66.92 L265.92 66.65 L265.33 66.39 L264.73 66.13 Z"
+					></path>
+					{/* 先端（右） */}
+					<path
+						fill="url(#loading-moon-fade-right)"
+						d="M336.21 134.14 L335.84 133.44 L335.47 132.74 L335.09 132.04 L334.71 131.35 L334.32 130.65 L333.94 129.96 L333.54 129.28 L333.15 128.59 L332.75 127.91 L332.34 127.23 L331.94 126.55 L331.53 125.87 L331.11 125.20 L330.69 124.53 L330.27 123.86 L329.85 123.19 L329.42 122.53 L328.99 121.87 L328.55 121.21 L328.11 120.55 L327.67 119.90 L327.22 119.25 L326.77 118.60 L326.32 117.95 L325.86 117.31 L325.40 116.67 L324.93 116.03 L324.47 115.40 L323.99 114.77 L323.52 114.14 L323.04 113.51 L322.55 112.89 L322.07 112.27 L321.58 111.65 L321.08 111.04 L320.58 110.43 L320.08 109.83 L319.57 109.23 L319.05 108.63 L318.52 108.05 L318.52 108.05 L318.94 108.72 L319.38 109.37 L319.81 110.02 L320.25 110.68 L320.68 111.33 L321.11 111.99 L321.54 112.65 L321.97 113.30 L322.39 113.97 L322.81 114.63 L323.23 115.29 L323.64 115.96 L324.06 116.62 L324.46 117.29 L324.87 117.96 L325.27 118.63 L325.67 119.31 L326.06 119.98 L326.45 120.66 L326.84 121.34 L327.23 122.02 L327.61 122.70 L327.99 123.39 L328.36 124.07 L328.73 124.76 L329.10 125.45 L329.46 126.14 L329.82 126.83 L330.18 127.53 L330.53 128.22 L330.88 128.92 L331.23 129.62 L331.57 130.32 L331.91 131.02 L332.25 131.73 L332.58 132.43 L332.91 133.14 L333.23 133.85 L333.55 134.56 L333.87 135.27 Z"
+					></path>
+				</g>
 			</g>
+
+			{/*
+			 * 鳥居。面は地色で塗って、月を隠すシルエットにする。
+			 * 部材の名前は元の SVG のまま。
+			 */}
+			<g class="loading-torii" filter="url(#loading-torii-glow)">
+				{/* 貫（ぬき） */}
+				<rect class="loading-torii-part" x="195" y="360" width="810" height="32"></rect>
+				<line class="loading-torii-line" x1="203" y1="376" x2="997" y2="376"></line>
+
+				{/* 柱（左右、下に向かって外側へ開く） */}
+				<path class="loading-torii-part" d="M312 222 L352 222 L341 1056 L287 1056 Z"></path>
+				<path class="loading-torii-part" d="M848 222 L888 222 L913 1056 L859 1056 Z"></path>
+				<line class="loading-torii-line" x1="332" y1="232" x2="314" y2="1000"></line>
+				<line class="loading-torii-line" x1="868" y1="232" x2="886" y2="1000"></line>
+
+				{/* 楔（くさび） */}
+				<rect class="loading-torii-part" x="291" y="364" width="14" height="24"></rect>
+				<rect class="loading-torii-part" x="895" y="364" width="14" height="24"></rect>
+
+				{/* 根巻（ねまき） */}
+				<rect class="loading-torii-part" x="272" y="1006" width="82" height="60" rx="3"></rect>
+				<rect class="loading-torii-part" x="846" y="1006" width="82" height="60" rx="3"></rect>
+				<line class="loading-torii-line" x1="272" y1="1021" x2="354" y2="1021"></line>
+				<line class="loading-torii-line" x1="846" y1="1021" x2="928" y2="1021"></line>
+
+				{/* 額束（がくづか）と額 */}
+				<rect class="loading-torii-part" x="586" y="222" width="28" height="140"></rect>
+				<rect class="loading-torii-part" x="558" y="246" width="84" height="106" rx="2"></rect>
+				<rect class="loading-torii-line" x="566" y="254" width="68" height="90"></rect>
+
+				{/* 島木（しまぎ） */}
+				<rect class="loading-torii-part" x="214" y="194" width="772" height="30"></rect>
+
+				{/* 笠木（かさぎ）：両端が反り上がる形 */}
+				<path
+					class="loading-torii-part"
+					d="M132 112 Q176 160 252 164 L948 164 Q1024 160 1068 112 L1060 146 Q1020 192 948 196 L252 196 Q180 192 140 146 Z"
+				></path>
+				<path
+					class="loading-torii-line"
+					d="M150 132 Q190 176 252 180 L948 180 Q1010 176 1050 132"
+				></path>
+			</g>
+
+			{/* 地面の線 */}
+			<line
+				x1="120"
+				y1="1066"
+				x2="1080"
+				y2="1066"
+				stroke="var(--color-text)"
+				stroke-opacity="0.25"
+				stroke-width="5"></line>
 		</svg>
 	</div>
 
