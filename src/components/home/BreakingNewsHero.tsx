@@ -24,7 +24,12 @@ export default function BreakingNewsHero({
 	posterFullWidth,
 	posterFullHeight,
 }: Props) {
-	const [flipped, setFlipped] = useState(false);
+	/*
+	 * めくった回数。1回ごとに同じ向きへ 180 度ずつ足していき、
+	 * 表へ戻すときも逆回転させずに一周（計 360 度）させる。
+	 */
+	const [turns, setTurns] = useState(0);
+	const flipped = turns % 2 === 1;
 	const showButtonRef = useRef<HTMLButtonElement>(null);
 	const backButtonRef = useRef<HTMLButtonElement>(null);
 	// 初回描画ではフォーカスを動かさない（ページを開いた瞬間に奪わないため）。
@@ -40,8 +45,9 @@ export default function BreakingNewsHero({
 	}, [flipped]);
 
 	const flip = (next: boolean) => {
+		if (next === flipped) return;
 		hasToggled.current = true;
-		setFlipped(next);
+		setTurns((count) => count + 1);
 	};
 
 	/*
@@ -60,7 +66,8 @@ export default function BreakingNewsHero({
 			}}
 		>
 			<div
-				className={`relative transition-transform duration-700 ease-in-out transform-3d motion-reduce:transition-none ${flipped ? 'rotate-y-180' : ''}`}
+				className="relative transition-transform duration-700 ease-in-out transform-3d motion-reduce:transition-none"
+				style={{ transform: `rotateY(${turns * 180}deg)` }}
 			>
 				<section
 					className="surface-panel rounded-2xl px-4 pt-6 pb-4 backface-hidden"
