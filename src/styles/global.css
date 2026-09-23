@@ -46,6 +46,11 @@
 }
 
 @layer base {
+  :root {
+    /* 亀甲の柄（.kikko と body の地の層で共用する） */
+    --kikko-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='27.713' viewBox='0 0 48 27.713'%3E%3Cg fill='none' stroke='%2300ffcc' stroke-opacity='0.18' stroke-width='1.2'%3E%3Cpath d='M16 0 L8 13.86 L-8 13.86 L-16 0'/%3E%3Cpath d='M16 27.71 L8 13.86'/%3E%3Cpath d='M64 0 L56 13.86 L40 13.86 L32 0'/%3E%3Cpath d='M64 27.71 L56 13.86'/%3E%3Cpath d='M40 13.86 L32 27.71 L16 27.71'/%3E%3C/g%3E%3C/svg%3E");
+  }
+
   html {
     overflow-x: hidden;
     /*
@@ -256,16 +261,38 @@
    * data URI 内では CSS 変数も currentColor も解決されないため）。
    */
   .kikko {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='27.713' viewBox='0 0 48 27.713'%3E%3Cg fill='none' stroke='%2300ffcc' stroke-opacity='0.18' stroke-width='1.2'%3E%3Cpath d='M16 0 L8 13.86 L-8 13.86 L-16 0'/%3E%3Cpath d='M16 27.71 L8 13.86'/%3E%3Cpath d='M64 0 L56 13.86 L40 13.86 L32 0'/%3E%3Cpath d='M64 27.71 L56 13.86'/%3E%3Cpath d='M40 13.86 L32 27.71 L16 27.71'/%3E%3C/g%3E%3C/svg%3E");
+    background-image: var(--kikko-tile);
     background-size: 48px 27.713px;
   }
 
   /*
-   * 地として敷くときだけ、スクロールで柄が流れないよう貼り付ける。
-   * 小さな要素（記事サムネの代替など）に当てると柄が出ないため body 限定。
+   * 地として敷くときは、body 自身ではなく画面に貼り付けた層に柄を描く。
+   * body の背景だと body の箱の外（上下へオーバースクロールしたときに
+   * 見える余白）には柄が出ず、濃紺だけになってしまう。
+   * また iOS Safari は background-attachment: fixed を無視する。
+   * そこで固定配置の層を画面の上下へ 1 画面分ずつはみ出させて敷き、
+   * 引っ張った先でも柄が途切れないようにする。
+   * isolation で body を重なりの基準にし、z-index:-1 の層を
+   * body の地色の上・中身の下に置く。
    */
   body.kikko {
-    background-attachment: fixed;
+    background-image: none;
+    isolation: isolate;
+  }
+
+  body.kikko::before {
+    content: "";
+    position: fixed;
+    top: -100vh;
+    right: 0;
+    bottom: -100vh;
+    left: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: var(--kikko-tile);
+    background-size: 48px 27.713px;
+    /* はみ出した分だけずらし、柄の起点を画面の左上に揃える */
+    background-position: 0 100vh;
   }
 
   /*
