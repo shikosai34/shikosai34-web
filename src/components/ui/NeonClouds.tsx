@@ -1,3 +1,4 @@
+import KasumiCloud from './KasumiCloud';
 /*
  * 光る雲と流れる霧を重ねた背景。
  *
@@ -32,36 +33,10 @@ interface Props {
 }
 
 /*
- * 横棒8本。実測した座標（viewBox 542x368）をそのまま使う。
- * 太さ・丸端・間隔を変えると「段々に流れる」印象が崩れるため、
- * 大きさの調整は要素側（幅・高さ）で行う。
+ * 雲の絵は KasumiCloud（kasumi-cloud-2.svg 由来）に統一した。
+ * 以前は参考サイトの PNG から実測した横棒のパスを持っていたが、
+ * より作り込まれた霞の SVG に差し替えている。
  */
-const CLOUD_PATH =
-	// 横棒は独立していない。2本ずつが右端でU字につながり、
-	// 1本の管が折り返しながら右下へ流れていく形になっている。
-	// 座標・折り返し位置は実物（542x368）からの実測値。
-	'M45 78H246A17 17 0 0 1 246 112H107 ' +
-	'M108 138H210A17 17 0 0 1 210 172H91 ' +
-	'M92 198H297A17 17 0 0 1 297 232H199 ' +
-	'M200 258H445A17 17 0 0 1 445 292H161';
-
-function CloudTube({ flip = false }: { flip?: boolean }) {
-	return (
-		<svg
-			viewBox="0 0 542 368"
-			preserveAspectRatio="xMidYMid meet"
-			style={flip ? { transform: 'scaleX(-1)' } : undefined}
-		>
-			{/*
-			 * にじみ → 中間 → 芯 の順に重ねる。
-			 * 参考サイトは芯がほぼ白で、まわりだけが色づいている。
-			 */}
-			<path className="cloud-bloom" d={CLOUD_PATH} />
-			<path className="cloud-mid" d={CLOUD_PATH} />
-			<path className="cloud-core" d={CLOUD_PATH} />
-		</svg>
-	);
-}
 
 export default function NeonClouds({ className = '', fog = true, placement = 'corners' }: Props) {
 	return (
@@ -81,24 +56,30 @@ export default function NeonClouds({ className = '', fog = true, placement = 'co
 			 * 雲は余白に置く。文字やポスターの上には重ねない。
 			 * 左右で向きを反転させると、同じ形の繰り返しに見えにくい。
 			 */}
-			<span className="neon-cloud top-1 right-3 h-20 w-36 sm:h-24 sm:w-44">
-				<CloudTube />
-			</span>
+			<KasumiCloud
+				id="panel-a"
+				className="neon-cloud top-1 right-2 w-20 text-accent/35 sm:w-24"
+			/>
 
 			{placement === 'corners' ? (
 				<>
-					<span className="neon-cloud neon-cloud--pink bottom-3 left-3 h-16 w-32 opacity-75 sm:h-20 sm:w-40">
-						<CloudTube flip />
-					</span>
-					<span className="neon-cloud top-1/2 right-5 h-14 w-28 opacity-35 sm:w-32">
-						<CloudTube />
-					</span>
+					<KasumiCloud
+						id="panel-b"
+						flip
+						className="neon-cloud bottom-1 left-1 w-16 text-glow-pink/30 sm:w-20"
+					/>
+					<KasumiCloud
+						id="panel-c"
+						className="neon-cloud top-1/3 right-3 w-14 text-accent/18 sm:w-16"
+					/>
 				</>
 			) : (
 				/* 上だけ。本文の上に雲がかからないようにする。 */
-				<span className="neon-cloud neon-cloud--pink top-14 left-3 h-16 w-32 opacity-60 sm:h-20 sm:w-40">
-					<CloudTube flip />
-				</span>
+				<KasumiCloud
+					id="panel-top"
+					flip
+					className="neon-cloud top-12 left-1 w-16 text-glow-pink/28 sm:w-20"
+				/>
 			)}
 		</div>
 	);
