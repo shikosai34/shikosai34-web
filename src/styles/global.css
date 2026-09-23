@@ -402,6 +402,52 @@
   }
 
   /* ===================================================================
+   * 和傘（フッター上の装飾）
+   * -------------------------------------------------------------------
+   * 参考サイトは deco_umbrella*.svg を @keyframes umbrella で
+   * 14〜17秒 / 720deg、向き違いに回している。同じ考え方で、
+   * 傘ごとに秒数を変えて回転が揃わないようにする。
+   * =================================================================== */
+  .wagasa-spin-14,
+  .wagasa-spin-15,
+  .wagasa-spin-16,
+  .wagasa-spin-17 {
+    animation-name: wagasa-turn;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    /* 回転の中心を絵の中心に固定する（既定でも中心だが、明示する）。 */
+    transform-origin: 50% 50%;
+  }
+
+  .wagasa-spin-14 { animation-duration: 14s; }
+  .wagasa-spin-15 { animation-duration: 15s; }
+  .wagasa-spin-16 { animation-duration: 16s; }
+  .wagasa-spin-17 { animation-duration: 17s; }
+
+  /* 逆回し。隣り合う傘が同じ向きに揃わないようにする。 */
+  .wagasa-reverse {
+    animation-direction: reverse;
+  }
+
+  @keyframes wagasa-turn {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .wagasa-spin-14,
+    .wagasa-spin-15,
+    .wagasa-spin-16,
+    .wagasa-spin-17 {
+      animation: none;
+    }
+  }
+
+  /* ===================================================================
    * 流れる霧（fog）
    * -------------------------------------------------------------------
    * 参考サイトは背景画像を 60s / 80s(reverse) で background-position

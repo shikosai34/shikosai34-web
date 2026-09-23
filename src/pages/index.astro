@@ -6,6 +6,7 @@ import logoG from '../assets/logo/yokogaki/HOL_G-trimmed.png';
 import kosenLogo from '../assets/logo/kosen/footer.svg';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
+import WagasaRow from '../components/layout/WagasaRow';
 import BreakingNewsHero from '../components/home/BreakingNewsHero';
 import PosterDialog from '../components/home/PosterDialog';
 import ThemeModel from '../components/home/ThemeModel';
@@ -79,5 +80,6 @@ const stageEvents = (await getVisibleEvents()).map((entry) => ({
 		<NewsSection items={latestNews} />
 	</main>
 
+	<WagasaRow />
 	<Footer logoSrc={logoG.src} kosenLogoSrc={kosenLogo.src} />
 </Layout>
