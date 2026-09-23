@@ -25,11 +25,7 @@ export default function BreakingNewsHero({
 	dialog,
 }: Props) {
 	return (
-		/*
-		 * ポスターの構図に合わせ、左右のオレンジの帯で濃紺の面を挟む。
-		 * 帯は border で引く（要素を足すとレイアウトが増えるため）。
-		 */
-		<section className="surface-panel mx-4 mt-6 rounded-2xl border-x-4 border-x-main px-4 pt-6 pb-4">
+		<section className="surface-panel mx-4 mt-6 rounded-2xl px-4 pt-6 pb-4">
 			{/*
 			 * 光る雲と霧。参考サイトのキービジュアルの空気感にあたる部分。
 			 * .surface-panel > * は z-index:1 なので、この背景だけ 0 に落として
