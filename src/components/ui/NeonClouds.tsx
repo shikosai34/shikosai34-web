@@ -17,6 +17,12 @@ interface Props {
 	 * 小さな囲みでは雲だけにする（霧はタイルが大きく、狭い面では効かない）。
 	 */
 	fog?: boolean;
+	/**
+	 * 雲の配置。既定（'corners'）は上下に散らす。
+	 * 本文が下まで詰まっているパネルでは 'top' にして、
+	 * 上の余白だけに置く（文字に重ねない）。
+	 */
+	placement?: 'corners' | 'top';
 }
 
 /*
@@ -36,7 +42,7 @@ const CLOUD_PATH =
 function CloudTube({ flip = false }: { flip?: boolean }) {
 	return (
 		<svg
-			viewBox="0 0 124 80"
+			viewBox="-12 -12 148 104"
 			preserveAspectRatio="xMidYMid meet"
 			style={flip ? { transform: 'scaleX(-1)' } : undefined}
 		>
@@ -48,7 +54,7 @@ function CloudTube({ flip = false }: { flip?: boolean }) {
 	);
 }
 
-export default function NeonClouds({ className = '', fog = true }: Props) {
+export default function NeonClouds({ className = '', fog = true, placement = 'corners' }: Props) {
 	return (
 		<div
 			aria-hidden="true"
@@ -69,12 +75,21 @@ export default function NeonClouds({ className = '', fog = true }: Props) {
 			<span className="neon-cloud top-2 right-3 h-16 w-44 sm:h-20 sm:w-56">
 				<CloudTube />
 			</span>
-			<span className="neon-cloud neon-cloud--pink bottom-4 left-3 h-14 w-40 opacity-85 sm:h-16 sm:w-48">
-				<CloudTube flip />
-			</span>
-			<span className="neon-cloud top-1/2 right-6 h-12 w-32 opacity-45 sm:w-40">
-				<CloudTube />
-			</span>
+			{placement === 'corners' ? (
+				<>
+					<span className="neon-cloud neon-cloud--pink bottom-4 left-3 h-14 w-40 opacity-85 sm:h-16 sm:w-48">
+						<CloudTube flip />
+					</span>
+					<span className="neon-cloud top-1/2 right-6 h-12 w-32 opacity-45 sm:w-40">
+						<CloudTube />
+					</span>
+				</>
+			) : (
+				/* 上だけ。本文の上に雲がかからないようにする。 */
+				<span className="neon-cloud neon-cloud--pink top-16 left-3 h-12 w-32 opacity-70 sm:h-14 sm:w-40">
+					<CloudTube flip />
+				</span>
+			)}
 		</div>
 	);
 }

@@ -337,7 +337,12 @@
     inset: 0;
     width: 100%;
     height: 100%;
-    overflow: visible;
+    /*
+     * overflow は隠す。visible だとぼかした線が箱の外へ漏れ、
+     * 雲から線の切れ端が飛び出して見える。
+     * にじみの余白は viewBox 側に取ってある。
+     */
+    overflow: hidden;
     fill: none;
     stroke: currentColor;
     stroke-linecap: round;

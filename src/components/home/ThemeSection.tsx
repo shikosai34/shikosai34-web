@@ -41,7 +41,7 @@ export default function ThemeSection({ mark }: Props) {
 	return (
 		<section className="surface-panel mx-4 mt-8 rounded-2xl p-6 text-text">
 			{/* 守破離のまわりは余白が広いので、雲を効かせやすい。 */}
-			<NeonClouds className="rounded-2xl" />
+			<NeonClouds className="rounded-2xl" placement="top" />
 
 			<div className="w-72 max-w-full justify-start font-primary text-3xl font-normal text-white">This year's theme</div>
 

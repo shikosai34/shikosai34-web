@@ -1,7 +1,6 @@
 import ArrowRightIcon from '../icons/ArrowRightIcon';
 import Button from '../ui/Button';
 import type { ReactNode } from 'react';
-import KumoLine from '../ui/KumoLine';
 import NeonClouds from '../ui/NeonClouds';
 import SectionHeading from '../ui/SectionHeading';
 
@@ -39,13 +38,11 @@ export default function BreakingNewsHero({
 			<NeonClouds className="rounded-2xl" />
 
 			{/*
-			 * 見出しの右の余白に流雲を流す。狭い画面では場所がないので
-			 * sm 以上でのみ出す。
+			 * 見出しの右の余白にはネオンの雲（NeonClouds）が入るため、
+			 * 線画の KumoLine は重ねない。細い線が雲の横に
+			 * 取り残されて、ワイヤーフレームのように見えてしまう。
 			 */}
-			<div className="flex items-start justify-between gap-4">
-				<SectionHeading title="茨香祭速報" />
-				<KumoLine className="hidden h-8 w-24 shrink-0 text-accent/40 sm:block" side="right" />
-			</div>
+			<SectionHeading title="茨香祭速報" />
 
 			{/*
 			 * 参考サイトに倣い、紙面を円でそのまま切り抜く。
