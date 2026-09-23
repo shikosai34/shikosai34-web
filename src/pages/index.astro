@@ -6,7 +6,6 @@ import Header from '../components/layout/Header';
 import SiteFooter from '../components/layout/SiteFooter.astro';
 import EdgeKasumi from '../components/layout/EdgeKasumi';
 import BreakingNewsHero from '../components/home/BreakingNewsHero';
-import PosterDialog from '../components/home/PosterDialog';
 import ThemeModel from '../components/home/ThemeModel';
 import ThemeSection from '../components/home/ThemeSection';
 import NewsSection from '../components/home/NewsSection';
@@ -22,8 +21,8 @@ const posterImage = await getImage({
 	format: 'webp',
 });
 
-// 拡大表示用。円で切り抜くヒーローでは四隅が欠けるため、
-// ダイアログでは文字が読める大きさのものを渡す。
+// 裏面用。円で切り抜く表面では四隅が欠けるため、
+// タイルを裏返した面には文字が読める大きさのものを渡す。
 const posterFull = await getImage({
 	src: posterAsset,
 	width: 1600,
@@ -59,20 +58,15 @@ const stageEvents = (await getVisibleEvents()).map((entry) => ({
 
 	<main class="mx-auto w-full max-w-2xl pb-16">
 		<BreakingNewsHero
+			client:load
 			posterSrc={posterImage.src}
 			posterWidth={posterImage.attributes.width}
 			posterHeight={posterImage.attributes.height}
 			posterAlt={posterAltText}
-		>
-			<PosterDialog
-				slot="dialog"
-				client:load
-				src={posterFull.src}
-				width={Number(posterFull.attributes.width)}
-				height={Number(posterFull.attributes.height)}
-				alt={posterAltText}
-			/>
-		</BreakingNewsHero>
+			posterFullSrc={posterFull.src}
+			posterFullWidth={Number(posterFull.attributes.width)}
+			posterFullHeight={Number(posterFull.attributes.height)}
+		/>
 
 		<ThemeSection>
 			<ThemeModel slot="mark" client:only="react" />
