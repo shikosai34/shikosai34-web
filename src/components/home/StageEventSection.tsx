@@ -75,7 +75,7 @@ export default function StageEventSection({ events = [] }: Props) {
 
 	return (
 		<section className="surface-panel mx-4 mt-8 rounded-2xl p-4 pt-6 pb-6 text-text">
-			<SectionHeading title="Stage Events" />
+			<SectionHeading title="Stage Events" icon="mic" />
 			<p className="text-sm leading-relaxed text-text/80">
 				体育館ステージのイベント情報はこちらから確認できます。
 			</p>

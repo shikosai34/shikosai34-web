@@ -10,7 +10,7 @@ interface Props {
 export default function NewsSection({ items = [] }: Props) {
 	return (
 		<section className="surface-panel mx-4 mt-8 rounded-2xl p-4 pt-6 pb-6">
-			<SectionHeading title="News" />
+			<SectionHeading title="News" icon="newspaper" />
 
 			{/*
 			 * 一覧は角を落としたシアンの枠で囲う。枠の内側に余白を取り、

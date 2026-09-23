@@ -7,6 +7,7 @@ import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
 import SiteFooter from '../layout/SiteFooter.astro';
 import Header from '../layout/Header';
 import SectionHeading from './SectionHeading';
+import type { SectionIconName } from '../icons/SectionIcon';
 import Layout from '../../layouts/Layout.astro';
 
 interface Props {
@@ -14,11 +15,13 @@ interface Props {
 	title: string;
 	/** セクション見出し（英語）。SectionHeading に渡す。 */
 	heading: string;
+	/** 見出しの左に置くアイコン。 */
+	icon: SectionIconName;
 	/** 準備中メッセージ。省略時は「{title}は準備中です。」 */
 	message?: string;
 }
 
-const { title, heading, message = `${title}は準備中です。` } = Astro.props;
+const { title, heading, icon, message = `${title}は準備中です。` } = Astro.props;
 ---
 
 <Layout title={`${title} | 第34回 茨香祭`}>
@@ -26,7 +29,7 @@ const { title, heading, message = `${title}は準備中です。` } = Astro.prop
 
 	<main class="mx-auto w-full max-w-3xl px-4 pb-16">
 		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6">
-			<SectionHeading title={heading} />
+			<SectionHeading title={heading} icon={icon} />
 			<p class="py-8 text-center text-sm text-text/70">{message}</p>
 		</section>
 	</main>
