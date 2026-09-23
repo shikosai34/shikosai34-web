@@ -24,12 +24,15 @@ export default function Header({ logoSrc }: Props) {
 			 */}
 			<div className="pointer-events-none fixed inset-x-0 top-3 z-[60] flex items-start justify-between px-3">
 				{/*
-				 * ロゴ。地もヘッダーも同じ濃紺なので、塗りだけでは面が消える。
-				 * 少し濃い地に差し色の縁と発光を添えて、浮いた札として見せる。
+				 * ロゴ。札は敷かず、字だけを地に直接置く。
+				 * 色はフッターと同じオレンジ→緑のグラデーションのもの。
+				 * 白と違って地の濃紺から十分浮くので、面で囲わなくても読める。
+				 *
+				 * 面がない分あたりが小さくなるので、押せる範囲は余白で確保する。
 				 */}
 				<a
 					href="/"
-					className="pointer-events-auto flex items-center rounded-2xl border border-accent/40 bg-base/80 px-4 py-3 shadow-[0_0_20px_rgba(0,255,204,0.15)] backdrop-blur-sm transition-colors hover:border-accent"
+					className="pointer-events-auto flex items-center px-1 py-2 transition-opacity hover:opacity-80"
 				>
 					<img src={logoSrc} alt="茨香祭" className="h-9 w-auto" />
 				</a>
