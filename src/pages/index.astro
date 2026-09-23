@@ -4,7 +4,6 @@ import posterAsset from '../assets/poster/sokuhou/01-poster.png';
 import logoG from '../assets/logo/yokogaki/HOL_G-trimmed.png';
 import Header from '../components/layout/Header';
 import SiteFooter from '../components/layout/SiteFooter.astro';
-import EdgeKasumi from '../components/layout/EdgeKasumi';
 import BreakingNewsHero from '../components/home/BreakingNewsHero';
 import PosterDialog from '../components/home/PosterDialog';
 import ThemeModel from '../components/home/ThemeModel';
@@ -52,9 +51,6 @@ const stageEvents = (await getVisibleEvents()).map((entry) => ({
 ---
 
 <Layout title="茨香祭速報 | 第34回 茨香祭">
-	{/* 画面の左右端に固定する霞。スクロールしても残る。 */}
-	<EdgeKasumi />
-
 	<Header client:load logoSrc={logoG.src} />
 
 	<main class="mx-auto w-full max-w-2xl pb-16">
