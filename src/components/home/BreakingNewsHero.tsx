@@ -81,7 +81,7 @@ export default function BreakingNewsHero({
 					 */}
 					<NeonClouds className="rounded-2xl" />
 
-					<SectionHeading title="茨香祭速報" />
+					<SectionHeading title="茨香祭速報" icon="megaphone" />
 
 					{/*
 					 * 参考サイトに倣い、紙面を円でそのまま切り抜く。
