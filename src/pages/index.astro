@@ -2,12 +2,9 @@
 import { getImage } from 'astro:assets';
 import posterAsset from '../assets/poster/sokuhou/01-poster.png';
 import logoW from '../assets/logo/yokogaki/HOL_W-trimmed.png';
-import logoG from '../assets/logo/yokogaki/HOL_G-trimmed.png';
-import kosenLogo from '../assets/logo/kosen/footer.svg';
 import Header from '../components/layout/Header';
-import Footer from '../components/layout/Footer';
+import SiteFooter from '../components/layout/SiteFooter.astro';
 import EdgeKasumi from '../components/layout/EdgeKasumi';
-import WagasaRow from '../components/layout/WagasaRow.astro';
 import BreakingNewsHero from '../components/home/BreakingNewsHero';
 import PosterDialog from '../components/home/PosterDialog';
 import ThemeModel from '../components/home/ThemeModel';
@@ -84,6 +81,5 @@ const stageEvents = (await getVisibleEvents()).map((entry) => ({
 		<NewsSection items={latestNews} />
 	</main>
 
-	<WagasaRow />
-	<Footer logoSrc={logoG.src} kosenLogoSrc={kosenLogo.src} />
+	<SiteFooter />
 </Layout>
