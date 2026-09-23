@@ -1,0 +1,153 @@
+---
+/*
+ * 最初の読み込みとページ遷移で出すローディング画面。
+ *
+ * 参考サイト（nitacfesta.com）の作りに倣う：
+ * 全画面のオーバーレイ（z-index 最前面）＋中央の絵＋進捗バー。
+ * 満ちたら左へスライドしながらフェードアウトする。
+ *
+ * ただし参考サイトは本文を JS で display:none にしてから
+ * タイマーで出しており、JS が落ちると何も見えなくなる。
+ * ここではその作りは採らない。本文は常に表示したまま、
+ * 覆いを上にかぶせるだけにする（JS が動かなければ
+ * noscript のスタイルで覆いごと消える）。
+ *
+ * このサイトは View Transitions を使っていない素の MPA なので、
+ * ページ遷移のたびに普通に読み込みが走る。つまり、この覆いを
+ * 全ページに置けば「遷移のたびに出る」が自然に成立する。
+ * 初回だけは長めに見せ、2回目以降は短く切り上げる
+ * （毎回同じ尺だとページを巡るたびに待たされるため）。
+ *
+ * 絵は月と鳥居。装飾なので aria-hidden とし、
+ * 画面全体には aria-busy を立てて読み上げに状態を伝える。
+ */
+---
+
+<div id="loading-screen" class="loading-screen" role="status" aria-live="polite" aria-label="読み込み中">
+	<div class="loading-art" aria-hidden="true">
+		<svg viewBox="0 0 240 210" fill="none">
+			<defs>
+				<radialGradient id="loading-moon-glow">
+					<stop offset="0%" stop-color="var(--color-accent)" stop-opacity="0.5"></stop>
+					<stop offset="45%" stop-color="var(--color-accent)" stop-opacity="0.14"></stop>
+					<stop offset="100%" stop-color="var(--color-accent)" stop-opacity="0"></stop>
+				</radialGradient>
+			</defs>
+
+			{/* 月のにじみ */}
+			<circle cx="120" cy="84" r="98" fill="url(#loading-moon-glow)"></circle>
+
+			{/* 満月 */}
+			<circle cx="120" cy="84" r="52" fill="var(--color-accent)" fill-opacity="0.06"></circle>
+			<circle
+				class="loading-moon"
+				cx="120"
+				cy="84"
+				r="52"
+				stroke="var(--color-text)"
+				stroke-opacity="0.85"
+				stroke-width="1.4"></circle>
+
+			{/*
+			 * 鳥居。月より小さく、手前に置く。
+			 * 面は地色で塗って、月を隠すシルエットにする。
+			 */}
+			<g
+				class="loading-torii"
+				fill="var(--color-base)"
+				stroke="var(--color-text)"
+				stroke-width="1.5"
+				stroke-linejoin="round"
+			>
+				{/* 笠木（反った横木） */}
+				<path d="M62 96 Q120 86 178 96 L178 103 Q120 93 62 103 Z"></path>
+				{/* 島木 */}
+				<rect x="71" y="105" width="98" height="6"></rect>
+				{/* 貫 */}
+				<rect x="80" y="129" width="80" height="5.5"></rect>
+				{/* 額束 */}
+				<rect x="115" y="111" width="10" height="18"></rect>
+				{/* 柱 */}
+				<path d="M87 111 L84 180 L96 180 L94 111 Z"></path>
+				<path d="M153 111 L156 180 L144 180 L146 111 Z"></path>
+			</g>
+		</svg>
+	</div>
+
+	<p class="loading-label" aria-hidden="true">茨香祭</p>
+
+	<div class="loading-track" aria-hidden="true">
+		<div class="loading-bar" id="loading-bar"></div>
+	</div>
+</div>
+
+{/*
+ * JS が無効なら覆いを出さない。
+ * 進捗を進める手段がなく、出したままだと本文に永久に到達できないため。
+ */}
+<noscript>
+	<style>
+		.loading-screen {
+			display: none !important;
+		}
+	</style>
+</noscript>
+
+<script>
+	// 初回訪問かどうか。sessionStorage はタブを閉じるまで残る。
+	// プライベートウィンドウなどで例外になることがあるため必ず包む。
+	function isFirstVisit() {
+		try {
+			if (sessionStorage.getItem('shikosai-visited')) return false;
+			sessionStorage.setItem('shikosai-visited', '1');
+			return true;
+		} catch {
+			// 読み書きできない環境では毎回「初回」として扱う。
+			return true;
+		}
+	}
+
+	function runLoading() {
+		const screen = document.getElementById('loading-screen');
+		const bar = document.getElementById('loading-bar');
+		if (!screen || !bar) return;
+
+		// 動きを減らす設定なら、演出はせず即座に外す。
+		const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		if (reduced) {
+			screen.remove();
+			document.documentElement.classList.remove('is-loading');
+			return;
+		}
+
+		// 初回はしっかり見せ、ページ遷移では短く切り上げる。
+		const total = isFirstVisit() ? 1500 : 520;
+		const start = performance.now();
+
+		function tick(now: number) {
+			const ratio = Math.min(1, (now - start) / total);
+			bar.style.width = `${Math.round(ratio * 100)}%`;
+			if (ratio < 1) {
+				requestAnimationFrame(tick);
+				return;
+			}
+			// 満ちたら左へ流して消す。
+			screen.classList.add('is-done');
+			document.documentElement.classList.remove('is-loading');
+			// アニメーションの終了で取り除く（時間の二重管理を避ける）。
+			screen.addEventListener('transitionend', () => screen.remove(), { once: true });
+			// transitionend が来ない場合の保険。
+			setTimeout(() => screen.remove(), 1200);
+		}
+		requestAnimationFrame(tick);
+	}
+
+	// 覆いが出ている間は背後をスクロールさせない。
+	document.documentElement.classList.add('is-loading');
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', runLoading, { once: true });
+	} else {
+		runLoading();
+	}
+</script>

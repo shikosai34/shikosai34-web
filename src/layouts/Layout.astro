@@ -2,6 +2,7 @@
 import '@fontsource/kiwi-maru/400.css';
 import '@fontsource/kiwi-maru/500.css';
 import '../styles/global.css';
+import LoadingScreen from '../components/layout/LoadingScreen.astro';
 
 interface Props {
 	title?: string;
@@ -48,6 +49,11 @@ const ogImageURL = new URL('/ogp.png', siteOrigin);
 		<meta name="twitter:card" content="summary_large_image" />
 	</head>
 	<body class:list={[bodyClass ?? 'bg-text text-base']}>
+		{/*
+		 * 読み込み中の覆い。View Transitions を使っていない素の MPA なので、
+		 * これを Layout に置くだけでページ遷移のたびに出る。
+		 */}
+		<LoadingScreen />
 		<slot />
 	</body>
 </html>

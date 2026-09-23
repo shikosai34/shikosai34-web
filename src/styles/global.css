@@ -377,6 +377,113 @@
   }
 
   /* ===================================================================
+   * ローディング画面（月と鳥居）
+   * -------------------------------------------------------------------
+   * 参考サイト（nitacfesta.com）に倣い、全画面の覆い＋進捗バーで、
+   * 満ちたら左へスライドしながら消える。
+   *
+   * 本文は常に表示したまま、この覆いを上に重ねるだけにする。
+   * 参考サイトのように本文を display:none にすると、
+   * JS が落ちたときに何も見えなくなるため。
+   * =================================================================== */
+  .loading-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    background-color: var(--color-base);
+    /* 参考サイトと同じく、左へ流しながら薄くする。 */
+    transition:
+      transform 0.9s cubic-bezier(0.7, 0, 0.3, 1),
+      opacity 0.9s ease;
+  }
+
+  .loading-screen.is-done {
+    transform: translateX(-100%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* 覆いが出ている間は背後を動かさない。 */
+  html.is-loading,
+  html.is-loading body {
+    overflow: hidden;
+  }
+
+  .loading-art {
+    width: min(62vw, 260px);
+  }
+
+  .loading-art svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  /* 月をゆっくり明滅させ、止まって見えないようにする。 */
+  .loading-moon {
+    animation: loading-moon-pulse 2.6s ease-in-out infinite;
+  }
+
+  @keyframes loading-moon-pulse {
+    0%,
+    100% {
+      stroke-opacity: 0.85;
+    }
+    50% {
+      stroke-opacity: 0.45;
+    }
+  }
+
+  .loading-label {
+    font-family: var(--font-primary);
+    font-size: 1.05rem;
+    letter-spacing: 0.4em;
+    /* letter-spacing の分だけ右に寄るので、その半分を戻す。 */
+    text-indent: 0.4em;
+    color: color-mix(in srgb, var(--color-text) 75%, transparent);
+  }
+
+  /* 進捗バー。参考サイトは 300x14 の角丸。 */
+  .loading-track {
+    width: min(62vw, 260px);
+    height: 6px;
+    overflow: hidden;
+    border-radius: 999px;
+    background-color: color-mix(in srgb, var(--color-text) 14%, transparent);
+  }
+
+  .loading-bar {
+    width: 0%;
+    height: 100%;
+    border-radius: 999px;
+    /* ポスターの2色。左から右へシアン→マゼンタ。 */
+    background-image: linear-gradient(
+      90deg,
+      var(--color-accent) 0%,
+      var(--color-glow-pink) 100%
+    );
+  }
+
+  /*
+   * 動きを減らす設定では、そもそも JS 側で即座に外している。
+   * ここは保険（JS が外す前の一瞬で動かないように）。
+   */
+  @media (prefers-reduced-motion: reduce) {
+    .loading-screen {
+      transition: none;
+    }
+
+    .loading-moon {
+      animation: none;
+    }
+  }
+
+  /* ===================================================================
    * 画面端の霞
    * -------------------------------------------------------------------
    * 参考サイトは .kv__frame（position:sticky / 100vh / z-index:500）に
