@@ -3,10 +3,8 @@
  * 未作成ページ用の仮ページ。
  * /circle の「サークル情報は準備中です。」と同じ体裁で「〜は準備中です。」を表示する。
  */
-import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
 import logoW from '../../assets/logo/yokogaki/HOL_W-trimmed.png';
-import kosenLogo from '../../assets/logo/kosen/footer.svg';
-import Footer from '../layout/Footer';
+import SiteFooter from '../layout/SiteFooter.astro';
 import Header from '../layout/Header';
 import SectionHeading from './SectionHeading';
 import Layout from '../../layouts/Layout.astro';
@@ -33,5 +31,5 @@ const { title, heading, message = `${title}は準備中です。` } = Astro.prop
 		</section>
 	</main>
 
-	<Footer logoSrc={logoG.src} kosenLogoSrc={kosenLogo.src} />
+	<SiteFooter />
 </Layout>

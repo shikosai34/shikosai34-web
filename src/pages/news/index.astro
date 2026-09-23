@@ -1,8 +1,6 @@
 ---
-import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
 import logoW from '../../assets/logo/yokogaki/HOL_W-trimmed.png';
-import kosenLogo from '../../assets/logo/kosen/footer.svg';
-import Footer from '../../components/layout/Footer';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
 import Header from '../../components/layout/Header';
 import NewsListItem from '../../components/news/NewsListItem';
 import SectionHeading from '../../components/ui/SectionHeading';
@@ -42,5 +40,5 @@ const items = (await getVisibleNews()).map((entry) => ({
 		</section>
 	</main>
 
-	<Footer logoSrc={logoG.src} kosenLogoSrc={kosenLogo.src} />
+	<SiteFooter />
 </Layout>
