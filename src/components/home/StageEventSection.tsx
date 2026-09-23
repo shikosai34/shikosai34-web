@@ -6,7 +6,6 @@ import {
 } from '../../lib/next-stage-event';
 import ArrowRightIcon from '../icons/ArrowRightIcon';
 import Button from '../ui/Button';
-import NeonClouds from '../ui/NeonClouds';
 import SectionHeading from '../ui/SectionHeading';
 
 interface Props {
@@ -76,8 +75,6 @@ export default function StageEventSection({ events = [] }: Props) {
 
 	return (
 		<section className="surface-panel mx-4 mt-8 rounded-2xl p-4 pt-6 pb-6 text-text">
-			<NeonClouds className="rounded-2xl" fog={false} />
-
 			<SectionHeading title="Stage Events" />
 			<p className="text-sm leading-relaxed text-text/80">
 				体育館ステージのイベント情報はこちらから確認できます。

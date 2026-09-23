@@ -27,17 +27,12 @@ export default function BreakingNewsHero({
 	return (
 		<section className="surface-panel mx-4 mt-6 rounded-2xl px-4 pt-6 pb-4">
 			{/*
-			 * 光る雲と霧。参考サイトのキービジュアルの空気感にあたる部分。
+			 * 流れる霧。参考サイトのキービジュアルの空気感にあたる部分。
 			 * .surface-panel > * は z-index:1 なので、この背景だけ 0 に落として
 			 * 走査線（::after）と本文の間に挟む。
 			 */}
 			<NeonClouds className="rounded-2xl" />
 
-			{/*
-			 * 見出しの右の余白にはネオンの雲（NeonClouds）が入るため、
-			 * 線画の KumoLine は重ねない。細い線が雲の横に
-			 * 取り残されて、ワイヤーフレームのように見えてしまう。
-			 */}
 			<SectionHeading title="茨香祭速報" />
 
 			{/*

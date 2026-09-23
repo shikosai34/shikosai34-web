@@ -1,6 +1,5 @@
 import NewsListItem, { type NewsListItemData } from '../news/NewsListItem';
 import Button from '../ui/Button';
-import NeonClouds from '../ui/NeonClouds';
 import SectionHeading from '../ui/SectionHeading';
 
 interface Props {
@@ -11,8 +10,6 @@ interface Props {
 export default function NewsSection({ items = [] }: Props) {
 	return (
 		<section className="surface-panel mx-4 mt-8 rounded-2xl p-4 pt-6 pb-6">
-			<NeonClouds className="rounded-2xl" fog={false} />
-
 			<SectionHeading title="News" />
 
 			{/*
