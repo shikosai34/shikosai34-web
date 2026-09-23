@@ -35,41 +35,46 @@
 			</defs>
 
 			{/* 月のにじみ */}
-			<circle cx="120" cy="84" r="98" fill="url(#loading-moon-glow)"></circle>
-
-			{/* 満月 */}
-			<circle cx="120" cy="84" r="52" fill="var(--color-accent)" fill-opacity="0.06"></circle>
-			<circle
-				class="loading-moon"
-				cx="120"
-				cy="84"
-				r="52"
-				stroke="var(--color-text)"
-				stroke-opacity="0.85"
-				stroke-width="1.4"></circle>
+			<circle cx="120" cy="62" r="95" fill="url(#loading-moon-glow)"></circle>
 
 			{/*
-			 * 鳥居。月より小さく、手前に置く。
+			 * 三日月。円を2つ重ねて欠けさせるのではなく、
+			 * 外周の弧（月の縁）と内側の弧（影の境目）をつないだ
+			 * 1本の閉じたパスで描く。こうすると縁に線を引ける。
+			 * 内側の弧を右へずらすほど、光っている部分が太くなる。
+			 */}
+			<path
+				class="loading-moon"
+				d="M 146.5 19.6 A 50 50 0 1 0 146.5 104.4 A 48.5 48.5 0 1 1 146.5 19.6 Z"
+				fill="#dff7f1"
+				fill-opacity="0.92"
+				stroke="var(--color-text)"
+				stroke-opacity="0.9"
+				stroke-width="1"
+				stroke-linejoin="round"></path>
+
+			{/*
+			 * 鳥居。月と重ねて手前に置く。
 			 * 面は地色で塗って、月を隠すシルエットにする。
 			 */}
 			<g
 				class="loading-torii"
 				fill="var(--color-base)"
 				stroke="var(--color-text)"
-				stroke-width="1.5"
+				stroke-width="1.8"
 				stroke-linejoin="round"
 			>
 				{/* 笠木（反った横木） */}
-				<path d="M62 96 Q120 86 178 96 L178 103 Q120 93 62 103 Z"></path>
+				<path d="M26 96 Q120 82 214 96 L214 106 Q120 92 26 106 Z"></path>
 				{/* 島木 */}
-				<rect x="71" y="105" width="98" height="6"></rect>
+				<rect x="40" y="109" width="160" height="9"></rect>
 				{/* 貫 */}
-				<rect x="80" y="129" width="80" height="5.5"></rect>
+				<rect x="56" y="144" width="128" height="8"></rect>
 				{/* 額束 */}
-				<rect x="115" y="111" width="10" height="18"></rect>
+				<rect x="112" y="118" width="16" height="26"></rect>
 				{/* 柱 */}
-				<path d="M87 111 L84 180 L96 180 L94 111 Z"></path>
-				<path d="M153 111 L156 180 L144 180 L146 111 Z"></path>
+				<path d="M64 118 L58 200 L78 200 L74 118 Z"></path>
+				<path d="M176 118 L182 200 L162 200 L166 118 Z"></path>
 			</g>
 		</svg>
 	</div>
