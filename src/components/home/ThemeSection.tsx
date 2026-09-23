@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-import NeonClouds from '../ui/NeonClouds';
 
 function CrossMark({ className = '' }: { className?: string }) {
 	return (
@@ -40,9 +39,6 @@ export default function ThemeSection({ mark }: Props) {
 	// 他のセクションより紙面に近い見せ方にする。
 	return (
 		<section className="surface-panel mx-4 mt-8 rounded-2xl p-6 text-text">
-			{/* 守破離のまわりは余白が広いので、雲を効かせやすい。 */}
-			<NeonClouds className="rounded-2xl" placement="top" />
-
 			<div className="w-72 max-w-full justify-start font-primary text-3xl font-normal text-white">This year's theme</div>
 
 			<div className="mt-2 flex flex-col items-start gap-2">
