@@ -182,24 +182,6 @@
   }
 
   /*
-   * ポスターの縦帯にならい、左端にオレンジの帯を入れる。
-   * border ではなく擬似要素で描く。border-left にすると、
-   * 左右に帯を出したいトップのヒーロー（border-x-4）と competing して
-   * 片側が消えるため。
-   */
-  .surface-panel::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 0;
-    width: 3px;
-    pointer-events: none;
-    background-color: var(--color-main);
-  }
-
-  /*
    * パネルに走査線（ポスターの紙面にかかる横縞）を重ねる。
    * 1px 未満の縞はディスプレイ次第でモアレになるため 3px 周期に留める。
    */
