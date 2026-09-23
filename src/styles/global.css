@@ -9,10 +9,18 @@
 
   /*
    * ポスターのマゼンタ（実物から抽出した #e7386f）。
-   * グリッチの色ずれと斜めのスイープにのみ使う差し色で、
-   * 文字色や面の塗りには使わない。
+   * もとはグリッチの色ずれ専用だったが、参考サイト（cho-kaguyahime.com）の
+   * ネオン感に寄せるため、光る雲・グロー・見出しの差し色まで用途を広げた。
+   * ただし地色と本文には使わない（基調の4色を崩さないため）。
    */
   --color-glitch: #e7386f;
+
+  /*
+   * 上のマゼンタを発光させたときの明るい側。
+   * #e7386f をそのまま光らせると濁って見えるため、
+   * グローの芯にはこの明るいピンクを使う。
+   */
+  --color-glow-pink: #ff6ea8;
 
   --font-primary: "Kiwi Maru", sans-serif;
 
@@ -195,7 +203,12 @@
     content: "";
     position: absolute;
     inset: 0;
-    z-index: 0;
+    /*
+     * 走査線は雲（.neon-backdrop, z-index:0）より前に置く。
+     * 同じ 0 だと後から描かれるこちらが雲を覆い、
+     * screen の光が灰色に潰れる。
+     */
+    z-index: 2;
     pointer-events: none;
     background-image: repeating-linear-gradient(
       to bottom,
@@ -204,9 +217,25 @@
     );
   }
 
-  .surface-panel > * {
+  /*
+   * 中身は走査線（::after）より前に出す。
+   * ただし背景として敷く装飾（.neon-backdrop）は例外で、
+   * これを持ち上げるとポスターの上に雲がかぶさってしまう。
+   */
+  .surface-panel > *:not(.neon-backdrop) {
     position: relative;
     z-index: 1;
+  }
+
+  /*
+   * 光る雲を敷く層。
+   * z-index を指定すると stacking context ができ、
+   * 中の mix-blend-mode:screen がこの層の中で閉じてしまう
+   * （地の濃紺と混ざらず灰色の塊になる）。
+   * そのため z-index は付けず、DOM 順（最初の子）で背面に置く。
+   */
+  .neon-backdrop {
+    isolation: auto;
   }
 
   /*
@@ -269,5 +298,222 @@
     writing-mode: vertical-rl;
     text-orientation: upright;
     font-feature-settings: "vkna" 1;
+  }
+
+  /* ===================================================================
+   * 光る雲（ネオンクラウド）
+   * -------------------------------------------------------------------
+   * 参考サイト（cho-kaguyahime.com）は deco_neon-cloud1.png という
+   * 描き起こしの画像を floating-x で左右に揺らしている。
+   * 同じ絵は持てないので、和の「瑞雲」の輪郭を SVG で描き、
+   * それを mask にしてネオン色を流し込む。
+   *
+   * ぼかした楕円を重ねるだけだと「靄」にしかならず、
+   * 雲の形が出ない。輪郭を持つ figure を mask で抜くのが要点。
+   *
+   * 構造：
+   *   本体    … 瑞雲の形に抜いたグラデーション（シアン→ピンク）
+   *   ::before… 同じ形を大きくぼかした外側の光（ネオン管のにじみ）
+   *   ::after … 輪郭線。管そのものに見せる細い明るい線
+   * 装飾なので、当てる要素には aria-hidden を付ける。
+   * =================================================================== */
+  .neon-cloud {
+    position: absolute;
+    pointer-events: none;
+    /* 既定はシアン。ピンクにしたいときは .neon-cloud--pink を併用する。 */
+    --cloud-a: var(--color-accent);
+    --cloud-b: var(--color-glow-pink);
+    /*
+     * 瑞雲の輪郭。渦巻きを持つ雲を、重ねた円の和で作る。
+     * mask と ::after の stroke で同じ形を使うため変数に置く。
+     */
+    --cloud-shape: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 140' preserveAspectRatio='none'%3E%3Cpath fill='%23fff' d='M40 104c-16 0-28-11-28-25s12-25 27-25c1-14 13-25 28-25 8 0 16 3 21 9 7-13 21-22 37-22 20 0 37 13 43 30 5-3 11-5 17-5 17 0 31 13 32 29 13 2 23 13 23 26 0 15-13 27-29 27z'/%3E%3C/svg%3E");
+    /*
+     * 合成はこの箱で行う。
+     * filter: blur() は単体で stacking context を作るため、
+     * 同じ要素に mix-blend-mode を併記すると合成がその層で閉じ、
+     * 地の濃紺と混ざらずに灰色の塊として見えてしまう。
+     * そこで「ぼかしは擬似要素／合成は親」と役割を分ける。
+     */
+    mix-blend-mode: plus-lighter;
+    opacity: 0.55;
+  }
+
+  .neon-cloud--pink {
+    --cloud-a: var(--color-glow-pink);
+    --cloud-b: var(--color-glitch);
+  }
+
+  /*
+   * 外側のにじみ。同じ形を一回り大きくぼかして下に敷くと、
+   * ネオン管が空気を光らせているように見える。
+   */
+  .neon-cloud::before {
+    content: "";
+    position: absolute;
+    inset: -12%;
+    background-image: linear-gradient(
+      120deg,
+      color-mix(in srgb, var(--cloud-a) 55%, transparent) 0%,
+      color-mix(in srgb, var(--cloud-b) 55%, transparent) 100%
+    );
+    mask-image: var(--cloud-shape);
+    mask-repeat: no-repeat;
+    mask-size: 100% 100%;
+    -webkit-mask-image: var(--cloud-shape);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    filter: blur(18px);
+    opacity: 0.75;
+    animation: cloud-drift 9s ease-in-out infinite;
+  }
+
+  /*
+   * 雲の面。芯に近いほど明るくして、下側を暗く落とすと
+   * 平らな塗りではなく「光っている塊」に見える。
+   */
+  .neon-cloud::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--cloud-b) 45%, transparent) 0%,
+      color-mix(in srgb, var(--cloud-a) 38%, transparent) 45%,
+      transparent 88%
+    );
+    mask-image: var(--cloud-shape);
+    mask-repeat: no-repeat;
+    mask-size: 100% 100%;
+    -webkit-mask-image: var(--cloud-shape);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    filter: blur(7px);
+    opacity: 0.9;
+    animation: cloud-drift 9s ease-in-out infinite;
+  }
+
+  /*
+   * 参考サイトの floating-x（8s / 7.9s / 3s / 2.6s）に倣った横揺れ。
+   * 上下にもわずかに振ると、浮遊感が出る。
+   */
+  @keyframes cloud-drift {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(4%, -5%, 0);
+    }
+  }
+
+  /* ===================================================================
+   * 流れる霧（fog）
+   * -------------------------------------------------------------------
+   * 参考サイトは背景画像を 60s / 80s(reverse) で background-position
+   * だけ動かしている。同じ手法を、画像の代わりに
+   * 繰り返せるグラデーションで再現する。
+   * 横に長いタイルを流すと、雲が奥をゆっくり通るように見える。
+   * =================================================================== */
+  .neon-fog {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    opacity: 0.2;
+    background-repeat: repeat-x;
+    background-image:
+      radial-gradient(
+        closest-side ellipse at 20% 50%,
+        color-mix(in srgb, var(--color-accent) 30%, transparent) 0%,
+        transparent 100%
+      ),
+      radial-gradient(
+        closest-side ellipse at 62% 42%,
+        color-mix(in srgb, var(--color-glow-pink) 26%, transparent) 0%,
+        transparent 100%
+      ),
+      radial-gradient(
+        closest-side ellipse at 88% 58%,
+        color-mix(in srgb, var(--color-accent) 22%, transparent) 0%,
+        transparent 100%
+      );
+    background-size:
+      620px 150px,
+      520px 190px,
+      580px 130px;
+    filter: blur(14px);
+    /* 参考サイトと同じく、2層を逆向きに流して視差を作る。 */
+    animation: fog-drift 60s linear infinite;
+  }
+
+  .neon-fog--reverse {
+    opacity: 0.14;
+    animation: fog-drift 80s linear infinite reverse;
+  }
+
+  @keyframes fog-drift {
+    0% {
+      background-position:
+        0 0,
+        0 0,
+        0 0;
+    }
+    100% {
+      /*
+       * それぞれ background-size の整数倍だけ動かすと、
+       * タイルの継ぎ目が出ずにループする。
+       */
+      background-position:
+        1240px 0,
+        1040px 0,
+        1160px 0;
+    }
+  }
+
+  /* ===================================================================
+   * ネオンの発光（文字・枠）
+   * =================================================================== */
+
+  /*
+   * 見出しをネオン管のように光らせる。
+   * text-shadow を「芯の白・中間・外側」の3段で重ねるのが要点で、
+   * 1段だけだとただのぼやけた文字になる。
+   */
+  .neon-text {
+    color: var(--color-text);
+    text-shadow:
+      0 0 4px color-mix(in srgb, var(--color-glow-pink) 90%, transparent),
+      0 0 11px color-mix(in srgb, var(--color-glitch) 75%, transparent),
+      0 0 24px color-mix(in srgb, var(--color-glitch) 45%, transparent);
+  }
+
+  .neon-text--cyan {
+    text-shadow:
+      0 0 4px color-mix(in srgb, var(--color-accent) 90%, transparent),
+      0 0 11px color-mix(in srgb, var(--color-accent) 70%, transparent),
+      0 0 24px color-mix(in srgb, var(--color-accent) 40%, transparent);
+  }
+
+  /*
+   * 枠まわりの発光。内外に影を落として管の厚みを出す。
+   */
+  .neon-ring {
+    box-shadow:
+      0 0 18px color-mix(in srgb, var(--color-accent) 30%, transparent),
+      0 0 44px color-mix(in srgb, var(--color-glitch) 20%, transparent),
+      inset 0 0 22px color-mix(in srgb, var(--color-accent) 14%, transparent);
+  }
+
+  /*
+   * 動きを減らす設定の利用者には、揺れと流れを止める。
+   * 光そのもの（色・グロー）は情報量なので残す。
+   */
+  @media (prefers-reduced-motion: reduce) {
+    .neon-cloud::before,
+    .neon-cloud::after,
+    .neon-fog {
+      animation: none;
+    }
   }
 }

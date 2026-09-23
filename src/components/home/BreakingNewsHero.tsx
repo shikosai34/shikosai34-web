@@ -2,6 +2,7 @@ import ArrowRightIcon from '../icons/ArrowRightIcon';
 import Button from '../ui/Button';
 import type { ReactNode } from 'react';
 import KumoLine from '../ui/KumoLine';
+import NeonClouds from '../ui/NeonClouds';
 import SectionHeading from '../ui/SectionHeading';
 
 interface Props {
@@ -31,6 +32,13 @@ export default function BreakingNewsHero({
 		 */
 		<section className="surface-panel mx-4 mt-6 rounded-2xl border-x-4 border-x-main px-4 pt-6 pb-4">
 			{/*
+			 * 光る雲と霧。参考サイトのキービジュアルの空気感にあたる部分。
+			 * .surface-panel > * は z-index:1 なので、この背景だけ 0 に落として
+			 * 走査線（::after）と本文の間に挟む。
+			 */}
+			<NeonClouds className="rounded-2xl" />
+
+			{/*
 			 * 見出しの右の余白に流雲を流す。狭い画面では場所がないので
 			 * sm 以上でのみ出す。
 			 */}
@@ -47,7 +55,7 @@ export default function BreakingNewsHero({
 			 * 正円にし、紙面の上寄り（object-top）を見せる。ポスターは
 			 * 人物と日付が上半分に集まっているため。
 			 */}
-			<div className="kikko relative -mx-2 flex aspect-square items-center justify-center overflow-hidden rounded-full border-2 border-accent/50 bg-base shadow-[0_0_28px_rgba(0,255,204,0.16)] sm:mx-auto sm:max-w-md">
+			<div className="kikko neon-ring relative -mx-2 flex aspect-square items-center justify-center overflow-hidden rounded-full border-2 border-accent/50 bg-base sm:mx-auto sm:max-w-md">
 				{/*
 				 * 紙面は円より小さく置く。object-cover で埋めると倍率が上がって
 				 * 四隅が大きく欠けるため、縮めて端の情報を残す。
@@ -72,14 +80,18 @@ export default function BreakingNewsHero({
 			<div className="bracket-frame stripes relative z-10 -mt-5 bg-base/55 px-4 py-3 backdrop-blur-[2px] sm:mx-auto sm:max-w-md">
 				{/* 日付＋注記。参考サイトは大きな日付の右に小さく添える。 */}
 				<div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-					<p className="outlined-text text-2xl font-bold tracking-tight text-accent">
+					<p className="outlined-text neon-text--cyan text-2xl font-bold tracking-tight text-accent">
 						10月24日(土)
 					</p>
 					<p className="text-xs text-text/80">※25日(日)は学内限定</p>
 				</div>
 
 				{/* 主文。地から浮かせるため縁取りする。 */}
-				<p className="outlined-text mt-1 text-xl font-bold tracking-tight text-text">
+				{/*
+				 * 主文はピンクで光らせる。ポスターのマゼンタを
+				 * 一番目立つ一行に回して、シアンの日付と対にする。
+				 */}
+				<p className="outlined-text neon-text mt-1 text-xl font-bold tracking-tight">
 					新ポスター解禁！
 				</p>
 
