@@ -1,0 +1,22 @@
+---
+/*
+ * 和傘の帯とフッターをまとめたもの。全ページの末尾に置く。
+ *
+ * この2つを分けずに束ねているのは、和傘がフッターの上端の弧に
+ * 乗る前提の位置調整（WagasaRow 側の -mb-2）を持っているため。
+ * 別々に置くと、ページごとに順番や間隔がずれる余地が残る。
+ *
+ * ロゴはどのページでも同じものを使うので、ここで読んで渡す。
+ * 呼び出し側はロゴの場所を知らなくてよい。
+ *
+ * Footer が React、WagasaRow が Astro なので入れ子にはできない。
+ * この Astro のラッパーで並べる。
+ */
+import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
+import kosenLogo from '../../assets/logo/kosen/footer.svg';
+import Footer from './Footer';
+import WagasaRow from './WagasaRow.astro';
+---
+
+<WagasaRow />
+<Footer logoSrc={logoG.src} kosenLogoSrc={kosenLogo.src} />

@@ -1,15 +1,13 @@
 ---
 import { getImage } from 'astro:assets';
 import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
-import logoW from '../../assets/logo/yokogaki/HOL_W-trimmed.png';
-import kosenLogo from '../../assets/logo/kosen/footer.svg';
 import mv01 from '../../assets/main-visual/01.png';
 import mv02 from '../../assets/main-visual/02.png';
 import mv03 from '../../assets/main-visual/03.png';
 import mv04 from '../../assets/main-visual/04.png';
 import mv05 from '../../assets/main-visual/05.png';
 import mv06 from '../../assets/main-visual/06.png';
-import Footer from '../../components/layout/Footer';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
 import Header from '../../components/layout/Header';
 import MainVisualLightbox from '../../components/main-visual/MainVisualLightbox';
 import SectionHeading from '../../components/ui/SectionHeading';
@@ -50,7 +48,7 @@ const groups = [
 ---
 
 <Layout title="ビジュアル | 第34回 茨香祭">
-	<Header client:load logoSrc={logoW.src} />
+	<Header client:load logoSrc={logoG.src} />
 
 	<main class="mx-auto w-full max-w-3xl px-4 pb-16">
 		{/*
@@ -138,5 +136,5 @@ const groups = [
 
 	{groups.map((group) => <MainVisualLightbox group={group.key} items={group.items} client:load />)}
 
-	<Footer logoSrc={logoG.src} kosenLogoSrc={kosenLogo.src} />
+	<SiteFooter />
 </Layout>

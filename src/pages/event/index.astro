@@ -1,10 +1,8 @@
 ---
 import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
-import logoW from '../../assets/logo/yokogaki/HOL_W-trimmed.png';
-import kosenLogo from '../../assets/logo/kosen/footer.svg';
 import EventCard from '../../components/event/EventCard.astro';
 import SearchIcon from '../../components/icons/SearchIcon';
-import Footer from '../../components/layout/Footer';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
 import Header from '../../components/layout/Header';
 import SectionHeading from '../../components/ui/SectionHeading';
 import Layout from '../../layouts/Layout.astro';
@@ -15,7 +13,7 @@ const genreFilters = EVENT_GENRES.map((value) => ({ value, label: EVENT_GENRE_LA
 ---
 
 <Layout title="ステージ企画 | 第34回 茨香祭">
-	<Header client:load logoSrc={logoW.src} />
+	<Header client:load logoSrc={logoG.src} />
 
 	<main class="mx-auto w-full max-w-3xl px-4 pb-16">
 		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6">
@@ -96,7 +94,7 @@ const genreFilters = EVENT_GENRES.map((value) => ({ value, label: EVENT_GENRE_LA
 		</section>
 	</main>
 
-	<Footer logoSrc={logoG.src} kosenLogoSrc={kosenLogo.src} />
+	<SiteFooter />
 </Layout>
 
 <script is:inline>

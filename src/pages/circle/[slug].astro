@@ -1,9 +1,7 @@
 ---
 import { render } from 'astro:content';
 import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
-import logoW from '../../assets/logo/yokogaki/HOL_W-trimmed.png';
-import kosenLogo from '../../assets/logo/kosen/footer.svg';
-import Footer from '../../components/layout/Footer';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
 import Header from '../../components/layout/Header';
 import Layout from '../../layouts/Layout.astro';
 import { CIRCLE_CATEGORY_LABELS } from '../../lib/circles';
@@ -24,7 +22,7 @@ const { name, category, location, schedule, image, snsLinks, fesflowPlanned, fes
 ---
 
 <Layout title={`${name} | サークル | 第34回 茨香祭`}>
-	<Header client:load logoSrc={logoW.src} />
+	<Header client:load logoSrc={logoG.src} />
 
 	<main class="mx-auto w-full max-w-2xl px-4 pb-16">
 		<article class="surface-panel mt-8 rounded-2xl p-5 text-text">
@@ -101,7 +99,7 @@ const { name, category, location, schedule, image, snsLinks, fesflowPlanned, fes
 		</article>
 	</main>
 
-	<Footer logoSrc={logoG.src} kosenLogoSrc={kosenLogo.src} />
+	<SiteFooter />
 </Layout>
 
 <style>

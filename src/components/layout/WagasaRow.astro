@@ -1,0 +1,45 @@
+---
+/*
+ * フッターの上に和傘を並べる帯。
+ *
+ * 絵はいただいたジェネレータ（Python）が出力した4種類：
+ * 青海波・市松・麻の葉・渦。src/assets/wagasa/ に置いてある。
+ * 濃紺の地に載せるため、面は透過・線は薄い白に変えてある
+ * （生成時は白い面＋黒い線で、そのままだと白い円盤に見えるため）。
+ *
+ * <img> で読むのは、4枚合わせて 140KB ほどあり、
+ * インラインにすると HTML がその分重くなるため。
+ * Astro が最適化・キャッシュする経路に乗せる。
+ *
+ * 回転は参考サイト（cho-kaguyahime.com）の @keyframes umbrella に倣い、
+ * 14〜17秒で傘ごとに速度と向きを変える。
+ *
+ * フッターは上端が弧になっているので、下げすぎると縁で切れる。
+ *
+ * 装飾なので aria-hidden。
+ */
+import seigaiha from '../../assets/wagasa/wagasa-seigaiha.svg';
+import ichimatsu from '../../assets/wagasa/wagasa-ichimatsu.svg';
+import asanoha from '../../assets/wagasa/wagasa-asanoha.svg';
+import uzu from '../../assets/wagasa/wagasa-uzu.svg';
+
+const UMBRELLAS = [
+	{ src: seigaiha.src, alt: '', spin: 'wagasa-spin-15', size: 'w-24 sm:w-32', lift: '-translate-y-1' },
+	{ src: ichimatsu.src, alt: '', spin: 'wagasa-spin-16 wagasa-reverse', size: 'w-28 sm:w-36', lift: '' },
+	{ src: asanoha.src, alt: '', spin: 'wagasa-spin-14', size: 'w-28 sm:w-36', lift: '' },
+	{ src: uzu.src, alt: '', spin: 'wagasa-spin-17 wagasa-reverse', size: 'w-24 sm:w-32', lift: '-translate-y-1' },
+];
+---
+
+<div
+	aria-hidden="true"
+	class="pointer-events-none relative -mb-2 flex items-end justify-center gap-2 px-4 sm:gap-6"
+>
+	{
+		UMBRELLAS.map((u) => (
+			<span class={`block ${u.lift} ${u.size} shrink-0`}>
+				<img src={u.src} alt="" loading="lazy" decoding="async" class={`h-auto w-full ${u.spin}`} />
+			</span>
+		))
+	}
+</div>
