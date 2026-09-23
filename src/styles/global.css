@@ -485,8 +485,12 @@
     overflow: hidden;
   }
 
+  /*
+   * 絵は横より縦に長い（1200:1386）。幅だけで決めると背の低い画面で
+   * 下の見出しと進捗バーを押し出すので、高さの上限も併せて掛ける。
+   */
   .loading-art {
-    width: min(80vw, 360px);
+    width: min(78vw, 320px, 52vh);
   }
 
   .loading-art svg {
@@ -496,8 +500,45 @@
   }
 
   /*
+   * 鳥居の部材。面は地色で塗って、背後の月を隠すシルエットにする。
+   * 元の SVG は独自の紺色を持っていたが、覆いの地色に合わせる。
+   *
+   * 線の太さは viewBox（横1200）の値。実際の表示は 320px ほどなので
+   * 1/3.75 に縮む。元の 2 では画面上 0.5px 相当で消えてしまうため、
+   * 表示の大きさから逆算して 10 にしている。
+   */
+  .loading-torii-part {
+    fill: var(--color-base);
+    stroke: var(--color-text);
+    stroke-opacity: 0.85;
+    stroke-width: 10;
+    stroke-linejoin: round;
+  }
+
+  /* 部材の上に引く細い線（木目の見立て）。 */
+  .loading-torii-line {
+    fill: none;
+    stroke: var(--color-text);
+    stroke-opacity: 0.3;
+    stroke-width: 5;
+  }
+
+  /*
+   * 月の弧。線の太さは元の SVG（400x400）の座標系の値で、
+   * そこから 1.25 倍に拡大した上で 1200 幅の絵に載り、
+   * さらに 320px ほどに縮む。元の 2.6 では画面上 1px を切って
+   * 消えてしまうため、表示の大きさから逆算して太くする。
+   */
+  .loading-moon-arc {
+    fill: none;
+    stroke: #eef3f8;
+    stroke-width: 7;
+    stroke-linecap: butt;
+  }
+
+  /*
    * 月をゆっくり明滅させ、止まって見えないようにする。
-   * 三日月は塗りで見せるため、stroke ではなく要素ごと薄くする。
+   * 塗りと線の両方で見せるので、要素ごと薄くする。
    */
   .loading-moon {
     animation: loading-moon-pulse 2.6s ease-in-out infinite;
