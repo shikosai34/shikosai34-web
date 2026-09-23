@@ -52,7 +52,7 @@ export default function NeonClouds({ className = '', fog = true }: Props) {
 			 * 文字やポスターの上には置かない。
 			 */}
 			<span className="neon-cloud top-1 right-2 h-16 w-36 sm:h-20 sm:w-44" />
-			<span className="neon-cloud neon-cloud--pink bottom-10 -left-4 h-16 w-36 sm:h-20 sm:w-44" />
+			<span className="neon-cloud neon-cloud--pink bottom-4 left-6 h-14 w-32 opacity-70 sm:h-16 sm:w-40" />
 			{/*
 			 * 中段にもう一枚だけ薄く置くと、上下の雲がつながって
 			 * 「靄の中に浮いている」ように見える。

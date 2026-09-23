@@ -336,7 +336,7 @@
      * そこで「ぼかしは擬似要素／合成は親」と役割を分ける。
      */
     mix-blend-mode: plus-lighter;
-    opacity: 0.55;
+    opacity: 0.8;
   }
 
   .neon-cloud--pink {
@@ -351,7 +351,7 @@
   .neon-cloud::before {
     content: "";
     position: absolute;
-    inset: -12%;
+    inset: -30%;
     background-image: linear-gradient(
       120deg,
       color-mix(in srgb, var(--cloud-a) 55%, transparent) 0%,
@@ -363,8 +363,8 @@
     -webkit-mask-image: var(--cloud-shape);
     -webkit-mask-repeat: no-repeat;
     -webkit-mask-size: 100% 100%;
-    filter: blur(18px);
-    opacity: 0.75;
+    filter: blur(30px);
+    opacity: 1;
     animation: cloud-drift 9s ease-in-out infinite;
   }
 
@@ -388,8 +388,8 @@
     -webkit-mask-image: var(--cloud-shape);
     -webkit-mask-repeat: no-repeat;
     -webkit-mask-size: 100% 100%;
-    filter: blur(7px);
-    opacity: 0.9;
+    filter: blur(16px);
+    opacity: 0.55;
     animation: cloud-drift 9s ease-in-out infinite;
   }
 
