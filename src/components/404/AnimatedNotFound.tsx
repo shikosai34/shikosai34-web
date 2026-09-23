@@ -1,14 +1,17 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, useSpring, useTransform, useMotionValue } from 'framer-motion';
 
 // 画面が割れるようなクリッピンググリッチエフェクト
 const GlitchText = ({ text }: { text: string }) => {
+  const [repeatDelays] = useState(() => [Math.random() * 3 + 1, Math.random() * 3 + 1.5]);
+
   return (
     <div className="relative inline-block">
       <span className="relative z-10">{text}</span>
       
       {/* Glitch Layer 1 (Accent) */}
       <motion.span
+		aria-hidden="true"
         className="absolute top-0 left-0 -ml-1 text-transparent mix-blend-screen opacity-70 pointer-events-none"
         style={{ WebkitTextStroke: '2px var(--color-accent)' }}
         animate={{
@@ -22,13 +25,14 @@ const GlitchText = ({ text }: { text: string }) => {
             'inset(0% 0 100% 0)'
           ],
         }}
-        transition={{ duration: 0.4, repeat: Infinity, repeatType: "mirror", repeatDelay: Math.random() * 3 + 1 }}
+        transition={{ duration: 0.4, repeat: Infinity, repeatType: "mirror", repeatDelay: repeatDelays[0] }}
       >
         {text}
       </motion.span>
       
       {/* Glitch Layer 2 (Main) */}
       <motion.span
+		aria-hidden="true"
         className="absolute top-0 left-0 ml-1 text-transparent mix-blend-screen opacity-70 pointer-events-none"
         style={{ WebkitTextStroke: '2px var(--color-main)' }}
         animate={{
@@ -42,7 +46,7 @@ const GlitchText = ({ text }: { text: string }) => {
             'inset(0% 0 100% 0)'
           ],
         }}
-        transition={{ duration: 0.5, repeat: Infinity, repeatType: "mirror", repeatDelay: Math.random() * 3 + 1.5 }}
+        transition={{ duration: 0.5, repeat: Infinity, repeatType: "mirror", repeatDelay: repeatDelays[1] }}
       >
         {text}
       </motion.span>
@@ -51,25 +55,40 @@ const GlitchText = ({ text }: { text: string }) => {
 };
 
 // 背後を落ちるデータストリーム（マトリックス風のサイバーパンク要素）
-const DataStream = ({ delay, left }: { delay: number, left: number }) => {
+interface DataStreamProps {
+  delay: number;
+  duration: number;
+  height: number;
+  left: number;
+}
+
+const DataStream = ({ delay, duration, height, left }: DataStreamProps) => {
   return (
     <motion.div
       className="absolute top-[-20%] w-1 md:w-2 opacity-40 pointer-events-none"
       style={{ 
         left: `${left}%`, 
         backgroundColor: 'var(--color-accent)',
-        height: Math.random() * 150 + 50 + 'px',
+        height: `${height}px`,
         filter: 'blur(3px)',
         boxShadow: '0 0 10px var(--color-accent)'
       }}
       animate={{ y: ['-20vh', '120vh'] }}
-      transition={{ duration: Math.random() * 2 + 2, repeat: Infinity, delay, ease: 'linear' }}
+      transition={{ duration, repeat: Infinity, delay, ease: 'linear' }}
     />
   );
 };
 
 export default function AnimatedNotFound() {
   const [isMounted, setIsMounted] = useState(false);
+  const [streams] = useState(() =>
+    Array.from({ length: 20 }, () => ({
+      delay: Math.random() * 5,
+      duration: Math.random() * 2 + 2,
+      height: Math.random() * 150 + 50,
+      left: Math.random() * 100,
+    })),
+  );
   const containerRef = useRef<HTMLDivElement>(null);
   
   // マウス追従のパララックス（視差）エフェクト用設定
@@ -114,14 +133,10 @@ export default function AnimatedNotFound() {
     );
   }
 
-  const streams = Array.from({ length: 20 }).map((_, i) => (
-    <DataStream key={i} left={Math.random() * 100} delay={Math.random() * 5} />
-  ));
-
   return (
     <div 
       ref={containerRef}
-      className="fixed inset-0 flex flex-col items-center justify-center overflow-hidden z-50"
+      className="fixed inset-0 z-50 overflow-x-hidden overflow-y-auto"
       style={{ 
         backgroundColor: 'var(--color-base)',
         perspective: '1000px' // 3Dパララックス用の視点距離
@@ -155,7 +170,9 @@ export default function AnimatedNotFound() {
         
         {/* 奥を流れるデータストリーム */}
         <div className="absolute inset-0" style={{ transform: 'translateZ(-50px)' }}>
-          {streams}
+          {streams.map((stream, index) => (
+            <DataStream key={index} {...stream} />
+          ))}
         </div>
         
         {/* 背景に浮かぶ巨大な404透かし */}
@@ -234,7 +251,7 @@ export default function AnimatedNotFound() {
 
       {/* --- メインコンテンツレイヤー（マウスに追従して小さく逆に動く） --- */}
       <motion.div 
-        className="relative z-20 flex flex-col items-center space-y-8 select-none px-4"
+        className="relative z-20 flex min-h-full flex-col items-center justify-center space-y-8 px-4 py-10 select-none"
         style={{ x: fgTranslateX, y: fgTranslateY }}
       >
         
