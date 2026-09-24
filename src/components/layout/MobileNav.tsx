@@ -37,10 +37,12 @@ export default function MobileNav({ isOpen, onClose }: Props) {
 					 * 縦書きは右から左へ読むため、グループも右端から並べる。
 					 * 全 19 項目を 1 行に並べると画面幅に収まらないので、
 					 * グループごとに行を分け、行の中だけ右から左へ送る。
-					 * 広い画面ではグループ自体も右から左へ横に並べ、
-					 * 縦に積んで画面の高さからはみ出さないようにする。
+					 *
+					 * 広い画面でも同じく、トップ類・企画・来場案内・その他の 4 段に積む。
+					 * グループを横に並べると、縦書きの列がどのグループに属するのか
+					 * 見分けにくくなるため。
 					 */}
-					<div className="flex flex-col gap-7 md:flex-row-reverse md:flex-wrap md:justify-center md:gap-x-14 md:gap-y-10">
+					<div className="flex flex-col gap-7">
 						{navGroups.map((group) => (
 							<div key={group.heading ?? 'main'}>
 								{group.heading ? (
