@@ -395,6 +395,14 @@
     pointer-events: none;
   }
 
+  /*
+   * サイト内のページ遷移では覆いを出さない。
+   * JS が外す前に描画されて一瞬見えないよう、CSS で先に隠す。
+   */
+  html.skip-loading .loading-screen {
+    display: none;
+  }
+
   /* 覆いが出ている間は背後を動かさない。 */
   html.is-loading,
   html.is-loading body {
