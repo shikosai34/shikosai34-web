@@ -47,8 +47,12 @@ export default function MobileNav({ isOpen, onClose, poster }: Props) {
 				{/*
 				 * 閉じる導線はヘッダーの MENU ボタンが兼ねる（開くと×に変わる）。
 				 * ここではその丸い面と重ならないよう、上端を空けておく。
+				 *
+				 * nav は高さ固定の縦並びなので、中身が画面より高いと子が縮む。
+				 * この空きは中身がなく真っ先に潰れ、最初の段がボタンに、上の飾り罫が
+				 * ロゴとボタンに重なってしまうため、shrink-0 で縮ませない（はみ出した分はスクロール）。
 				 */}
-				<div aria-hidden="true" className="h-16" />
+				<div aria-hidden="true" className="h-16 shrink-0" />
 
 				<div className="mt-6 flex-1 md:mx-auto md:w-full md:max-w-5xl">
 					<DiamondRule className="mb-6" />
