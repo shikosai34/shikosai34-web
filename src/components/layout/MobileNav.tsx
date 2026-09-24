@@ -30,15 +30,17 @@ export default function MobileNav({ isOpen, onClose }: Props) {
 				 */}
 				<div aria-hidden="true" className="h-16" />
 
-				<div className="mt-6 flex-1">
+				<div className="mt-6 flex-1 md:mx-auto md:w-full md:max-w-5xl">
 					<DiamondRule className="mb-6" />
 
 					{/*
 					 * 縦書きは右から左へ読むため、グループも右端から並べる。
 					 * 全 19 項目を 1 行に並べると画面幅に収まらないので、
 					 * グループごとに行を分け、行の中だけ右から左へ送る。
+					 * 広い画面ではグループ自体も右から左へ横に並べ、
+					 * 縦に積んで画面の高さからはみ出さないようにする。
 					 */}
-					<div className="flex flex-col gap-7">
+					<div className="flex flex-col gap-7 md:flex-row-reverse md:flex-wrap md:justify-center md:gap-x-14 md:gap-y-10">
 						{navGroups.map((group) => (
 							<div key={group.heading ?? 'main'}>
 								{group.heading ? (

@@ -74,7 +74,7 @@ export default function StageEventSection({ events = [] }: Props) {
 	const event = state.kind === 'next' || state.kind === 'current' ? state.event : null;
 
 	return (
-		<section className="surface-panel mx-4 mt-8 rounded-2xl p-4 pt-6 pb-6 text-text">
+		<section className="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 text-text sm:p-6">
 			<SectionHeading title="Stage Events" icon="mic" />
 			<p className="text-sm leading-relaxed text-text/80">
 				体育館ステージのイベント情報はこちらから確認できます。

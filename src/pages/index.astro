@@ -52,7 +52,7 @@ const stageEvents = (await getVisibleEvents()).map((entry) => ({
 <Layout title="茨香祭速報 | 第34回 茨香祭">
 	<Header client:load logoSrc={logoG.src} />
 
-	<main class="mx-auto w-full max-w-2xl pb-16">
+	<main class="mx-auto w-full max-w-5xl px-4 pb-16 sm:px-6">
 		<BreakingNewsHero
 			client:load
 			posterSrc={posterImage.src}
@@ -67,8 +67,14 @@ const stageEvents = (await getVisibleEvents()).map((entry) => ({
 		<ThemeSection>
 			<ThemeModel slot="mark" client:only="react" />
 		</ThemeSection>
-		<StageEventSection client:load events={stageEvents} />
-		<NewsSection items={latestNews} />
+		{/*
+		 * 広い画面では Stage Events と News を横に並べる。
+		 * どちらも縦に短いパネルなので、1 列に積むと PC では間延びする。
+		 */}
+		<div class="lg:grid lg:grid-cols-2 lg:gap-6">
+			<StageEventSection client:load events={stageEvents} />
+			<NewsSection items={latestNews} />
+		</div>
 	</main>
 
 	<SiteFooter />

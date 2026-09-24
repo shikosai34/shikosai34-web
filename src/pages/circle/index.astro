@@ -45,8 +45,8 @@ for (const circle of circles) {
 <Layout title="サークル一覧 | 第34回 茨香祭">
 	<Header client:load logoSrc={logoG.src} />
 
-	<main class="mx-auto w-full max-w-3xl px-4 pb-16">
-		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6">
+	<main class="mx-auto w-full max-w-5xl px-4 pb-16 sm:px-6">
+		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
 			<div class="flex items-baseline justify-between gap-4">
 				<SectionHeading title="Circle" icon="users" />
 				<a href="#circle-list" class="shrink-0 text-sm text-text underline hover:no-underline">
@@ -106,7 +106,7 @@ for (const circle of circles) {
 							該当するサークルはありません。
 						</p>
 
-						<ul class="circle-grid mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+						<ul class="circle-grid mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
 							{circles.map((circle) => (
 								<li data-category={circle.data.category} data-search={searchTextById.get(circle.id)}>
 									<a href={`/circle/${circle.id}`} class="block h-full rounded-xl">

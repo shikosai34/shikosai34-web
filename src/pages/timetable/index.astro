@@ -19,8 +19,8 @@ const events = await getVisibleEvents();
 <Layout title="タイムテーブル | 第34回 茨香祭">
 	<Header client:load logoSrc={logoG.src} />
 
-	<main class="mx-auto w-full max-w-3xl px-4 pb-16">
-		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6">
+	<main class="mx-auto w-full max-w-5xl px-4 pb-16 sm:px-6">
+		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
 			<div class="flex flex-wrap items-baseline justify-between gap-3">
 				<SectionHeading title="Timetable" icon="clock" />
 				<a href="/event" class="text-sm text-text underline hover:no-underline">企画一覧で見る</a>
@@ -43,7 +43,8 @@ const events = await getVisibleEvents();
 				</nav>
 			</div>
 
-			<div class="mt-8 space-y-12">
+			{/* 開催日は 2 日だけなので、広い画面では日ごとの列を横に並べる。 */}
+			<div class="mt-8 space-y-12 lg:grid lg:grid-cols-2 lg:gap-8 lg:space-y-0">
 				{
 					FESTIVAL_DAYS.map((day) => {
 						const dayEvents = events.filter((event) => getEventDayKey(event.data.startAt) === day.date);
@@ -64,7 +65,7 @@ const events = await getVisibleEvents();
 								) : (
 									<ol class="space-y-3">
 										{dayEvents.map((event) => (
-											<li class="grid grid-cols-[4.5rem_1fr] gap-3 sm:grid-cols-[6rem_1fr]">
+											<li class="grid grid-cols-[4.5rem_1fr] gap-3 sm:grid-cols-[6rem_1fr] lg:grid-cols-[4.5rem_1fr]">
 												<div class="pt-4 text-right">
 													<time datetime={event.data.startAt.toISOString()} class="block font-medium text-text">
 														{formatEventTime(event.data.startAt)}
@@ -76,7 +77,7 @@ const events = await getVisibleEvents();
 													data-event-detail
 													class="flex overflow-hidden rounded-xl border border-text/20 bg-base text-text transition-transform hover:-translate-y-0.5 focus:outline-2 focus:outline-offset-2 focus:outline-accent"
 												>
-													<div class="kikko w-24 shrink-0 bg-text/5 sm:w-32">
+													<div class="kikko w-24 shrink-0 bg-text/5 sm:w-32 lg:w-24">
 														{event.data.image ? (
 															<img src={event.data.image} alt="" loading="lazy" class="h-full w-full object-cover" />
 														) : (

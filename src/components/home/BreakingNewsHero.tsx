@@ -60,7 +60,7 @@ export default function BreakingNewsHero({
 	 */
 	return (
 		<div
-			className="mx-4 mt-6 perspective-[1600px]"
+			className="mt-6 perspective-[1600px]"
 			onKeyDown={(event) => {
 				if (flipped && event.key === 'Escape') flip(false);
 			}}
@@ -70,7 +70,7 @@ export default function BreakingNewsHero({
 				style={{ transform: `rotateY(${turns * 180}deg)` }}
 			>
 				<section
-					className="surface-panel rounded-2xl px-4 pt-6 pb-4 backface-hidden"
+					className="surface-panel rounded-2xl px-4 pt-6 pb-4 backface-hidden sm:px-6 lg:px-10 lg:pb-8"
 					inert={flipped}
 					aria-hidden={flipped}
 				>
@@ -84,88 +84,103 @@ export default function BreakingNewsHero({
 					<SectionHeading title="茨香祭速報" icon="megaphone" />
 
 					{/*
-					 * 参考サイトに倣い、紙面を円でそのまま切り抜く。
-					 * 円の内側いっぱいに広がるよう object-cover で埋める。
-					 *
-					 * 円は縦長だと上下が切れすぎるので、横長（5:4）の楕円ではなく
-					 * 正円にし、紙面の上寄り（object-top）を見せる。ポスターは
-					 * 人物と日付が上半分に集まっているため。
+					 * モバイルは円の下に告知を重ねて縦に積む。
+					 * 広い画面では円を左、告知と導線を右に置いて横に並べ、
+					 * 円が画面の高さを超えて大きくなりすぎないようにする。
 					 */}
-					<div className="kikko neon-ring relative -mx-2 flex aspect-square items-center justify-center overflow-hidden rounded-full border-2 border-accent/50 bg-base sm:mx-auto sm:max-w-md">
+					<div className="lg:grid lg:grid-cols-2 lg:items-center lg:gap-10">
 						{/*
-						 * 紙面は円より小さく置く。object-cover で埋めると倍率が上がって
-						 * 四隅が大きく欠けるため、縮めて端の情報を残す。
+						 * 参考サイトに倣い、紙面を円でそのまま切り抜く。
+						 * 円の内側いっぱいに広がるよう object-cover で埋める。
 						 *
-						 * ただし縮めすぎると円の中で紙面が浮いてしまうので、
-						 * 上下は円からわずかに外れるくらい（高さ 106%）に留める。
-						 * 左右は円の内側に収まる幅にして、隅が環をはみ出さないようにする。
+						 * 円は縦長だと上下が切れすぎるので、横長（5:4）の楕円ではなく
+						 * 正円にし、紙面の上寄り（object-top）を見せる。ポスターは
+						 * 人物と日付が上半分に集まっているため。
 						 */}
-						<img
-							src={posterSrc}
-							width={posterWidth}
-							height={posterHeight}
-							alt={posterAlt}
-							className="h-[106%] w-auto max-w-none"
-						/>
-					</div>
+						<div className="kikko neon-ring relative -mx-2 flex aspect-square items-center justify-center overflow-hidden rounded-full border-2 border-accent/50 bg-base sm:mx-auto sm:max-w-md lg:mx-0 lg:max-w-none">
+							{/*
+							 * 紙面は円より小さく置く。object-cover で埋めると倍率が上がって
+							 * 四隅が大きく欠けるため、縮めて端の情報を残す。
+							 *
+							 * ただし縮めすぎると円の中で紙面が浮いてしまうので、
+							 * 上下は円からわずかに外れるくらい（高さ 106%）に留める。
+							 * 左右は円の内側に収まる幅にして、隅が環をはみ出さないようにする。
+							 */}
+							<img
+								src={posterSrc}
+								width={posterWidth}
+								height={posterHeight}
+								alt={posterAlt}
+								className="h-[106%] w-auto max-w-none"
+							/>
+						</div>
 
-					{/*
-					 * 告知のパネル。参考サイトに倣い、円の下端に少し重ねて置く。
-					 * 円と重ねるぶん、地は不透明にして紙面が透けないようにする。
-					 */}
-					<div className="bracket-frame stripes relative z-10 -mt-5 bg-base/55 px-4 py-3 backdrop-blur-[2px] sm:mx-auto sm:max-w-md">
-						{/* 日付＋注記。参考サイトは大きな日付の右に小さく添える。 */}
-						<div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-							<p className="outlined-text neon-text--cyan text-2xl font-bold tracking-tight text-accent">
-								10月24日(土)
+						<div>
+							{/*
+							 * 告知のパネル。参考サイトに倣い、円の下端に少し重ねて置く。
+							 * 円と重ねるぶん、地は不透明にして紙面が透けないようにする。
+							 */}
+							<div className="bracket-frame stripes relative z-10 -mt-5 bg-base/55 px-4 py-3 backdrop-blur-[2px] sm:mx-auto sm:max-w-md lg:mx-0 lg:mt-0 lg:max-w-none lg:px-6 lg:py-5">
+								{/*
+								 * 見出し → 何の → いつ の順に並べる。日付を見出しより前に置くと
+								 * 「10月24日に新ポスター解禁」という予告に読めてしまうため、
+								 * 日付は「一般公開」の直後に添えて開催日だとわかるようにする。
+								 */}
+
+								{/* 主文。地から浮かせるため縁取りする。 */}
+								{/*
+								 * 主文はピンクで光らせる。ポスターのマゼンタを
+								 * 一番目立つ一行に回して、シアンの日付と対にする。
+								 */}
+								<p className="outlined-text neon-text text-xl font-bold tracking-tight lg:text-3xl">
+									新ポスター解禁！
+								</p>
+
+								{/* 補足とハザード帯。 */}
+								<div className="mt-2 flex items-center gap-3">
+									<p className="shrink-0 text-xs text-text/75">第34回 茨香祭 一般公開</p>
+									<span className="hazard-stripes h-3 flex-1 opacity-70" aria-hidden="true" />
+								</div>
+
+								{/* 日付＋注記。参考サイトは大きな日付の右に小さく添える。 */}
+								<div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1 lg:mt-2">
+									<p className="outlined-text neon-text--cyan text-2xl font-bold tracking-tight text-accent lg:text-4xl">
+										10月24日(土)
+									</p>
+									<p className="text-xs text-text/80">※25日(日)は学内限定</p>
+								</div>
+							</div>
+
+							{/*
+							 * 円から外れる情報（開催日時・QR コード・学校名）は紙面の四隅に
+							 * あるため、切り抜くと読めなくなる。全体を見られる導線を必ず添える。
+							 */}
+							<p className="mt-3 text-center text-xs text-text/70">
+								<button
+									ref={showButtonRef}
+									type="button"
+									onClick={() => flip(true)}
+									className="min-h-11 underline underline-offset-2 transition-colors hover:text-accent"
+								>
+									ポスター全体を見る
+								</button>
 							</p>
-							<p className="text-xs text-text/80">※25日(日)は学内限定</p>
+
+							{/*
+							 * 紙面の下に、ポスターのマゼンタの斜線とハーフトーンを重ねた区切りを敷く。
+							 */}
+							<div className="relative mt-4 h-3 w-full overflow-hidden" aria-hidden="true">
+								<span className="halftone absolute inset-0 opacity-40" />
+								<span className="glitch-sweep absolute inset-0" />
+							</div>
+
+							<div className="flex justify-end pt-3">
+								<Button href="/poster/backnumber" variant="primary-dark">
+									バックナンバーを見る
+									<ArrowRightIcon className="h-4 w-4" />
+								</Button>
+							</div>
 						</div>
-
-						{/* 主文。地から浮かせるため縁取りする。 */}
-						{/*
-						 * 主文はピンクで光らせる。ポスターのマゼンタを
-						 * 一番目立つ一行に回して、シアンの日付と対にする。
-						 */}
-						<p className="outlined-text neon-text mt-1 text-xl font-bold tracking-tight">
-							新ポスター解禁！
-						</p>
-
-						{/* 補足とハザード帯。 */}
-						<div className="mt-2 flex items-center gap-3">
-							<p className="shrink-0 text-xs text-text/75">第34回 茨香祭 一般公開</p>
-							<span className="hazard-stripes h-3 flex-1 opacity-70" aria-hidden="true" />
-						</div>
-					</div>
-
-					{/*
-					 * 円から外れる情報（開催日時・QR コード・学校名）は紙面の四隅に
-					 * あるため、切り抜くと読めなくなる。全体を見られる導線を必ず添える。
-					 */}
-					<p className="mt-3 text-center text-xs text-text/70">
-						<button
-							ref={showButtonRef}
-							type="button"
-							onClick={() => flip(true)}
-							className="min-h-11 underline underline-offset-2 transition-colors hover:text-accent"
-						>
-							ポスター全体を見る
-						</button>
-					</p>
-
-					{/*
-					 * 紙面の下に、ポスターのマゼンタの斜線とハーフトーンを重ねた区切りを敷く。
-					 */}
-					<div className="relative mt-4 h-3 w-full overflow-hidden" aria-hidden="true">
-						<span className="halftone absolute inset-0 opacity-40" />
-						<span className="glitch-sweep absolute inset-0" />
-					</div>
-
-					<div className="flex justify-end pt-3">
-						<Button href="/poster/backnumber" variant="primary-dark">
-							バックナンバーを見る
-							<ArrowRightIcon className="h-4 w-4" />
-						</Button>
 					</div>
 				</section>
 
