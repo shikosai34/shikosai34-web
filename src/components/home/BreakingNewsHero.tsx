@@ -121,20 +121,18 @@ export default function BreakingNewsHero({
 							 * 円と重ねるぶん、地は不透明にして紙面が透けないようにする。
 							 */}
 							<div className="bracket-frame stripes relative z-10 -mt-5 bg-base/55 px-4 py-3 backdrop-blur-[2px] sm:mx-auto sm:max-w-md lg:mx-0 lg:mt-0 lg:max-w-none lg:px-6 lg:py-5">
-								{/* 日付＋注記。参考サイトは大きな日付の右に小さく添える。 */}
-								<div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-									<p className="outlined-text neon-text--cyan text-2xl font-bold tracking-tight text-accent lg:text-4xl">
-										10月24日(土)
-									</p>
-									<p className="text-xs text-text/80">※25日(日)は学内限定</p>
-								</div>
+								{/*
+								 * 見出し → 何の → いつ の順に並べる。日付を見出しより前に置くと
+								 * 「10月24日に新ポスター解禁」という予告に読めてしまうため、
+								 * 日付は「一般公開」の直後に添えて開催日だとわかるようにする。
+								 */}
 
 								{/* 主文。地から浮かせるため縁取りする。 */}
 								{/*
 								 * 主文はピンクで光らせる。ポスターのマゼンタを
 								 * 一番目立つ一行に回して、シアンの日付と対にする。
 								 */}
-								<p className="outlined-text neon-text mt-1 text-xl font-bold tracking-tight lg:mt-2 lg:text-3xl">
+								<p className="outlined-text neon-text text-xl font-bold tracking-tight lg:text-3xl">
 									新ポスター解禁！
 								</p>
 
@@ -142,6 +140,14 @@ export default function BreakingNewsHero({
 								<div className="mt-2 flex items-center gap-3">
 									<p className="shrink-0 text-xs text-text/75">第34回 茨香祭 一般公開</p>
 									<span className="hazard-stripes h-3 flex-1 opacity-70" aria-hidden="true" />
+								</div>
+
+								{/* 日付＋注記。参考サイトは大きな日付の右に小さく添える。 */}
+								<div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1 lg:mt-2">
+									<p className="outlined-text neon-text--cyan text-2xl font-bold tracking-tight text-accent lg:text-4xl">
+										10月24日(土)
+									</p>
+									<p className="text-xs text-text/80">※25日(日)は学内限定</p>
 								</div>
 							</div>
 
