@@ -1,6 +1,5 @@
 ---
 import { getImage } from 'astro:assets';
-import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
 import mv01 from '../../assets/main-visual/01.png';
 import mv02 from '../../assets/main-visual/02.png';
 import mv03 from '../../assets/main-visual/03.png';
@@ -8,7 +7,7 @@ import mv04 from '../../assets/main-visual/04.png';
 import mv05 from '../../assets/main-visual/05.png';
 import mv06 from '../../assets/main-visual/06.png';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
-import Header from '../../components/layout/Header';
+import SiteHeader from '../../components/layout/SiteHeader.astro';
 import MainVisualLightbox from '../../components/main-visual/MainVisualLightbox';
 import SectionHeading from '../../components/ui/SectionHeading';
 import Layout from '../../layouts/Layout.astro';
@@ -48,7 +47,7 @@ const groups = [
 ---
 
 <Layout title="ビジュアル | 第34回 茨香祭">
-	<Header client:load logoSrc={logoG.src} />
+	<SiteHeader />
 
 	<main class="mx-auto w-full max-w-5xl px-4 pb-16 sm:px-6">
 		{/*

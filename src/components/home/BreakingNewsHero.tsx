@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import ArrowRightIcon from '../icons/ArrowRightIcon';
 import Button, { buttonClassName } from '../ui/Button';
 import NeonClouds from '../ui/NeonClouds';
+import PosterCircle from '../ui/PosterCircle';
 import SectionHeading from '../ui/SectionHeading';
 
 interface Props {
@@ -89,31 +90,13 @@ export default function BreakingNewsHero({
 					 * 円が画面の高さを超えて大きくなりすぎないようにする。
 					 */}
 					<div className="lg:grid lg:grid-cols-2 lg:items-center lg:gap-10">
-						{/*
-						 * 参考サイトに倣い、紙面を円でそのまま切り抜く。
-						 * 円の内側いっぱいに広がるよう object-cover で埋める。
-						 *
-						 * 円は縦長だと上下が切れすぎるので、横長（5:4）の楕円ではなく
-						 * 正円にし、紙面の上寄り（object-top）を見せる。ポスターは
-						 * 人物と日付が上半分に集まっているため。
-						 */}
-						<div className="kikko neon-ring relative -mx-2 flex aspect-square items-center justify-center overflow-hidden rounded-full border-2 border-accent/50 bg-base sm:mx-auto sm:max-w-md lg:mx-0 lg:max-w-none">
-							{/*
-							 * 紙面は円より小さく置く。object-cover で埋めると倍率が上がって
-							 * 四隅が大きく欠けるため、縮めて端の情報を残す。
-							 *
-							 * ただし縮めすぎると円の中で紙面が浮いてしまうので、
-							 * 上下は円からわずかに外れるくらい（高さ 106%）に留める。
-							 * 左右は円の内側に収まる幅にして、隅が環をはみ出さないようにする。
-							 */}
-							<img
-								src={posterSrc}
-								width={posterWidth}
-								height={posterHeight}
-								alt={posterAlt}
-								className="h-[106%] w-auto max-w-none"
-							/>
-						</div>
+						<PosterCircle
+							src={posterSrc}
+							width={posterWidth}
+							height={posterHeight}
+							alt={posterAlt}
+							className="-mx-2 sm:mx-auto sm:max-w-md lg:mx-0 lg:max-w-none"
+						/>
 
 						<div>
 							{/*

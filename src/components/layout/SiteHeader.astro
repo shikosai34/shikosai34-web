@@ -1,0 +1,27 @@
+---
+/*
+ * ヘッダー（ロゴ＋メニュー）。全ページの先頭に置く。
+ *
+ * ロゴとメニューに添えるポスターはどのページでも同じものを使うので、
+ * ここで読んで渡す。呼び出し側はロゴやポスターの場所を知らなくてよい
+ * （SiteFooter と同じ考え方）。
+ *
+ * ポスターは getImage で縮める必要があり、React の Header の中では
+ * 呼べないため、この Astro のラッパーで用意してから渡す。
+ */
+import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
+import { getPosterImage } from '../../lib/poster';
+import Header from './Header';
+
+const poster = await getPosterImage();
+---
+
+<Header
+	client:load
+	logoSrc={logoG.src}
+	poster={{
+		src: poster.src,
+		width: Number(poster.attributes.width),
+		height: Number(poster.attributes.height),
+	}}
+/>
