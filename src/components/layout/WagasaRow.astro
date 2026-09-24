@@ -17,7 +17,12 @@
  * フッターは上端が弧になっているので、下げすぎると縁で切れる。
  *
  * 4本の合計幅は 390px 幅の画面より広いので、固定幅にせず
- * 画面幅に合わせて縮め（flex-1 + max-w-*）、横にはみ出さないようにする。
+ * 画面幅に合わせて縮め（flex-* + max-w-*）、横にはみ出さないようにする。
+ *
+ * 中央の2本は端の2本の 1.25 倍にして、ひと目で大きさの差がわかるようにする。
+ * 伸び率（flex-[4] / flex-[5]）と上限（max-w-24 / max-w-30 など）を同じ 4:5 に
+ * そろえ、縮めているときも上限に達したときも比率が崩れないようにする
+ * （伸び率だけ・上限だけだと、どちらかの幅で4本とも同じ大きさになる）。
  *
  * 装飾なので aria-hidden。
  */
@@ -27,10 +32,10 @@ import asanoha from '../../assets/wagasa/wagasa-asanoha.svg';
 import uzu from '../../assets/wagasa/wagasa-uzu.svg';
 
 const UMBRELLAS = [
-	{ src: seigaiha.src, alt: '', spin: 'wagasa-spin-15', size: 'max-w-24 sm:max-w-32', lift: '-translate-y-1' },
-	{ src: ichimatsu.src, alt: '', spin: 'wagasa-spin-16 wagasa-reverse', size: 'max-w-28 sm:max-w-36', lift: '' },
-	{ src: asanoha.src, alt: '', spin: 'wagasa-spin-14', size: 'max-w-28 sm:max-w-36', lift: '' },
-	{ src: uzu.src, alt: '', spin: 'wagasa-spin-17 wagasa-reverse', size: 'max-w-24 sm:max-w-32', lift: '-translate-y-1' },
+	{ src: seigaiha.src, alt: '', spin: 'wagasa-spin-15', size: 'flex-[4] max-w-24 sm:max-w-32', lift: '-translate-y-1' },
+	{ src: ichimatsu.src, alt: '', spin: 'wagasa-spin-16 wagasa-reverse', size: 'flex-[5] max-w-30 sm:max-w-40', lift: '' },
+	{ src: asanoha.src, alt: '', spin: 'wagasa-spin-14', size: 'flex-[5] max-w-30 sm:max-w-40', lift: '' },
+	{ src: uzu.src, alt: '', spin: 'wagasa-spin-17 wagasa-reverse', size: 'flex-[4] max-w-24 sm:max-w-32', lift: '-translate-y-1' },
 ];
 ---
 
@@ -40,7 +45,7 @@ const UMBRELLAS = [
 >
 	{
 		UMBRELLAS.map((u) => (
-			<span class={`block min-w-0 flex-1 ${u.lift} ${u.size}`}>
+			<span class={`block min-w-0 ${u.lift} ${u.size}`}>
 				<img src={u.src} alt="" loading="lazy" decoding="async" class={`h-auto w-full ${u.spin}`} />
 			</span>
 		))

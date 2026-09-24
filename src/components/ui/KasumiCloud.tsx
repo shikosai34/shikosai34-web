@@ -10,6 +10,10 @@
  *   - 発光の強さを場所ごとに変えたい
  * ため。<img> だと中の stroke を外から触れない。
  *
+ * 線はすべて 1 本の <path> にまとめて描く。色は半透明（text-accent/45 など）で
+ * 渡されるので、線ごとに <path> を分けると、内側の半円が水平線に接する所で
+ * 2 回塗られて重なりだけ濃く光ってしまう。1 本の path なら重なっても 1 回しか塗られない。
+ *
  * 装飾なので aria-hidden。
  */
 
@@ -31,6 +35,9 @@ const KASUMI_INNER = [
 	'M 86 144 A 9 9 0 0 0 86 162',
 	'M 123.5 162 A 11.5 11.5 0 0 1 123.5 185',
 ];
+
+/** 描画する形。重なりを 1 回だけ塗るよう、すべてを 1 本の path にまとめる。 */
+const KASUMI_PATH = [KASUMI_TOP, KASUMI_MAIN, ...KASUMI_INNER].join(' ');
 
 interface Props {
 	className?: string;
@@ -55,9 +62,14 @@ export default function KasumiCloud({
 }: Props) {
 	const filterId = `${id}-glow`;
 
+	/*
+	 * 発光は SVG の箱の外まで広がるので、overflow を visible にして切らない。
+	 * 箱で切ると、淡い光がそこで途切れて四角い境界が見えてしまう。
+	 */
 	return (
 		<svg
 			viewBox="0 0 210 226"
+			overflow="visible"
 			className={className}
 			fill="none"
 			stroke="currentColor"
@@ -70,9 +82,14 @@ export default function KasumiCloud({
 				 * 発光。ぼかし量の違う2層を重ねると、
 				 * 管のすぐ外の明るいにじみと、遠くまで届く淡い光の
 				 * 両方が出る（元の SVG と同じ作り）。
+				 *
+				 * フィルターの範囲は、光が消えきるところまで取る。
+				 * 線は x -5〜215（反転時を含む）・y 37.5〜185 にあり、発光層の線の半幅 3 と
+				 * 遠い光のぼかし（stdDeviation 10 の 3 倍 = 30）を足すと x -38〜248・y 4.5〜218。
+				 * 範囲が足りないと、光がそこで直線的に切れる。
 				 */}
 				{glow && (
-					<filter id={filterId} filterUnits="userSpaceOnUse" x="-20" y="0" width="250" height="226">
+					<filter id={filterId} filterUnits="userSpaceOnUse" x="-45" y="-10" width="300" height="246">
 						<feGaussianBlur in="SourceGraphic" stdDeviation="2" result="near" />
 						<feGaussianBlur in="SourceGraphic" stdDeviation="10" result="far" />
 						<feMerge>
@@ -88,11 +105,7 @@ export default function KasumiCloud({
 				 * transform に上書きされて反転が消えるため。
 				 */}
 				<g id={`${id}-shape`} transform={flip ? 'translate(210 0) scale(-1 1)' : undefined}>
-					<path d={KASUMI_TOP} />
-					<path d={KASUMI_MAIN} />
-					{KASUMI_INNER.map((d) => (
-						<path key={d} d={d} />
-					))}
+					<path d={KASUMI_PATH} />
 				</g>
 			</defs>
 
