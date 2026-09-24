@@ -176,7 +176,7 @@ export default function BreakingNewsHero({
 
 							<div className="flex justify-end pt-3">
 								<Button href="/poster/backnumber" variant="primary-dark">
-									バックナンバーを見る
+									過去のポスターを見る
 									<ArrowRightIcon className="h-4 w-4" />
 								</Button>
 							</div>
