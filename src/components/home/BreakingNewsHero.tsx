@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import ArrowRightIcon from '../icons/ArrowRightIcon';
-import Button from '../ui/Button';
+import Button, { buttonClassName } from '../ui/Button';
 import NeonClouds from '../ui/NeonClouds';
 import SectionHeading from '../ui/SectionHeading';
 
@@ -155,16 +155,16 @@ export default function BreakingNewsHero({
 							 * 円から外れる情報（開催日時・QR コード・学校名）は紙面の四隅に
 							 * あるため、切り抜くと読めなくなる。全体を見られる導線を必ず添える。
 							 */}
-							<p className="mt-3 text-center text-xs text-text/70">
+							<div className="mt-3 flex justify-center">
 								<button
 									ref={showButtonRef}
 									type="button"
 									onClick={() => flip(true)}
-									className="min-h-11 underline underline-offset-2 transition-colors hover:text-accent"
+									className={buttonClassName('outline')}
 								>
 									ポスター全体を見る
 								</button>
-							</p>
+							</div>
 
 							{/*
 							 * 紙面の下に、ポスターのマゼンタの斜線とハーフトーンを重ねた区切りを敷く。
@@ -176,7 +176,7 @@ export default function BreakingNewsHero({
 
 							<div className="flex justify-end pt-3">
 								<Button href="/poster/backnumber" variant="primary-dark">
-									バックナンバーを見る
+									過去のポスターを見る
 									<ArrowRightIcon className="h-4 w-4" />
 								</Button>
 							</div>
@@ -191,20 +191,26 @@ export default function BreakingNewsHero({
 					aria-hidden={!flipped}
 					aria-label="ポスター全体"
 				>
-					<img
-						src={posterFullSrc}
-						width={posterFullWidth}
-						height={posterFullHeight}
-						alt={posterAlt}
-						loading="lazy"
-						className="min-h-0 w-auto max-w-full flex-1 object-contain"
-					/>
+					{/*
+					 * 紙面の角を丸めるため、object-contain で枠の中に余白を作るのではなく、
+					 * 画像そのものを枠に収まる大きさまで縮める（要素の箱＝見えている紙面になる）。
+					 */}
+					<div className="flex min-h-0 w-full flex-1 items-center justify-center">
+						<img
+							src={posterFullSrc}
+							width={posterFullWidth}
+							height={posterFullHeight}
+							alt={posterAlt}
+							loading="lazy"
+							className="h-auto max-h-full w-auto max-w-full rounded-xl"
+						/>
+					</div>
 
 					<button
 						ref={backButtonRef}
 						type="button"
 						onClick={() => flip(false)}
-						className="min-h-11 shrink-0 text-xs text-text/70 underline underline-offset-2 transition-colors hover:text-accent"
+						className={buttonClassName('outline', 'shrink-0')}
 					>
 						表に戻る
 					</button>
