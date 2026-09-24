@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import MobileNav from './MobileNav';
+import MobileNav, { type NavPoster } from './MobileNav';
 
 interface Props {
 	logoSrc: string;
+	/** メニューの左側に添えるポスター。 */
+	poster: NavPoster;
 }
 
-export default function Header({ logoSrc }: Props) {
+export default function Header({ logoSrc, poster }: Props) {
 	const [isNavOpen, setIsNavOpen] = useState(false);
 
 	return (
@@ -70,7 +72,7 @@ export default function Header({ logoSrc }: Props) {
 				</button>
 			</div>
 
-			<MobileNav isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
+			<MobileNav isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} poster={poster} />
 		</header>
 	);
 }

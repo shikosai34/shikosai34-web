@@ -1,8 +1,5 @@
 ---
-import { getImage } from 'astro:assets';
-import posterAsset from '../assets/poster/sokuhou/01-poster.png';
-import logoG from '../assets/logo/yokogaki/HOL_G-trimmed.png';
-import Header from '../components/layout/Header';
+import SiteHeader from '../components/layout/SiteHeader.astro';
 import SiteFooter from '../components/layout/SiteFooter.astro';
 import BreakingNewsHero from '../components/home/BreakingNewsHero';
 import ThemeModel from '../components/home/ThemeModel';
@@ -13,23 +10,9 @@ import Layout from '../layouts/Layout.astro';
 import { getVisibleEvents } from '../lib/events';
 import { formatNewsDate } from '../lib/news';
 import { getVisibleNews } from '../lib/news-collection';
+import { getPosterFullImage, getPosterImage, posterAlt as posterAltText } from '../lib/poster';
 
-const posterImage = await getImage({
-	src: posterAsset,
-	width: 800,
-	format: 'webp',
-});
-
-// 裏面用。円で切り抜く表面では四隅が欠けるため、
-// タイルを裏返した面には文字が読める大きさのものを渡す。
-const posterFull = await getImage({
-	src: posterAsset,
-	width: 1600,
-	format: 'webp',
-});
-
-const posterAltText =
-	'茨香祭2026 ポスター。第34回茨香祭 テーマ「守破離」。一般公開は10月24日（土）9:00〜17:00、25日（日）は学内限定。茨城工業高等専門学校。';
+const [posterImage, posterFull] = await Promise.all([getPosterImage(), getPosterFullImage()]);
 
 const latestNews = (await getVisibleNews()).slice(0, 3).map((entry) => ({
 	href: `/news/${entry.id}`,
@@ -50,7 +33,7 @@ const stageEvents = (await getVisibleEvents()).map((entry) => ({
 ---
 
 <Layout title="茨香祭速報 | 第34回 茨香祭">
-	<Header client:load logoSrc={logoG.src} />
+	<SiteHeader />
 
 	<main class="mx-auto w-full max-w-5xl px-4 pb-16 sm:px-6">
 		<BreakingNewsHero

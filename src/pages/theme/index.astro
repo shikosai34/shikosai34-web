@@ -1,14 +1,13 @@
 ---
-import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
-import Header from '../../components/layout/Header';
+import SiteHeader from '../../components/layout/SiteHeader.astro';
 import ThemeModel from '../../components/home/ThemeModel';
 import ThemeSection from '../../components/home/ThemeSection';
 import Layout from '../../layouts/Layout.astro';
 ---
 
 <Layout title="テーマ | 第34回 茨香祭">
-	<Header client:load logoSrc={logoG.src} />
+	<SiteHeader />
 
 	<main class="mx-auto w-full max-w-5xl px-4 pb-16 sm:px-6">
 		<ThemeSection>
