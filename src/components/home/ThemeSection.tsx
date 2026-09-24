@@ -38,36 +38,42 @@ export default function ThemeSection({ mark }: Props) {
 	// ポスターでテーマ「守破離」が最も強い要素なので、走査線を重ねて
 	// 他のセクションより紙面に近い見せ方にする。
 	return (
-		<section className="surface-panel mx-4 mt-8 rounded-2xl p-6 text-text">
-			<div className="w-72 max-w-full justify-start font-primary text-3xl font-normal text-white">This year's theme</div>
+		<section className="surface-panel mt-8 rounded-2xl p-6 text-text lg:p-10">
+			<div className="max-w-full justify-start font-primary text-3xl font-normal text-white lg:text-4xl">This year's theme</div>
 
-			<div className="mt-2 flex flex-col items-start gap-2">
-				<CrossMark />
-				{mark ? (
-					<div className="relative h-44 w-full max-w-[20rem] self-center bg-radial from-accent/10 to-transparent to-70% sm:h-52">
-						{mark}
-						<noscript>
-							<ShuhariMark className="absolute inset-0 m-auto h-auto w-[90%]" />
-						</noscript>
-					</div>
-				) : (
-					<ShuhariMark className="h-auto w-full max-w-[18rem] self-center" />
-				)}
-				<CrossMark className="self-end rotate-180" />
-			</div>
+			{/*
+			 * モバイルはロゴの下に説明を積む。広い画面ではロゴを左、説明を右に並べ、
+			 * 小さな文字が横に長く伸びて読みにくくならないようにする。
+			 */}
+			<div className="lg:grid lg:grid-cols-2 lg:items-center lg:gap-12">
+				<div className="mt-2 flex flex-col items-start gap-2">
+					<CrossMark />
+					{mark ? (
+						<div className="relative h-44 w-full max-w-[20rem] self-center bg-radial from-accent/10 to-transparent to-70% sm:h-52 lg:h-64 lg:max-w-[24rem]">
+							{mark}
+							<noscript>
+								<ShuhariMark className="absolute inset-0 m-auto h-auto w-[90%]" />
+							</noscript>
+						</div>
+					) : (
+						<ShuhariMark className="h-auto w-full max-w-[18rem] self-center lg:max-w-[22rem]" />
+					)}
+					<CrossMark className="self-end rotate-180" />
+				</div>
 
-			<div className="mt-4 font-primary text-xs font-normal leading-[17px] text-white">
-				和を基調とした、新しさと挑戦を表現するテーマです。
-				<br />
-				<br />
-				守：受け継がれてきた伝統や型を大切に守る
-				<br />
-				破：既存の枠にとらわれず、新たな発想で変化を生み出す
-				<br />
-				離：学びを土台に、自分たちらしい独自の形へと昇華させる
-				<br />
-				<br />
-				これまでの茨香祭の歴史と想いを受け継ぎながら、一人ひとりの個性が輝き、常識を越える新たな茨香祭を創り上げます！
+				<div className="mt-4 font-primary text-xs font-normal leading-[17px] text-white sm:text-sm sm:leading-relaxed lg:mt-0 lg:text-[1rem] lg:leading-loose">
+					和を基調とした、新しさと挑戦を表現するテーマです。
+					<br />
+					<br />
+					守：受け継がれてきた伝統や型を大切に守る
+					<br />
+					破：既存の枠にとらわれず、新たな発想で変化を生み出す
+					<br />
+					離：学びを土台に、自分たちらしい独自の形へと昇華させる
+					<br />
+					<br />
+					これまでの茨香祭の歴史と想いを受け継ぎながら、一人ひとりの個性が輝き、常識を越える新たな茨香祭を創り上げます！
+				</div>
 			</div>
 		</section>
 	);

@@ -40,8 +40,8 @@ const items = await Promise.all(
 <Layout title="茨香祭速報 バックナンバー | 第34回 茨香祭">
 	<Header client:load logoSrc={logoG.src} />
 
-	<main class="mx-auto w-full max-w-2xl px-4 pb-16">
-		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6">
+	<main class="mx-auto w-full max-w-5xl px-4 pb-16 sm:px-6">
+		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
 			<SectionHeading title="バックナンバー" icon="images" />
 
 			<p class="text-sm leading-relaxed text-text">
@@ -51,11 +51,12 @@ const items = await Promise.all(
 			{/*
 			 * 号数は多くないので 1 列で大きく見せる。紙面は文字が細かく、
 			 * 格子に詰めると読めないため。
+			 * 広い画面では紙面の横に号数と見出しを添え、縦に間延びさせない。
 			 */}
 			<ul class="mt-6 space-y-8">
 				{
 					items.map((item) => (
-						<li>
+						<li class="md:grid md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] md:items-start md:gap-8">
 							<a href={item.full} target="_blank" rel="noopener noreferrer">
 								<img
 									src={item.thumb}
@@ -67,7 +68,7 @@ const items = await Promise.all(
 									class="w-full rounded-xl border border-text/15"
 								/>
 							</a>
-							<div class="pt-3">
+							<div class="pt-3 md:pt-0">
 								<p class="text-sm font-medium text-text">
 									{item.issue}
 									<span class="pl-2 font-normal text-text/60">{item.publishedAt}</span>

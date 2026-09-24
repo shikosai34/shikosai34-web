@@ -34,7 +34,7 @@ export default function Header({ logoSrc }: Props) {
 					href="/"
 					className="pointer-events-auto flex items-center px-1 py-2 transition-opacity hover:opacity-80"
 				>
-					<img src={logoSrc} alt="茨香祭" className="h-9 w-auto" />
+					<img src={logoSrc} alt="茨香祭" className="h-9 w-auto md:h-11" />
 				</a>
 
 				{/*

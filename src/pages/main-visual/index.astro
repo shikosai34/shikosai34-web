@@ -50,11 +50,11 @@ const groups = [
 <Layout title="ビジュアル | 第34回 茨香祭">
 	<Header client:load logoSrc={logoG.src} />
 
-	<main class="mx-auto w-full max-w-3xl px-4 pb-16">
+	<main class="mx-auto w-full max-w-5xl px-4 pb-16 sm:px-6">
 		{/*
 		 * セクションごとに独立したパネルに載せて括りを分ける（`/news` と同じ意匠）。
 		 */}
-		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6">
+		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
 			<SectionHeading title="Visual" icon="image" />
 
 			<p class="text-sm leading-relaxed text-text">
@@ -67,10 +67,10 @@ const groups = [
 			 * multi-column だと縦方向に流れて読み順が崩れるので、grid で左上から並べ、
 			 * 高さは各画像の aspect-ratio に任せる（行ごとに上端が揃う）。
 			 *
-			 * PC でも 2 列のままにして 1 点あたりを大きく見せる（3 列だと小さく、
-			 * 4 点では 2 行目が埋まらず間延びする）。
+			 * モバイル・タブレットは 2 列で 1 点あたりを大きく見せ、
+			 * 広い画面では 4 点を 1 行に並べる（3 列だと 2 行目が埋まらず間延びする）。
 			 */}
-			<ul class="mt-6 grid grid-cols-2 items-start gap-3">
+			<ul class="mt-6 grid grid-cols-2 items-start gap-3 lg:grid-cols-4 lg:gap-4">
 				{
 					visualItems.map((item, index) => (
 						<li>
@@ -96,7 +96,7 @@ const groups = [
 			</ul>
 		</section>
 
-		<section class="surface-panel mt-6 rounded-2xl p-4 pt-6 pb-6">
+		<section class="surface-panel mt-6 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
 			<SectionHeading title="Original Character" icon="user" />
 
 			<p class="text-sm leading-relaxed text-text">
@@ -104,13 +104,18 @@ const groups = [
 			</p>
 
 			{/*
-			 * 立ち絵（縦長）と三面図（横長）は縦横比の差が大きく、横に並べると
-			 * 高さが揃わない。無理に並べず上下に積み、横幅だけを揃える。
+			 * 立ち絵（縦長）と三面図（横長）は縦横比の差が大きい。
+			 * モバイルでは上下に積んで横幅だけを揃える。
+			 * 広い画面では横に並べ、各項目の伸び率を縦横比（幅÷高さ）にして
+			 * 高さを揃える（flex-basis 0 のとき、幅が伸び率に比例するため）。
 			 */}
-			<ul class="mt-6 flex flex-col items-center gap-3">
+			<ul class="mt-6 flex flex-col items-center gap-3 md:flex-row md:items-start md:gap-4">
 				{
 					characterItems.map((item, index) => (
-						<li class="w-full max-w-md">
+						<li
+							class="w-full max-w-md md:max-w-none md:min-w-0 md:[flex:var(--ratio)_1_0%]"
+							style={`--ratio: ${item.width / item.height}`}
+						>
 							<a
 								href={item.src}
 								data-lightbox-group="character"
