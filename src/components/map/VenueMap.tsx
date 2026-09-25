@@ -196,7 +196,7 @@ export default function VenueMap({ exhibits }: Props) {
 
 			{/* 建物・会場のボタン。3D を操作しなくても（キーボードでも）選べるように常に出す */}
 			{!planOpen && (
-				<nav aria-label="建物から選ぶ" className="absolute inset-x-0 bottom-0 z-10 p-2 md:p-3">
+				<nav aria-label="建物から選ぶ" className="absolute inset-x-0 bottom-0 z-10 p-2 md:p-5">
 					<ul className="flex gap-1.5 overflow-x-auto pb-1 md:flex-wrap">
 						{[...Object.keys(PLAN_FILES), ...PLACES.map((p) => p.key)].map((id) => {
 							const p = PLACES.find((p) => p.key === id);
@@ -217,21 +217,35 @@ export default function VenueMap({ exhibits }: Props) {
 								</li>
 							);
 						})}
+						<li className="shrink-0">
+							<a
+								href="#floor-guide"
+								className="inline-block rounded-md border border-text/30 bg-base/85 px-3 py-1.5 text-sm text-text/80 backdrop-blur-sm hover:border-main hover:text-main"
+							>
+								配置一覧 ↓
+							</a>
+						</li>
 					</ul>
 				</nav>
 			)}
 
-			{!planOpen && !place && webgl && (
-				<p className="pointer-events-none absolute top-3 left-3 z-10 rounded-sm bg-base/70 px-2 py-1 text-xs text-text/70">
-					ドラッグで回転・ピンチで拡大。建物を押すと中が見られます。
-				</p>
+			{!planOpen && !place && (
+				<div className="pointer-events-none absolute top-20 left-3 z-10 max-w-[calc(100%-1.5rem)] md:top-24 md:left-5">
+					<p className="text-2xl tracking-wide text-text drop-shadow-[0_0_8px_color-mix(in_srgb,var(--color-accent)_60%,transparent)] md:text-3xl">
+						Map
+						<span className="ml-2 align-middle text-xs tracking-[0.2em] text-accent">会場マップ</span>
+					</p>
+					{webgl && (
+						<p className="mt-1 text-xs text-text/70">ドラッグで回転・ピンチで拡大。光っている建物を押すと中が見られます。</p>
+					)}
+				</div>
 			)}
 
 			{place && !planOpen && (
 				<div
 					role="dialog"
 					aria-label={place.name}
-					className="absolute inset-x-2 top-2 z-20 max-h-[65%] overflow-y-auto rounded-lg border border-accent/40 bg-base/95 p-4 md:inset-x-auto md:top-3 md:right-3 md:w-[340px]"
+					className="absolute inset-x-2 top-20 z-20 max-h-[60%] overflow-y-auto rounded-lg border border-accent/40 bg-base/95 p-4 md:inset-x-auto md:top-24 md:right-5 md:w-[360px]"
 				>
 					<button type="button" onClick={closePlace} aria-label="閉じる" className="absolute top-3 right-3 text-text/70 hover:text-main">
 						<CloseIcon className="h-5 w-5" />

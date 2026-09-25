@@ -79,7 +79,8 @@ export default function FloorPlanView({ plan, exhibits, initialFloor, initialRoo
 	const selectedRoom = roomsInPlan.find((r) => r.key === selectedKey);
 
 	return (
-		<div className="map-floor-view absolute inset-0 z-20 flex flex-col bg-base md:flex-row">
+		// 上端（pt-20）はヘッダーのロゴ・メニューが重なるので空けておく
+		<div className="map-floor-view absolute inset-0 z-20 flex flex-col bg-base pt-20 md:flex-row">
 			<section className="flex min-h-0 flex-1 flex-col">
 				<header className="flex flex-wrap items-center gap-3 px-3 py-3 md:px-5">
 					<button

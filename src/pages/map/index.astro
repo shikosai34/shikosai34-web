@@ -63,31 +63,29 @@ const listing = MAP_ROOMS.filter((room) => exhibits[room.key]?.length).reduce<
 const unplaced = circles.filter((c) => !c.data.mapRoom);
 ---
 
-<Layout title="会場マップ | 第34回 茨香祭">
+<Layout title="会場マップ | 第34回 茨香祭" edgeKasumi={false}>
 	<SiteHeader />
 
-	<main class="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6">
-		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
-			<SectionHeading title="Map" icon="map" subtitle="会場マップ" />
-			<p class="mb-4 text-sm leading-relaxed text-text/80">
-				建物を押すと、階ごとの見取り図と出展が見られます。光っている建物に出展があります。
+	{/*
+	 * 地図は画面いっぱいに敷く。ヘッダーが確保している上端の余白（h-20）の分だけ引き上げ、
+	 * ロゴとメニューを地図の上に浮かせる。
+	 */}
+	<h1 class="sr-only">会場マップ</h1>
+	<div class="relative -mt-20 h-dvh min-h-[480px] w-full">
+		<VenueMap client:only="react" exhibits={exhibits} />
+		<noscript>
+			<p class="absolute inset-x-0 top-1/3 px-6 text-center text-sm text-text/70">
+				地図の表示には JavaScript が必要です。下の配置一覧をご覧ください。
 			</p>
+		</noscript>
+	</div>
 
-			<div class="bracket-frame h-[78dvh] min-h-[480px] md:h-[720px]">
-				<VenueMap client:only="react" exhibits={exhibits} />
-				<noscript>
-					<p class="p-6 text-center text-sm text-text/70">
-						地図の表示には JavaScript が必要です。下の配置一覧をご覧ください。
-					</p>
-				</noscript>
-			</div>
-			<p class="mt-2 text-right text-xs text-text/50">
-				地図データ: © OpenStreetMap contributors, Overture Maps Foundation
-			</p>
-		</section>
-
+	<main id="floor-guide" class="mx-auto w-full max-w-6xl scroll-mt-20 px-4 pb-16 sm:px-6">
 		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
 			<SectionHeading title="Floor Guide" icon="pin" subtitle="配置一覧" />
+			<p class="mb-4 text-sm leading-relaxed text-text/80">
+				出展のある場所の一覧です。場所の名前を押すと、地図でその場所を開きます。
+			</p>
 			{
 				listing.length === 0 ? (
 					<p class="py-8 text-center text-sm text-text/70">出展の配置は準備中です。</p>
@@ -147,6 +145,9 @@ const unplaced = circles.filter((c) => !c.data.mapRoom);
 					</div>
 				)
 			}
+			<p class="mt-8 text-right text-xs text-text/50">
+				地図データ: © OpenStreetMap contributors, Overture Maps Foundation
+			</p>
 		</section>
 	</main>
 
