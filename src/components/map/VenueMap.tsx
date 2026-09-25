@@ -207,7 +207,7 @@ export default function VenueMap({ exhibits }: Props) {
 									<button
 										type="button"
 										onClick={() => (p ? openPlace(p.key) : openBuilding(id))}
-										className={`rounded-md border bg-base/85 px-3 py-1.5 text-sm backdrop-blur-sm transition-colors ${
+										className={`whitespace-nowrap rounded-md border bg-base/85 px-3 py-1.5 text-sm backdrop-blur-sm transition-colors ${
 											selected === id ? 'border-main text-main' : 'border-accent/50 text-text hover:border-main hover:text-main'
 										}`}
 									>
@@ -220,7 +220,7 @@ export default function VenueMap({ exhibits }: Props) {
 						<li className="shrink-0">
 							<a
 								href="#floor-guide"
-								className="inline-block rounded-md border border-text/30 bg-base/85 px-3 py-1.5 text-sm text-text/80 backdrop-blur-sm hover:border-main hover:text-main"
+								className="inline-block whitespace-nowrap rounded-md border border-text/30 bg-base/85 px-3 py-1.5 text-sm text-text/80 backdrop-blur-sm hover:border-main hover:text-main"
 							>
 								配置一覧 ↓
 							</a>
@@ -231,12 +231,12 @@ export default function VenueMap({ exhibits }: Props) {
 
 			{!planOpen && !place && (
 				<div className="pointer-events-none absolute top-20 left-3 z-10 max-w-[calc(100%-1.5rem)] md:top-24 md:left-5">
-					<p className="text-2xl tracking-wide text-text drop-shadow-[0_0_8px_color-mix(in_srgb,var(--color-accent)_60%,transparent)] md:text-3xl">
+					<p className="whitespace-nowrap text-2xl tracking-wide text-text drop-shadow-[0_0_8px_color-mix(in_srgb,var(--color-accent)_60%,transparent)] md:text-3xl">
 						Map
 						<span className="ml-2 align-middle text-xs tracking-[0.2em] text-accent">会場マップ</span>
 					</p>
 					{webgl && (
-						<p className="mt-1 text-xs text-text/70">ドラッグで回転・ピンチで拡大。光っている建物を押すと中が見られます。</p>
+						<p className="mt-1 truncate text-xs text-text/70">建物を押すと中が見られます</p>
 					)}
 				</div>
 			)}

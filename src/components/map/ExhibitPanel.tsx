@@ -24,9 +24,9 @@ interface ListProps {
 export function FloorExhibitList({ title, items, hoveredKey, onHover, onSelect }: ListProps) {
 	return (
 		<div>
-			<p className="mb-2 px-1 text-sm text-text/80">
-				{title}
-				<span className="ml-2 text-main">{items.length}件</span>
+			<p className="mb-2 flex min-w-0 gap-2 whitespace-nowrap px-1 text-sm text-text/80">
+				<span className="min-w-0 truncate">{title}</span>
+				<span className="shrink-0 text-main">{items.length}件</span>
 			</p>
 			{items.length === 0 ? (
 				<p className="py-8 text-center text-sm text-text/60">この階に出展はありません。</p>
@@ -48,7 +48,7 @@ export function FloorExhibitList({ title, items, hoveredKey, onHover, onSelect }
 								<Thumb item={item} className="h-14 w-14" />
 								<span className="min-w-0 flex-1">
 									<span className="block truncate text-xs text-text/60">{room.number ?? room.name}</span>
-									<span className="line-clamp-2 block text-sm font-medium text-text">{item.title}</span>
+									<span className="block truncate text-sm font-medium text-text" title={item.title}>{item.title}</span>
 									<GroupChip item={item} />
 								</span>
 							</button>
@@ -76,10 +76,12 @@ export function RoomDetail({ room, items, onBack }: DetailProps) {
 				</button>
 			)}
 			<div>
-				<p className="text-xs tracking-wider text-accent">
+				<p className="truncate text-xs tracking-wider text-accent">
 					{[room.building, room.floor ? `${room.floor}F` : null, room.number].filter(Boolean).join(' ・ ')}
 				</p>
-				<h3 className="text-xl font-medium text-text">{room.name}</h3>
+				<h3 className="truncate text-xl font-medium text-text" title={room.name}>
+					{room.name}
+				</h3>
 			</div>
 			{items.length === 0 ? (
 				<p className="text-sm text-text/60">この部屋の出展情報はありません。</p>
@@ -91,11 +93,14 @@ export function RoomDetail({ room, items, onBack }: DetailProps) {
 								<Thumb item={item} className="h-20 w-20" />
 								<span className="min-w-0 flex-1">
 									<GroupChip item={item} />
-									<span className="mt-1 block font-medium text-text underline decoration-accent/50 underline-offset-4 group-hover:decoration-accent">
+									<span
+										className="mt-1 block truncate font-medium text-text underline decoration-accent/50 underline-offset-4 group-hover:decoration-accent"
+										title={item.title}
+									>
 										{item.title}
 									</span>
-									<span className="block text-xs text-text/70">{item.subtitle}</span>
-									{item.time && <span className="block text-xs text-main">{item.time}</span>}
+									<span className="block truncate text-xs text-text/70">{item.subtitle}</span>
+									{item.time && <span className="block truncate text-xs text-main">{item.time}</span>}
 								</span>
 								<ChevronRightIcon className="h-5 w-5 shrink-0 self-center text-accent" />
 							</a>
@@ -118,7 +123,7 @@ function Thumb({ item, className }: { item: MapExhibit; className: string }) {
 function GroupChip({ item }: { item: MapExhibit }) {
 	const group = EXHIBIT_GROUPS[item.group];
 	return (
-		<span className="mt-0.5 inline-flex items-center gap-1 text-xs text-text/80">
+		<span className="mt-0.5 inline-flex items-center gap-1 whitespace-nowrap text-xs text-text/80">
 			<span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: group.color }} aria-hidden="true" />
 			{group.label}
 		</span>

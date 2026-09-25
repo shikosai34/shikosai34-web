@@ -127,6 +127,8 @@ function Room({ room, exhibits, active, dimmed, onSelect, onHover }: RoomProps) 
 					: mix('#e8e8e8', BASE, 0.04);
 
 	const label = room.number ?? (room.kind === 'room' ? room.name : null);
+	// L 字の部屋の名前は、ラベルの点から部屋の外接矩形の端までに収める
+	const labelHalf = room.labelAt ? Math.max(10, Math.min(room.labelAt[0] * S - x0, x1 - room.labelAt[0] * S) - 3) : 0;
 	const onKeyDown = (e: KeyboardEvent) => {
 		if (e.key === 'Enter' || e.key === ' ') {
 			e.preventDefault();
@@ -160,10 +162,16 @@ function Room({ room, exhibits, active, dimmed, onSelect, onHover }: RoomProps) 
 			{active && <polygon points={points} fill="none" stroke="#ff9933" strokeWidth={4} filter="url(#plan-glow)" />}
 
 			{room.labelAt && room.kind === 'room' && room.name && (
-				<foreignObject x={room.labelAt[0] * S - 80} y={room.labelAt[1] * S - 10} width={160} height={20} style={{ pointerEvents: 'none' }}>
+				<foreignObject
+					x={room.labelAt[0] * S - labelHalf}
+					y={room.labelAt[1] * S - 10}
+					width={labelHalf * 2}
+					height={20}
+					style={{ pointerEvents: 'none' }}
+				>
 					<div className="flex h-full w-full items-center justify-center gap-1 overflow-hidden whitespace-nowrap text-text" style={{ fontSize: 11 }}>
 						<span className="min-w-0 truncate font-medium">{main ? main.title : room.name}</span>
-						{main && exhibits.length > 1 && <span className="text-text/60">ほか{exhibits.length - 1}件</span>}
+						{main && exhibits.length > 1 && <span className="shrink-0 text-text/60">ほか{exhibits.length - 1}件</span>}
 					</div>
 				</foreignObject>
 			)}
@@ -176,7 +184,7 @@ function Room({ room, exhibits, active, dimmed, onSelect, onHover }: RoomProps) 
 							<>
 								<div className="flex min-w-0 shrink-0 items-center gap-1">
 									{room.number && (
-										<span className="shrink-0 rounded-sm bg-accent/85 px-1 font-medium text-base" style={{ fontSize: 10 }}>
+										<span className="max-w-full shrink-0 truncate rounded-sm bg-accent/85 px-1 font-medium text-base" style={{ fontSize: 10 }}>
 											{room.number}
 										</span>
 									)}
@@ -223,12 +231,13 @@ function Marker({ marker, floor, floorNumbers, onGoFloor }: MarkerProps) {
 	const [x, y] = marker.at.map((v) => v * S);
 	const up = floorNumbers.includes(floor + 1) ? floor + 1 : null;
 	const down = floorNumbers.includes(floor - 1) ? floor - 1 : null;
-	const w = marker.type === 'stairs' ? 110 : 160;
+	// 札の長さに関わらず切れないよう枠は広めに取り、札のない余白はクリックを下の部屋へ通す
+	const w = 320;
 	if (marker.type === 'stairs' && !up && !down) return null;
 
 	return (
-		<foreignObject x={x - w / 2} y={y - 12} width={w} height={24}>
-			<div className="flex h-full w-full items-center justify-center">
+		<foreignObject x={x - w / 2} y={y - 12} width={w} height={24} style={{ pointerEvents: 'none' }}>
+			<div className="flex h-full w-full items-center justify-center [&>*]:pointer-events-auto">
 				{marker.type === 'stairs' ? (
 					<div className="flex items-center gap-1 whitespace-nowrap rounded-full border border-accent/50 bg-base/90 py-0.5 pr-0.5 pl-1.5 text-text" style={{ fontSize: 9 }}>
 						<span className="mr-1 text-text/70">階段</span>

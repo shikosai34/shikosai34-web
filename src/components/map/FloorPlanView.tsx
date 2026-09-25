@@ -82,29 +82,30 @@ export default function FloorPlanView({ plan, exhibits, initialFloor, initialRoo
 		// 上端（pt-20）はヘッダーのロゴ・メニューが重なるので空けておく
 		<div className="map-floor-view absolute inset-0 z-20 flex flex-col bg-base pt-20 md:flex-row">
 			<section className="flex min-h-0 flex-1 flex-col">
-				<header className="flex flex-wrap items-center gap-3 px-3 py-3 md:px-5">
+				<header className="flex items-center gap-2 px-3 py-3 md:gap-3 md:px-5">
 					<button
 						type="button"
 						onClick={onClose}
-						className="rounded-lg border border-accent/60 bg-base/80 px-3 py-1.5 text-sm text-accent hover:border-main hover:text-main"
+						aria-label="キャンパスに戻る"
+						className="shrink-0 whitespace-nowrap rounded-lg border border-accent/60 bg-base/80 px-3 py-1.5 text-sm text-accent hover:border-main hover:text-main"
 					>
-						← キャンパス
+						←<span className="hidden sm:inline"> キャンパス</span>
 					</button>
-					<h3 className="flex items-baseline gap-2 text-text">
-						<span className="text-xl">{plan.building}</span>
-						<span className="text-3xl leading-none text-accent drop-shadow-[0_0_6px_color-mix(in_srgb,var(--color-accent)_70%,transparent)]">
+					<h3 className="flex min-w-0 items-baseline gap-2 whitespace-nowrap text-text">
+						<span className="truncate text-xl">{plan.building}</span>
+						<span className="shrink-0 text-3xl leading-none text-accent drop-shadow-[0_0_6px_color-mix(in_srgb,var(--color-accent)_70%,transparent)]">
 							{floor}F
 						</span>
 					</h3>
 					{/* モバイルは階のボタンを並べる（積み重ね図は小さすぎて押しにくい） */}
-					<div className="ml-auto flex gap-1 md:hidden" role="group" aria-label="階の切り替え">
+					<div className="ml-auto flex shrink-0 gap-1 md:hidden" role="group" aria-label="階の切り替え">
 						{[...floorNumbers].reverse().map((f) => (
 							<button
 								key={f}
 								type="button"
 								onClick={() => goFloor(f)}
 								aria-pressed={f === floor}
-								className={`h-9 w-10 rounded-md border text-sm ${f === floor ? 'border-accent bg-accent text-base' : 'border-accent/40 text-text'}`}
+								className={`h-9 w-9 rounded-md border text-sm ${f === floor ? 'border-accent bg-accent text-base' : 'border-accent/40 text-text'}`}
 							>
 								{f}F
 							</button>
@@ -115,11 +116,12 @@ export default function FloorPlanView({ plan, exhibits, initialFloor, initialRoo
 				<div className="flex min-h-0 flex-1 overflow-hidden px-2 pb-2 md:px-5 md:pb-5" onClick={() => setSelectedKey(null)}>
 					<div className="hidden w-[190px] shrink-0 flex-col justify-center gap-3 pr-4 md:flex" onClick={(e) => e.stopPropagation()}>
 						<FloorStack floors={floors} current={floor} counts={counts} onSelect={goFloor} className="w-full" />
-						<p className="text-xs leading-snug text-text/60">
-							階を押すと移動します。
-							<br />
-							図面はホイール・ドラッグで拡大・移動できます。
-						</p>
+						{/* 1 行ずつ短く区切り、欄の幅で折り返さないようにする */}
+						<ul className="flex flex-col gap-0.5 whitespace-nowrap text-xs text-text/60">
+							<li>階を押して移動</li>
+							<li>ホイールで拡大</li>
+							<li>ドラッグで移動</li>
+						</ul>
 					</div>
 					<div
 						ref={panZoom.ref}
@@ -152,9 +154,9 @@ export default function FloorPlanView({ plan, exhibits, initialFloor, initialRoo
 			</section>
 
 			<aside className="flex h-[42%] w-full flex-col border-t border-accent/30 bg-base/95 md:h-full md:w-[360px] md:border-t-0 md:border-l">
-				<div className="flex flex-wrap gap-x-3 gap-y-1 border-b border-text/10 px-4 py-2.5">
+				<div className="flex gap-x-3 overflow-x-auto whitespace-nowrap border-b border-text/10 px-4 py-2.5">
 					{Object.values(EXHIBIT_GROUPS).map((g) => (
-						<span key={g.label} className="inline-flex items-center gap-1 text-xs text-text/80">
+						<span key={g.label} className="inline-flex shrink-0 items-center gap-1 text-xs text-text/80">
 							<span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: g.color }} aria-hidden="true" />
 							{g.label}
 						</span>

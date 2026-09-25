@@ -97,6 +97,8 @@ function extractWallRects(svg) {
 		const fill = attr(tag, 'fill');
 		const stroke = attr(tag, 'stroke');
 		if (fill === 'white' || stroke === 'white') continue;
+		// 点線（2号館と3号館の境目など）は壁ではない
+		if (attr(tag, 'stroke-dasharray')) continue;
 
 		let subpaths;
 		if (tag.startsWith('<line')) {
