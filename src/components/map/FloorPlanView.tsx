@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { EXHIBIT_GROUPS, PLAN_SCALE, type ExhibitsByRoom, type Plan } from '../../lib/map';
+import { EXHIBIT_GROUPS, PLAN_SCALE, type ExhibitsByRoom, type Plan, type PlanRoom } from '../../lib/map';
 import { MAP_ROOMS } from '../../lib/map-rooms';
 import { FloorExhibitList, RoomDetail, type FloorExhibit } from './ExhibitPanel';
 import FloorPlan from './FloorPlan';
 import FloorStack from './FloorStack';
+import RoomTooltip from './RoomTooltip';
 import { usePanZoom } from './usePanZoom';
 
 /*
@@ -36,6 +37,8 @@ export default function FloorPlanView({ plan, exhibits, initialFloor, initialRoo
 	const [selectedKey, setSelectedKey] = useState<string | null>(initialRoom ?? null);
 	const [hoveredKey, setHoveredKey] = useState<string | null>(null);
 	const [direction, setDirection] = useState<'up' | 'down' | null>(null);
+	/** カーソルの下の部屋と、図面の枠の中での位置（詳細のツールチップ用） */
+	const [tip, setTip] = useState<{ room: PlanRoom; x: number; y: number } | null>(null);
 
 	useEffect(() => onChange(floor, selectedKey), [floor, selectedKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -56,6 +59,7 @@ export default function FloorPlanView({ plan, exhibits, initialFloor, initialRoo
 		setFloor(f);
 		setSelectedKey(null);
 		setHoveredKey(null);
+		setTip(null);
 	};
 
 	const current = floors.find((f) => f.floor === floor) ?? floors[0];
@@ -70,6 +74,12 @@ export default function FloorPlanView({ plan, exhibits, initialFloor, initialRoo
 		return [(cx - w / 2) * S, (cy - h / 2) * S, w * S, h * S];
 	}, [floors, current]);
 	const panZoom = usePanZoom(baseBox, floor);
+
+	const pointRoom = (room: PlanRoom | null, clientX?: number, clientY?: number) => {
+		const box = panZoom.ref.current?.getBoundingClientRect();
+		if (!room || !box || clientX === undefined || clientY === undefined) return setTip(null);
+		setTip({ room, x: clientX - box.left, y: clientY - box.top });
+	};
 
 	const floorItems = (f: number): FloorExhibit[] =>
 		roomsInPlan
@@ -118,6 +128,7 @@ export default function FloorPlanView({ plan, exhibits, initialFloor, initialRoo
 						<FloorStack floors={floors} current={floor} counts={counts} onSelect={goFloor} className="w-full" />
 						{/* 1 行ずつ短く区切り、欄の幅で折り返さないようにする */}
 						<ul className="flex flex-col gap-0.5 whitespace-nowrap text-xs text-text/60">
+							<li>部屋にカーソルで詳細</li>
 							<li>階を押して移動</li>
 							<li>ホイールで拡大</li>
 							<li>ドラッグで移動</li>
@@ -126,6 +137,12 @@ export default function FloorPlanView({ plan, exhibits, initialFloor, initialRoo
 					<div
 						ref={panZoom.ref}
 						{...panZoom.handlers}
+						onPointerMove={(e) => {
+							// ドラッグで図面を動かしている間は詳細を出さない
+							if (e.buttons && e.pointerType === 'mouse') setTip(null);
+							panZoom.handlers.onPointerMove(e);
+						}}
+						onPointerLeave={() => setTip(null)}
 						className="relative h-full min-w-0 flex-1 touch-none select-none"
 						onClick={(e) => e.stopPropagation()}
 					>
@@ -139,9 +156,20 @@ export default function FloorPlanView({ plan, exhibits, initialFloor, initialRoo
 							floorNumbers={floorNumbers}
 							onSelect={(key) => setSelectedKey(key)}
 							onHover={setHoveredKey}
+							onPoint={pointRoom}
 							onGoFloor={goFloor}
 							className={`h-full w-full ${direction ? `map-floor-enter-${direction}` : ''}`}
 						/>
+						{tip && (
+							<RoomTooltip
+								room={tip.room}
+								exhibits={tip.room.key ? (exhibits[tip.room.key] ?? []) : []}
+								x={tip.x}
+								y={tip.y}
+								width={panZoom.ref.current?.clientWidth ?? 0}
+								height={panZoom.ref.current?.clientHeight ?? 0}
+							/>
+						)}
 						<div className="absolute right-1 bottom-1 flex flex-col gap-1" role="group" aria-label="図面の拡大・縮小">
 							<ZoomButton label="拡大" onClick={panZoom.zoomIn}>＋</ZoomButton>
 							<ZoomButton label="縮小" onClick={panZoom.zoomOut} disabled={panZoom.zoom <= 1}>－</ZoomButton>
@@ -154,7 +182,8 @@ export default function FloorPlanView({ plan, exhibits, initialFloor, initialRoo
 			</section>
 
 			<aside className="flex h-[42%] w-full flex-col border-t border-accent/30 bg-base/95 md:h-full md:w-[360px] md:border-t-0 md:border-l">
-				<div className="flex gap-x-3 overflow-x-auto whitespace-nowrap border-b border-text/10 px-4 py-2.5">
+				{/* 凡例は 1 行に並べる。狭い画面では横にずらして見る（スクロールバーは出さない） */}
+				<div className="flex gap-x-2 overflow-x-auto whitespace-nowrap border-b border-text/10 px-4 py-2.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 					{Object.values(EXHIBIT_GROUPS).map((g) => (
 						<span key={g.label} className="inline-flex shrink-0 items-center gap-1 text-xs text-text/80">
 							<span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: g.color }} aria-hidden="true" />

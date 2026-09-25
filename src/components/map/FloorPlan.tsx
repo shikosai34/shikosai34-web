@@ -20,6 +20,8 @@ interface Props {
 	floorNumbers: number[];
 	onSelect: (key: string | null) => void;
 	onHover: (key: string | null) => void;
+	/** カーソルの下の部屋（詳細のツールチップ用）。null で外れた */
+	onPoint: (room: PlanRoom | null, clientX?: number, clientY?: number) => void;
 	onGoFloor: (floor: number) => void;
 	className?: string;
 }
@@ -44,6 +46,7 @@ export default function FloorPlan({
 	floorNumbers,
 	onSelect,
 	onHover,
+	onPoint,
 	onGoFloor,
 	className = '',
 }: Props) {
@@ -56,7 +59,10 @@ export default function FloorPlan({
 			preserveAspectRatio="xMidYMid meet"
 			role="group"
 			aria-label={`${floor.floor}階の平面図`}
-			onClick={() => onSelect(null)}
+			onClick={() => {
+				onSelect(null);
+				onPoint(null);
+			}}
 		>
 			<defs>
 				<filter id="plan-glow" x="-10%" y="-10%" width="120%" height="120%">
@@ -82,6 +88,7 @@ export default function FloorPlan({
 					dimmed={!!selectedKey && room.key !== selectedKey && room.kind === 'room'}
 					onSelect={onSelect}
 					onHover={onHover}
+					onPoint={onPoint}
 				/>
 			))}
 
@@ -106,9 +113,23 @@ interface RoomProps {
 	dimmed: boolean;
 	onSelect: (key: string | null) => void;
 	onHover: (key: string | null) => void;
+	onPoint: (room: PlanRoom | null, clientX?: number, clientY?: number) => void;
 }
 
-function Room({ room, exhibits, active, dimmed, onSelect, onHover }: RoomProps) {
+/**
+ * 文字列の幅の目安（px）。全角は 1 字 ≒ 1em、半角は ≒ 0.6em とみて少し多めに見積もる。
+ * foreignObject の中身は描いてみないと幅が分からないため、収まるかの判定はこの見積もりで行う。
+ */
+function textWidth(text: string, fontSize: number): number {
+	let em = 0;
+	for (const ch of text) em += (ch.codePointAt(0) ?? 0) < 0x2000 ? 0.62 : 1.05;
+	return em * fontSize;
+}
+
+/** 行の高さ（px）。フォントの大きさ × 1.3 */
+const lineHeight = (fontSize: number) => fontSize * 1.3;
+
+function Room({ room, exhibits, active, dimmed, onSelect, onHover, onPoint }: RoomProps) {
 	const [x0, y0, x1, y1] = room.bbox.map((v) => v * S);
 	const w = x1 - x0;
 	const h = y1 - y0;
@@ -116,6 +137,8 @@ function Room({ room, exhibits, active, dimmed, onSelect, onHover }: RoomProps) 
 	const main = exhibits[0];
 	const color = main ? EXHIBIT_GROUPS[main.group].color : null;
 	const selectable = !!room.key;
+	// 名前・番号・出展のどれかがあれば、カーソルを当てたときに詳細を出す
+	const hasDetail = !!(room.name || room.number || exhibits.length);
 
 	const fill =
 		room.kind === 'corridor'
@@ -126,9 +149,42 @@ function Room({ room, exhibits, active, dimmed, onSelect, onHover }: RoomProps) 
 					? mix(color, BASE, 0.16)
 					: mix('#e8e8e8', BASE, 0.04);
 
-	const label = room.number ?? (room.kind === 'room' ? room.name : null);
+	/*
+	 * 部屋の中の文字は、収まるものだけ出す（… で切ったり折り返したりしない）。
+	 * 収まらない分はカーソルを当てたときの詳細（FloorPlanView のツールチップ）で見せる。
+	 */
+	const iw = w - 8;
+	const ih = h - 6;
+	const badgeW = room.number ? textWidth(room.number, 10) + 8 : 0;
+	const showBadge = room.kind === 'room' && !!room.number && badgeW <= iw && ih >= lineHeight(10);
+	const nameSize = showBadge ? 10 : 11;
+	const showName =
+		room.kind === 'room' &&
+		!!room.name &&
+		ih >= lineHeight(nameSize) &&
+		textWidth(room.name, nameSize) <= iw - (showBadge ? badgeW + 4 : 0);
+	const firstLine = showBadge || showName;
+
+	const titleSize = w > 100 ? 12 : 11;
+	const more = exhibits.length > 1 ? ` ほか${exhibits.length - 1}件` : '';
+	const titleRoom = ih - (firstLine ? lineHeight(10) + 4 : 0);
+	const showImage = !!main?.image && titleRoom > 50;
+	const horizontal = w >= h * 1.3;
+	const imageW = showImage && horizontal ? Math.min(48, titleRoom) + 6 : 0;
+	const showTitle = !!main && titleRoom >= lineHeight(titleSize) && textWidth(main.title + more, titleSize) <= iw - imageW;
+	// 出展名が入らないときは件数だけ出し、カーソルを当てれば見られることを示す
+	const countText = `●${exhibits.length}`;
+	const showCount = !!main && !showTitle && titleRoom >= lineHeight(11) && textWidth(countText, 11) <= iw;
+
+	const centerText = room.kind === 'stairs' ? '階段' : room.kind === 'toilet' ? room.name : null;
+	const centerSize = Math.min(10, h / 2.5);
+	const showCenter = !!centerText && textWidth(centerText, centerSize) <= iw && ih >= lineHeight(centerSize);
+
 	// L 字の部屋の名前は、ラベルの点から部屋の外接矩形の端までに収める
-	const labelHalf = room.labelAt ? Math.max(10, Math.min(room.labelAt[0] * S - x0, x1 - room.labelAt[0] * S) - 3) : 0;
+	const labelHalf = room.labelAt ? Math.min(room.labelAt[0] * S - x0, x1 - room.labelAt[0] * S) - 3 : 0;
+	const labelText = main ? main.title + more : room.name;
+	const showLabelAt = !!room.labelAt && room.kind === 'room' && !!labelText && textWidth(labelText, 11) <= labelHalf * 2;
+
 	const onKeyDown = (e: KeyboardEvent) => {
 		if (e.key === 'Enter' || e.key === ' ') {
 			e.preventDefault();
@@ -138,6 +194,11 @@ function Room({ room, exhibits, active, dimmed, onSelect, onHover }: RoomProps) 
 
 	return (
 		<g
+			{...(hasDetail && {
+				onPointerMove: (e) => onPoint(room, e.clientX, e.clientY),
+				onPointerDown: (e) => onPoint(room, e.clientX, e.clientY),
+				onPointerLeave: () => onPoint(null),
+			})}
 			{...(selectable && {
 				role: 'button',
 				tabIndex: 0,
@@ -161,56 +222,68 @@ function Room({ room, exhibits, active, dimmed, onSelect, onHover }: RoomProps) 
 			{color && !active && <polygon points={points} fill="none" stroke={color} strokeWidth={1.5} strokeOpacity={0.8} />}
 			{active && <polygon points={points} fill="none" stroke="#ff9933" strokeWidth={4} filter="url(#plan-glow)" />}
 
-			{room.labelAt && room.kind === 'room' && room.name && (
+			{showLabelAt && (
 				<foreignObject
-					x={room.labelAt[0] * S - labelHalf}
-					y={room.labelAt[1] * S - 10}
+					x={room.labelAt![0] * S - labelHalf}
+					y={room.labelAt![1] * S - 10}
 					width={labelHalf * 2}
 					height={20}
 					style={{ pointerEvents: 'none' }}
 				>
-					<div className="flex h-full w-full items-center justify-center gap-1 overflow-hidden whitespace-nowrap text-text" style={{ fontSize: 11 }}>
-						<span className="min-w-0 truncate font-medium">{main ? main.title : room.name}</span>
-						{main && exhibits.length > 1 && <span className="shrink-0 text-text/60">ほか{exhibits.length - 1}件</span>}
+					<div className="flex h-full w-full items-center justify-center whitespace-nowrap font-medium text-text" style={{ fontSize: 11 }}>
+						{labelText}
 					</div>
 				</foreignObject>
 			)}
 
-			{!room.labelAt && (room.kind === 'room' || room.kind === 'toilet' || room.kind === 'stairs') && (label || room.kind !== 'room') && (
+			{!room.labelAt && (firstLine || showTitle || showCount || showCenter) && (
 				<foreignObject x={x0 + 3} y={y0 + 3} width={Math.max(w - 6, 1)} height={Math.max(h - 6, 1)} style={{ pointerEvents: 'none' }}>
-					{/* 部屋の中の文字は折り返さず、入り切らない分は … で切る */}
 					<div className="flex h-full w-full flex-col overflow-hidden whitespace-nowrap text-text" style={{ fontSize: 11, lineHeight: 1.3 }}>
 						{room.kind === 'room' ? (
 							<>
-								<div className="flex min-w-0 shrink-0 items-center gap-1">
-									{room.number && (
-										<span className="max-w-full shrink-0 truncate rounded-sm bg-accent/85 px-1 font-medium text-base" style={{ fontSize: 10 }}>
-											{room.number}
-										</span>
-									)}
-									{room.name && room.number && <span className="min-w-0 truncate text-text/70" style={{ fontSize: 10 }}>{room.name}</span>}
-									{!room.number && room.name && <span className="min-w-0 truncate font-medium">{room.name}</span>}
-								</div>
-								{main && (
-									<div className={`mt-1 flex min-h-0 flex-1 gap-1.5 ${w < h * 1.3 ? 'flex-col items-start' : 'items-center'}`}>
-										{main.image && h > 60 && (
+								{firstLine && (
+									<div className="flex shrink-0 items-center gap-1">
+										{showBadge && (
+											<span className="shrink-0 rounded-sm bg-accent/85 px-1 font-medium text-base" style={{ fontSize: 10 }}>
+												{room.number}
+											</span>
+										)}
+										{showName && (
+											<span className={showBadge ? 'text-text/70' : 'font-medium'} style={{ fontSize: nameSize }}>
+												{room.name}
+											</span>
+										)}
+									</div>
+								)}
+								{(showTitle || showCount || showImage) && (
+									<div className={`mt-1 flex min-h-0 flex-1 gap-1.5 ${horizontal ? 'items-center' : 'flex-col items-start'}`}>
+										{showImage && (
 											<img
-												src={main.image}
+												src={main!.image}
 												alt=""
-												className={`${w < h * 1.3 ? 'min-h-0 w-full flex-1' : 'aspect-square h-full max-h-[48px]'} shrink-0 rounded-sm object-cover`}
+												className={`${horizontal ? 'aspect-square h-full max-h-[48px]' : 'min-h-0 w-full flex-1'} shrink-0 rounded-sm object-cover`}
 											/>
 										)}
-										<div className="w-full min-w-0 truncate font-medium" style={{ fontSize: w > 100 ? 12 : 11 }}>
-											{main.title}
-											{exhibits.length > 1 && <span className="text-text/60"> ほか{exhibits.length - 1}件</span>}
-										</div>
+										{showTitle && (
+											<div className="font-medium" style={{ fontSize: titleSize }}>
+												{main!.title}
+												{more && <span className="text-text/60">{more}</span>}
+											</div>
+										)}
+										{showCount && (
+											<div style={{ fontSize: 11, color: color ?? undefined }} aria-hidden="true">
+												{countText}
+											</div>
+										)}
 									</div>
 								)}
 							</>
 						) : (
-							<div className="m-auto max-w-full truncate text-center text-text/60" style={{ fontSize: Math.min(10, h / 2.5) }}>
-								{room.kind === 'stairs' ? '階段' : room.name}
-							</div>
+							showCenter && (
+								<div className="m-auto text-center text-text/60" style={{ fontSize: centerSize }}>
+									{centerText}
+								</div>
+							)
 						)}
 					</div>
 				</foreignObject>
