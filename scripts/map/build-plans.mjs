@@ -35,7 +35,8 @@ const CONFIG = {
 	'bldg2-3': { building: '2・3号館', yBoundaries: [320, 560] },
 	bldg4: { building: '4号館', yBoundaries: [258, 425] },
 	bldg5: { building: '5号館', yBoundaries: [230] },
-	bldg8: { building: '8号館', yBoundaries: [300, 600] },
+	// 2 階の図面は 1 号館への渡り廊下の線が混じって崩れるため、同じ形の 3 階を写して使う
+	bldg8: { building: '8号館', yBoundaries: [330, 568], copyFloors: { 2: 3 } },
 	library: { building: '図書館棟', yBoundaries: [290] },
 };
 
@@ -261,6 +262,23 @@ for (const [file, info] of Object.entries(CONFIG)) {
 		floors.push({ floor, bbox: bbox.map(round), walls: wallRects.filter(inBox).map((r) => r.map(round)), rooms: [], markers: [], rawRooms: rooms });
 	}
 
+	for (const [to, from] of Object.entries(info.copyFloors ?? {})) {
+		const target = floors.find((f) => f.floor === Number(to));
+		const source = floors.find((f) => f.floor === from);
+		if (!target || !source) continue;
+		const dx = target.bbox[0] - source.bbox[0];
+		const dy = target.bbox[1] - source.bbox[1];
+		const shift = (r) => [r[0] + dx, r[1] + dy, r[2] + dx, r[3] + dy].map(round);
+		target.bbox = shift(source.bbox);
+		target.walls = source.walls.map(shift);
+		target.rawRooms = source.rawRooms.map((room) => ({
+			...room,
+			ring: room.ring.map(([x, y]) => [x + dx, y + dy]),
+			bbox: shift(room.bbox),
+			contains: ([x, y]) => room.contains([x - dx, y - dy]),
+		}));
+	}
+
 	const usedLabels = new Set();
 	for (const f of floors) {
 		f.rawRooms.forEach((room, n) => {
@@ -289,7 +307,9 @@ for (const [file, info] of Object.entries(CONFIG)) {
 
 	// 階段・入口などの目印（その点を範囲に含む階に置く）
 	for (const m of labelFile.markers ?? []) {
-		const f = floors.find((f) => m.at[0] >= f.bbox[0] && m.at[0] <= f.bbox[2] && m.at[1] >= f.bbox[1] && m.at[1] <= f.bbox[3]);
+		// 入口などは外壁の上に置くので、範囲から少しはみ出しても拾う
+		const m2 = 12;
+		const f = floors.find((f) => m.at[0] >= f.bbox[0] - m2 && m.at[0] <= f.bbox[2] + m2 && m.at[1] >= f.bbox[1] - m2 && m.at[1] <= f.bbox[3] + m2);
 		if (f) f.markers.push(m);
 		else {
 			console.warn(`  ⚠ ${info.building}: 目印 (${m.at}) がどの階の範囲にも入っていません`);
