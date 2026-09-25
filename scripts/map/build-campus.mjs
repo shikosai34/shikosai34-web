@@ -16,7 +16,7 @@ const OSM = path.join(ROOT, 'scripts/map/osm.json');
 const OUT = path.join(ROOT, 'public/map/campus.geojson');
 
 /** 地図の中心（src/lib/map.ts の MAP_CENTER と揃える）。道路はここから ROAD_RADIUS m 以内だけ残す */
-const CENTER = [140.551, 36.4];
+const CENTER = [140.5509, 36.4002];
 const ROAD_RADIUS = 380;
 const M_PER_DEG_LAT = 110950;
 const M_PER_DEG_LON = 111320 * Math.cos((CENTER[1] * Math.PI) / 180);

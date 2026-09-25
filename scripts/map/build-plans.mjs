@@ -28,7 +28,7 @@ const DEBUG_DIR = '/tmp/map-debug';
 /**
  * 図面ごとの設定。yBoundaries は各階を分ける SVG 上の y 座標（上から順）。
  * 図面は上の階ほど上に描かれているので、いちばん上の帯が最上階になる。
- * building は public/map/buildings.geojson の name と一致させる（3D の建物と結びつけるため）。
+ * building は public/map/campus.geojson の建物名 と一致させる（3D の建物と結びつけるため）。
  */
 const CONFIG = {
 	bldg1: { building: '1号館', yBoundaries: [310, 540] },
@@ -253,7 +253,11 @@ for (const [file, info] of Object.entries(CONFIG)) {
 			Math.max(...rooms.map((r) => r.bbox[2])) + 1.5,
 			Math.max(...rooms.map((r) => r.bbox[3])) + 1.5,
 		];
-		const inBox = (r) => r[0] >= bbox[0] - 1 && r[2] <= bbox[2] + 1 && r[1] >= bbox[1] - 1 && r[3] <= bbox[3] + 1;
+		// 壁は中心がその階の範囲に入るものを採る（線で描いた壁は端が線幅ぶんはみ出すため、外接矩形では判定しない）
+		const inBox = (r) => {
+			const [cx, cy] = [(r[0] + r[2]) / 2, (r[1] + r[3]) / 2];
+			return cx >= bbox[0] - 1 && cx <= bbox[2] + 1 && cy >= bbox[1] - 1 && cy <= bbox[3] + 1;
+		};
 		floors.push({ floor, bbox: bbox.map(round), walls: wallRects.filter(inBox).map((r) => r.map(round)), rooms: [], markers: [], rawRooms: rooms });
 	}
 
@@ -320,7 +324,7 @@ for (const [file, info] of Object.entries(CONFIG)) {
 // 屋外の場所（図面を持たず、3D 上のピンで示す）
 if (fs.existsSync(OUTDOOR_FILE)) {
 	for (const o of JSON.parse(fs.readFileSync(OUTDOOR_FILE, 'utf-8')).places ?? []) {
-		roomIndex.push({ key: o.key, building: o.building ?? '屋外', floor: null, number: null, name: o.name, plan: null });
+		roomIndex.push({ key: o.key, building: o.building ?? '屋外', floor: null, number: null, name: o.name, plan: null, at: o.at });
 	}
 }
 

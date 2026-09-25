@@ -253,7 +253,11 @@
 		"floor": null,
 		"number": null,
 		"name": "屋外テント",
-		"plan": null
+		"plan": null,
+		"at": [
+			140.55115,
+			36.4001
+		]
 	},
 	{
 		"key": "gym1-stage",
@@ -261,7 +265,11 @@
 		"floor": null,
 		"number": null,
 		"name": "体育館ステージ",
-		"plan": null
+		"plan": null,
+		"at": [
+			140.55217,
+			36.40004
+		]
 	},
 	{
 		"key": "martial-arts-hall",
@@ -269,6 +277,10 @@
 		"floor": null,
 		"number": null,
 		"name": "武道館",
-		"plan": null
+		"plan": null,
+		"at": [
+			140.55202,
+			36.39973
+		]
 	}
 ]

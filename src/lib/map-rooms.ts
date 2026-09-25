@@ -16,9 +16,11 @@ export interface MapRoom {
 	name: string;
 	/** 平面図のファイル名（public/map/plans/<plan>.json）。図面を持たない場所は null。 */
 	plan: string | null;
+	/** 図面を持たない場所の位置 [経度, 緯度]（3D の地図にピンを立てる） */
+	at?: [number, number];
 }
 
-export const MAP_ROOMS: MapRoom[] = rooms;
+export const MAP_ROOMS = rooms as MapRoom[];
 
 export const MAP_ROOM_KEYS = new Set(MAP_ROOMS.map((room) => room.key));
 
