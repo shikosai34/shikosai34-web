@@ -3,6 +3,7 @@ import { glob } from 'astro/loaders';
 import { CIRCLE_CATEGORIES } from './lib/circles';
 import { EVENT_GENRES, EVENT_STATUSES, FESTIVAL_DAYS, getEventDayKey } from './lib/events';
 import { NEWS_CATEGORIES } from './lib/news';
+import { MAP_ROOM_KEYS } from './lib/map-rooms';
 
 /**
  * お知らせ（`/news`）のコレクション。
@@ -61,6 +62,14 @@ const circles = defineCollection({
 		category: z.enum(CIRCLE_CATEGORIES),
 		/** 実施場所（教室名など） */
 		location: z.string().min(1),
+		/**
+		 * 会場マップ上の部屋キー（任意）。CMS の「マップ上の場所」で選ぶ。
+		 * 選択肢は scripts/map/build-plans.mjs が src/data/map-rooms.json から生成する。
+		 */
+		mapRoom: z
+			.string()
+			.refine((key) => MAP_ROOM_KEYS.has(key), { message: '会場マップに存在しない部屋キーです。' })
+			.optional(),
 		/** 実施時間（自由記述） */
 		schedule: z.string().min(1),
 		/** FesFlow 導入予定（各団体の申告）。詳細ページのリンク表示判定に使う。 */

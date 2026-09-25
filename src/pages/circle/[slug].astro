@@ -5,6 +5,7 @@ import SiteHeader from '../../components/layout/SiteHeader.astro';
 import Layout from '../../layouts/Layout.astro';
 import { CIRCLE_CATEGORY_LABELS } from '../../lib/circles';
 import { getCollectionOrEmpty } from '../../lib/content';
+import { formatMapRoom, getMapRoom } from '../../lib/map-rooms';
 
 export async function getStaticPaths() {
 	const circles = await getCollectionOrEmpty('circles');
@@ -16,8 +17,9 @@ export async function getStaticPaths() {
 
 const { circle } = Astro.props;
 const { Content } = await render(circle);
-const { name, category, location, schedule, image, snsLinks, fesflowPlanned, fesflowUrl } =
+const { name, category, location, mapRoom, schedule, image, snsLinks, fesflowPlanned, fesflowUrl } =
 	circle.data;
+const room = getMapRoom(mapRoom);
 ---
 
 <Layout title={`${name} | サークル | 第34回 茨香祭`}>
@@ -51,7 +53,19 @@ const { name, category, location, schedule, image, snsLinks, fesflowPlanned, fes
 				<dt class="font-medium">日時</dt>
 				<dd>{schedule}</dd>
 				<dt class="font-medium">場所</dt>
-				<dd>{location}</dd>
+				<dd>
+					{location}
+					{
+						room && (
+							<a
+								href={`/map?room=${encodeURIComponent(room.key)}`}
+								class="ml-2 whitespace-nowrap text-accent underline hover:no-underline"
+							>
+								マップで見る（{formatMapRoom(room)}）
+							</a>
+						)
+					}
+				</dd>
 			</dl>
 
 			<div class="circle-body mt-4 flex flex-col gap-3 text-text">
