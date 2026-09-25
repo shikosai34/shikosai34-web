@@ -1,0 +1,26 @@
+{
+	"rooms": [
+		{ "at": [230, 127], "key": "1-325", "number": "1-325", "name": "教室" },
+		{ "at": [473, 127], "key": "1-320", "number": "1-320", "name": "教室" },
+		{ "at": [319, 133], "name": "階段", "kind": "stairs" },
+		{ "at": [338, 283], "name": "階段", "kind": "stairs" },
+		{ "at": [356, 125], "name": "男子トイレ", "kind": "toilet" },
+		{ "at": [356, 136], "name": "女子トイレ", "kind": "toilet" },
+		{ "at": [342, 141], "name": "廊下", "kind": "corridor" },
+
+		{ "at": [164, 360], "key": "1-217", "number": "1-217", "name": "マルチメディア室" },
+		{ "at": [235, 366], "name": "階段", "kind": "stairs" },
+		{ "at": [272, 332], "name": "女子トイレ", "kind": "toilet" },
+		{ "at": [272, 366], "name": "男子トイレ", "kind": "toilet" },
+		{ "at": [277, 439], "key": "bldg1-physics-lab-1", "name": "物理第一実験室" },
+		{ "at": [253, 513], "name": "階段", "kind": "stairs" },
+
+		{ "at": [187, 592], "name": "階段", "kind": "stairs" },
+		{ "at": [230, 623], "key": "bldg1-lobby", "name": "1号館ロビー" }
+	],
+	"markers": [
+		{ "at": [234, 330], "type": "exit", "text": "8号館へ（2階渡り廊下）" },
+		{ "at": [187, 560], "type": "entrance", "text": "入口" },
+		{ "at": [224, 752], "type": "entrance", "text": "入口" }
+	]
+}

@@ -1,0 +1,24 @@
+{
+	"rooms": [
+		{ "at": [175, 142], "key": "2-308", "number": "2-308", "name": "教室" },
+		{ "at": [231, 142], "key": "2-309", "number": "2-309", "name": "教室" },
+		{ "at": [242, 230], "name": "階段", "kind": "stairs" },
+		{ "at": [289, 226], "name": "男子トイレ", "kind": "toilet" },
+		{ "at": [200, 175], "name": "廊下", "kind": "corridor" },
+		{ "at": [358, 184], "name": "廊下", "kind": "corridor" },
+
+		{ "at": [242, 460], "name": "階段", "kind": "stairs" },
+		{ "at": [289, 455], "name": "女子トイレ", "kind": "toilet" },
+		{ "at": [380, 413], "name": "廊下", "kind": "corridor" },
+		{ "at": [90, 420], "name": "廊下", "kind": "corridor" },
+
+		{ "at": [242, 700], "name": "階段", "kind": "stairs" },
+		{ "at": [289, 697], "name": "男子トイレ", "kind": "toilet" },
+		{ "at": [358, 655], "name": "廊下", "kind": "corridor" },
+		{ "at": [90, 660], "name": "廊下", "kind": "corridor" }
+	],
+	"markers": [
+		{ "at": [267, 590], "type": "entrance", "text": "入口" },
+		{ "at": [267, 718], "type": "entrance", "text": "入口" }
+	]
+}

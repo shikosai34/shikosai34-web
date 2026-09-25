@@ -1,0 +1,22 @@
+{
+	"rooms": [
+		{ "at": [366, 141], "key": "4-310", "number": "4-310", "name": "学生実験室3" },
+		{ "at": [200, 191], "name": "廊下・階段", "kind": "corridor" },
+		{ "at": [407, 210], "name": "男子トイレ", "kind": "toilet" },
+
+		{ "at": [366, 309], "key": "4-210", "number": "4-210", "name": "学生実験室2" },
+		{ "at": [329, 393], "key": "bldg4-meeting-room", "name": "会議室" },
+		{ "at": [200, 360], "name": "廊下・階段", "kind": "corridor" },
+		{ "at": [402, 383], "name": "多目的トイレ", "kind": "toilet" },
+
+		{ "at": [200, 527], "name": "廊下・階段", "kind": "corridor" },
+		{ "at": [407, 546], "name": "男子トイレ", "kind": "toilet" }
+	],
+	"markers": [
+		{ "at": [457, 120], "type": "stairs" },
+		{ "at": [457, 288], "type": "stairs" },
+		{ "at": [457, 456], "type": "stairs" },
+		{ "at": [468, 523], "type": "entrance", "text": "入口" },
+		{ "at": [457, 578], "type": "entrance", "text": "入口" }
+	]
+}

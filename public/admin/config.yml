@@ -128,6 +128,48 @@ collections:
           - { label: 同好会, value: society }
           - { label: その他, value: other }
       - { label: 実施場所, name: location, widget: string, hint: '教室名など。' }
+      - label: マップ上の場所
+        name: mapRoom
+        widget: select
+        required: false
+        hint: '会場マップで示す部屋。選ぶと /map とサークル詳細の「マップで見る」に反映されます。一覧にない場所は実行委員会に連絡してください。'
+        options:
+          # >>> GENERATED: map-rooms (bun scripts/map/build-plans.mjs)
+          - { label: '1号館 1F 1号館ロビー', value: 'bldg1-lobby' }
+          - { label: '1号館 2F 1-217 マルチメディア室', value: '1-217' }
+          - { label: '1号館 2F 物理第一実験室', value: 'bldg1-physics-lab-1' }
+          - { label: '1号館 3F 1-320 教室', value: '1-320' }
+          - { label: '1号館 3F 1-325 教室', value: '1-325' }
+          - { label: '2・3号館 3F 2-308 教室', value: '2-308' }
+          - { label: '2・3号館 3F 2-309 教室', value: '2-309' }
+          - { label: '4号館 2F 4-210 学生実験室2', value: '4-210' }
+          - { label: '4号館 2F 会議室', value: 'bldg4-meeting-room' }
+          - { label: '4号館 3F 4-310 学生実験室3', value: '4-310' }
+          - { label: '5号館 1F 大教室', value: 'bldg5-lecture-hall' }
+          - { label: '8号館 1F 8-101 3年機械・制御系1組教室', value: '8-101' }
+          - { label: '8号館 1F 8-102 3年機械・制御系2組教室', value: '8-102' }
+          - { label: '8号館 1F 8-103 3年電気・電子系教室', value: '8-103' }
+          - { label: '8号館 1F 8-104 3年化学・生物・環境系教室', value: '8-104' }
+          - { label: '8号館 1F 8号館ラウンジ', value: 'bldg8-lounge' }
+          - { label: '8号館 2F 8-201 2年1組教室', value: '8-201' }
+          - { label: '8号館 2F 8-202 2年2組教室', value: '8-202' }
+          - { label: '8号館 2F 8-203 2年3組教室', value: '8-203' }
+          - { label: '8号館 2F 8-204 2年4組教室', value: '8-204' }
+          - { label: '8号館 2F 8-205 2年5組教室', value: '8-205' }
+          - { label: '8号館 2F 8-206 ゼミ室', value: '8-206' }
+          - { label: '8号館 3F 8-301 1年1組教室', value: '8-301' }
+          - { label: '8号館 3F 8-302 1年2組教室', value: '8-302' }
+          - { label: '8号館 3F 8-303 1年3組教室', value: '8-303' }
+          - { label: '8号館 3F 8-304 1年4組教室', value: '8-304' }
+          - { label: '8号館 3F 8-305 1年5組教室', value: '8-305' }
+          - { label: '図書館棟 1F セミナー・交流スペース', value: 'library-seminar-space' }
+          - { label: '図書館棟 1F 視聴覚教室', value: 'av-room' }
+          - { label: '図書館棟 2F ベンチャーラボ', value: 'venture-lab' }
+          - { label: '図書館棟 2F 図書館', value: 'library' }
+          - { label: '屋外 屋外テント', value: 'outdoor-tents' }
+          - { label: '第一体育館 体育館ステージ', value: 'gym1-stage' }
+          - { label: '武道館', value: 'martial-arts-hall' }
+          # <<< GENERATED: map-rooms
       - { label: 実施時間, name: schedule, widget: string, hint: '例: 両日 10:00〜16:00' }
       - { label: FesFlow 導入予定, name: fesflowPlanned, widget: boolean, default: false }
       - label: サムネイル画像
