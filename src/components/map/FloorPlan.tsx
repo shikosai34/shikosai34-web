@@ -161,7 +161,8 @@ function Room({ room, exhibits, active, dimmed, onSelect, onHover }: RoomProps) 
 
 			{(room.kind === 'room' || room.kind === 'toilet' || room.kind === 'stairs') && (label || room.kind !== 'room') && (
 				<foreignObject x={x0 + 3} y={y0 + 3} width={Math.max(w - 6, 1)} height={Math.max(h - 6, 1)} style={{ pointerEvents: 'none' }}>
-					<div className="flex h-full w-full flex-col overflow-hidden text-text" style={{ fontSize: 11, lineHeight: 1.3 }}>
+					{/* 部屋の中の文字は折り返さず、入り切らない分は … で切る */}
+					<div className="flex h-full w-full flex-col overflow-hidden whitespace-nowrap text-text" style={{ fontSize: 11, lineHeight: 1.3 }}>
 						{room.kind === 'room' ? (
 							<>
 								<div className="flex min-w-0 shrink-0 items-center gap-1">
@@ -170,8 +171,8 @@ function Room({ room, exhibits, active, dimmed, onSelect, onHover }: RoomProps) 
 											{room.number}
 										</span>
 									)}
-									{room.name && room.number && <span className="truncate text-text/70" style={{ fontSize: 10 }}>{room.name}</span>}
-									{!room.number && room.name && <span className="truncate font-medium">{room.name}</span>}
+									{room.name && room.number && <span className="min-w-0 truncate text-text/70" style={{ fontSize: 10 }}>{room.name}</span>}
+									{!room.number && room.name && <span className="min-w-0 truncate font-medium">{room.name}</span>}
 								</div>
 								{main && (
 									<div className={`mt-1 flex min-h-0 flex-1 gap-1.5 ${w < h * 1.3 ? 'flex-col items-start' : 'items-center'}`}>
@@ -182,7 +183,7 @@ function Room({ room, exhibits, active, dimmed, onSelect, onHover }: RoomProps) 
 												className={`${w < h * 1.3 ? 'min-h-0 w-full flex-1' : 'aspect-square h-full max-h-[48px]'} shrink-0 rounded-sm object-cover`}
 											/>
 										)}
-										<div className="line-clamp-3 min-w-0 font-medium" style={{ fontSize: w > 100 ? 12 : 11 }}>
+										<div className="w-full min-w-0 truncate font-medium" style={{ fontSize: w > 100 ? 12 : 11 }}>
 											{main.title}
 											{exhibits.length > 1 && <span className="text-text/60"> ほか{exhibits.length - 1}件</span>}
 										</div>
@@ -190,7 +191,7 @@ function Room({ room, exhibits, active, dimmed, onSelect, onHover }: RoomProps) 
 								)}
 							</>
 						) : (
-							<div className="m-auto text-center text-text/60" style={{ fontSize: Math.min(10, h / 2.5) }}>
+							<div className="m-auto max-w-full truncate text-center text-text/60" style={{ fontSize: Math.min(10, h / 2.5) }}>
 								{room.kind === 'stairs' ? '階段' : room.name}
 							</div>
 						)}
@@ -220,7 +221,7 @@ function Marker({ marker, floor, floorNumbers, onGoFloor }: MarkerProps) {
 		<foreignObject x={x - w / 2} y={y - 12} width={w} height={24}>
 			<div className="flex h-full w-full items-center justify-center">
 				{marker.type === 'stairs' ? (
-					<div className="flex items-center gap-1 rounded-full border border-accent/50 bg-base/90 py-0.5 pr-0.5 pl-1.5 text-text" style={{ fontSize: 9 }}>
+					<div className="flex items-center gap-1 whitespace-nowrap rounded-full border border-accent/50 bg-base/90 py-0.5 pr-0.5 pl-1.5 text-text" style={{ fontSize: 9 }}>
 						<span className="mr-1 text-text/70">階段</span>
 						{up && (
 							<button
@@ -249,7 +250,7 @@ function Marker({ marker, floor, floorNumbers, onGoFloor }: MarkerProps) {
 					</div>
 				) : (
 					<div
-						className={`rounded-full px-2 py-0.5 font-medium ${marker.type === 'entrance' ? 'bg-main text-base' : 'border border-glow-pink bg-base/90 text-glow-pink'}`}
+						className={`whitespace-nowrap rounded-full px-2 py-0.5 font-medium ${marker.type === 'entrance' ? 'bg-main text-base' : 'border border-glow-pink bg-base/90 text-glow-pink'}`}
 						style={{ fontSize: 9 }}
 					>
 						{marker.text}
