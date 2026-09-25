@@ -26,18 +26,27 @@ const CMS_CONFIG = path.join(ROOT, 'public/admin/config.yml');
 const DEBUG_DIR = '/tmp/map-debug';
 
 /**
- * 図面ごとの設定。yBoundaries は各階を分ける SVG 上の y 座標（上から順）。
- * 図面は上の階ほど上に描かれているので、いちばん上の帯が最上階になる。
+ * 図面ごとの設定。
+ * - svg: 元の図面（scripts/map/svg/<svg>.svg）。省略時は設定の名前と同じ。
+ *   hb- で始まるものは学生便覧のスキャンから trace-handbook.py で起こしたもの
+ * - yBoundaries: 各階を分ける SVG 上の y 座標（上から順）。
+ *   図面は上の階ほど上に描かれているので、いちばん上の帯が最上階になる。
+ * - xBoundaries: 階が横に並んでいる図面（10号館）用。各階を分ける x 座標で、左から 1 階、2 階…の順。
  * building は public/map/campus.geojson の建物名 と一致させる（3D の建物と結びつけるため）。
  */
 const CONFIG = {
 	bldg1: { building: '1号館', yBoundaries: [310, 540] },
 	'bldg2-3': { building: '2・3号館', yBoundaries: [320, 560] },
-	bldg4: { building: '4号館', yBoundaries: [258, 425] },
+	bldg4: { building: '4号館', svg: 'hb-bldg4', yBoundaries: [167, 334, 502] },
 	bldg5: { building: '5号館', yBoundaries: [230] },
+	bldg7: { building: '7号館', svg: 'hb-bldg7', yBoundaries: [220, 470] },
 	// 2 階の図面は 1 号館への渡り廊下の線が混じって崩れるため、同じ形の 3 階を写して使う
 	bldg8: { building: '8号館', yBoundaries: [330, 568], copyFloors: { 2: 3 } },
+	bldg10: { building: '10号館', svg: 'hb-bldg10', xBoundaries: [137, 280] },
 	library: { building: '図書館棟', yBoundaries: [290] },
+	ibayu: { building: '茨友会館', svg: 'hb-ibayu', yBoundaries: [290] },
+	gym1: { building: '第一体育館', svg: 'hb-gym1', yBoundaries: [212] },
+	budokan: { building: '武道館', svg: 'hb-budokan', yBoundaries: [215] },
 };
 
 // ---------------------------------------------------------------------------
@@ -174,8 +183,8 @@ function findRooms(rects) {
 			area += (xs[i + 1] - xs[i]) * (ys[j + 1] - ys[j]);
 			bbox = [Math.min(bbox[0], xs[i]), Math.min(bbox[1], ys[j]), Math.max(bbox[2], xs[i + 1]), Math.max(bbox[3], ys[j + 1])];
 		}
-		// 二重壁の間の細い隙間などは除外
-		if (area < 40 || Math.min(bbox[2] - bbox[0], bbox[3] - bbox[1]) < 4) continue;
+		// 二重壁の間の細い隙間・階段の段（便覧の図面）などは除外
+		if (area < 80 || Math.min(bbox[2] - bbox[0], bbox[3] - bbox[1]) < 4) continue;
 
 		// セルを行ごとの帯にまとめてから結合し、部屋の輪郭にする
 		let ring;
@@ -229,23 +238,27 @@ const roomIndex = [];
 let problems = 0;
 
 for (const [file, info] of Object.entries(CONFIG)) {
-	const svg = fs.readFileSync(path.join(SVG_DIR, `${file}.svg`), 'utf-8');
+	const svg = fs.readFileSync(path.join(SVG_DIR, `${info.svg ?? file}.svg`), 'utf-8');
 	const labelsPath = path.join(LABELS_DIR, `${file}.json`);
 	const labelFile = fs.existsSync(labelsPath) ? JSON.parse(fs.readFileSync(labelsPath, 'utf-8')) : {};
 	const labels = labelFile.rooms ?? [];
 
-	const wallRects = extractWallRects(svg);
+	// 図面の開口（扉の切れ目・曲線の外壁など）で部屋が閉じない所は、ラベルの extraWalls で塞ぐ
+	const wallRects = [...extractWallRects(svg), ...(labelFile.extraWalls ?? [])];
 	const allRooms = findRooms(wallRects);
-	const bounds = [-Infinity, ...info.yBoundaries, Infinity];
+	const horizontal = !!info.xBoundaries;
+	const bounds = [-Infinity, ...(info.xBoundaries ?? info.yBoundaries), Infinity];
 	const floorCount = bounds.length - 1;
-	const floorOfY = (y) => {
-		const i = bounds.findIndex((b, k) => y > b && y <= bounds[k + 1]);
-		return floorCount - i;
+	/** 部屋の中心 → 階 */
+	const floorOf = (bbox) => {
+		const v = horizontal ? (bbox[0] + bbox[2]) / 2 : (bbox[1] + bbox[3]) / 2;
+		const i = bounds.findIndex((b, k) => v > b && v <= bounds[k + 1]);
+		return horizontal ? i + 1 : floorCount - i;
 	};
 
 	const floors = [];
 	for (let floor = 1; floor <= floorCount; floor++) {
-		const rooms = allRooms.filter((r) => floorOfY((r.bbox[1] + r.bbox[3]) / 2) === floor);
+		const rooms = allRooms.filter((r) => floorOf(r.bbox) === floor);
 		if (rooms.length === 0) continue;
 		// 各階の範囲は部屋の外接矩形に外壁の厚みを足したもの（範囲外の矢印などは捨てる）
 		const bbox = [
@@ -299,6 +312,8 @@ for (const [file, info] of Object.entries(CONFIG)) {
 				kind: label?.kind ?? 'room',
 				points: room.ring.slice(0, -1).map((p) => p.map(round)),
 				bbox: room.bbox.map(round),
+				// 矩形でない部屋（L 字の廊下・ロビーなど）は外接矩形の隅に名前を置くと隣の部屋に重なるので、ラベルの点に置く
+				...(label && room.ring.length > 5 && { labelAt: label.at }),
 			});
 			if (key) roomIndex.push({ key, building: info.building, floor: f.floor, number: label.number ?? null, name: label.name, plan: file });
 		});
@@ -333,11 +348,18 @@ for (const [file, info] of Object.entries(CONFIG)) {
 				const hue = (i * 137) % 360;
 				const cx = round((r.bbox[0] + r.bbox[2]) / 2);
 				const cy = round((r.bbox[1] + r.bbox[3]) / 2);
-				return `<path d="M${r.points.map((p) => p.join(' ')).join('L')}Z" fill="hsla(${hue},80%,55%,0.35)" stroke="hsl(${hue},80%,40%)" stroke-width="0.5"/><text x="${cx}" y="${cy}" font-size="5" text-anchor="middle" fill="${r.key ? '#060' : '#c00'}">${r.key ?? `${Math.round(cx)},${Math.round(cy)}`}</text>`;
+				return `<path d="M${r.points.map((p) => p.join(' ')).join('L')}Z" fill="hsla(${hue},80%,55%,0.35)" stroke="hsl(${hue},80%,40%)" stroke-width="0.5"/><text x="${cx}" y="${cy}" font-size="5" text-anchor="middle" fill="${r.key ? '#060' : r.name ? '#006' : '#c00'}">${r.name ?? `${Math.round(cx)},${Math.round(cy)}`}</text>`;
 			}),
 		);
-		const bands = info.yBoundaries.map((y) => `<line x1="0" x2="596" y1="${y}" y2="${y}" stroke="blue" stroke-dasharray="4 2"/>`);
-		fs.writeFileSync(path.join(DEBUG_DIR, `${file}.svg`), svg.replace('</svg>', `${[...overlay, ...bands].join('\n')}\n</svg>`));
+		const bands = horizontal
+			? info.xBoundaries.map((x) => `<line y1="0" y2="2000" x1="${x}" x2="${x}" stroke="blue" stroke-dasharray="4 2"/>`)
+			: info.yBoundaries.map((y) => `<line x1="0" x2="596" y1="${y}" y2="${y}" stroke="blue" stroke-dasharray="4 2"/>`);
+		// 便覧から起こした図面は文字を持たないので、元の画像（trace-handbook.py が書き出す）を下に敷く
+		const background = info.svg?.startsWith('hb-')
+			? `<image href="${info.svg}.png" x="0" y="0" width="100%" height="100%" opacity="0.6"/>`
+			: '';
+		const withBackground = svg.replace(/(<svg[^>]*>)/, `$1${background}`);
+		fs.writeFileSync(path.join(DEBUG_DIR, `${file}.svg`), withBackground.replace('</svg>', `${[...overlay, ...bands].join('\n')}\n</svg>`));
 	}
 }
 

@@ -25,6 +25,8 @@ export interface PlanRoom {
 	/** 輪郭（SVG 座標） */
 	points: [number, number][];
 	bbox: [number, number, number, number];
+	/** 矩形でない部屋の名前を置く位置（SVG 座標）。なければ外接矩形の左上に置く */
+	labelAt?: [number, number];
 }
 
 export interface PlanMarker {
@@ -59,8 +61,13 @@ export const PLAN_FILES: Record<string, string> = {
 	'2・3号館': 'bldg2-3',
 	'4号館': 'bldg4',
 	'5号館': 'bldg5',
+	'7号館': 'bldg7',
 	'8号館': 'bldg8',
+	'10号館': 'bldg10',
 	図書館棟: 'library',
+	茨友会館: 'ibayu',
+	第一体育館: 'gym1',
+	武道館: 'budokan',
 };
 
 export async function loadPlan(building: string): Promise<Plan> {

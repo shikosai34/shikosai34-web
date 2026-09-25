@@ -1,10 +1,58 @@
 [
 	{
+		"key": "1-109",
+		"building": "1号館",
+		"floor": 1,
+		"number": "1-109",
+		"name": "SCS室兼音楽室",
+		"plan": "bldg1"
+	},
+	{
+		"key": "1-113",
+		"building": "1号館",
+		"floor": 1,
+		"number": "1-113",
+		"name": "学生会室",
+		"plan": "bldg1"
+	},
+	{
 		"key": "bldg1-lobby",
 		"building": "1号館",
 		"floor": 1,
 		"number": null,
-		"name": "1号館ロビー",
+		"name": "1号館ロビー（教務進学資料コーナー）",
+		"plan": "bldg1"
+	},
+	{
+		"key": "bldg1-me-lab",
+		"building": "1号館",
+		"floor": 1,
+		"number": null,
+		"name": "機械電気実験室",
+		"plan": "bldg1"
+	},
+	{
+		"key": "bldg1-mech-lab",
+		"building": "1号館",
+		"floor": 1,
+		"number": null,
+		"name": "機械力学実験室",
+		"plan": "bldg1"
+	},
+	{
+		"key": "bldg1-elec-lab",
+		"building": "1号館",
+		"floor": 1,
+		"number": null,
+		"name": "電気基礎実験室",
+		"plan": "bldg1"
+	},
+	{
+		"key": "1-215",
+		"building": "1号館",
+		"floor": 2,
+		"number": "1-215",
+		"name": "ゼミ室",
 		"plan": "bldg1"
 	},
 	{
@@ -12,7 +60,7 @@
 		"building": "1号館",
 		"floor": 2,
 		"number": "1-217",
-		"name": "マルチメディア室",
+		"name": "マルチメディアパソコン教室",
 		"plan": "bldg1"
 	},
 	{
@@ -20,7 +68,23 @@
 		"building": "1号館",
 		"floor": 2,
 		"number": null,
-		"name": "物理第一実験室",
+		"name": "物理第1実験室",
+		"plan": "bldg1"
+	},
+	{
+		"key": "bldg1-physics-lab-2",
+		"building": "1号館",
+		"floor": 2,
+		"number": null,
+		"name": "物理第2実験室",
+		"plan": "bldg1"
+	},
+	{
+		"key": "1-318",
+		"building": "1号館",
+		"floor": 3,
+		"number": "1-318",
+		"name": "課外活動室2",
 		"plan": "bldg1"
 	},
 	{
@@ -28,7 +92,31 @@
 		"building": "1号館",
 		"floor": 3,
 		"number": "1-320",
-		"name": "教室",
+		"name": "語学演習室",
+		"plan": "bldg1"
+	},
+	{
+		"key": "1-321",
+		"building": "1号館",
+		"floor": 3,
+		"number": "1-321",
+		"name": "教室（5M2）",
+		"plan": "bldg1"
+	},
+	{
+		"key": "1-322",
+		"building": "1号館",
+		"floor": 3,
+		"number": "1-322",
+		"name": "教室（5M1）",
+		"plan": "bldg1"
+	},
+	{
+		"key": "1-324",
+		"building": "1号館",
+		"floor": 3,
+		"number": "1-324",
+		"name": "教室（4M2）",
 		"plan": "bldg1"
 	},
 	{
@@ -36,15 +124,127 @@
 		"building": "1号館",
 		"floor": 3,
 		"number": "1-325",
-		"name": "教室",
+		"name": "教室（4M1）",
 		"plan": "bldg1"
+	},
+	{
+		"key": "bldg1-mid-meeting",
+		"building": "1号館",
+		"floor": 3,
+		"number": null,
+		"name": "中会議室",
+		"plan": "bldg1"
+	},
+	{
+		"key": "bldg3-mech-system-lab",
+		"building": "2・3号館",
+		"floor": 1,
+		"number": null,
+		"name": "機械システム実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-lecture",
+		"building": "2・3号館",
+		"floor": 1,
+		"number": null,
+		"name": "講義室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-material-lab",
+		"building": "2・3号館",
+		"floor": 1,
+		"number": null,
+		"name": "材料実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-intelligent-lab",
+		"building": "2・3号館",
+		"floor": 1,
+		"number": null,
+		"name": "知能システム実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg2-elec-mech-lab",
+		"building": "2・3号館",
+		"floor": 1,
+		"number": null,
+		"name": "電気機械実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-fluid-lab",
+		"building": "2・3号館",
+		"floor": 1,
+		"number": null,
+		"name": "流体基礎実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-mech-motion-lab",
+		"building": "2・3号館",
+		"floor": 2,
+		"number": null,
+		"name": "機械運動実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-mech-basic-lab",
+		"building": "2・3号館",
+		"floor": 2,
+		"number": null,
+		"name": "機械基礎実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg2-info-proc-lab",
+		"building": "2・3号館",
+		"floor": 2,
+		"number": null,
+		"name": "情報処理実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-control-lab",
+		"building": "2・3号館",
+		"floor": 2,
+		"number": null,
+		"name": "制御工学実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-design-lab-1",
+		"building": "2・3号館",
+		"floor": 2,
+		"number": null,
+		"name": "設計工学実験室1",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-design-lab-2",
+		"building": "2・3号館",
+		"floor": 2,
+		"number": null,
+		"name": "設計工学実験室2",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg2-e-measure-lab",
+		"building": "2・3号館",
+		"floor": 2,
+		"number": null,
+		"name": "電子計測実験室",
+		"plan": "bldg2-3"
 	},
 	{
 		"key": "2-308",
 		"building": "2・3号館",
 		"floor": 3,
 		"number": "2-308",
-		"name": "教室",
+		"name": "教室（4E）",
 		"plan": "bldg2-3"
 	},
 	{
@@ -52,8 +252,64 @@
 		"building": "2・3号館",
 		"floor": 3,
 		"number": "2-309",
-		"name": "教室",
+		"name": "教室（5E）",
 		"plan": "bldg2-3"
+	},
+	{
+		"key": "3-309",
+		"building": "2・3号館",
+		"floor": 3,
+		"number": "3-309",
+		"name": "製図室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-info-eng-lab",
+		"building": "2・3号館",
+		"floor": 3,
+		"number": null,
+		"name": "情報工学実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-control-basic-lab",
+		"building": "2・3号館",
+		"floor": 3,
+		"number": null,
+		"name": "制御工学基礎実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-e-circuit-lab",
+		"building": "2・3号館",
+		"floor": 3,
+		"number": null,
+		"name": "電子回路実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-e-basic-lab",
+		"building": "2・3号館",
+		"floor": 3,
+		"number": null,
+		"name": "電子工学基礎実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-e-eng-lab",
+		"building": "2・3号館",
+		"floor": 3,
+		"number": null,
+		"name": "電子工学実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "4-107",
+		"building": "4号館",
+		"floor": 1,
+		"number": "4-107",
+		"name": "学生実験室1",
+		"plan": "bldg4"
 	},
 	{
 		"key": "4-210",
@@ -80,12 +336,172 @@
 		"plan": "bldg4"
 	},
 	{
-		"key": "bldg5-lecture-hall",
+		"key": "4-411",
+		"building": "4号館",
+		"floor": 4,
+		"number": "4-411",
+		"name": "学生実験室4",
+		"plan": "bldg4"
+	},
+	{
+		"key": "5-103",
 		"building": "5号館",
 		"floor": 1,
-		"number": null,
+		"number": "5-103",
+		"name": "教室（5C）",
+		"plan": "bldg5"
+	},
+	{
+		"key": "5-104",
+		"building": "5号館",
+		"floor": 1,
+		"number": "5-104",
 		"name": "大教室",
 		"plan": "bldg5"
+	},
+	{
+		"key": "5-201",
+		"building": "5号館",
+		"floor": 2,
+		"number": "5-201",
+		"name": "教室",
+		"plan": "bldg5"
+	},
+	{
+		"key": "5-202",
+		"building": "5号館",
+		"floor": 2,
+		"number": "5-202",
+		"name": "教室（4C）",
+		"plan": "bldg5"
+	},
+	{
+		"key": "7-113",
+		"building": "7号館",
+		"floor": 1,
+		"number": "7-113",
+		"name": "情報工学演習室",
+		"plan": "bldg7"
+	},
+	{
+		"key": "bldg7-programming",
+		"building": "7号館",
+		"floor": 1,
+		"number": null,
+		"name": "プログラミング室",
+		"plan": "bldg7"
+	},
+	{
+		"key": "bldg7-optics-lab",
+		"building": "7号館",
+		"floor": 1,
+		"number": null,
+		"name": "光物性実験室",
+		"plan": "bldg7"
+	},
+	{
+		"key": "bldg7-e-property-lab",
+		"building": "7号館",
+		"floor": 1,
+		"number": null,
+		"name": "電子物性実験室",
+		"plan": "bldg7"
+	},
+	{
+		"key": "bldg7-semiconductor-lab",
+		"building": "7号館",
+		"floor": 1,
+		"number": null,
+		"name": "半導体材料実験室",
+		"plan": "bldg7"
+	},
+	{
+		"key": "7-201",
+		"building": "7号館",
+		"floor": 2,
+		"number": "7-201",
+		"name": "教室（3I）",
+		"plan": "bldg7"
+	},
+	{
+		"key": "bldg7-seminar",
+		"building": "7号館",
+		"floor": 2,
+		"number": null,
+		"name": "会議室・ゼミ室",
+		"plan": "bldg7"
+	},
+	{
+		"key": "bldg7-e-lab",
+		"building": "7号館",
+		"floor": 2,
+		"number": null,
+		"name": "電子工学実験室・共通スペース",
+		"plan": "bldg7"
+	},
+	{
+		"key": "bldg7-precision-lab",
+		"building": "7号館",
+		"floor": 2,
+		"number": null,
+		"name": "電子工学精密実験室",
+		"plan": "bldg7"
+	},
+	{
+		"key": "bldg7-basic-lab",
+		"building": "7号館",
+		"floor": 2,
+		"number": null,
+		"name": "電子情報基礎実験室",
+		"plan": "bldg7"
+	},
+	{
+		"key": "7-301",
+		"building": "7号館",
+		"floor": 3,
+		"number": "7-301",
+		"name": "教室（5I）",
+		"plan": "bldg7"
+	},
+	{
+		"key": "7-302",
+		"building": "7号館",
+		"floor": 3,
+		"number": "7-302",
+		"name": "教室（4I）",
+		"plan": "bldg7"
+	},
+	{
+		"key": "bldg7-transmission-lab",
+		"building": "7号館",
+		"floor": 3,
+		"number": null,
+		"name": "情報伝送実験室",
+		"plan": "bldg7"
+	},
+	{
+		"key": "bldg7-applied-lab",
+		"building": "7号館",
+		"floor": 3,
+		"number": null,
+		"name": "電子情報応用実験室・共通スペース",
+		"plan": "bldg7"
+	},
+	{
+		"key": "bldg7-e-fab-lab",
+		"building": "7号館",
+		"floor": 3,
+		"number": null,
+		"name": "電子情報製作実験室",
+		"plan": "bldg7"
+	},
+	{
+		"key": "bldg7-logic-lab",
+		"building": "7号館",
+		"floor": 3,
+		"number": null,
+		"name": "論理設計演習室",
+		"plan": "bldg7"
 	},
 	{
 		"key": "8-101",
@@ -216,11 +632,123 @@
 		"plan": "bldg8"
 	},
 	{
+		"key": "10-103",
+		"building": "10号館",
+		"floor": 1,
+		"number": "10-103",
+		"name": "講義室",
+		"plan": "bldg10"
+	},
+	{
+		"key": "10-104",
+		"building": "10号館",
+		"floor": 1,
+		"number": "10-104",
+		"name": "講義室",
+		"plan": "bldg10"
+	},
+	{
+		"key": "10-105",
+		"building": "10号館",
+		"floor": 1,
+		"number": "10-105",
+		"name": "ゼミ室",
+		"plan": "bldg10"
+	},
+	{
+		"key": "10-106",
+		"building": "10号館",
+		"floor": 1,
+		"number": "10-106",
+		"name": "ゼミ室",
+		"plan": "bldg10"
+	},
+	{
+		"key": "bldg10-maker",
+		"building": "10号館",
+		"floor": 1,
+		"number": null,
+		"name": "みんなの工作",
+		"plan": "bldg10"
+	},
+	{
+		"key": "bldg10-lobby",
+		"building": "10号館",
+		"floor": 1,
+		"number": null,
+		"name": "ロビー",
+		"plan": "bldg10"
+	},
+	{
+		"key": "bldg10-m-system-lab",
+		"building": "10号館",
+		"floor": 2,
+		"number": null,
+		"name": "機械システム実験室",
+		"plan": "bldg10"
+	},
+	{
+		"key": "bldg10-material-lab",
+		"building": "10号館",
+		"floor": 2,
+		"number": null,
+		"name": "機能性素材実験室",
+		"plan": "bldg10"
+	},
+	{
+		"key": "bldg10-e-system-lab",
+		"building": "10号館",
+		"floor": 2,
+		"number": null,
+		"name": "電子システム実験室",
+		"plan": "bldg10"
+	},
+	{
+		"key": "bldg10-meeting",
+		"building": "10号館",
+		"floor": 3,
+		"number": null,
+		"name": "ミーティング室",
+		"plan": "bldg10"
+	},
+	{
+		"key": "bldg10-media-lab-1",
+		"building": "10号館",
+		"floor": 3,
+		"number": null,
+		"name": "メディアデザインラボ1",
+		"plan": "bldg10"
+	},
+	{
+		"key": "bldg10-media-lab-2",
+		"building": "10号館",
+		"floor": 3,
+		"number": null,
+		"name": "メディアデザインラボ2",
+		"plan": "bldg10"
+	},
+	{
+		"key": "bldg10-media-lab-3",
+		"building": "10号館",
+		"floor": 3,
+		"number": null,
+		"name": "メディアデザインラボ3",
+		"plan": "bldg10"
+	},
+	{
+		"key": "bldg10-info-lab",
+		"building": "10号館",
+		"floor": 3,
+		"number": null,
+		"name": "情報処理室",
+		"plan": "bldg10"
+	},
+	{
 		"key": "library-seminar-space",
 		"building": "図書館棟",
 		"floor": 1,
 		"number": null,
-		"name": "セミナー・交流スペース",
+		"name": "JX金属つながる〜む",
 		"plan": "library"
 	},
 	{
@@ -236,7 +764,7 @@
 		"building": "図書館棟",
 		"floor": 2,
 		"number": null,
-		"name": "ベンチャーラボ",
+		"name": "課外活動室1（ベンチャーラボ）",
 		"plan": "library"
 	},
 	{
@@ -244,8 +772,48 @@
 		"building": "図書館棟",
 		"floor": 2,
 		"number": null,
-		"name": "図書館",
+		"name": "図書館（閲覧室）",
 		"plan": "library"
+	},
+	{
+		"key": "ibayu-hall",
+		"building": "茨友会館",
+		"floor": 1,
+		"number": null,
+		"name": "ホール・カフェスペース",
+		"plan": "ibayu"
+	},
+	{
+		"key": "ibayu-dining",
+		"building": "茨友会館",
+		"floor": 1,
+		"number": null,
+		"name": "新日本電工あつまる食堂",
+		"plan": "ibayu"
+	},
+	{
+		"key": "gym1-stage",
+		"building": "第一体育館",
+		"floor": 1,
+		"number": null,
+		"name": "競技場（ステージ）",
+		"plan": "gym1"
+	},
+	{
+		"key": "gym1-training",
+		"building": "第一体育館",
+		"floor": 2,
+		"number": null,
+		"name": "トレーニング場",
+		"plan": "gym1"
+	},
+	{
+		"key": "budokan-hall",
+		"building": "武道館",
+		"floor": 1,
+		"number": null,
+		"name": "剣道・柔道競技室",
+		"plan": "budokan"
 	},
 	{
 		"key": "outdoor-tents",
@@ -257,30 +825,6 @@
 		"at": [
 			140.55115,
 			36.4001
-		]
-	},
-	{
-		"key": "gym1-stage",
-		"building": "第一体育館",
-		"floor": null,
-		"number": null,
-		"name": "体育館ステージ",
-		"plan": null,
-		"at": [
-			140.55217,
-			36.40004
-		]
-	},
-	{
-		"key": "martial-arts-hall",
-		"building": "武道館",
-		"floor": null,
-		"number": null,
-		"name": "武道館",
-		"plan": null,
-		"at": [
-			140.55202,
-			36.39973
 		]
 	}
 ]

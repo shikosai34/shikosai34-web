@@ -1,8 +1,14 @@
 {
 	"_comment": "図面を持たない場所。at は [経度, 緯度]。3D の地図上にピンを立てる。building が buildings の name と一致する場合はその建物に紐づく。",
 	"places": [
-		{ "key": "gym1-stage", "building": "第一体育館", "name": "体育館ステージ", "at": [140.55217, 36.40004] },
-		{ "key": "martial-arts-hall", "building": "武道館", "name": "武道館", "at": [140.55202, 36.39973] },
-		{ "key": "outdoor-tents", "building": "屋外", "name": "屋外テント", "at": [140.55115, 36.4001] }
+		{
+			"key": "outdoor-tents",
+			"building": "屋外",
+			"name": "屋外テント",
+			"at": [
+				140.55115,
+				36.4001
+			]
+		}
 	]
 }

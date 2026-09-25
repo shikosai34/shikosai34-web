@@ -159,7 +159,16 @@ function Room({ room, exhibits, active, dimmed, onSelect, onHover }: RoomProps) 
 			{color && !active && <polygon points={points} fill="none" stroke={color} strokeWidth={1.5} strokeOpacity={0.8} />}
 			{active && <polygon points={points} fill="none" stroke="#ff9933" strokeWidth={4} filter="url(#plan-glow)" />}
 
-			{(room.kind === 'room' || room.kind === 'toilet' || room.kind === 'stairs') && (label || room.kind !== 'room') && (
+			{room.labelAt && room.kind === 'room' && room.name && (
+				<foreignObject x={room.labelAt[0] * S - 80} y={room.labelAt[1] * S - 10} width={160} height={20} style={{ pointerEvents: 'none' }}>
+					<div className="flex h-full w-full items-center justify-center gap-1 overflow-hidden whitespace-nowrap text-text" style={{ fontSize: 11 }}>
+						<span className="min-w-0 truncate font-medium">{main ? main.title : room.name}</span>
+						{main && exhibits.length > 1 && <span className="text-text/60">ほか{exhibits.length - 1}件</span>}
+					</div>
+				</foreignObject>
+			)}
+
+			{!room.labelAt && (room.kind === 'room' || room.kind === 'toilet' || room.kind === 'stairs') && (label || room.kind !== 'room') && (
 				<foreignObject x={x0 + 3} y={y0 + 3} width={Math.max(w - 6, 1)} height={Math.max(h - 6, 1)} style={{ pointerEvents: 'none' }}>
 					{/* 部屋の中の文字は折り返さず、入り切らない分は … で切る */}
 					<div className="flex h-full w-full flex-col overflow-hidden whitespace-nowrap text-text" style={{ fontSize: 11, lineHeight: 1.3 }}>

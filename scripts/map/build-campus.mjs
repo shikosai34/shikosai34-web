@@ -27,8 +27,11 @@ const distance = ([lon, lat]) => Math.hypot((lon - CENTER[0]) * M_PER_DEG_LON, (
  * 北側の「第一体育館」は重複登録で、実際の第一体育館（1号館の東）とは別の建物のため名前を外す。
  */
 const RENAME_BY_INDEX = { 37: null };
-/** 階数が無い・誤っている建物の補正（TODO: 7号館・情報センター・寄宿舎管理棟は未確認のため仮に 2 階） */
-const LEVELS = { '2・3号館': 3, '7号館': 2, '情報センター': 2, '寄宿舎管理棟': 2, '第一体育館': 3 };
+/**
+ * 階数が無い・誤っている建物の補正。学生便覧の建物図面に合わせる
+ * （TODO: 情報センター・寄宿舎管理棟は便覧に図面がなく未確認のため仮に 2 階）
+ */
+const LEVELS = { '2・3号館': 3, '4号館': 4, '7号館': 3, '図書館棟': 2, '情報センター': 2, '寄宿舎管理棟': 2, '第一体育館': 3 };
 
 const round = (v) => Math.round(v * 1e7) / 1e7;
 const roundCoords = (c) => (typeof c[0] === 'number' ? c.map(round) : c.map(roundCoords));
