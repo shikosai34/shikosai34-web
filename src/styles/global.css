@@ -673,4 +673,44 @@
       animation: none;
     }
   }
+
+  /* ===================================================================
+   * 会場マップ（/map）
+   * -------------------------------------------------------------------
+   * フロア画面の階移動。上の階へは上から、下の階へは下から図面が入ってくる。
+   * =================================================================== */
+  .map-floor-enter-up {
+    animation: map-floor-enter-up 0.35s ease-out;
+  }
+
+  .map-floor-enter-down {
+    animation: map-floor-enter-down 0.35s ease-out;
+  }
+
+  @keyframes map-floor-enter-up {
+    from { transform: translateY(-8%) scale(0.97); opacity: 0; }
+    to { transform: none; opacity: 1; }
+  }
+
+  @keyframes map-floor-enter-down {
+    from { transform: translateY(8%) scale(0.97); opacity: 0; }
+    to { transform: none; opacity: 1; }
+  }
+
+  .map-floor-view {
+    animation: map-fade-in 0.4s ease-out;
+  }
+
+  @keyframes map-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .map-floor-enter-up,
+    .map-floor-enter-down,
+    .map-floor-view {
+      animation: none;
+    }
+  }
 }

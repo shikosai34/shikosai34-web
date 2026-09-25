@@ -1,5 +1,154 @@
 ---
-import PlaceholderPage from '../../components/ui/PlaceholderPage.astro';
+/**
+ * 会場マップ。
+ * 上に 3D のキャンパスとフロア図（VenueMap）、下にテキストの配置一覧を置く。
+ * 配置一覧は地図を見られない・JS が動かない環境でも同じ情報にたどり着けるようにするためのもの
+ * （docs/design/04-non-functional.md「会場マップ」）。
+ */
+import VenueMap from '../../components/map/VenueMap';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import SiteHeader from '../../components/layout/SiteHeader.astro';
+import SectionHeading from '../../components/ui/SectionHeading';
+import Layout from '../../layouts/Layout.astro';
+import { CIRCLE_CATEGORY_LABELS } from '../../lib/circles';
+import { getCollectionOrEmpty } from '../../lib/content';
+import { formatEventDate, formatEventTimeRange, getVisibleEvents } from '../../lib/events';
+import { exhibitGroupOfCategory, type ExhibitsByRoom } from '../../lib/map';
+import { formatMapRoom, MAP_ROOMS } from '../../lib/map-rooms';
+
+/** 体育館ステージの企画を置く部屋キー（scripts/map/outdoor.json） */
+const STAGE_ROOM = 'gym1-stage';
+
+const exhibits: ExhibitsByRoom = {};
+const push = (key: string, item: ExhibitsByRoom[string][number]) => (exhibits[key] ??= []).push(item);
+
+const circles = (await getCollectionOrEmpty('circles')).sort((a, b) =>
+	a.data.nameKana.localeCompare(b.data.nameKana, 'ja'),
+);
+for (const circle of circles) {
+	const { name, category, mapRoom, image } = circle.data;
+	if (!mapRoom) continue;
+	push(mapRoom, {
+		id: `circle-${circle.id}`,
+		title: name,
+		subtitle: CIRCLE_CATEGORY_LABELS[category],
+		group: exhibitGroupOfCategory(category),
+		href: `/circle/${circle.id}`,
+		image,
+	});
+}
+
+for (const event of await getVisibleEvents()) {
+	if (event.data.status === 'cancelled') continue;
+	push(STAGE_ROOM, {
+		id: `event-${event.id}`,
+		title: event.data.title,
+		subtitle: event.data.performer,
+		group: 'stage',
+		href: `/event/${event.id}`,
+		image: event.data.image,
+		time: `${formatEventDate(event.data.startAt)} ${formatEventTimeRange(event.data.startAt, event.data.endAt)}`,
+	});
+}
+
+// テキストの配置一覧（建物 → 部屋）。出展のある部屋だけ載せる
+const listing = MAP_ROOMS.filter((room) => exhibits[room.key]?.length).reduce<
+	{ building: string; rooms: typeof MAP_ROOMS }[]
+>((groups, room) => {
+	const group = groups.find((g) => g.building === room.building);
+	if (group) group.rooms.push(room);
+	else groups.push({ building: room.building, rooms: [room] });
+	return groups;
+}, []);
+const unplaced = circles.filter((c) => !c.data.mapRoom);
 ---
 
-<PlaceholderPage title="会場マップ" heading="Map" icon="map" />
+<Layout title="会場マップ | 第34回 茨香祭">
+	<SiteHeader />
+
+	<main class="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6">
+		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
+			<SectionHeading title="Map" icon="map" subtitle="会場マップ" />
+			<p class="mb-4 text-sm leading-relaxed text-text/80">
+				建物を押すと、階ごとの見取り図と出展が見られます。光っている建物に出展があります。
+			</p>
+
+			<div class="bracket-frame h-[78dvh] min-h-[480px] md:h-[720px]">
+				<VenueMap client:only="react" exhibits={exhibits} />
+				<noscript>
+					<p class="p-6 text-center text-sm text-text/70">
+						地図の表示には JavaScript が必要です。下の配置一覧をご覧ください。
+					</p>
+				</noscript>
+			</div>
+			<p class="mt-2 text-right text-xs text-text/50">
+				地図データ: © OpenStreetMap contributors, Overture Maps Foundation
+			</p>
+		</section>
+
+		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
+			<SectionHeading title="Floor Guide" icon="pin" subtitle="配置一覧" />
+			{
+				listing.length === 0 ? (
+					<p class="py-8 text-center text-sm text-text/70">出展の配置は準備中です。</p>
+				) : (
+					<div class="grid gap-6 md:grid-cols-2">
+						{listing.map((group) => (
+							<div>
+								<h3 class="mb-2 border-b border-accent/40 pb-1 text-lg text-text">{group.building}</h3>
+								<dl class="flex flex-col gap-3">
+									{group.rooms.map((room) => (
+										<div>
+											<dt class="text-sm">
+												<a
+													href={`/map?room=${encodeURIComponent(room.key)}`}
+													class="text-accent underline hover:no-underline"
+												>
+													{formatMapRoom(room)}
+												</a>
+												{room.number && <span class="ml-2 text-text/60">{room.name}</span>}
+											</dt>
+											<dd>
+												<ul class="mt-1 flex flex-col gap-0.5 pl-3">
+													{exhibits[room.key].map((item) => (
+														<li class="text-sm text-text">
+															<a href={item.href} class="underline hover:no-underline">
+																{item.title}
+															</a>
+															<span class="ml-2 text-xs text-text/60">
+																{item.time ?? item.subtitle}
+															</span>
+														</li>
+													))}
+												</ul>
+											</dd>
+										</div>
+									))}
+								</dl>
+							</div>
+						))}
+					</div>
+				)
+			}
+			{
+				unplaced.length > 0 && (
+					<div class="mt-8">
+						<h3 class="mb-2 border-b border-text/20 pb-1 text-text">地図に未登録の出展</h3>
+						<ul class="flex flex-col gap-0.5">
+							{unplaced.map((circle) => (
+								<li class="text-sm text-text">
+									<a href={`/circle/${circle.id}`} class="underline hover:no-underline">
+										{circle.data.name}
+									</a>
+									<span class="ml-2 text-xs text-text/60">{circle.data.location}</span>
+								</li>
+							))}
+						</ul>
+					</div>
+				)
+			}
+		</section>
+	</main>
+
+	<SiteFooter />
+</Layout>
