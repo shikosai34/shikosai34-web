@@ -1,19 +1,44 @@
 {
-	"_comment": "図面を持たない屋外の会場。at は [経度, 緯度]。3D の地図上に和傘のピンを立てる。tents を指定すると出展の数だけ屋台のテントを並べる（track: トラックの外周に沿って / column: ピンの南へ 1 列に / grid: 碁盤目に）。配置は【晴天時】動線・出展場所一覧 に合わせる。",
+	"_comment": "図面を持たない会場。at は [経度, 緯度]。3D の地図上に和傘のピンを立てる。building が 3D の建物名と一致すればその建物に紐づく。tents を指定すると出展の数だけ屋台のテントを並べる（outline: at を含む区画（トラック・広場）の縁に沿って / column: ピンの南へ 1 列に / grid: 碁盤目に）。weather を指定するとその天候のときだけ使う会場になる（sunny / rainy）。配置は【晴天時】【雨天時】動線・出展場所一覧 に合わせる。",
 	"places": [
 		{
 			"key": "ground",
 			"building": "屋外",
 			"name": "グラウンド",
 			"at": [140.55299, 36.40037],
-			"tents": "track"
+			"tents": "outline",
+			"weather": "sunny"
 		},
 		{
 			"key": "ground-baseball-side",
 			"building": "屋外",
 			"name": "グラウンド（野球場側）",
 			"at": [140.55222, 36.4016],
-			"tents": "column"
+			"tents": "column",
+			"weather": "sunny"
+		},
+		{
+			"key": "courtyard",
+			"building": "屋外",
+			"name": "中庭（1号館・第一体育館の間）",
+			"at": [140.5515, 36.39987],
+			"tents": "outline",
+			"tentsInset": 3,
+			"weather": "rainy"
+		},
+		{
+			"key": "gym2",
+			"building": "第二体育館",
+			"name": "第二体育館",
+			"at": [140.551764, 36.401155],
+			"weather": "rainy"
+		},
+		{
+			"key": "club-house",
+			"building": "共用部室",
+			"name": "共用部室",
+			"at": [140.550696, 36.399355],
+			"weather": "rainy"
 		}
 	]
 }

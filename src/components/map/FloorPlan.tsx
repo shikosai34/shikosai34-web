@@ -1,4 +1,5 @@
 import type { KeyboardEvent } from 'react';
+import type { Weather } from '../../lib/map-rooms';
 import { EXHIBIT_GROUPS, PLAN_SCALE, type ExhibitsByRoom, type PlanFloor, type PlanMarker, type PlanRoom } from '../../lib/map';
 
 /*
@@ -14,6 +15,8 @@ interface Props {
 	floor: PlanFloor;
 	/** 全階で共通の viewBox（階を切り替えても縮尺が変わらないように） */
 	viewBox: string;
+	/** 天候（部屋の使い道が天候で変わる） */
+	weather: Weather;
 	exhibits: ExhibitsByRoom;
 	selectedKey: string | null;
 	hoveredKey: string | null;
@@ -42,6 +45,7 @@ const toPoints = (room: PlanRoom) => room.points.map(([x, y]) => `${x * S},${y *
 export default function FloorPlan({
 	floor,
 	viewBox,
+	weather,
 	exhibits,
 	selectedKey,
 	hoveredKey,
@@ -85,6 +89,7 @@ export default function FloorPlan({
 				<Room
 					key={room.id}
 					room={room}
+					use={room.use?.[weather]}
 					exhibits={room.key ? (exhibits[room.key] ?? []) : []}
 					active={!!room.key && room.key === activeKey}
 					dimmed={!!selectedKey && room.key !== selectedKey && room.kind === 'room'}
@@ -110,6 +115,8 @@ export default function FloorPlan({
 
 interface RoomProps {
 	room: PlanRoom;
+	/** その天候での使い道（予選会場・休憩所など） */
+	use?: string;
 	exhibits: ExhibitsByRoom[string];
 	active: boolean;
 	dimmed: boolean;
@@ -131,7 +138,7 @@ function textWidth(text: string, fontSize: number): number {
 /** 行の高さ（px）。フォントの大きさ × 1.3 */
 const lineHeight = (fontSize: number) => fontSize * 1.3;
 
-function Room({ room, exhibits, active, dimmed, onSelect, onHover, onPoint }: RoomProps) {
+function Room({ room, use, exhibits, active, dimmed, onSelect, onHover, onPoint }: RoomProps) {
 	const [x0, y0, x1, y1] = room.bbox.map((v) => v * S);
 	const w = x1 - x0;
 	const h = y1 - y0;
@@ -140,7 +147,7 @@ function Room({ room, exhibits, active, dimmed, onSelect, onHover, onPoint }: Ro
 	const color = main ? EXHIBIT_GROUPS[main.group].color : null;
 	const selectable = !!room.key;
 	// 名前・番号・出展のどれかがあれば、カーソルを当てたときに詳細を出す
-	const hasDetail = !!(room.name || room.number || room.use || exhibits.length);
+	const hasDetail = !!(room.name || room.number || use || exhibits.length);
 
 	const fill =
 		room.kind === 'corridor'
@@ -149,7 +156,7 @@ function Room({ room, exhibits, active, dimmed, onSelect, onHover, onPoint }: Ro
 				? mix('#e8e8e8', BASE, 0.08)
 				: color
 					? mix(color, BASE, 0.16)
-					: room.use
+					: use
 						? mix(USE_COLOR, BASE, 0.14)
 						: mix('#e8e8e8', BASE, 0.04);
 
@@ -180,7 +187,7 @@ function Room({ room, exhibits, active, dimmed, onSelect, onHover, onPoint }: Ro
 	const countText = `●${exhibits.length}`;
 	const showCount = !!main && !showTitle && titleRoom >= lineHeight(11) && textWidth(countText, 11) <= iw;
 	// 出展のない部屋は、当日の使い道（予選会場・休憩所など）を書く
-	const showUse = !main && !!room.use && titleRoom >= lineHeight(12) && textWidth(room.use, 12) <= iw;
+	const showUse = !main && !!use && titleRoom >= lineHeight(12) && textWidth(use, 12) <= iw;
 
 	const centerText = room.kind === 'stairs' ? '階段' : room.kind === 'toilet' ? room.name : null;
 	const centerSize = Math.min(10, h / 2.5);
@@ -189,7 +196,7 @@ function Room({ room, exhibits, active, dimmed, onSelect, onHover, onPoint }: Ro
 	// L 字の部屋の名前は、ラベルの点から部屋の外接矩形の端までに収める
 	const labelHalf = room.labelAt ? Math.min(room.labelAt[0] * S - x0, x1 - room.labelAt[0] * S) - 3 : 0;
 	// 出展がなく使い道（休憩所など）がある部屋は、部屋名の代わりに使い道を書く
-	const labelText = main ? main.title + more : (room.use ?? room.name);
+	const labelText = main ? main.title + more : (use ?? room.name);
 	const showLabelAt = !!room.labelAt && room.kind === 'room' && !!labelText && textWidth(labelText, 11) <= labelHalf * 2;
 
 	const onKeyDown = (e: KeyboardEvent) => {
@@ -226,7 +233,7 @@ function Room({ room, exhibits, active, dimmed, onSelect, onHover, onPoint }: Ro
 		>
 			<polygon points={points} fill={fill} />
 			{room.kind === 'stairs' && <polygon points={points} fill="url(#plan-stairs)" />}
-			{(color ?? (room.use ? USE_COLOR : null)) && !active && (
+			{(color ?? (use ? USE_COLOR : null)) && !active && (
 				<polygon points={points} fill="none" stroke={color ?? USE_COLOR} strokeWidth={1.5} strokeOpacity={0.8} />
 			)}
 			{active && <polygon points={points} fill="none" stroke="#ff9933" strokeWidth={4} filter="url(#plan-glow)" />}
@@ -241,7 +248,7 @@ function Room({ room, exhibits, active, dimmed, onSelect, onHover, onPoint }: Ro
 				>
 					<div
 						className="flex h-full w-full items-center justify-center whitespace-nowrap font-medium text-text"
-						style={{ fontSize: 11, color: !main && room.use ? USE_COLOR : undefined }}
+						style={{ fontSize: 11, color: !main && use ? USE_COLOR : undefined }}
 					>
 						{labelText}
 					</div>
@@ -269,7 +276,7 @@ function Room({ room, exhibits, active, dimmed, onSelect, onHover, onPoint }: Ro
 								)}
 								{showUse && (
 									<div className="m-auto font-medium" style={{ fontSize: 12, color: USE_COLOR }}>
-										{room.use}
+										{use}
 									</div>
 								)}
 								{(showTitle || showCount || showImage) && (

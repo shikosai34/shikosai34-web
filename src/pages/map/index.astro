@@ -13,34 +13,58 @@ import Layout from '../../layouts/Layout.astro';
 import { CIRCLE_CATEGORY_LABELS } from '../../lib/circles';
 import { getCollectionOrEmpty } from '../../lib/content';
 import { formatEventDate, formatEventTimeRange, getVisibleEvents } from '../../lib/events';
-import { exhibitGroupOfCategory, type ExhibitsByRoom } from '../../lib/map';
-import { formatMapRoom, MAP_ROOMS } from '../../lib/map-rooms';
+import { exhibitGroupOfCategory, type ExhibitsByRoom, type MapExhibit } from '../../lib/map';
+import {
+	DEFAULT_WEATHER,
+	formatMapRoom,
+	getMapRoom,
+	isRoomInWeather,
+	MAP_ROOMS,
+	roomKeyInWeather,
+	WEATHER_LABELS,
+	WEATHERS,
+	type Weather,
+} from '../../lib/map-rooms';
 
-/** 体育館ステージの企画を置く部屋キー（scripts/map/outdoor.json） */
+/** 体育館ステージの企画を置く部屋キー（第一体育館の競技場）。ステージ企画は天候によらずここ */
 const STAGE_ROOM = 'gym1-stage';
 
-const exhibits: ExhibitsByRoom = {};
-const push = (key: string, item: ExhibitsByRoom[string][number]) => (exhibits[key] ??= []).push(item);
+/**
+ * サークルのその天候での部屋キー。晴天時だけの会場（グラウンドなど）のまま雨天時の場所が
+ * 決まっていないときは、雨天時の地図には置かない（「地図に未登録の出展」に出す）。
+ */
+function placedKey(circle: { mapRoom?: string; mapRoomRainy?: string }, weather: Weather): string | undefined {
+	const key = roomKeyInWeather(circle, weather);
+	const room = getMapRoom(key);
+	return room && isRoomInWeather(room, weather) ? key : undefined;
+}
+
+/** 天候ごとの「部屋キー → 出展」。晴天時はサークルの mapRoom、雨天時は mapRoomRainy（なければ mapRoom） */
+const exhibits = Object.fromEntries(WEATHERS.map((w) => [w, {}])) as Record<Weather, ExhibitsByRoom>;
+const push = (weather: Weather, key: string, item: MapExhibit) => (exhibits[weather][key] ??= []).push(item);
 
 const circles = (await getCollectionOrEmpty('circles')).sort((a, b) =>
 	a.data.nameKana.localeCompare(b.data.nameKana, 'ja'),
 );
 for (const circle of circles) {
-	const { name, category, mapRoom, image } = circle.data;
-	if (!mapRoom) continue;
-	push(mapRoom, {
+	const { name, category, image } = circle.data;
+	const item: MapExhibit = {
 		id: `circle-${circle.id}`,
 		title: name,
 		subtitle: CIRCLE_CATEGORY_LABELS[category],
 		group: exhibitGroupOfCategory(category),
 		href: `/circle/${circle.id}`,
 		image,
-	});
+	};
+	for (const weather of WEATHERS) {
+		const key = placedKey(circle.data, weather);
+		if (key) push(weather, key, item);
+	}
 }
 
 for (const event of await getVisibleEvents()) {
 	if (event.data.status === 'cancelled') continue;
-	push(STAGE_ROOM, {
+	const item: MapExhibit = {
 		id: `event-${event.id}`,
 		title: event.data.title,
 		subtitle: event.data.performer,
@@ -48,19 +72,26 @@ for (const event of await getVisibleEvents()) {
 		href: `/event/${event.id}`,
 		image: event.data.image,
 		time: `${formatEventDate(event.data.startAt)} ${formatEventTimeRange(event.data.startAt, event.data.endAt)}`,
-	});
+	};
+	for (const weather of WEATHERS) push(weather, STAGE_ROOM, item);
 }
 
-// テキストの配置一覧（建物 → 部屋）。出展のある部屋と、予選会場・休憩所などの使い道がある部屋を載せる
-const listing = MAP_ROOMS.filter((room) => exhibits[room.key]?.length || room.use).reduce<
-	{ building: string; rooms: typeof MAP_ROOMS }[]
->((groups, room) => {
-	const group = groups.find((g) => g.building === room.building);
-	if (group) group.rooms.push(room);
-	else groups.push({ building: room.building, rooms: [room] });
-	return groups;
-}, []);
-const unplaced = circles.filter((c) => !c.data.mapRoom);
+/**
+ * テキストの配置一覧（天候 → 建物 → 部屋）。出展のある部屋と、
+ * 予選会場・休憩所などの使い道がある部屋を載せる。
+ */
+const listings = WEATHERS.map((weather) => {
+	const groups: { building: string; rooms: typeof MAP_ROOMS }[] = [];
+	for (const room of MAP_ROOMS) {
+		if (!isRoomInWeather(room, weather) || !(exhibits[weather][room.key]?.length || room.use?.[weather])) continue;
+		const group = groups.find((g) => g.building === room.building);
+		if (group) group.rooms.push(room);
+		else groups.push({ building: room.building, rooms: [room] });
+	}
+	const unplaced = circles.filter((c) => !placedKey(c.data, weather) && !(weather === 'rainy' && c.data.mapRoomRainy === 'none'));
+	const absent = weather === 'rainy' ? circles.filter((c) => c.data.mapRoomRainy === 'none') : [];
+	return { weather, groups, unplaced, absent };
+});
 ---
 
 <Layout title="会場マップ | 第34回 茨香祭" edgeKasumi={false}>
@@ -72,7 +103,7 @@ const unplaced = circles.filter((c) => !c.data.mapRoom);
 	 */}
 	<h1 class="sr-only">会場マップ</h1>
 	<div class="relative -mt-20 h-dvh min-h-[480px] w-full">
-		<VenueMap client:only="react" exhibits={exhibits} />
+		<VenueMap client:only="react" exhibits={exhibits} defaultWeather={DEFAULT_WEATHER} />
 		<noscript>
 			<p class="absolute inset-x-0 top-1/3 px-6 text-center text-sm text-text/70">
 				地図の表示には JavaScript が必要です。下の配置一覧をご覧ください。
@@ -84,67 +115,99 @@ const unplaced = circles.filter((c) => !c.data.mapRoom);
 		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
 			<SectionHeading title="Floor Guide" icon="pin" subtitle="配置一覧" />
 			<p class="mb-4 text-sm leading-relaxed text-text/80">
-				出展のある場所の一覧です。場所の名前を押すと、地図でその場所を開きます。
+				出展のある場所の一覧です。晴天時と雨天時で場所が変わります。場所の名前を押すと、地図でその場所を開きます。
 			</p>
+			{/* 天候の切り替え。JS が動かないときは両方の一覧をそのまま並べる */}
+			<div class="mb-5 flex gap-2" role="tablist" aria-label="天候" data-weather-tabs data-default={DEFAULT_WEATHER} hidden>
+				{
+					WEATHERS.map((weather) => (
+						<button
+							type="button"
+							role="tab"
+							data-weather-tab={weather}
+							class="rounded-md border border-accent/50 px-4 py-1.5 text-sm text-text aria-selected:border-main aria-selected:bg-main aria-selected:text-base"
+						>
+							{WEATHER_LABELS[weather]}
+						</button>
+					))
+				}
+			</div>
 			{
-				listing.length === 0 ? (
-					<p class="py-8 text-center text-sm text-text/70">出展の配置は準備中です。</p>
-				) : (
-					<div class="grid gap-6 md:grid-cols-2">
-						{listing.map((group) => (
-							<div>
-								<h3 class="mb-2 border-b border-accent/40 pb-1 text-lg text-text">{group.building}</h3>
-								<dl class="flex flex-col gap-3">
-									{group.rooms.map((room) => (
-										<div>
-											<dt class="text-sm">
-												<a
-													href={`/map?room=${encodeURIComponent(room.key)}`}
-													class="text-accent underline hover:no-underline"
-												>
-													{formatMapRoom(room)}
-												</a>
-												{room.number && <span class="ml-2 text-text/60">{room.name}</span>}
-												{room.use && <span class="ml-2 text-glow-pink">{room.use}</span>}
-											</dt>
-											<dd>
-												<ul class="mt-1 flex flex-col gap-0.5 pl-3">
-													{(exhibits[room.key] ?? []).map((item) => (
-														<li class="text-sm text-text">
-															<a href={item.href} class="underline hover:no-underline">
-																{item.title}
-															</a>
-															<span class="ml-2 text-xs text-text/60">
-																{item.time ?? item.subtitle}
-															</span>
-														</li>
-													))}
-												</ul>
-											</dd>
-										</div>
-									))}
-								</dl>
+				listings.map(({ weather, groups, unplaced, absent }) => (
+					<div data-weather-panel={weather} role="tabpanel" aria-label={`${WEATHER_LABELS[weather]}の配置`}>
+						<h3 class="mb-3 text-accent" data-weather-heading>
+							{WEATHER_LABELS[weather]}の配置
+						</h3>
+						{groups.length === 0 ? (
+							<p class="py-8 text-center text-sm text-text/70">出展の配置は準備中です。</p>
+						) : (
+							<div class="grid gap-6 md:grid-cols-2">
+								{groups.map((group) => (
+									<div>
+										<h4 class="mb-2 border-b border-accent/40 pb-1 text-lg text-text">{group.building}</h4>
+										<dl class="flex flex-col gap-3">
+											{group.rooms.map((room) => (
+												<div>
+													<dt class="text-sm">
+														<a
+															href={`/map?room=${encodeURIComponent(room.key)}${weather === 'rainy' ? '&weather=rainy' : ''}`}
+															class="text-accent underline hover:no-underline"
+														>
+															{formatMapRoom(room)}
+														</a>
+														{room.number && <span class="ml-2 text-text/60">{room.name}</span>}
+														{room.use?.[weather] && <span class="ml-2 text-glow-pink">{room.use[weather]}</span>}
+													</dt>
+													<dd>
+														<ul class="mt-1 flex flex-col gap-0.5 pl-3">
+															{(exhibits[weather][room.key] ?? []).map((item) => (
+																<li class="text-sm text-text">
+																	<a href={item.href} class="underline hover:no-underline">
+																		{item.title}
+																	</a>
+																	<span class="ml-2 text-xs text-text/60">{item.time ?? item.subtitle}</span>
+																</li>
+															))}
+														</ul>
+													</dd>
+												</div>
+											))}
+										</dl>
+									</div>
+								))}
 							</div>
-						))}
+						)}
+						{absent.length > 0 && (
+							<div class="mt-8">
+								<h4 class="mb-2 border-b border-text/20 pb-1 text-text">雨天時は出展しない団体</h4>
+								<ul class="flex flex-col gap-0.5">
+									{absent.map((circle) => (
+										<li class="text-sm text-text">
+											<a href={`/circle/${circle.id}`} class="underline hover:no-underline">
+												{circle.data.name}
+											</a>
+										</li>
+									))}
+								</ul>
+							</div>
+						)}
+						{unplaced.length > 0 && (
+							<div class="mt-8">
+								<h4 class="mb-2 border-b border-text/20 pb-1 text-text">地図に未登録の出展</h4>
+								<ul class="flex flex-col gap-0.5">
+									{unplaced.map((circle) => (
+										<li class="text-sm text-text">
+											<a href={`/circle/${circle.id}`} class="underline hover:no-underline">
+												{circle.data.name}
+											</a>
+											<span class="ml-2 text-xs text-text/60">{circle.data.location}</span>
+										</li>
+									))}
+								</ul>
+							</div>
+						)}
 					</div>
-				)
-			}
-			{
-				unplaced.length > 0 && (
-					<div class="mt-8">
-						<h3 class="mb-2 border-b border-text/20 pb-1 text-text">地図に未登録の出展</h3>
-						<ul class="flex flex-col gap-0.5">
-							{unplaced.map((circle) => (
-								<li class="text-sm text-text">
-									<a href={`/circle/${circle.id}`} class="underline hover:no-underline">
-										{circle.data.name}
-									</a>
-									<span class="ml-2 text-xs text-text/60">{circle.data.location}</span>
-								</li>
-							))}
-						</ul>
-					</div>
-				)
+				))
 			}
 			<p class="mt-8 text-right text-xs text-text/50">
 				地図データ: © OpenStreetMap contributors, Overture Maps Foundation
@@ -154,3 +217,36 @@ const unplaced = circles.filter((c) => !c.data.mapRoom);
 
 	<SiteFooter />
 </Layout>
+
+<script>
+	/*
+	 * 配置一覧の天候の切り替え。地図（VenueMap）の切り替えと ?weather= で揃える。
+	 * JS が動かないときはタブを隠したまま、両方の一覧を並べて見せる。
+	 */
+	const tabs = document.querySelector<HTMLElement>('[data-weather-tabs]');
+	const panels = [...document.querySelectorAll<HTMLElement>('[data-weather-panel]')];
+	const buttons = [...document.querySelectorAll<HTMLButtonElement>('[data-weather-tab]')];
+
+	function show(weather: string) {
+		for (const panel of panels) panel.hidden = panel.dataset.weatherPanel !== weather;
+		for (const button of buttons) button.setAttribute('aria-selected', String(button.dataset.weatherTab === weather));
+	}
+
+	if (tabs) {
+		tabs.hidden = false;
+		for (const heading of document.querySelectorAll<HTMLElement>('[data-weather-heading]')) heading.hidden = true;
+		const fromUrl = new URLSearchParams(location.search).get('weather');
+		const initial = fromUrl === 'rainy' || fromUrl === 'sunny' ? fromUrl : (tabs.dataset.default ?? 'sunny');
+		show(initial);
+		for (const button of buttons) {
+			button.addEventListener('click', () => {
+				const weather = button.dataset.weatherTab ?? 'sunny';
+				show(weather);
+				// 地図のほうも切り替える
+				window.dispatchEvent(new CustomEvent('map:set-weather', { detail: weather }));
+			});
+		}
+		// 地図で切り替えたら一覧も揃える
+		window.addEventListener('map:weather', (e) => show((e as CustomEvent<string>).detail));
+	}
+</script>

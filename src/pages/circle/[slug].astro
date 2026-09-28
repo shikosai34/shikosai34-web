@@ -5,7 +5,7 @@ import SiteHeader from '../../components/layout/SiteHeader.astro';
 import Layout from '../../layouts/Layout.astro';
 import { CIRCLE_CATEGORY_LABELS } from '../../lib/circles';
 import { getCollectionOrEmpty } from '../../lib/content';
-import { formatMapRoom, getMapRoom } from '../../lib/map-rooms';
+import { formatMapRoom, getMapRoom, NOT_IN_RAIN } from '../../lib/map-rooms';
 
 export async function getStaticPaths() {
 	const circles = await getCollectionOrEmpty('circles');
@@ -17,9 +17,12 @@ export async function getStaticPaths() {
 
 const { circle } = Astro.props;
 const { Content } = await render(circle);
-const { name, category, location, mapRoom, schedule, image, snsLinks, fesflowPlanned, fesflowUrl } =
+const { name, category, location, mapRoom, mapRoomRainy, schedule, image, snsLinks, fesflowPlanned, fesflowUrl } =
 	circle.data;
 const room = getMapRoom(mapRoom);
+// 雨天時に場所が変わる（または出展しない）ときだけ、雨天時の案内を添える
+const rainyRoom = mapRoomRainy && mapRoomRainy !== mapRoom ? getMapRoom(mapRoomRainy) : undefined;
+const absentInRain = mapRoomRainy === NOT_IN_RAIN;
 ---
 
 <Layout title={`${name} | サークル | 第34回 茨香祭`}>
@@ -61,10 +64,21 @@ const room = getMapRoom(mapRoom);
 								href={`/map?room=${encodeURIComponent(room.key)}`}
 								class="ml-2 whitespace-nowrap text-accent underline hover:no-underline"
 							>
-								マップで見る（{formatMapRoom(room)}）
+								マップで見る（{rainyRoom || absentInRain ? '晴天時 ' : ''}{formatMapRoom(room)}）
 							</a>
 						)
 					}
+					{
+						rainyRoom && (
+							<a
+								href={`/map?room=${encodeURIComponent(rainyRoom.key)}&weather=rainy`}
+								class="ml-2 whitespace-nowrap text-accent underline hover:no-underline"
+							>
+								雨天時（{formatMapRoom(rainyRoom)}）
+							</a>
+						)
+					}
+					{absentInRain && <span class="ml-2 whitespace-nowrap text-text/70">雨天時は出展しません</span>}
 				</dd>
 			</dl>
 

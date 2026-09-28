@@ -391,10 +391,10 @@ interface TentSlot {
 }
 
 /**
- * 陸上競技場のトラックの外周に沿って、count 張りのテントを等間隔に並べる。
- * 外周の輪（経緯度）を中心へ inset m 寄せた線の上に置き、屋根の縁を外周の向きに揃える。
+ * 区画（陸上競技場のトラック・中庭の広場など）の縁に沿って、count 張りのテントを等間隔に並べる。
+ * 縁の輪（経緯度）を中心へ inset m 寄せた線の上に置き、屋根の縁を縁の向きに揃える。
  */
-function trackSlots(ring: Ring, count: number, inset = 6): TentSlot[] {
+function outlineSlots(ring: Ring, count: number, inset = 6): TentSlot[] {
 	const pts = toPlane(ring).slice(0, -1);
 	const [cx, cy] = centroid([...pts, pts[0]]);
 	const inner = pts.map(([x, y]) => {
@@ -416,6 +416,17 @@ function trackSlots(ring: Ring, count: number, inset = 6): TentSlot[] {
 		slots.push({ x: ax + (bx - ax) * f, y: ay + (by - ay) * f, angle: Math.atan2(by - ay, bx - ax) });
 	}
 	return slots;
+}
+
+/** 点が多角形（平面の座標）の中にあるか */
+function contains(poly: [number, number][], [x, y]: [number, number]): boolean {
+	let inside = false;
+	for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+		const [xi, yi] = poly[i];
+		const [xj, yj] = poly[j];
+		if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+	}
+	return inside;
 }
 
 /** ピンの手前（南）へ 1 列に並べる（野球場側など、区画が縦に並ぶ会場） */
@@ -568,16 +579,24 @@ export default function CampusScene({ campus, counts, places, selected, camera, 
 		};
 	}, [hovered]);
 
-	const trackRing = useMemo(() => {
-		const f = campus.features.find((f) => f.properties.kind === 'track' && f.geometry.type === 'Polygon');
-		return f ? (f.geometry as { coordinates: Ring[] }).coordinates[0] : null;
-	}, [campus]);
+	/** テントを縁に沿って並べられる区画（トラック・広場）の輪 */
+	const areaRings = useMemo(
+		() =>
+			campus.features
+				.filter((f) => (f.properties.kind === 'track' || f.properties.kind === 'plaza') && f.geometry.type === 'Polygon')
+				.map((f) => (f.geometry as { coordinates: Ring[] }).coordinates[0]),
+		[campus],
+	);
 	/** 屋外の会場のテントの置き場所（出展の数だけ） */
 	const tentSlots = (p: MapRoom): TentSlot[] => {
 		const count = counts[p.key] ?? 0;
-		if (p.tents === 'track' && trackRing) return trackSlots(trackRing, count);
-		if (p.tents === 'column') return columnSlots(project(p.at!), count);
-		return gridSlots(project(p.at!), count);
+		const at = project(p.at!);
+		if (p.tents === 'outline') {
+			const ring = areaRings.find((r) => contains(toPlane(r), at));
+			if (ring) return outlineSlots(ring, count, p.tentsInset);
+		}
+		if (p.tents === 'column') return columnSlots(at, count);
+		return gridSlots(at, count);
 	};
 
 	/** 押せる建物（平面図があるか、屋外の会場を含む建物） */

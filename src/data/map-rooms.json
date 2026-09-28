@@ -350,7 +350,9 @@
 		"number": "5-103",
 		"name": "教室（5C）",
 		"plan": "bldg5",
-		"use": "予選会場"
+		"use": {
+			"sunny": "予選会場"
+		}
 	},
 	{
 		"key": "5-104",
@@ -359,7 +361,9 @@
 		"number": "5-104",
 		"name": "大教室",
 		"plan": "bldg5",
-		"use": "休憩所"
+		"use": {
+			"sunny": "休憩所"
+		}
 	},
 	{
 		"key": "5-201",
@@ -376,7 +380,9 @@
 		"number": "5-202",
 		"name": "教室（4C）",
 		"plan": "bldg5",
-		"use": "予選会場"
+		"use": {
+			"sunny": "予選会場"
+		}
 	},
 	{
 		"key": "7-113",
@@ -829,7 +835,8 @@
 			140.55299,
 			36.40037
 		],
-		"tents": "track"
+		"tents": "outline",
+		"weather": "sunny"
 	},
 	{
 		"key": "ground-baseball-side",
@@ -842,6 +849,48 @@
 			140.55222,
 			36.4016
 		],
-		"tents": "column"
+		"tents": "column",
+		"weather": "sunny"
+	},
+	{
+		"key": "club-house",
+		"building": "共用部室",
+		"floor": null,
+		"number": null,
+		"name": "共用部室",
+		"plan": null,
+		"at": [
+			140.550696,
+			36.399355
+		],
+		"weather": "rainy"
+	},
+	{
+		"key": "gym2",
+		"building": "第二体育館",
+		"floor": null,
+		"number": null,
+		"name": "第二体育館",
+		"plan": null,
+		"at": [
+			140.551764,
+			36.401155
+		],
+		"weather": "rainy"
+	},
+	{
+		"key": "courtyard",
+		"building": "屋外",
+		"floor": null,
+		"number": null,
+		"name": "中庭（1号館・第一体育館の間）",
+		"plan": null,
+		"at": [
+			140.5515,
+			36.39987
+		],
+		"tents": "outline",
+		"tentsInset": 3,
+		"weather": "rainy"
 	}
 ]

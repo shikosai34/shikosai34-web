@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import CloseIcon from '../icons/CloseIcon';
 import {
 	countExhibitsByBuilding,
@@ -6,15 +6,17 @@ import {
 	PLAN_FILES,
 	project,
 	readViewFromUrl,
+	readWeatherFromUrl,
 	viewToSearch,
 	type ExhibitsByRoom,
 	type MapView,
 	type Plan,
 } from '../../lib/map';
-import { MAP_ROOMS } from '../../lib/map-rooms';
+import { isRoomInWeather, MAP_ROOMS, type Weather } from '../../lib/map-rooms';
 import type { CameraRequest, CampusData } from './CampusScene';
 import { RoomDetail } from './ExhibitPanel';
 import FloorPlanView from './FloorPlanView';
+import WeatherToggle from './WeatherToggle';
 
 /*
  * 会場マップ（/map）の本体。client:only で読み込む。
@@ -22,6 +24,7 @@ import FloorPlanView from './FloorPlanView';
  * 全体は 3D のキャンパス。建物を押すとカメラが真上へ回り込み、フロア画面（2D）へ切り替わる。
  * 平面図のない会場（体育館・屋外テントなど）は、その場で出展の一覧を出す。
  * 表示中の建物・階・部屋は URL（?room= / ?building=&floor=）に反映し、そのまま共有できる。
+ * 晴天時・雨天時で出展場所が変わるので、天候を切り替えられる（?weather=rainy）。
  *
  * WebGL が使えない環境では 3D を出さず、建物のボタンだけを並べる。
  */
@@ -29,7 +32,10 @@ import FloorPlanView from './FloorPlanView';
 const CampusScene = lazy(() => import('./CampusScene'));
 
 interface Props {
-	exhibits: ExhibitsByRoom;
+	/** 天候ごとの「部屋キー → 出展」 */
+	exhibits: Record<Weather, ExhibitsByRoom>;
+	/** 最初に出す天候（?weather= があればそちらを優先） */
+	defaultWeather: Weather;
 }
 
 const HOME_CAMERA: CameraRequest = { center: null };
@@ -54,10 +60,13 @@ function useMediaQuery(query: string): boolean {
 	return matches;
 }
 
-/** 平面図のない会場（屋外テント・体育館ステージなど） */
-const PLACES = MAP_ROOMS.filter((r) => !r.plan);
+/** 平面図のない会場（グラウンド・第二体育館など）。天候によって使うものが変わる */
+const ALL_PLACES = MAP_ROOMS.filter((r) => !r.plan);
 
-export default function VenueMap({ exhibits }: Props) {
+export default function VenueMap({ exhibits: exhibitsByWeather, defaultWeather }: Props) {
+	const [weather, setWeather] = useState<Weather>(() => readWeatherFromUrl(location.search) ?? defaultWeather);
+	const exhibits = exhibitsByWeather[weather];
+	const PLACES = useMemo(() => ALL_PLACES.filter((p) => isRoomInWeather(p, weather)), [weather]);
 	const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
 	const narrow = useMediaQuery('(max-width: 767px)');
 	const [webgl] = useState(supportsWebGL);
@@ -72,7 +81,7 @@ export default function VenueMap({ exhibits }: Props) {
 	/** 一覧を出している平面図のない会場（部屋キー） */
 	const [placeKey, setPlaceKey] = useState<string | null>(() => {
 		const key = new URLSearchParams(location.search).get('room');
-		return PLACES.some((p) => p.key === key) ? key : null;
+		return ALL_PLACES.some((p) => p.key === key) ? key : null;
 	});
 	const [camera, setCamera] = useState<CameraRequest>(HOME_CAMERA);
 
@@ -80,7 +89,7 @@ export default function VenueMap({ exhibits }: Props) {
 		const byBuilding = countExhibitsByBuilding(exhibits);
 		for (const p of PLACES) byBuilding[p.key] = exhibits[p.key]?.length ?? 0;
 		return byBuilding;
-	}, [exhibits]);
+	}, [exhibits, PLACES]);
 
 	useEffect(() => {
 		if (!webgl) return;
@@ -90,8 +99,28 @@ export default function VenueMap({ exhibits }: Props) {
 			.catch(() => setLoadError(true));
 	}, [webgl]);
 
-	const writeUrl = useCallback((next: MapView) => {
-		history.replaceState(history.state, '', `${location.pathname}${viewToSearch(next)}`);
+	/** 最後に URL に書いた表示状態（天候を切り替えたときに書き直す） */
+	const lastView = useRef<MapView>({ building: null });
+	const writeUrl = useCallback(
+		(next: MapView) => {
+			lastView.current = next;
+			history.replaceState(history.state, '', `${location.pathname}${viewToSearch(next, weather)}`);
+		},
+		[weather],
+	);
+
+	// 天候を切り替えたら URL を書き直し、下の配置一覧にも知らせる。一覧のタブからの切り替えも受ける
+	useEffect(() => {
+		history.replaceState(history.state, '', `${location.pathname}${viewToSearch(lastView.current, weather)}`);
+		window.dispatchEvent(new CustomEvent('map:weather', { detail: weather }));
+	}, [weather]);
+	useEffect(() => {
+		const onSet = (e: Event) => {
+			const next = (e as CustomEvent<string>).detail;
+			if (next === 'sunny' || next === 'rainy') setWeather(next);
+		};
+		window.addEventListener('map:set-weather', onSet);
+		return () => window.removeEventListener('map:set-weather', onSet);
 	}, []);
 
 	/** 建物の中心（平面の [東, 北]） */
@@ -162,6 +191,11 @@ export default function VenueMap({ exhibits }: Props) {
 		if (!campus || !placeKey) return;
 		openPlace(placeKey);
 	}, [campus]); // eslint-disable-line react-hooks/exhaustive-deps
+
+	// その天候で使わない会場を開いていたら閉じる
+	useEffect(() => {
+		if (placeKey && !PLACES.some((p) => p.key === placeKey)) closePlace();
+	}, [PLACES]); // eslint-disable-line react-hooks/exhaustive-deps
 
 	const place = PLACES.find((p) => p.key === placeKey);
 	const planOpen = !!view.building && !!plan && plan.building === view.building;
@@ -238,6 +272,7 @@ export default function VenueMap({ exhibits }: Props) {
 					{webgl && (
 						<p className="mt-1 truncate text-xs text-text/70">建物を押すと中が見られます</p>
 					)}
+					<WeatherToggle weather={weather} onChange={setWeather} className="pointer-events-auto mt-2" />
 				</div>
 			)}
 
@@ -259,6 +294,8 @@ export default function VenueMap({ exhibits }: Props) {
 					key={plan.building}
 					plan={plan}
 					exhibits={exhibits}
+					weather={weather}
+					onWeatherChange={setWeather}
 					initialFloor={view.floor}
 					initialRoom={view.room}
 					onClose={closePlan}

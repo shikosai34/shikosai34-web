@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { EXHIBIT_GROUPS, PLAN_SCALE, type ExhibitsByRoom, type Plan, type PlanRoom } from '../../lib/map';
-import { MAP_ROOMS } from '../../lib/map-rooms';
+import { MAP_ROOMS, type Weather } from '../../lib/map-rooms';
 import { FloorExhibitList, RoomDetail, type FloorExhibit } from './ExhibitPanel';
 import FloorPlan from './FloorPlan';
 import FloorStack from './FloorStack';
 import RoomTooltip from './RoomTooltip';
+import WeatherToggle from './WeatherToggle';
 import { usePanZoom } from './usePanZoom';
 
 /*
@@ -15,6 +16,8 @@ import { usePanZoom } from './usePanZoom';
 interface Props {
 	plan: Plan;
 	exhibits: ExhibitsByRoom;
+	weather: Weather;
+	onWeatherChange: (weather: Weather) => void;
 	initialFloor?: number;
 	initialRoom?: string;
 	onClose: () => void;
@@ -24,7 +27,7 @@ interface Props {
 
 const S = PLAN_SCALE;
 
-export default function FloorPlanView({ plan, exhibits, initialFloor, initialRoom, onClose, onChange }: Props) {
+export default function FloorPlanView({ plan, exhibits, weather, onWeatherChange, initialFloor, initialRoom, onClose, onChange }: Props) {
 	const floors = plan.floors;
 	const floorNumbers = floors.map((f) => f.floor);
 	const roomsInPlan = useMemo(() => MAP_ROOMS.filter((r) => r.building === plan.building), [plan.building]);
@@ -107,6 +110,7 @@ export default function FloorPlanView({ plan, exhibits, initialFloor, initialRoo
 							{floor}F
 						</span>
 					</h3>
+					<WeatherToggle weather={weather} onChange={onWeatherChange} className="ml-auto hidden md:inline-flex" />
 					{/* モバイルは階のボタンを並べる（積み重ね図は小さすぎて押しにくい） */}
 					<div className="ml-auto flex shrink-0 gap-1 md:hidden" role="group" aria-label="階の切り替え">
 						{[...floorNumbers].reverse().map((f) => (
@@ -150,6 +154,7 @@ export default function FloorPlanView({ plan, exhibits, initialFloor, initialRoo
 							key={floor}
 							floor={current}
 							viewBox={panZoom.viewBox}
+							weather={weather}
 							exhibits={exhibits}
 							selectedKey={selectedKey}
 							hoveredKey={hoveredKey}
@@ -163,6 +168,7 @@ export default function FloorPlanView({ plan, exhibits, initialFloor, initialRoo
 						{tip && (
 							<RoomTooltip
 								room={tip.room}
+								use={tip.room.use?.[weather]}
 								exhibits={tip.room.key ? (exhibits[tip.room.key] ?? []) : []}
 								x={tip.x}
 								y={tip.y}
@@ -192,6 +198,7 @@ export default function FloorPlanView({ plan, exhibits, initialFloor, initialRoo
 					))}
 				</div>
 				<div className="flex-1 overflow-y-auto p-3" aria-live="polite">
+					<WeatherToggle weather={weather} onChange={onWeatherChange} className="mb-3 md:hidden" />
 					{selectedRoom ? (
 						<RoomDetail room={selectedRoom} items={exhibits[selectedRoom.key] ?? []} onBack={() => setSelectedKey(null)} />
 					) : (

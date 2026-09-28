@@ -3,7 +3,7 @@ import { glob } from 'astro/loaders';
 import { CIRCLE_CATEGORIES } from './lib/circles';
 import { EVENT_GENRES, EVENT_STATUSES, FESTIVAL_DAYS, getEventDayKey } from './lib/events';
 import { NEWS_CATEGORIES } from './lib/news';
-import { MAP_ROOM_KEYS } from './lib/map-rooms';
+import { MAP_ROOM_KEYS, NOT_IN_RAIN } from './lib/map-rooms';
 
 /**
  * お知らせ（`/news`）のコレクション。
@@ -69,6 +69,14 @@ const circles = defineCollection({
 		mapRoom: z
 			.string()
 			.refine((key) => MAP_ROOM_KEYS.has(key), { message: '会場マップに存在しない部屋キーです。' })
+			.optional(),
+		/**
+		 * 雨天時の部屋キー（任意）。空なら晴天時（mapRoom）と同じ場所、
+		 * "none" なら雨天時は出展しない。
+		 */
+		mapRoomRainy: z
+			.string()
+			.refine((key) => key === NOT_IN_RAIN || MAP_ROOM_KEYS.has(key), { message: '会場マップに存在しない部屋キーです。' })
 			.optional(),
 		/** 実施時間（自由記述） */
 		schedule: z.string().min(1),

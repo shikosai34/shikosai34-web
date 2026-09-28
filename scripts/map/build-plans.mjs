@@ -231,6 +231,14 @@ function findRooms(rects) {
 // ---------------------------------------------------------------------------
 
 const round = (v) => Math.round(v * 100) / 100;
+
+/** 天候。晴天時・雨天時で出展場所が変わる（【晴天時】【雨天時】動線・出展場所一覧） */
+const WEATHERS = ['sunny', 'rainy'];
+/**
+ * 当日の使い道（予選会場・休憩所など）。ラベルでは文字列（両方の天候で同じ）か
+ * { sunny, rainy } で書き、出力はいつも { sunny?, rainy? } に揃える。
+ */
+const normalizeUse = (use) => (!use ? undefined : typeof use === 'string' ? { sunny: use, rainy: use } : use);
 const debug = !!process.env.DEBUG_ROOMS;
 if (debug) fs.mkdirSync(DEBUG_DIR, { recursive: true });
 fs.mkdirSync(PLANS_DIR, { recursive: true });
@@ -317,9 +325,9 @@ for (const [file, info] of Object.entries(CONFIG)) {
 				// 矩形でない部屋（L 字の廊下・ロビーなど）は外接矩形の隅に名前を置くと隣の部屋に重なるので、ラベルの点に置く
 				...(label && room.ring.length > 5 && { labelAt: label.at }),
 				// 当日の使い道（予選会場・休憩所など、サークルの出展ではない場所）
-				...(label?.use && { use: label.use }),
+				...(label?.use && { use: normalizeUse(label.use) }),
 			});
-			if (key) roomIndex.push({ key, building: info.building, floor: f.floor, number: label.number ?? null, name: label.name, plan: file, ...(label.use && { use: label.use }) });
+			if (key) roomIndex.push({ key, building: info.building, floor: f.floor, number: label.number ?? null, name: label.name, plan: file, ...(label.use && { use: normalizeUse(label.use) }) });
 		});
 		delete f.rawRooms;
 	}
@@ -370,7 +378,7 @@ for (const [file, info] of Object.entries(CONFIG)) {
 // 屋外の場所（図面を持たず、3D 上のピンで示す）
 if (fs.existsSync(OUTDOOR_FILE)) {
 	for (const o of JSON.parse(fs.readFileSync(OUTDOOR_FILE, 'utf-8')).places ?? []) {
-		roomIndex.push({ key: o.key, building: o.building ?? '屋外', floor: null, number: null, name: o.name, plan: null, at: o.at, ...(o.tents && { tents: o.tents }) });
+		roomIndex.push({ key: o.key, building: o.building ?? '屋外', floor: null, number: null, name: o.name, plan: null, at: o.at, ...(o.tents && { tents: o.tents }), ...(o.tentsInset !== undefined && { tentsInset: o.tentsInset }), ...(o.weather && { weather: o.weather }) });
 	}
 }
 
@@ -388,24 +396,32 @@ if (dupes.length) {
 fs.mkdirSync(path.dirname(ROOMS_FILE), { recursive: true });
 fs.writeFileSync(ROOMS_FILE, `${JSON.stringify(roomIndex, null, '\t')}\n`);
 
-// CMS の選択肢を書き換える
-const START = '# >>> GENERATED: map-rooms (bun scripts/map/build-plans.mjs)';
-const END = '# <<< GENERATED: map-rooms';
-const cms = fs.readFileSync(CMS_CONFIG, 'utf-8');
-const startAt = cms.indexOf(START);
-const endAt = cms.indexOf(END);
-if (startAt >= 0 && endAt > startAt) {
+// CMS の選択肢を書き換える（晴天時・雨天時のそれぞれ。片方の天候だけの屋外の会場は、その天候の選択肢にだけ出す）
+const q = (s) => `'${s.replaceAll("'", "''")}'`;
+const optionLabel = (r) => [r.building, r.floor ? `${r.floor}F` : null, r.number, r.name === r.building ? null : r.name].filter(Boolean).join(' ');
+const blocks = [
+	{ id: 'map-rooms', weather: 'sunny', extra: [] },
+	{ id: 'map-rooms-rainy', weather: 'rainy', extra: [{ label: '雨天時は出展しない', value: 'none' }] },
+];
+let cms = fs.readFileSync(CMS_CONFIG, 'utf-8');
+for (const block of blocks) {
+	const START = `# >>> GENERATED: ${block.id} (bun scripts/map/build-plans.mjs)`;
+	const END = `# <<< GENERATED: ${block.id}`;
+	const startAt = cms.indexOf(START);
+	const endAt = cms.indexOf(END);
+	if (startAt < 0 || endAt < startAt) {
+		console.warn(`⚠ public/admin/config.yml に GENERATED: ${block.id} の目印がないため、CMS の選択肢は更新していません`);
+		continue;
+	}
 	const indent = cms.slice(cms.lastIndexOf('\n', startAt) + 1, startAt);
-	const q = (s) => `'${s.replaceAll("'", "''")}'`;
-	const lines = roomIndex.map((r) => {
-		const label = [r.building, r.floor ? `${r.floor}F` : null, r.number, r.name === r.building ? null : r.name].filter(Boolean).join(' ');
-		return `${indent}- { label: ${q(label)}, value: ${q(r.key)} }`;
-	});
-	const next = `${cms.slice(0, startAt)}${START}\n${lines.join('\n')}\n${indent}${cms.slice(endAt)}`;
-	if (next !== cms) fs.writeFileSync(CMS_CONFIG, next);
-} else {
-	console.warn('⚠ public/admin/config.yml に GENERATED の目印がないため、CMS の選択肢は更新していません');
+	const options = [
+		...block.extra,
+		...roomIndex.filter((r) => !r.weather || r.weather === block.weather).map((r) => ({ label: optionLabel(r), value: r.key })),
+	];
+	const lines = options.map((o) => `${indent}- { label: ${q(o.label)}, value: ${q(o.value)} }`);
+	cms = `${cms.slice(0, startAt)}${START}\n${lines.join('\n')}\n${indent}${cms.slice(endAt)}`;
 }
+if (cms !== fs.readFileSync(CMS_CONFIG, 'utf-8')) fs.writeFileSync(CMS_CONFIG, cms);
 
 console.log(`\n部屋キー ${roomIndex.length} 件を書き出しました。`);
 if (problems) {

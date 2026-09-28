@@ -6,7 +6,7 @@
  * - public/map/campus.geojson … 3D の地面と建物（build-campus.mjs）
  * - public/map/plans/<file>.json … 各館の平面図（build-plans.mjs）
  */
-import { MAP_ROOMS, type MapRoom } from './map-rooms';
+import { MAP_ROOMS, type MapRoom, type RoomUse, type Weather } from './map-rooms';
 
 // ---------------------------------------------------------------------------
 // 平面図
@@ -27,8 +27,8 @@ export interface PlanRoom {
 	bbox: [number, number, number, number];
 	/** 矩形でない部屋の名前を置く位置（SVG 座標）。なければ外接矩形の左上に置く */
 	labelAt?: [number, number];
-	/** 当日の使い道（予選会場・休憩所など、サークルの出展ではない場所） */
-	use?: string;
+	/** 当日の使い道（予選会場・休憩所など、サークルの出展ではない場所）。天候ごと */
+	use?: RoomUse;
 }
 
 export interface PlanMarker {
@@ -150,6 +150,12 @@ export interface MapView {
 	room?: string;
 }
 
+/** ?weather=rainy なら雨天時の配置を出す */
+export function readWeatherFromUrl(search: string): Weather | null {
+	const w = new URLSearchParams(search).get('weather');
+	return w === 'rainy' || w === 'sunny' ? w : null;
+}
+
 /** ?room=<部屋キー> または ?building=<建物名>&floor=<階> を読む */
 export function readViewFromUrl(search: string): MapView {
 	const params = new URLSearchParams(search);
@@ -165,10 +171,15 @@ export function readViewFromUrl(search: string): MapView {
 	return { building: null };
 }
 
-export function viewToSearch(view: MapView): string {
-	if (!view.building) return view.room ? `?room=${encodeURIComponent(view.room)}` : '';
-	if (view.room) return `?room=${encodeURIComponent(view.room)}`;
-	const params = new URLSearchParams({ building: view.building });
-	if (view.floor) params.set('floor', String(view.floor));
-	return `?${params}`;
+/** 表示状態を URL の ?以降にする。雨天時の配置を見ているときは weather=rainy を付ける */
+export function viewToSearch(view: MapView, weather: Weather = 'sunny'): string {
+	const params = new URLSearchParams();
+	if (view.room) params.set('room', view.room);
+	else if (view.building) {
+		params.set('building', view.building);
+		if (view.floor) params.set('floor', String(view.floor));
+	}
+	if (weather === 'rainy') params.set('weather', 'rainy');
+	const search = params.toString();
+	return search ? `?${search}` : '';
 }

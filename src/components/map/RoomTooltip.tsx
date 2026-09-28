@@ -10,6 +10,8 @@ const MAX_ITEMS = 4;
 
 interface Props {
 	room: PlanRoom;
+	/** その天候での使い道（予選会場・休憩所など） */
+	use?: string;
 	exhibits: MapExhibit[];
 	/** 図面の枠の中での位置（px） */
 	x: number;
@@ -19,7 +21,7 @@ interface Props {
 	height: number;
 }
 
-export default function RoomTooltip({ room, exhibits, x, y, width, height }: Props) {
+export default function RoomTooltip({ room, use, exhibits, x, y, width, height }: Props) {
 	const flipX = x > width * 0.6;
 	const flipY = y > height * 0.7;
 	const shown = exhibits.slice(0, MAX_ITEMS);
@@ -38,7 +40,7 @@ export default function RoomTooltip({ room, exhibits, x, y, width, height }: Pro
 				{room.number && <span className="rounded-sm bg-accent/85 px-1 font-medium text-base">{room.number}</span>}
 				{room.name && <span className="text-sm font-medium">{room.name}</span>}
 			</div>
-			{room.use && <div className="mt-1 font-medium text-glow-pink">{room.use}</div>}
+			{use && <div className="mt-1 font-medium text-glow-pink">{use}</div>}
 			{shown.map((item) => (
 				<div key={item.id} className="mt-1 flex items-center gap-1.5">
 					<span className="inline-block h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: EXHIBIT_GROUPS[item.group].color }} aria-hidden="true" />

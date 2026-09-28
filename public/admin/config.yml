@@ -128,7 +128,7 @@ collections:
           - { label: 同好会, value: society }
           - { label: その他, value: other }
       - { label: 実施場所, name: location, widget: string, hint: '教室名など。' }
-      - label: マップ上の場所
+      - label: マップ上の場所（晴天時）
         name: mapRoom
         widget: select
         required: false
@@ -240,6 +240,120 @@ collections:
           - { label: '屋外 グラウンド', value: 'ground' }
           - { label: '屋外 グラウンド（野球場側）', value: 'ground-baseball-side' }
           # <<< GENERATED: map-rooms
+      - label: マップ上の場所（雨天時）
+        name: mapRoomRainy
+        widget: select
+        required: false
+        hint: '雨天時に場所が変わる場合だけ選びます。空欄なら晴天時と同じ場所です。雨天時に出展しない場合は「雨天時は出展しない」を選んでください。'
+        options:
+          # >>> GENERATED: map-rooms-rainy (bun scripts/map/build-plans.mjs)
+          - { label: '雨天時は出展しない', value: 'none' }
+          - { label: '1号館 1F 1-109 SCS室兼音楽室', value: '1-109' }
+          - { label: '1号館 1F 1-113 学生会室', value: '1-113' }
+          - { label: '1号館 1F 1号館ロビー（教務進学資料コーナー）', value: 'bldg1-lobby' }
+          - { label: '1号館 1F 機械電気実験室', value: 'bldg1-me-lab' }
+          - { label: '1号館 1F 機械力学実験室', value: 'bldg1-mech-lab' }
+          - { label: '1号館 1F 電気基礎実験室', value: 'bldg1-elec-lab' }
+          - { label: '1号館 2F 1-215 ゼミ室', value: '1-215' }
+          - { label: '1号館 2F 1-217 マルチメディアパソコン教室', value: '1-217' }
+          - { label: '1号館 2F 物理第1実験室', value: 'bldg1-physics-lab-1' }
+          - { label: '1号館 2F 物理第2実験室', value: 'bldg1-physics-lab-2' }
+          - { label: '1号館 3F 1-318 課外活動室2', value: '1-318' }
+          - { label: '1号館 3F 1-320 語学演習室', value: '1-320' }
+          - { label: '1号館 3F 1-321 教室（5M2）', value: '1-321' }
+          - { label: '1号館 3F 1-322 教室（5M1）', value: '1-322' }
+          - { label: '1号館 3F 1-324 教室（4M2）', value: '1-324' }
+          - { label: '1号館 3F 1-325 教室（4M1）', value: '1-325' }
+          - { label: '1号館 3F 中会議室', value: 'bldg1-mid-meeting' }
+          - { label: '2・3号館 1F 機械システム実験室', value: 'bldg3-mech-system-lab' }
+          - { label: '2・3号館 1F 講義室', value: 'bldg3-lecture' }
+          - { label: '2・3号館 1F 材料実験室', value: 'bldg3-material-lab' }
+          - { label: '2・3号館 1F 知能システム実験室', value: 'bldg3-intelligent-lab' }
+          - { label: '2・3号館 1F 電気機械実験室', value: 'bldg2-elec-mech-lab' }
+          - { label: '2・3号館 1F 流体基礎実験室', value: 'bldg3-fluid-lab' }
+          - { label: '2・3号館 2F 機械運動実験室', value: 'bldg3-mech-motion-lab' }
+          - { label: '2・3号館 2F 機械基礎実験室', value: 'bldg3-mech-basic-lab' }
+          - { label: '2・3号館 2F 情報処理実験室', value: 'bldg2-info-proc-lab' }
+          - { label: '2・3号館 2F 制御工学実験室', value: 'bldg3-control-lab' }
+          - { label: '2・3号館 2F 設計工学実験室1', value: 'bldg3-design-lab-1' }
+          - { label: '2・3号館 2F 設計工学実験室2', value: 'bldg3-design-lab-2' }
+          - { label: '2・3号館 2F 電子計測実験室', value: 'bldg2-e-measure-lab' }
+          - { label: '2・3号館 3F 2-308 教室（4E）', value: '2-308' }
+          - { label: '2・3号館 3F 2-309 教室（5E）', value: '2-309' }
+          - { label: '2・3号館 3F 3-309 製図室', value: '3-309' }
+          - { label: '2・3号館 3F 情報工学実験室', value: 'bldg3-info-eng-lab' }
+          - { label: '2・3号館 3F 制御工学基礎実験室', value: 'bldg3-control-basic-lab' }
+          - { label: '2・3号館 3F 電子回路実験室', value: 'bldg3-e-circuit-lab' }
+          - { label: '2・3号館 3F 電子工学基礎実験室', value: 'bldg3-e-basic-lab' }
+          - { label: '2・3号館 3F 電子工学実験室', value: 'bldg3-e-eng-lab' }
+          - { label: '4号館 1F 4-107 学生実験室1', value: '4-107' }
+          - { label: '4号館 2F 4-210 学生実験室2', value: '4-210' }
+          - { label: '4号館 2F 会議室', value: 'bldg4-meeting-room' }
+          - { label: '4号館 3F 4-310 学生実験室3', value: '4-310' }
+          - { label: '4号館 4F 4-411 学生実験室4', value: '4-411' }
+          - { label: '5号館 1F 5-103 教室（5C）', value: '5-103' }
+          - { label: '5号館 1F 5-104 大教室', value: '5-104' }
+          - { label: '5号館 2F 5-201 教室', value: '5-201' }
+          - { label: '5号館 2F 5-202 教室（4C）', value: '5-202' }
+          - { label: '7号館 1F 7-113 情報工学演習室', value: '7-113' }
+          - { label: '7号館 1F プログラミング室', value: 'bldg7-programming' }
+          - { label: '7号館 1F 光物性実験室', value: 'bldg7-optics-lab' }
+          - { label: '7号館 1F 電子物性実験室', value: 'bldg7-e-property-lab' }
+          - { label: '7号館 1F 半導体材料実験室', value: 'bldg7-semiconductor-lab' }
+          - { label: '7号館 2F 7-201 教室（3I）', value: '7-201' }
+          - { label: '7号館 2F 会議室・ゼミ室', value: 'bldg7-seminar' }
+          - { label: '7号館 2F 電子工学実験室・共通スペース', value: 'bldg7-e-lab' }
+          - { label: '7号館 2F 電子工学精密実験室', value: 'bldg7-precision-lab' }
+          - { label: '7号館 2F 電子情報基礎実験室', value: 'bldg7-basic-lab' }
+          - { label: '7号館 3F 7-301 教室（5I）', value: '7-301' }
+          - { label: '7号館 3F 7-302 教室（4I）', value: '7-302' }
+          - { label: '7号館 3F 情報伝送実験室', value: 'bldg7-transmission-lab' }
+          - { label: '7号館 3F 電子情報応用実験室・共通スペース', value: 'bldg7-applied-lab' }
+          - { label: '7号館 3F 電子情報製作実験室', value: 'bldg7-e-fab-lab' }
+          - { label: '7号館 3F 論理設計演習室', value: 'bldg7-logic-lab' }
+          - { label: '8号館 1F 8-101 3年機械・制御系1組教室', value: '8-101' }
+          - { label: '8号館 1F 8-102 3年機械・制御系2組教室', value: '8-102' }
+          - { label: '8号館 1F 8-103 3年電気・電子系教室', value: '8-103' }
+          - { label: '8号館 1F 8-104 3年化学・生物・環境系教室', value: '8-104' }
+          - { label: '8号館 1F 8号館ロビー（ラウンジ）', value: 'bldg8-lounge' }
+          - { label: '8号館 2F 8-201 2年1組教室', value: '8-201' }
+          - { label: '8号館 2F 8-202 2年2組教室', value: '8-202' }
+          - { label: '8号館 2F 8-203 2年3組教室', value: '8-203' }
+          - { label: '8号館 2F 8-204 2年4組教室', value: '8-204' }
+          - { label: '8号館 2F 8-205 2年5組教室', value: '8-205' }
+          - { label: '8号館 2F 8-206 ゼミ室', value: '8-206' }
+          - { label: '8号館 3F 8-301 1年1組教室', value: '8-301' }
+          - { label: '8号館 3F 8-302 1年2組教室', value: '8-302' }
+          - { label: '8号館 3F 8-303 1年3組教室', value: '8-303' }
+          - { label: '8号館 3F 8-304 1年4組教室', value: '8-304' }
+          - { label: '8号館 3F 8-305 1年5組教室', value: '8-305' }
+          - { label: '10号館 1F 10-103 講義室', value: '10-103' }
+          - { label: '10号館 1F 10-104 講義室', value: '10-104' }
+          - { label: '10号館 1F 10-105 ゼミ室', value: '10-105' }
+          - { label: '10号館 1F 10-106 ゼミ室', value: '10-106' }
+          - { label: '10号館 1F みんなの工作', value: 'bldg10-maker' }
+          - { label: '10号館 1F ロビー', value: 'bldg10-lobby' }
+          - { label: '10号館 2F 機械システム実験室', value: 'bldg10-m-system-lab' }
+          - { label: '10号館 2F 機能性素材実験室', value: 'bldg10-material-lab' }
+          - { label: '10号館 2F 電子システム実験室', value: 'bldg10-e-system-lab' }
+          - { label: '10号館 3F ミーティング室', value: 'bldg10-meeting' }
+          - { label: '10号館 3F メディアデザインラボ1', value: 'bldg10-media-lab-1' }
+          - { label: '10号館 3F メディアデザインラボ2', value: 'bldg10-media-lab-2' }
+          - { label: '10号館 3F メディアデザインラボ3', value: 'bldg10-media-lab-3' }
+          - { label: '10号館 3F 情報処理室', value: 'bldg10-info-lab' }
+          - { label: '図書館棟 1F JX金属つながる〜む', value: 'library-seminar-space' }
+          - { label: '図書館棟 1F 視聴覚教室', value: 'av-room' }
+          - { label: '図書館棟 2F 課外活動室1（ベンチャーラボ）', value: 'venture-lab' }
+          - { label: '図書館棟 2F 図書館（閲覧室）', value: 'library' }
+          - { label: '茨友会館 1F ホール・カフェスペース', value: 'ibayu-hall' }
+          - { label: '茨友会館 1F 新日本電工あつまる食堂', value: 'ibayu-dining' }
+          - { label: '第一体育館 1F 競技場（ステージ）', value: 'gym1-stage' }
+          - { label: '第一体育館 2F トレーニング場', value: 'gym1-training' }
+          - { label: '武道館 1F 剣道・柔道競技室', value: 'budokan-hall' }
+          - { label: '共用部室', value: 'club-house' }
+          - { label: '第二体育館', value: 'gym2' }
+          - { label: '屋外 中庭（1号館・第一体育館の間）', value: 'courtyard' }
+          # <<< GENERATED: map-rooms-rainy
       - { label: 実施時間, name: schedule, widget: string, hint: '例: 両日 10:00〜16:00' }
       - { label: FesFlow 導入予定, name: fesflowPlanned, widget: boolean, default: false }
       - label: サムネイル画像
