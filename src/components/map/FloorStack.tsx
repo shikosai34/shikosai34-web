@@ -2,7 +2,7 @@ import type { PlanFloor } from '../../lib/map';
 
 /*
  * 建物を斜め上から見た階の積み重ね。今いる階と、その上下に階があることを示す。
- * 各階の部屋の形をそのまま薄い板にして重ね、今いる階だけシアンで光らせる。
+ * 各階の部屋の形をそのまま薄い板にして重ね、今いる階だけ明るく塗る（光らせはしない）。
  */
 
 interface Props {
@@ -49,14 +49,14 @@ export default function FloorStack({ floors, current, counts, onSelect, classNam
 				return (
 					<g key={f.floor} onClick={() => onSelect(f.floor)} className="cursor-pointer" opacity={f.floor > current ? 0.45 : 1}>
 						{f.rooms.map((r) => (
-							<polygon key={`t-${r.id}`} points={pts(THICK, r.points)} fill={isCurrent ? '#00a88a' : '#16475c'} />
+							<polygon key={`t-${r.id}`} points={pts(THICK, r.points)} fill={isCurrent ? '#2a6770' : '#16475c'} />
 						))}
 						{f.rooms.map((r) => (
 							<polygon
 								key={r.id}
 								points={pts(0, r.points)}
-								fill={isCurrent ? '#00ffcc' : '#1f5a70'}
-								stroke={isCurrent ? '#00ffcc' : '#1f5a70'}
+								fill={isCurrent ? '#4b9aa0' : '#1f5a70'}
+								stroke={isCurrent ? '#4b9aa0' : '#1f5a70'}
 								strokeWidth={1.5}
 							/>
 						))}
@@ -68,8 +68,8 @@ export default function FloorStack({ floors, current, counts, onSelect, classNam
 				const isCurrent = f.floor === current;
 				return (
 					<g key={`l-${f.floor}`} onClick={() => onSelect(f.floor)} className="cursor-pointer">
-						<line x1={W - 6} x2={W + 8} y1={y} y2={y} stroke={isCurrent ? '#00ffcc' : '#4d7a8a'} strokeWidth={1.5} />
-						<text x={W + 12} y={y + 6} fontSize={isCurrent ? 19 : 15} fill={isCurrent ? '#00ffcc' : '#8fb0bb'}>
+						<line x1={W - 6} x2={W + 8} y1={y} y2={y} stroke={isCurrent ? '#e8e8e8' : '#4d7a8a'} strokeWidth={1.5} />
+						<text x={W + 12} y={y + 6} fontSize={isCurrent ? 19 : 15} fill={isCurrent ? '#e8e8e8' : '#8fb0bb'}>
 							{f.floor}F
 						</text>
 						{counts[f.floor] > 0 && (

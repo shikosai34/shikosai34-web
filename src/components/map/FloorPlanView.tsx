@@ -106,7 +106,7 @@ export default function FloorPlanView({ plan, exhibits, weather, onWeatherChange
 					</button>
 					<h3 className="flex min-w-0 items-baseline gap-2 whitespace-nowrap text-text">
 						<span className="truncate text-xl">{plan.building}</span>
-						<span className="shrink-0 text-3xl leading-none text-accent drop-shadow-[0_0_6px_color-mix(in_srgb,var(--color-accent)_70%,transparent)]">
+						<span className="shrink-0 text-2xl leading-none text-text">
 							{floor}F
 						</span>
 					</h3>
