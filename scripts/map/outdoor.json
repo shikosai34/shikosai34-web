@@ -1,14 +1,19 @@
 {
-	"_comment": "図面を持たない場所。at は [経度, 緯度]。3D の地図上にピンを立てる。building が buildings の name と一致する場合はその建物に紐づく。",
+	"_comment": "図面を持たない屋外の会場。at は [経度, 緯度]。3D の地図上に和傘のピンを立て、tents が true なら出展の数だけ屋台のテントを並べる。",
 	"places": [
 		{
-			"key": "outdoor-tents",
+			"key": "ground",
 			"building": "屋外",
-			"name": "屋外テント",
-			"at": [
-				140.55115,
-				36.4001
-			]
+			"name": "グラウンド",
+			"at": [140.55299, 36.40045],
+			"tents": true
+		},
+		{
+			"key": "ground-baseball-side",
+			"building": "屋外",
+			"name": "グラウンド（野球場側）",
+			"at": [140.55272, 36.40098],
+			"tents": true
 		}
 	]
 }

@@ -18,6 +18,8 @@ export interface MapRoom {
 	plan: string | null;
 	/** 図面を持たない場所の位置 [経度, 緯度]（3D の地図にピンを立てる） */
 	at?: [number, number];
+	/** 屋台のテントが並ぶ屋外の会場（3D の地図で出展の数だけテントを描く） */
+	tents?: boolean;
 }
 
 export const MAP_ROOMS = rooms as MapRoom[];

@@ -202,7 +202,7 @@ collections:
           - { label: '8号館 1F 8-102 3年機械・制御系2組教室', value: '8-102' }
           - { label: '8号館 1F 8-103 3年電気・電子系教室', value: '8-103' }
           - { label: '8号館 1F 8-104 3年化学・生物・環境系教室', value: '8-104' }
-          - { label: '8号館 1F 8号館ラウンジ', value: 'bldg8-lounge' }
+          - { label: '8号館 1F 8号館ロビー（ラウンジ）', value: 'bldg8-lounge' }
           - { label: '8号館 2F 8-201 2年1組教室', value: '8-201' }
           - { label: '8号館 2F 8-202 2年2組教室', value: '8-202' }
           - { label: '8号館 2F 8-203 2年3組教室', value: '8-203' }
@@ -237,7 +237,8 @@ collections:
           - { label: '第一体育館 1F 競技場（ステージ）', value: 'gym1-stage' }
           - { label: '第一体育館 2F トレーニング場', value: 'gym1-training' }
           - { label: '武道館 1F 剣道・柔道競技室', value: 'budokan-hall' }
-          - { label: '屋外 屋外テント', value: 'outdoor-tents' }
+          - { label: '屋外 グラウンド', value: 'ground' }
+          - { label: '屋外 グラウンド（野球場側）', value: 'ground-baseball-side' }
           # <<< GENERATED: map-rooms
       - { label: 実施時間, name: schedule, widget: string, hint: '例: 両日 10:00〜16:00' }
       - { label: FesFlow 導入予定, name: fesflowPlanned, widget: boolean, default: false }

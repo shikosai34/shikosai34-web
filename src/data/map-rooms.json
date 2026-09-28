@@ -540,7 +540,7 @@
 		"building": "8号館",
 		"floor": 1,
 		"number": null,
-		"name": "8号館ラウンジ",
+		"name": "8号館ロビー（ラウンジ）",
 		"plan": "bldg8"
 	},
 	{
@@ -816,15 +816,29 @@
 		"plan": "budokan"
 	},
 	{
-		"key": "outdoor-tents",
+		"key": "ground",
 		"building": "屋外",
 		"floor": null,
 		"number": null,
-		"name": "屋外テント",
+		"name": "グラウンド",
 		"plan": null,
 		"at": [
-			140.55115,
-			36.4001
-		]
+			140.55299,
+			36.40045
+		],
+		"tents": true
+	},
+	{
+		"key": "ground-baseball-side",
+		"building": "屋外",
+		"floor": null,
+		"number": null,
+		"name": "グラウンド（野球場側）",
+		"plan": null,
+		"at": [
+			140.55272,
+			36.40098
+		],
+		"tents": true
 	}
 ]

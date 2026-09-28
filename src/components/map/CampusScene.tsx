@@ -383,6 +383,61 @@ function WagasaPin({ position, active, animate, onPick }: { position: [number, n
 	);
 }
 
+/**
+ * 屋外の会場に並ぶ屋台のテント。出展の数だけ、ピンの手前（南）に碁盤目に並べる。
+ * 実際の配置は決まっていないので、あくまで「ここにテントが集まっている」ことを示す絵として描く。
+ */
+function Tents({ position, count, active, onPick }: { position: [number, number]; count: number; active: boolean; onPick: () => void }) {
+	const COLS = 8;
+	const SPACING = 6;
+	const canopy = useRef<THREE.InstancedMesh>(null);
+	const valance = useRef<THREE.InstancedMesh>(null);
+
+	useEffect(() => {
+		const m = new THREE.Matrix4();
+		const q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 4);
+		const colors = [new THREE.Color(COLOR.main).multiplyScalar(1.6), new THREE.Color(COLOR.pink).multiplyScalar(1.4), new THREE.Color(COLOR.accent)];
+		for (let i = 0; i < count; i++) {
+			const row = Math.floor(i / COLS);
+			const inRow = Math.min(COLS, count - row * COLS);
+			const col = i % COLS;
+			const x = position[0] + (col - (inRow - 1) / 2) * SPACING;
+			// ピン（和傘）と重ならないよう、ピンの 10m 手前から並べる
+			const z = -position[1] + 10 + row * SPACING;
+			m.compose(new THREE.Vector3(x, 3.2, z), q, new THREE.Vector3(1, 1, 1));
+			canopy.current?.setMatrixAt(i, m);
+			m.compose(new THREE.Vector3(x, 1.9, z), new THREE.Quaternion(), new THREE.Vector3(1, 1, 1));
+			valance.current?.setMatrixAt(i, m);
+			valance.current?.setColorAt(i, colors[i % colors.length]);
+		}
+		for (const mesh of [canopy.current, valance.current]) {
+			if (!mesh) continue;
+			mesh.instanceMatrix.needsUpdate = true;
+			if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+		}
+	}, [count, position]);
+
+	if (count === 0) return null;
+	const pick = (e: ThreeEvent<MouseEvent>) => {
+		e.stopPropagation();
+		onPick();
+	};
+	return (
+		<group>
+			{/* 屋根（四角錐） */}
+			<instancedMesh ref={canopy} args={[undefined, undefined, count]} onClick={pick}>
+				<coneGeometry args={[3, 1.8, 4, 1]} />
+				<meshStandardMaterial color="#d9e6ea" emissive={active ? COLOR.main : '#6fb8c4'} emissiveIntensity={active ? 0.9 : 0.35} roughness={0.8} />
+			</instancedMesh>
+			{/* 屋根の縁の幕。屋台ごとに色を変えて灯す */}
+			<instancedMesh ref={valance} args={[undefined, undefined, count]} onClick={pick}>
+				<boxGeometry args={[4.2, 0.6, 4.2]} />
+				<meshBasicMaterial toneMapped={false} />
+			</instancedMesh>
+		</group>
+	);
+}
+
 // ---------------------------------------------------------------------------
 // カメラ
 // ---------------------------------------------------------------------------
@@ -509,7 +564,12 @@ export default function CampusScene({ campus, counts, places, selected, camera, 
 			{places
 				.filter((p) => p.at && !buildings.some((b) => b.name === p.building))
 				.map((p) => (
-					<WagasaPin key={p.key} position={project(p.at!)} active={selected === p.key} animate={animate} onPick={() => onPickPlace(p.key)} />
+					<group key={p.key}>
+						<WagasaPin position={project(p.at!)} active={selected === p.key} animate={animate} onPick={() => onPickPlace(p.key)} />
+						{p.tents && (
+							<Tents position={project(p.at!)} count={counts[p.key] ?? 0} active={selected === p.key} onPick={() => onPickPlace(p.key)} />
+						)}
+					</group>
 				))}
 
 			{/* 建物名 */}
