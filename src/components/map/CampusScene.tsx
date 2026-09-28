@@ -1,4 +1,4 @@
-import { CameraControls, Edges, Html, Line, Stars } from '@react-three/drei';
+import { CameraControls, CameraControlsImpl, Edges, Html, Line, Stars } from '@react-three/drei';
 import { Canvas, useFrame, useThree, type ThreeEvent } from '@react-three/fiber';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -42,8 +42,16 @@ const COLOR = {
 	pink: '#ff6ea8',
 };
 
-/** 既定の視点（全体を斜めに見下ろす） */
-const HOME = { position: [40, 190, 250] as const, target: [10, 0, 10] as const };
+/** 全体を見るときの、焦点から見たカメラの位置（斜め南から見下ろす）。焦点は敷地の中心 */
+const HOME_OFFSET = [0, 250, 290] as const;
+
+/** 敷地の範囲（平面の [東, 北]、m）。カメラの焦点はこの中に収める */
+export interface MapBounds {
+	minX: number;
+	maxX: number;
+	minY: number;
+	maxY: number;
+}
 
 /** 経緯度の輪 → 平面の輪（three の Shape 用に [東, 北]） */
 const toPlane = (ring: Ring) => ring.map((c) => project(c));
@@ -126,7 +134,13 @@ const GROUND_STYLE: Record<string, { fill: string; y: number; outline?: string }
 	track: { fill: '#3a1530', y: 0.06, outline: COLOR.pink },
 };
 
-function Ground({ features }: { features: CampusFeature[] }) {
+function Ground({ features, animate }: { features: CampusFeature[]; animate: boolean }) {
+	// ダブルクリック（ダブルタップ）した地点へ焦点を移す
+	const controls = useThree((s) => s.controls) as CameraControlsImpl | null;
+	const focusAt = (e: ThreeEvent<MouseEvent>) => {
+		e.stopPropagation();
+		controls?.moveTo(e.point.x, 0, e.point.z, animate);
+	};
 	const kikko = useMemo(() => {
 		const tex = makeKikkoTexture();
 		// 1 タイル = 12m × 6.9m
@@ -159,7 +173,7 @@ function Ground({ features }: { features: CampusFeature[] }) {
 
 	return (
 		<group>
-			<mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.05, 0]}>
+			<mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.05, 0]} onDoubleClick={focusAt}>
 				<planeGeometry args={[2000, 2000]} />
 				<meshBasicMaterial map={kikko} />
 			</mesh>
@@ -499,32 +513,75 @@ function Tents({ slots, active, onPick }: { slots: TentSlot[]; active: boolean; 
 // ---------------------------------------------------------------------------
 
 export interface CameraRequest {
-	/** 見る先（平面の [東, 北]）。null なら既定の視点に戻る */
+	/** 見る先（平面の [東, 北]）。null なら全体を見る視点に戻る */
 	center: [number, number] | null;
 	/** 真上から見下ろす（フロア画面へ切り替える前） */
 	topDown?: boolean;
+	/** 拡大・縮小のボタン。指定したときは center を見ず、今の焦点のまま寄る・引く */
+	zoom?: 'in' | 'out';
 	/** 動き終わったら呼ぶ */
 	onDone?: () => void;
 }
 
-function CameraRig({ request, animate }: { request: CameraRequest; animate: boolean }) {
+const { ACTION } = CameraControlsImpl;
+
+/**
+ * カメラの操作。地図アプリと同じく「焦点を動かす」を主にする。
+ * - マウス: 左ドラッグで地面の上を移動、右ドラッグ（Shift / Ctrl + 左ドラッグ）で回転・傾き、ホイールでカーソルの位置へ拡大
+ * - タッチ: 1 本指で移動、2 本指でピンチ拡大と回転
+ * 焦点は敷地の範囲（bounds）の中に収め、どこまでも流れていかないようにする。
+ */
+function CameraRig({ request, animate, bounds }: { request: CameraRequest; animate: boolean; bounds: MapBounds }) {
 	const ref = useRef<CameraControls>(null);
 	// 縦長の画面では横の視野が狭くなるので、全体を見る視点を引いて敷地が収まるようにする
 	const aspect = useThree((s) => s.size.width / s.size.height);
 	const pullBack = aspect < 1.2 ? Math.min(2.4, 1.2 / aspect) : 1;
+
+	// ボタン割り当て。オブジェクトを使い回し、修飾キーで左ボタンの役割だけ書き換える
+	const mouseButtons = useMemo<CameraControlsImpl['mouseButtons']>(
+		() => ({ left: ACTION.TRUCK, middle: ACTION.DOLLY, right: ACTION.ROTATE, wheel: ACTION.DOLLY }),
+		[],
+	);
+	const touches = useMemo<CameraControlsImpl['touches']>(
+		() => ({ one: ACTION.TOUCH_TRUCK, two: ACTION.TOUCH_DOLLY_ROTATE, three: ACTION.TOUCH_DOLLY_TRUCK }),
+		[],
+	);
+
+	// Shift / Ctrl / ⌘ を押している間は、左ドラッグで回転する（右ボタンのないトラックパッド向け）
+	useEffect(() => {
+		const onKey = (e: KeyboardEvent) => {
+			mouseButtons.left = e.shiftKey || e.ctrlKey || e.metaKey ? ACTION.ROTATE : ACTION.TRUCK;
+		};
+		window.addEventListener('keydown', onKey);
+		window.addEventListener('keyup', onKey);
+		return () => {
+			window.removeEventListener('keydown', onKey);
+			window.removeEventListener('keyup', onKey);
+		};
+	}, [mouseButtons]);
+
+	// 焦点を敷地の範囲に収める（平面の北は three の -z）
+	useEffect(() => {
+		ref.current?.setBoundary(new THREE.Box3(new THREE.Vector3(bounds.minX, 0, -bounds.maxY), new THREE.Vector3(bounds.maxX, 0, -bounds.minY)));
+	}, [bounds]);
+
 	useEffect(() => {
 		const controls = ref.current;
 		if (!controls) return;
-		const { center, topDown, onDone } = request;
-		const move = center
-			? topDown
+		const { center, topDown, zoom, onDone } = request;
+		let move: Promise<void>;
+		if (zoom) {
+			move = controls.dolly(zoom === 'in' ? controls.distance * 0.4 : -controls.distance * 0.6, animate);
+		} else if (center) {
+			move = topDown
 				? controls.setLookAt(center[0], 150, -center[1] + 0.1, center[0], 0, -center[1], animate)
-				: controls.setLookAt(center[0] + 55, 70, -center[1] + 75, center[0], 5, -center[1], animate)
-			: controls.setLookAt(
-					...(HOME.position.map((v, i) => HOME.target[i] + (v - HOME.target[i]) * pullBack) as [number, number, number]),
-					...HOME.target,
-					animate,
-				);
+				: controls.setLookAt(center[0] + 55, 70, -center[1] + 75, center[0], 5, -center[1], animate);
+		} else {
+			// 全体: 敷地の中心を焦点に、斜め南から見下ろす
+			const cx = (bounds.minX + bounds.maxX) / 2;
+			const cz = -(bounds.minY + bounds.maxY) / 2;
+			move = controls.setLookAt(cx + HOME_OFFSET[0] * pullBack, HOME_OFFSET[1] * pullBack, cz + HOME_OFFSET[2] * pullBack, cx, 0, cz, animate);
+		}
 		let cancelled = false;
 		move.then(() => !cancelled && onDone?.());
 		return () => {
@@ -536,6 +593,10 @@ function CameraRig({ request, animate }: { request: CameraRequest; animate: bool
 		<CameraControls
 			ref={ref}
 			makeDefault
+			mouseButtons={mouseButtons}
+			touches={touches}
+			verticalDragToForward
+			boundaryEnclosesCamera={false}
 			minDistance={25}
 			maxDistance={900}
 			maxPolarAngle={Math.PI * 0.42}
@@ -579,6 +640,19 @@ export default function CampusScene({ campus, counts, places, selected, camera, 
 		};
 	}, [hovered]);
 
+	/** 敷地（OSM の学校の範囲）の外接矩形に少し余白を足したもの。カメラの焦点をこの中に収める */
+	const bounds = useMemo((): MapBounds => {
+		const f = campus.features.find((f) => f.properties.kind === 'campus' && f.geometry.type === 'Polygon');
+		const pts = f ? toPlane((f.geometry as { coordinates: Ring[] }).coordinates[0]) : [[-200, -200] as [number, number], [200, 200] as [number, number]];
+		const margin = 40;
+		return {
+			minX: Math.min(...pts.map((p) => p[0])) - margin,
+			maxX: Math.max(...pts.map((p) => p[0])) + margin,
+			minY: Math.min(...pts.map((p) => p[1])) - margin,
+			maxY: Math.max(...pts.map((p) => p[1])) + margin,
+		};
+	}, [campus]);
+
 	/** テントを縁に沿って並べられる区画（トラック・広場）の輪 */
 	const areaRings = useMemo(
 		() =>
@@ -606,7 +680,7 @@ export default function CampusScene({ campus, counts, places, selected, camera, 
 		<Canvas
 			dpr={lowPower ? [1, 1.5] : [1, 2]}
 			frameloop={paused ? 'never' : 'always'}
-			camera={{ position: [...HOME.position], fov: 40, near: 1, far: 3000 }}
+			camera={{ position: [HOME_OFFSET[0], HOME_OFFSET[1], HOME_OFFSET[2]], fov: 40, near: 1, far: 3000 }}
 			gl={{ antialias: !lowPower }}
 			onPointerMissed={onBackgroundClick}
 			aria-hidden="true"
@@ -619,7 +693,7 @@ export default function CampusScene({ campus, counts, places, selected, camera, 
 			{/* 月明かり */}
 			<directionalLight position={[-120, 220, 80]} intensity={1.1} color="#b9d4ff" />
 
-			<Ground features={campus.features} />
+			<Ground features={campus.features} animate={animate} />
 
 			{buildings.map((b) => (
 				<Building
@@ -682,7 +756,7 @@ export default function CampusScene({ campus, counts, places, selected, camera, 
 					);
 				})}
 
-			<CameraRig request={camera} animate={animate} />
+			<CameraRig request={camera} animate={animate} bounds={bounds} />
 
 			{!lowPower && (
 				<EffectComposer>

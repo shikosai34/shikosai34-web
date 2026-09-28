@@ -270,9 +270,30 @@ export default function VenueMap({ exhibits: exhibitsByWeather, defaultWeather }
 						<span className="ml-2 align-middle text-xs tracking-[0.2em] text-accent">会場マップ</span>
 					</p>
 					{webgl && (
-						<p className="mt-1 truncate text-xs text-text/70">建物を押すと中が見られます</p>
+						<>
+							<p className="mt-1 truncate text-xs text-text/70">建物を押すと中が見られます</p>
+							<p className="truncate text-xs text-text/50">
+								<span className="md:hidden">指でなぞって移動・2本指で回転</span>
+								<span className="hidden md:inline">ドラッグで移動・右ドラッグで回転・ダブルクリックでそこへ寄る</span>
+							</p>
+						</>
 					)}
 					<WeatherToggle weather={weather} onChange={setWeather} className="pointer-events-auto mt-2" />
+				</div>
+			)}
+
+			{/* 3D の視点の操作。ドラッグ・ピンチが難しいときや、見失ったときに全体へ戻れるように */}
+			{webgl && campus && !planOpen && (
+				<div className="absolute top-1/2 right-3 z-10 flex -translate-y-1/2 flex-col gap-1" role="group" aria-label="地図の視点">
+					<CameraButton label="拡大" onClick={() => setCamera({ center: null, zoom: 'in' })}>
+						＋
+					</CameraButton>
+					<CameraButton label="縮小" onClick={() => setCamera({ center: null, zoom: 'out' })}>
+						－
+					</CameraButton>
+					<CameraButton label="全体を表示" onClick={() => setCamera({ center: null })}>
+						⤢
+					</CameraButton>
 				</div>
 			)}
 
@@ -311,5 +332,19 @@ function Loading() {
 		<p className="absolute inset-0 flex items-center justify-center text-sm tracking-widest text-accent/80" role="status">
 			地図を読み込んでいます…
 		</p>
+	);
+}
+
+function CameraButton({ label, onClick, children }: { label: string; onClick: () => void; children: string }) {
+	return (
+		<button
+			type="button"
+			aria-label={label}
+			title={label}
+			onClick={onClick}
+			className="h-9 w-9 rounded-md border border-accent/50 bg-base/85 text-lg leading-none text-accent backdrop-blur-sm hover:border-main hover:text-main"
+		>
+			{children}
+		</button>
 	);
 }
