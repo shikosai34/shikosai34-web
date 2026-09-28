@@ -383,54 +383,99 @@ function WagasaPin({ position, active, animate, onPick }: { position: [number, n
 	);
 }
 
+/** テントの置き場所（平面の [東, 北] と、屋根の向き（ラジアン）） */
+interface TentSlot {
+	x: number;
+	y: number;
+	angle: number;
+}
+
 /**
- * 屋外の会場に並ぶ屋台のテント。出展の数だけ、ピンの手前（南）に碁盤目に並べる。
- * 実際の配置は決まっていないので、あくまで「ここにテントが集まっている」ことを示す絵として描く。
+ * 陸上競技場のトラックの外周に沿って、count 張りのテントを等間隔に並べる。
+ * 外周の輪（経緯度）を中心へ inset m 寄せた線の上に置き、屋根の縁を外周の向きに揃える。
  */
-function Tents({ position, count, active, onPick }: { position: [number, number]; count: number; active: boolean; onPick: () => void }) {
-	const COLS = 8;
-	const SPACING = 6;
+function trackSlots(ring: Ring, count: number, inset = 6): TentSlot[] {
+	const pts = toPlane(ring).slice(0, -1);
+	const [cx, cy] = centroid([...pts, pts[0]]);
+	const inner = pts.map(([x, y]) => {
+		const d = Math.hypot(x - cx, y - cy);
+		const k = Math.max(0, 1 - inset / d);
+		return [cx + (x - cx) * k, cy + (y - cy) * k] as [number, number];
+	});
+	const loop = [...inner, inner[0]];
+	const lengths = loop.slice(1).map((p, i) => Math.hypot(p[0] - loop[i][0], p[1] - loop[i][1]));
+	const total = lengths.reduce((a, b) => a + b, 0);
+	const slots: TentSlot[] = [];
+	for (let n = 0; n < count; n++) {
+		let t = ((n + 0.5) / count) * total;
+		let i = 0;
+		while (t > lengths[i]) t -= lengths[i++];
+		const [ax, ay] = loop[i];
+		const [bx, by] = loop[i + 1];
+		const f = t / lengths[i];
+		slots.push({ x: ax + (bx - ax) * f, y: ay + (by - ay) * f, angle: Math.atan2(by - ay, bx - ax) });
+	}
+	return slots;
+}
+
+/** ピンの手前（南）へ 1 列に並べる（野球場側など、区画が縦に並ぶ会場） */
+function columnSlots([x, y]: [number, number], count: number, spacing = 10): TentSlot[] {
+	return Array.from({ length: count }, (_, i) => ({ x, y: y - 10 - i * spacing, angle: 0 }));
+}
+
+/** ピンの手前（南）に碁盤目に並べる（配置が決まっていない会場） */
+function gridSlots([x, y]: [number, number], count: number, cols = 8, spacing = 6): TentSlot[] {
+	return Array.from({ length: count }, (_, i) => {
+		const row = Math.floor(i / cols);
+		const inRow = Math.min(cols, count - row * cols);
+		return { x: x + ((i % cols) - (inRow - 1) / 2) * spacing, y: y - 10 - row * spacing, angle: 0 };
+	});
+}
+
+/**
+ * 屋外の会場に並ぶ屋台のテント。出展の数だけ張る。
+ * 区画ごとの割り当ては地図には持たないので、「ここにテントが並ぶ」ことを示す絵として描く。
+ */
+function Tents({ slots, active, onPick }: { slots: TentSlot[]; active: boolean; onPick: () => void }) {
 	const canopy = useRef<THREE.InstancedMesh>(null);
 	const valance = useRef<THREE.InstancedMesh>(null);
 
 	useEffect(() => {
 		const m = new THREE.Matrix4();
-		const q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 4);
+		const up = new THREE.Vector3(0, 1, 0);
 		const colors = [new THREE.Color(COLOR.main).multiplyScalar(1.6), new THREE.Color(COLOR.pink).multiplyScalar(1.4), new THREE.Color(COLOR.accent)];
-		for (let i = 0; i < count; i++) {
-			const row = Math.floor(i / COLS);
-			const inRow = Math.min(COLS, count - row * COLS);
-			const col = i % COLS;
-			const x = position[0] + (col - (inRow - 1) / 2) * SPACING;
-			// ピン（和傘）と重ならないよう、ピンの 10m 手前から並べる
-			const z = -position[1] + 10 + row * SPACING;
-			m.compose(new THREE.Vector3(x, 3.2, z), q, new THREE.Vector3(1, 1, 1));
+		slots.forEach(({ x, y, angle }, i) => {
+			// 平面の [東, 北] → three の (x, -z)。向きも z の反転に合わせる
+			const yaw = new THREE.Quaternion().setFromAxisAngle(up, angle);
+			const roof = yaw.clone().multiply(new THREE.Quaternion().setFromAxisAngle(up, Math.PI / 4));
+			m.compose(new THREE.Vector3(x, 3.2, -y), roof, new THREE.Vector3(1, 1, 1));
 			canopy.current?.setMatrixAt(i, m);
-			m.compose(new THREE.Vector3(x, 1.9, z), new THREE.Quaternion(), new THREE.Vector3(1, 1, 1));
+			m.compose(new THREE.Vector3(x, 1.9, -y), yaw, new THREE.Vector3(1, 1, 1));
 			valance.current?.setMatrixAt(i, m);
 			valance.current?.setColorAt(i, colors[i % colors.length]);
-		}
+		});
 		for (const mesh of [canopy.current, valance.current]) {
 			if (!mesh) continue;
 			mesh.instanceMatrix.needsUpdate = true;
 			if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
 		}
-	}, [count, position]);
+	}, [slots]);
 
-	if (count === 0) return null;
+	if (slots.length === 0) return null;
 	const pick = (e: ThreeEvent<MouseEvent>) => {
 		e.stopPropagation();
 		onPick();
 	};
 	return (
-		<group>
+		// 数が変わったら作り直す（インスタンスの数は後から変えられない）
+		<group key={slots.length}>
 			{/* 屋根（四角錐） */}
-			<instancedMesh ref={canopy} args={[undefined, undefined, count]} onClick={pick}>
+			<instancedMesh ref={canopy} args={[undefined, undefined, slots.length]} onClick={pick}>
 				<coneGeometry args={[3, 1.8, 4, 1]} />
 				<meshStandardMaterial color="#d9e6ea" emissive={active ? COLOR.main : '#6fb8c4'} emissiveIntensity={active ? 0.9 : 0.35} roughness={0.8} />
 			</instancedMesh>
 			{/* 屋根の縁の幕。屋台ごとに色を変えて灯す */}
-			<instancedMesh ref={valance} args={[undefined, undefined, count]} onClick={pick}>
+			<instancedMesh ref={valance} args={[undefined, undefined, slots.length]} onClick={pick}>
 				<boxGeometry args={[4.2, 0.6, 4.2]} />
 				<meshBasicMaterial toneMapped={false} />
 			</instancedMesh>
@@ -523,6 +568,18 @@ export default function CampusScene({ campus, counts, places, selected, camera, 
 		};
 	}, [hovered]);
 
+	const trackRing = useMemo(() => {
+		const f = campus.features.find((f) => f.properties.kind === 'track' && f.geometry.type === 'Polygon');
+		return f ? (f.geometry as { coordinates: Ring[] }).coordinates[0] : null;
+	}, [campus]);
+	/** 屋外の会場のテントの置き場所（出展の数だけ） */
+	const tentSlots = (p: MapRoom): TentSlot[] => {
+		const count = counts[p.key] ?? 0;
+		if (p.tents === 'track' && trackRing) return trackSlots(trackRing, count);
+		if (p.tents === 'column') return columnSlots(project(p.at!), count);
+		return gridSlots(project(p.at!), count);
+	};
+
 	/** 押せる建物（平面図があるか、屋外の会場を含む建物） */
 	const selectable = (name: string | null) => !!name && (name in PLAN_FILES || places.some((p) => p.building === name));
 
@@ -567,7 +624,7 @@ export default function CampusScene({ campus, counts, places, selected, camera, 
 					<group key={p.key}>
 						<WagasaPin position={project(p.at!)} active={selected === p.key} animate={animate} onPick={() => onPickPlace(p.key)} />
 						{p.tents && (
-							<Tents position={project(p.at!)} count={counts[p.key] ?? 0} active={selected === p.key} onPick={() => onPickPlace(p.key)} />
+							<Tents slots={tentSlots(p)} active={selected === p.key} onPick={() => onPickPlace(p.key)} />
 						)}
 					</group>
 				))}

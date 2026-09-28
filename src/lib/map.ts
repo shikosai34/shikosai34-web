@@ -27,6 +27,8 @@ export interface PlanRoom {
 	bbox: [number, number, number, number];
 	/** 矩形でない部屋の名前を置く位置（SVG 座標）。なければ外接矩形の左上に置く */
 	labelAt?: [number, number];
+	/** 当日の使い道（予選会場・休憩所など、サークルの出展ではない場所） */
+	use?: string;
 }
 
 export interface PlanMarker {

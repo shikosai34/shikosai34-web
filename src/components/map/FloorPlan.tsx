@@ -27,6 +27,8 @@ interface Props {
 }
 
 const BASE = '#0b3041';
+/** 予選会場・休憩所など、出展ではない使い道のある部屋の色（凡例の「ステージ」と同じピンク） */
+const USE_COLOR = '#ff6ea8';
 
 /** 2 色を混ぜる（a を t の割合で b に混ぜる）。SVG の fill 属性では color-mix() が効かない環境があるため */
 function mix(a: string, b: string, t: number): string {
@@ -138,7 +140,7 @@ function Room({ room, exhibits, active, dimmed, onSelect, onHover, onPoint }: Ro
 	const color = main ? EXHIBIT_GROUPS[main.group].color : null;
 	const selectable = !!room.key;
 	// 名前・番号・出展のどれかがあれば、カーソルを当てたときに詳細を出す
-	const hasDetail = !!(room.name || room.number || exhibits.length);
+	const hasDetail = !!(room.name || room.number || room.use || exhibits.length);
 
 	const fill =
 		room.kind === 'corridor'
@@ -147,7 +149,9 @@ function Room({ room, exhibits, active, dimmed, onSelect, onHover, onPoint }: Ro
 				? mix('#e8e8e8', BASE, 0.08)
 				: color
 					? mix(color, BASE, 0.16)
-					: mix('#e8e8e8', BASE, 0.04);
+					: room.use
+						? mix(USE_COLOR, BASE, 0.14)
+						: mix('#e8e8e8', BASE, 0.04);
 
 	/*
 	 * 部屋の中の文字は、収まるものだけ出す（… で切ったり折り返したりしない）。
@@ -175,6 +179,8 @@ function Room({ room, exhibits, active, dimmed, onSelect, onHover, onPoint }: Ro
 	// 出展名が入らないときは件数だけ出し、カーソルを当てれば見られることを示す
 	const countText = `●${exhibits.length}`;
 	const showCount = !!main && !showTitle && titleRoom >= lineHeight(11) && textWidth(countText, 11) <= iw;
+	// 出展のない部屋は、当日の使い道（予選会場・休憩所など）を書く
+	const showUse = !main && !!room.use && titleRoom >= lineHeight(12) && textWidth(room.use, 12) <= iw;
 
 	const centerText = room.kind === 'stairs' ? '階段' : room.kind === 'toilet' ? room.name : null;
 	const centerSize = Math.min(10, h / 2.5);
@@ -182,7 +188,8 @@ function Room({ room, exhibits, active, dimmed, onSelect, onHover, onPoint }: Ro
 
 	// L 字の部屋の名前は、ラベルの点から部屋の外接矩形の端までに収める
 	const labelHalf = room.labelAt ? Math.min(room.labelAt[0] * S - x0, x1 - room.labelAt[0] * S) - 3 : 0;
-	const labelText = main ? main.title + more : room.name;
+	// 出展がなく使い道（休憩所など）がある部屋は、部屋名の代わりに使い道を書く
+	const labelText = main ? main.title + more : (room.use ?? room.name);
 	const showLabelAt = !!room.labelAt && room.kind === 'room' && !!labelText && textWidth(labelText, 11) <= labelHalf * 2;
 
 	const onKeyDown = (e: KeyboardEvent) => {
@@ -219,7 +226,9 @@ function Room({ room, exhibits, active, dimmed, onSelect, onHover, onPoint }: Ro
 		>
 			<polygon points={points} fill={fill} />
 			{room.kind === 'stairs' && <polygon points={points} fill="url(#plan-stairs)" />}
-			{color && !active && <polygon points={points} fill="none" stroke={color} strokeWidth={1.5} strokeOpacity={0.8} />}
+			{(color ?? (room.use ? USE_COLOR : null)) && !active && (
+				<polygon points={points} fill="none" stroke={color ?? USE_COLOR} strokeWidth={1.5} strokeOpacity={0.8} />
+			)}
 			{active && <polygon points={points} fill="none" stroke="#ff9933" strokeWidth={4} filter="url(#plan-glow)" />}
 
 			{showLabelAt && (
@@ -230,13 +239,16 @@ function Room({ room, exhibits, active, dimmed, onSelect, onHover, onPoint }: Ro
 					height={20}
 					style={{ pointerEvents: 'none' }}
 				>
-					<div className="flex h-full w-full items-center justify-center whitespace-nowrap font-medium text-text" style={{ fontSize: 11 }}>
+					<div
+						className="flex h-full w-full items-center justify-center whitespace-nowrap font-medium text-text"
+						style={{ fontSize: 11, color: !main && room.use ? USE_COLOR : undefined }}
+					>
 						{labelText}
 					</div>
 				</foreignObject>
 			)}
 
-			{!room.labelAt && (firstLine || showTitle || showCount || showCenter) && (
+			{!room.labelAt && (firstLine || showTitle || showCount || showUse || showCenter) && (
 				<foreignObject x={x0 + 3} y={y0 + 3} width={Math.max(w - 6, 1)} height={Math.max(h - 6, 1)} style={{ pointerEvents: 'none' }}>
 					<div className="flex h-full w-full flex-col overflow-hidden whitespace-nowrap text-text" style={{ fontSize: 11, lineHeight: 1.3 }}>
 						{room.kind === 'room' ? (
@@ -253,6 +265,11 @@ function Room({ room, exhibits, active, dimmed, onSelect, onHover, onPoint }: Ro
 												{room.name}
 											</span>
 										)}
+									</div>
+								)}
+								{showUse && (
+									<div className="m-auto font-medium" style={{ fontSize: 12, color: USE_COLOR }}>
+										{room.use}
 									</div>
 								)}
 								{(showTitle || showCount || showImage) && (

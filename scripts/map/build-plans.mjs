@@ -316,8 +316,10 @@ for (const [file, info] of Object.entries(CONFIG)) {
 				bbox: room.bbox.map(round),
 				// 矩形でない部屋（L 字の廊下・ロビーなど）は外接矩形の隅に名前を置くと隣の部屋に重なるので、ラベルの点に置く
 				...(label && room.ring.length > 5 && { labelAt: label.at }),
+				// 当日の使い道（予選会場・休憩所など、サークルの出展ではない場所）
+				...(label?.use && { use: label.use }),
 			});
-			if (key) roomIndex.push({ key, building: info.building, floor: f.floor, number: label.number ?? null, name: label.name, plan: file });
+			if (key) roomIndex.push({ key, building: info.building, floor: f.floor, number: label.number ?? null, name: label.name, plan: file, ...(label.use && { use: label.use }) });
 		});
 		delete f.rawRooms;
 	}
@@ -368,7 +370,7 @@ for (const [file, info] of Object.entries(CONFIG)) {
 // 屋外の場所（図面を持たず、3D 上のピンで示す）
 if (fs.existsSync(OUTDOOR_FILE)) {
 	for (const o of JSON.parse(fs.readFileSync(OUTDOOR_FILE, 'utf-8')).places ?? []) {
-		roomIndex.push({ key: o.key, building: o.building ?? '屋外', floor: null, number: null, name: o.name, plan: null, at: o.at, ...(o.tents && { tents: true }) });
+		roomIndex.push({ key: o.key, building: o.building ?? '屋外', floor: null, number: null, name: o.name, plan: null, at: o.at, ...(o.tents && { tents: o.tents }) });
 	}
 }
 

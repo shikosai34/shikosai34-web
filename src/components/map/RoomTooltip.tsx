@@ -38,6 +38,7 @@ export default function RoomTooltip({ room, exhibits, x, y, width, height }: Pro
 				{room.number && <span className="rounded-sm bg-accent/85 px-1 font-medium text-base">{room.number}</span>}
 				{room.name && <span className="text-sm font-medium">{room.name}</span>}
 			</div>
+			{room.use && <div className="mt-1 font-medium text-glow-pink">{room.use}</div>}
 			{shown.map((item) => (
 				<div key={item.id} className="mt-1 flex items-center gap-1.5">
 					<span className="inline-block h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: EXHIBIT_GROUPS[item.group].color }} aria-hidden="true" />

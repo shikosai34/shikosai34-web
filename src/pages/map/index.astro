@@ -51,8 +51,8 @@ for (const event of await getVisibleEvents()) {
 	});
 }
 
-// テキストの配置一覧（建物 → 部屋）。出展のある部屋だけ載せる
-const listing = MAP_ROOMS.filter((room) => exhibits[room.key]?.length).reduce<
+// テキストの配置一覧（建物 → 部屋）。出展のある部屋と、予選会場・休憩所などの使い道がある部屋を載せる
+const listing = MAP_ROOMS.filter((room) => exhibits[room.key]?.length || room.use).reduce<
 	{ building: string; rooms: typeof MAP_ROOMS }[]
 >((groups, room) => {
 	const group = groups.find((g) => g.building === room.building);
@@ -105,10 +105,11 @@ const unplaced = circles.filter((c) => !c.data.mapRoom);
 													{formatMapRoom(room)}
 												</a>
 												{room.number && <span class="ml-2 text-text/60">{room.name}</span>}
+												{room.use && <span class="ml-2 text-glow-pink">{room.use}</span>}
 											</dt>
 											<dd>
 												<ul class="mt-1 flex flex-col gap-0.5 pl-3">
-													{exhibits[room.key].map((item) => (
+													{(exhibits[room.key] ?? []).map((item) => (
 														<li class="text-sm text-text">
 															<a href={item.href} class="underline hover:no-underline">
 																{item.title}

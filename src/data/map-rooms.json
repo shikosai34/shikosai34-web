@@ -349,7 +349,8 @@
 		"floor": 1,
 		"number": "5-103",
 		"name": "教室（5C）",
-		"plan": "bldg5"
+		"plan": "bldg5",
+		"use": "予選会場"
 	},
 	{
 		"key": "5-104",
@@ -357,7 +358,8 @@
 		"floor": 1,
 		"number": "5-104",
 		"name": "大教室",
-		"plan": "bldg5"
+		"plan": "bldg5",
+		"use": "休憩所"
 	},
 	{
 		"key": "5-201",
@@ -373,7 +375,8 @@
 		"floor": 2,
 		"number": "5-202",
 		"name": "教室（4C）",
-		"plan": "bldg5"
+		"plan": "bldg5",
+		"use": "予選会場"
 	},
 	{
 		"key": "7-113",
@@ -824,9 +827,9 @@
 		"plan": null,
 		"at": [
 			140.55299,
-			36.40045
+			36.40037
 		],
-		"tents": true
+		"tents": "track"
 	},
 	{
 		"key": "ground-baseball-side",
@@ -836,9 +839,9 @@
 		"name": "グラウンド（野球場側）",
 		"plan": null,
 		"at": [
-			140.55272,
-			36.40098
+			140.55222,
+			36.4016
 		],
-		"tents": true
+		"tents": "column"
 	}
 ]

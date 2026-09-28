@@ -16,10 +16,15 @@ export interface MapRoom {
 	name: string;
 	/** 平面図のファイル名（public/map/plans/<plan>.json）。図面を持たない場所は null。 */
 	plan: string | null;
+	/** 当日の使い道（予選会場・休憩所など、サークルの出展ではない場所） */
+	use?: string;
 	/** 図面を持たない場所の位置 [経度, 緯度]（3D の地図にピンを立てる） */
 	at?: [number, number];
-	/** 屋台のテントが並ぶ屋外の会場（3D の地図で出展の数だけテントを描く） */
-	tents?: boolean;
+	/**
+	 * 屋台のテントが並ぶ屋外の会場。3D の地図で出展の数だけテントを描く。
+	 * track: 陸上競技場のトラックの外周に沿って / column: ピンの南へ 1 列に / grid: ピンの南に碁盤目に
+	 */
+	tents?: 'track' | 'column' | 'grid';
 }
 
 export const MAP_ROOMS = rooms as MapRoom[];
