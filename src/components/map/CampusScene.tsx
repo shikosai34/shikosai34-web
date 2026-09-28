@@ -4,7 +4,7 @@ import { Bloom, EffectComposer } from '@react-three/postprocessing';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { PLAN_FILES, project } from '../../lib/map';
-import type { MapRoom } from '../../lib/map-rooms';
+import type { MapRoom, Weather } from '../../lib/map-rooms';
 
 /*
  * 会場マップの 3D キャンパス。夜祭の「和風ネオン模型」として描く。
@@ -32,6 +32,12 @@ export interface CampusData {
 }
 
 const FLOOR_HEIGHT = 3.6;
+/** 天候ごとの空・霧・光。雨天時は暗く、霧を濃くする（建物の明かりと提灯はそのまま灯す） */
+const ATMOSPHERE = {
+	sunny: { sky: '#04141c', fogNear: 320, fogFar: 900, ambient: 0.5, hemisphere: 0.8, moon: 1.1, stars: true },
+	rainy: { sky: '#02080c', fogNear: 160, fogFar: 620, ambient: 0.3, hemisphere: 0.45, moon: 0.35, stars: false },
+} as const;
+
 const COLOR = {
 	base: '#0b3041',
 	sky: '#04141c',
@@ -509,6 +515,68 @@ function Tents({ slots, active, onPick }: { slots: TentSlot[]; active: boolean; 
 }
 
 // ---------------------------------------------------------------------------
+// 雨（雨天時の配置を見ているとき）
+// ---------------------------------------------------------------------------
+
+/**
+ * 敷地の上に降る雨の筋。細い線を少し斜めに落とし、下まで来たら上へ戻す。
+ * 動きを減らす設定のときは降らせず、止まった筋だけを見せる。
+ * 稲妻のような光の点滅は使わない（光感受性発作への配慮）。
+ */
+function Rain({ bounds, count, animate }: { bounds: MapBounds; count: number; animate: boolean }) {
+	const TOP = 160;
+	const LENGTH = 2.6;
+	const SLANT = 0.35;
+	const SPEED = 70;
+	const ref = useRef<THREE.LineSegments>(null);
+
+	const { geometry, heads } = useMemo(() => {
+		const heads = new Float32Array(count * 3);
+		for (let i = 0; i < count; i++) {
+			heads[i * 3] = bounds.minX + Math.random() * (bounds.maxX - bounds.minX);
+			heads[i * 3 + 1] = Math.random() * TOP;
+			heads[i * 3 + 2] = -(bounds.minY + Math.random() * (bounds.maxY - bounds.minY));
+		}
+		const geometry = new THREE.BufferGeometry();
+		geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(count * 6), 3));
+		return { geometry, heads };
+	}, [bounds, count]);
+	useEffect(() => () => geometry.dispose(), [geometry]);
+
+	/** 雨粒の先頭の位置から、線分（先頭と尾）を書き直す */
+	const write = () => {
+		const pos = geometry.getAttribute('position') as THREE.BufferAttribute;
+		const a = pos.array as Float32Array;
+		for (let i = 0; i < count; i++) {
+			const [x, y, z] = [heads[i * 3], heads[i * 3 + 1], heads[i * 3 + 2]];
+			a.set([x, y, z, x + SLANT * LENGTH, y + LENGTH, z], i * 6);
+		}
+		pos.needsUpdate = true;
+	};
+	useEffect(write, [geometry]); // eslint-disable-line react-hooks/exhaustive-deps
+
+	useFrame((_, delta) => {
+		if (!animate) return;
+		const d = Math.min(delta, 0.1) * SPEED;
+		for (let i = 0; i < count; i++) {
+			heads[i * 3] -= d * SLANT;
+			heads[i * 3 + 1] -= d;
+			if (heads[i * 3 + 1] < 0) {
+				heads[i * 3 + 1] += TOP;
+				heads[i * 3] += TOP * SLANT;
+			}
+		}
+		write();
+	});
+
+	return (
+		<lineSegments ref={ref} geometry={geometry} frustumCulled={false}>
+			<lineBasicMaterial color="#9ec9d8" transparent opacity={0.28} depthWrite={false} />
+		</lineSegments>
+	);
+}
+
+// ---------------------------------------------------------------------------
 // カメラ
 // ---------------------------------------------------------------------------
 
@@ -623,12 +691,14 @@ interface Props {
 	lowPower: boolean;
 	/** フロア画面を上に重ねているあいだは描画を止める */
 	paused: boolean;
+	/** 天候。雨天時は暗くして雨を降らせる */
+	weather: Weather;
 	onPickBuilding: (name: string) => void;
 	onPickPlace: (key: string) => void;
 	onBackgroundClick: () => void;
 }
 
-export default function CampusScene({ campus, counts, places, selected, camera, animate, lowPower, paused, onPickBuilding, onPickPlace, onBackgroundClick }: Props) {
+export default function CampusScene({ campus, counts, places, selected, camera, animate, lowPower, paused, weather, onPickBuilding, onPickPlace, onBackgroundClick }: Props) {
 	const buildings = useMemo(() => buildingsOf(campus.features), [campus]);
 	const windows = useMemo(() => makeWindowTexture(), []);
 	const [hovered, setHovered] = useState<string | null>(null);
@@ -673,6 +743,8 @@ export default function CampusScene({ campus, counts, places, selected, camera, 
 		return gridSlots(at, count);
 	};
 
+	const air = ATMOSPHERE[weather];
+
 	/** 押せる建物（平面図があるか、屋外の会場を含む建物） */
 	const selectable = (name: string | null) => !!name && (name in PLAN_FILES || places.some((p) => p.building === name));
 
@@ -685,13 +757,14 @@ export default function CampusScene({ campus, counts, places, selected, camera, 
 			onPointerMissed={onBackgroundClick}
 			aria-hidden="true"
 		>
-			<color attach="background" args={[COLOR.sky]} />
-			<fog attach="fog" args={[COLOR.sky, 320, 900]} />
-			<Stars radius={700} depth={120} count={lowPower ? 800 : 2000} factor={5} fade speed={animate ? 0.4 : 0} />
-			<ambientLight intensity={0.5} color="#6fa6c0" />
-			<hemisphereLight args={['#2a5f7a', '#0b1a22', 0.8]} />
+			<color attach="background" args={[air.sky]} />
+			<fog attach="fog" args={[air.sky, air.fogNear, air.fogFar]} />
+			{air.stars && <Stars radius={700} depth={120} count={lowPower ? 800 : 2000} factor={5} fade speed={animate ? 0.4 : 0} />}
+			{weather === 'rainy' && <Rain bounds={bounds} count={lowPower ? 1500 : 4000} animate={animate} />}
+			<ambientLight intensity={air.ambient} color="#6fa6c0" />
+			<hemisphereLight args={['#2a5f7a', '#0b1a22', air.hemisphere]} />
 			{/* 月明かり */}
-			<directionalLight position={[-120, 220, 80]} intensity={1.1} color="#b9d4ff" />
+			<directionalLight position={[-120, 220, 80]} intensity={air.moon} color="#b9d4ff" />
 
 			<Ground features={campus.features} animate={animate} />
 

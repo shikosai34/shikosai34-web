@@ -214,6 +214,7 @@ export default function VenueMap({ exhibits: exhibitsByWeather, defaultWeather }
 							animate={!reducedMotion}
 							lowPower={lowPower}
 							paused={planOpen}
+							weather={weather}
 							onPickBuilding={openBuilding}
 							onPickPlace={openPlace}
 							onBackgroundClick={() => placeKey && closePlace()}
