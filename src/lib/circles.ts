@@ -55,6 +55,17 @@ export const CIRCLE_CATEGORY_LABELS: Record<CircleCategory, string> = {
 	other: 'その他',
 };
 
+/** 出展内容の区分（学年・種別の `category` とは別。CMS の「サークルカテゴリ」）。 */
+export const CIRCLE_GENRES = ['culture', 'food', 'tech'] as const;
+
+export type CircleGenre = (typeof CIRCLE_GENRES)[number];
+
+export const CIRCLE_GENRE_LABELS: Record<CircleGenre, string> = {
+	culture: '文化',
+	food: '食品',
+	tech: '技術',
+};
+
 /** 検索・比較用に文字列を正規化する（全角半角を畳み、小文字化）。 */
 export function normalizeForSearch(value: string): string {
 	return value.normalize('NFKC').toLowerCase();

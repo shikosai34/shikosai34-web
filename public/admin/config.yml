@@ -101,7 +101,7 @@ collections:
     create: true
     slug: '{{fields.slug}}'
     identifier_field: name
-    sortable_fields: [nameKana, order, name]
+    sortable_fields: [nameKana, name]
     fields:
       - { label: 団体名, name: name, widget: string }
       - label: 団体名（かな）
@@ -128,13 +128,53 @@ collections:
           - { label: 同好会, value: society }
           - { label: その他, value: other }
       - { label: 実施場所, name: location, widget: string, hint: '教室名など。' }
-      - { label: 実施時間, name: schedule, widget: string, hint: '例: 両日 10:00〜16:00' }
+      - label: サークルカテゴリ
+        name: genre
+        widget: select
+        options:
+          - { label: 文化, value: culture }
+          - { label: 食品, value: food }
+          - { label: 技術, value: tech }
+      - label: 紹介文（短文）
+        name: summary
+        widget: text
+        hint: '一覧のカードと詳細ページの冒頭に表示される、1〜2文の短い紹介です。'
+      - label: 見所
+        name: highlights
+        widget: text
+        required: false
+        hint: '来場者に見てほしいポイント。'
+      - label: 値段設定/企画詳細
+        name: details
+        widget: text
+        required: false
+        hint: '商品や体験の価格、企画の内容など。'
+      - label: 実施時間（10月24日）
+        name: scheduleDay1
+        widget: string
+        required: false
+        hint: '例: 10:00〜16:00。この日に実施しない場合は空欄にしてください。'
+      - label: 実施時間（10月25日）
+        name: scheduleDay2
+        widget: string
+        required: false
+        hint: '例: 10:00〜15:00。この日に実施しない場合は空欄にしてください。'
       - { label: FesFlow 導入予定, name: fesflowPlanned, widget: boolean, default: false }
       - label: サムネイル画像
         name: image
         widget: image-r2
         required: false
         hint: 'スマホの写真をそのままで大丈夫です。自動でリサイズ・WebP 変換して R2 に保存します。'
+      - label: その他画像
+        name: otherImages
+        widget: list
+        required: false
+        label_singular: 画像
+        field:
+          label: 画像
+          name: image
+          widget: image-r2
+        hint: '詳細ページに並べて表示する画像です。複数追加できます。'
       - label: SNS リンク
         name: snsLinks
         widget: list
@@ -153,13 +193,7 @@ collections:
         required: false
         pattern: ['^https?://', 'http:// または https:// で始まる URL を入力してください']
         hint: '実行委員会が後から入力します。'
-      - label: 掲載順
-        name: order
-        widget: number
-        required: false
-        value_type: int
-        hint: '小さいほど前に表示。未入力なら「かな」順。'
-      - { label: 紹介文, name: body, widget: markdown }
+      - { label: 詳細, name: body, widget: markdown }
 
   - name: events
     label: ステージ企画

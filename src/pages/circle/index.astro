@@ -8,16 +8,14 @@ import Layout from '../../layouts/Layout.astro';
 import {
 	CIRCLE_CATEGORY_GROUPS,
 	CIRCLE_CATEGORY_LABELS,
+	CIRCLE_GENRE_LABELS,
 	normalizeForSearch,
 } from '../../lib/circles';
 import { getCollectionOrEmpty } from '../../lib/content';
 
-const circles = (await getCollectionOrEmpty('circles')).sort((a, b) => {
-	const ao = a.data.order ?? Number.POSITIVE_INFINITY;
-	const bo = b.data.order ?? Number.POSITIVE_INFINITY;
-	if (ao !== bo) return ao - bo;
-	return a.data.nameKana.localeCompare(b.data.nameKana, 'ja');
-});
+const circles = (await getCollectionOrEmpty('circles')).sort((a, b) =>
+	a.data.nameKana.localeCompare(b.data.nameKana, 'ja'),
+);
 
 const countByCategory = new Map<string, number>();
 for (const circle of circles) {
@@ -29,13 +27,34 @@ const filterGroups = CIRCLE_CATEGORY_GROUPS;
 
 const searchTextById = new Map<string, string>();
 for (const circle of circles) {
-	const { name, nameKana, location, schedule, category } = circle.data;
+	const {
+		name,
+		nameKana,
+		location,
+		scheduleDay1,
+		scheduleDay2,
+		category,
+		genre,
+		summary,
+		highlights,
+		details,
+	} = circle.data;
 	searchTextById.set(
 		circle.id,
 		normalizeForSearch(
-			[name, nameKana, circle.body ?? '', location, schedule, CIRCLE_CATEGORY_LABELS[category]].join(
-				' ',
-			),
+			[
+				name,
+				nameKana,
+				summary,
+				highlights ?? '',
+				details ?? '',
+				circle.body ?? '',
+				location,
+				scheduleDay1 ?? '',
+				scheduleDay2 ?? '',
+				CIRCLE_CATEGORY_LABELS[category],
+				CIRCLE_GENRE_LABELS[genre],
+			].join(' '),
 		),
 	);
 }
@@ -112,6 +131,8 @@ for (const circle of circles) {
 										<CircleCard
 											name={circle.data.name}
 											category={circle.data.category}
+											genre={circle.data.genre}
+											summary={circle.data.summary}
 											location={circle.data.location}
 											image={circle.data.image}
 										/>

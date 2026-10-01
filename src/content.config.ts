@@ -1,6 +1,6 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
-import { CIRCLE_CATEGORIES } from './lib/circles';
+import { CIRCLE_CATEGORIES, CIRCLE_GENRES } from './lib/circles';
 import { EVENT_GENRES, EVENT_STATUSES, FESTIVAL_DAYS, getEventDayKey } from './lib/events';
 import { NEWS_CATEGORIES } from './lib/news';
 
@@ -43,7 +43,7 @@ const news = defineCollection({
 /**
  * サークル情報（`/circle`）。
  *
- * お知らせと同じく Decap CMS から Markdown で管理する。紹介文は本文（body）。
+ * お知らせと同じく Decap CMS から Markdown で管理する。詳細な紹介は本文（body）。
  * リポジトリ直下の `content/circles/` に置く。
  */
 const circles = defineCollection({
@@ -61,8 +61,18 @@ const circles = defineCollection({
 		category: z.enum(CIRCLE_CATEGORIES),
 		/** 実施場所（教室名など） */
 		location: z.string().min(1),
-		/** 実施時間（自由記述） */
-		schedule: z.string().min(1),
+		/** サークルカテゴリ（文化・食品・技術）。学年・種別の `category` とは別軸。 */
+		genre: z.enum(CIRCLE_GENRES),
+		/** 紹介文（短文）。一覧カードと詳細冒頭に表示する。 */
+		summary: z.string().min(1),
+		/** 見所（任意） */
+		highlights: z.string().optional(),
+		/** 値段設定・企画詳細（任意） */
+		details: z.string().optional(),
+		/** 実施時間（自由記述）。10月24日 */
+		scheduleDay1: z.string().optional(),
+		/** 実施時間（自由記述）。10月25日 */
+		scheduleDay2: z.string().optional(),
 		/** FesFlow 導入予定（各団体の申告）。詳細ページのリンク表示判定に使う。 */
 		fesflowPlanned: z.boolean(),
 		/**
@@ -70,6 +80,8 @@ const circles = defineCollection({
 		 * ローカルパスまたは R2 の配信 URL。
 		 */
 		image: z.string().optional(),
+		/** その他画像（任意）。サムネイルとは別に詳細ページへ並べる。 */
+		otherImages: z.array(z.string()).default([]),
 		snsLinks: z
 			.array(z.object({ label: z.string().min(1), url: z.string().url() }))
 			.default([]),
@@ -77,8 +89,6 @@ const circles = defineCollection({
 		// 以下は実行委員会が後から付与する（§2.9.3）。収集時点では値がない。
 		/** 実際の FesFlow ページ URL */
 		fesflowUrl: z.string().url().optional(),
-		/** 掲載順を手動指定する場合の並び順 */
-		order: z.number().optional(),
 	}),
 });
 
