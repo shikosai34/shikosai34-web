@@ -6,7 +6,7 @@ import SectionHeading from '../../components/ui/SectionHeading';
 import Layout from '../../layouts/Layout.astro';
 import busImage from '../../assets/access/access_bus.png';
 import taxiImage from '../../assets/access/access_taxi.png';
-import schoolMap from '../../assets/access/school_map.svg';
+// 自転車の案内を出すときに戻す: import schoolMap from '../../assets/access/school_map.svg';
 
 const address = '〒312-8508 茨城県ひたちなか市中根866';
 
@@ -28,6 +28,10 @@ const busLinks = [
 		href: 'http://bus.ibako.co.jp/timetable/result/?no=1052&de=2&week=1',
 	},
 	{
+		label: '茨城交通路線バス時刻表 勝田駅前（深谷津方面）',
+		href: 'http://bus.ibako.co.jp/timetable/result/?no=1052&de=2&week=1',
+	},
+	{
 		label: '茨城交通路線バス時刻表 茨城高専前（勝田駅方面）',
 		href: 'http://bus.ibako.co.jp/timetable/result/?no=436&de=1&week=1',
 	},
@@ -45,35 +49,19 @@ const busLinks = [
 	},
 ];
 
-// 増便の時刻は「発車〜到着」。
+// 臨時便（茨城高専スクールバス）は 1日目（10/24）のみ運行する。時刻は出発時刻。
 const extraBuses = [
 	{
 		id: 'outbound',
 		direction: '往路',
-		count: 8,
 		route: '勝田駅発 → 茨城高専前',
-		times: [
-			['9:35', '9:45'],
-			['10:00', '10:10'],
-			['10:25', '10:35'],
-			['11:00', '11:10'],
-			['11:30', '11:40'],
-			['12:00', '12:10'],
-			['12:30', '12:40'],
-			['13:00', '13:10'],
-		],
+		times: ['9:35', '10:00', '10:25', '11:00', '11:30', '12:00', '12:30', '13:00'],
 	},
 	{
 		id: 'inbound',
 		direction: '復路',
-		count: 4,
 		route: '茨城高専前発 → 勝田駅',
-		times: [
-			['15:00', '15:10'],
-			['15:30', '15:45'],
-			['16:10', '16:20'],
-			['16:50', '17:00'],
-		],
+		times: ['15:00', '15:30', '16:10', '16:50'],
 	},
 ];
 ---
@@ -117,11 +105,15 @@ const extraBuses = [
 				<section aria-labelledby="bus-heading">
 					<h2 id="bus-heading" class="border-b-2 border-text/25 pb-2 text-xl font-medium text-text">バスでのご来校</h2>
 					<p class="mt-4 text-sm leading-relaxed text-text/80">
-						JR勝田駅東口を出て左側にある、茨城交通バス2番乗り場から、いずれかのバスにお乗りください。茨城高専前で下車し、北へ進むと正門となります。
+						JR勝田駅東口を出て左側にある、茨城交通バス2番乗り場から、定期便・臨時便のいずれかにお乗りください。茨城高専前で下車し、北へ進むと正門となります。
 					</p>
-					<p class="mt-3 text-sm leading-relaxed text-text/80">
-						通常の便に加えて、以下の時間が増便されています。茨城交通路線バスの臨時便を茨城高専スクールバスとして運行します。通常のバス時刻表は下記のリンクもあわせてご確認ください。
-					</p>
+
+					<div class="mt-5 rounded-xl border-2 border-main bg-main/10 p-4" role="note">
+						<p class="font-medium text-text">臨時便は1日目（10月24日）のみ運行します</p>
+						<p class="mt-1 text-sm leading-relaxed text-text/80">
+							茨城交通の路線バス（定期便）に加えて、茨城高専スクールバスとして臨時便を増便します。時刻は出発時刻です。
+						</p>
+					</div>
 
 					<Image
 						src={busImage}
@@ -131,27 +123,24 @@ const extraBuses = [
 						sizes="(min-width: 640px) 320px, 80vw"
 					/>
 
-					<h3 class="mt-8 text-base font-medium text-text">増便のバス時刻表（茨城交通路線バス 臨時便）</h3>
-					<p class="mt-1 text-xs text-text/60">時刻は発車〜到着です。</p>
+					<h3 class="mt-8 text-base font-medium text-text">臨時便の時刻表（10月24日・出発時刻）</h3>
 					<div class="mt-4 space-y-8 sm:grid sm:grid-cols-2 sm:gap-6 sm:space-y-0">
 						{
 							extraBuses.map((bus) => (
 								<section aria-labelledby={`${bus.id}-heading`}>
 									<div class="mb-3 border-b-2 border-text/25 pb-2">
-										<p class="text-sm font-medium text-main">
-											{bus.direction}（{bus.count}便）
-										</p>
+										<p class="text-sm font-medium text-main">{bus.direction}</p>
 										<h4 id={`${bus.id}-heading`} class="text-base font-medium text-text">
 											{bus.route}
 										</h4>
 									</div>
-									<ul class="grid grid-cols-2 gap-2">
-										{bus.times.map(([from, to]) => (
-											<li class="rounded-xl border border-text/20 bg-base px-3 py-2 text-center font-medium text-text">
-												{from}〜{to}
+									<ol class="divide-y divide-text/10 rounded-xl border border-text/20 bg-base">
+										{bus.times.map((time) => (
+											<li class="px-4 py-2 text-center font-medium tabular-nums text-text">
+												<time>{time}</time>
 											</li>
 										))}
-									</ul>
+									</ol>
 								</section>
 							))
 						}
@@ -179,9 +168,15 @@ const extraBuses = [
 					<h2 id="car-heading" class="border-b-2 border-text/25 pb-2 text-xl font-medium text-text">
 						車・タクシーでのご来校
 					</h2>
-					<p class="mt-4 text-sm leading-relaxed text-text/80">
-						一般参加者駐車場は設置しません。お車でのお越しはお控えいただき、上記の茨城交通路線バスなどの利用をご検討ください。タクシーでお越しの方は、構内は自動車進入禁止となりますので、正門の前で降車するようお願いいたします。
-					</p>
+
+					<div class="mt-5 rounded-xl border-2 border-main bg-main/10 p-4" role="note">
+						<p class="font-medium text-text">お車でのお越しはお控えください</p>
+						<ul class="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed text-text/80 marker:text-text/60">
+							<li>一般参加者駐車場は設置しません。上記の茨城交通路線バスなどの利用をご検討ください。</li>
+							<li>構内は自動車進入禁止です。タクシーでお越しの方は、正門の前で降車してください。</li>
+						</ul>
+					</div>
+
 					<Image
 						src={taxiImage}
 						alt="タクシーでのアクセス"
@@ -191,6 +186,7 @@ const extraBuses = [
 					/>
 				</section>
 
+				{/* 自転車については現時点で案内がないため非表示。案内が決まったら戻す。
 				<section aria-labelledby="bicycle-heading">
 					<h2 id="bicycle-heading" class="border-b-2 border-text/25 pb-2 text-xl font-medium text-text">
 						自転車でのご来校
@@ -198,11 +194,12 @@ const extraBuses = [
 					<p class="mt-4 text-sm leading-relaxed text-text/80">
 						低学年駐輪場を一般参加者の方々へ開放します。構内では、安全のため必ず自転車を降り、スタッフの指示に従って駐輪してください。
 					</p>
-					{/* 地図 SVG は背景が透明で黒線のみなので、白いタイルの上に載せる。 */}
+					<!-- 地図 SVG は背景が透明で黒線のみなので、白いタイルの上に載せる。 -->
 					<div class="mt-6 rounded-xl border border-text/20 bg-white p-3 sm:p-4">
 						<Image src={schoolMap} alt="校内地図" class="mx-auto w-full" />
 					</div>
 				</section>
+				*/}
 			</div>
 		</section>
 	</main>
