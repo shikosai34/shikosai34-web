@@ -50,20 +50,38 @@ const busLinks = [
 ];
 
 // 臨時便（茨城高専スクールバス）は 1日目（10/24）のみ運行する。時刻は出発時刻。
+// regularTimes は、臨時便の最初〜最後の時刻の間に出る茨城交通の定期便（10/24 は土曜ダイヤ）の出発時刻。
+// 往路は勝田駅前（茨城高専前を経由する系統のみ）、復路は茨城高専前（勝田駅前行き）の
+// 茨城交通の時刻表（2026/10/01 時点）から転記している。ダイヤが変わったら見直す。
 const extraBuses = [
 	{
 		id: 'outbound',
 		direction: '往路',
 		route: '勝田駅発 → 茨城高専前',
 		times: ['9:35', '10:00', '10:25', '11:00', '11:30', '12:00', '12:30', '13:00'],
+		regularTimes: ['9:40', '10:00', '10:20', '10:40', '11:00', '11:20', '11:40', '12:00', '12:20', '12:40'],
 	},
 	{
 		id: 'inbound',
 		direction: '復路',
 		route: '茨城高専前発 → 勝田駅',
 		times: ['15:00', '15:30', '16:10', '16:50'],
+		regularTimes: ['15:01', '15:16', '15:31', '16:11', '16:31'],
 	},
 ];
+
+// 臨時便と定期便を 1 本の時刻順リストにまとめる（同時刻のときは定期便が先）。
+const toMinutes = (time: string) => {
+	const [hour, minute] = time.split(':').map(Number);
+	return hour * 60 + minute;
+};
+const timetables = extraBuses.map((bus) => ({
+	...bus,
+	departures: [
+		...bus.regularTimes.map((time) => ({ time, extra: false })),
+		...bus.times.map((time) => ({ time, extra: true })),
+	].sort((a, b) => toMinutes(a.time) - toMinutes(b.time)),
+}));
 ---
 
 <Layout title="アクセス | 第34回 茨香祭">
@@ -123,10 +141,10 @@ const extraBuses = [
 						sizes="(min-width: 640px) 320px, 80vw"
 					/>
 
-					<h3 class="mt-8 text-base font-medium text-text">臨時便の時刻表（10月24日・出発時刻）</h3>
+					<h3 class="mt-8 text-base font-medium text-text">バスの時刻表（10月24日・出発時刻）</h3>
 					<div class="mt-4 space-y-8 sm:grid sm:grid-cols-2 sm:gap-6 sm:space-y-0">
 						{
-							extraBuses.map((bus) => (
+							timetables.map((bus) => (
 								<section aria-labelledby={`${bus.id}-heading`}>
 									<div class="mb-3 border-b-2 border-text/25 pb-2">
 										<p class="text-sm font-medium text-main">{bus.direction}</p>
@@ -135,9 +153,17 @@ const extraBuses = [
 										</h4>
 									</div>
 									<ol class="divide-y divide-text/10 rounded-xl border border-text/20 bg-base">
-										{bus.times.map((time) => (
-											<li class="px-4 py-2 text-center font-medium tabular-nums text-text">
+										{bus.departures.map(({ time, extra }) => (
+											<li
+												class:list={[
+													'relative px-4 py-2 text-center tabular-nums',
+													extra ? 'bg-main/10 font-medium text-text' : 'text-text/80',
+												]}
+											>
 												<time>{time}</time>
+												{extra && (
+													<span class="absolute top-1/2 right-4 -translate-y-1/2 rounded-full bg-main px-2 py-0.5 text-xs font-medium text-base">臨時便</span>
+												)}
 											</li>
 										))}
 									</ol>
@@ -145,6 +171,9 @@ const extraBuses = [
 							))
 						}
 					</div>
+					<p class="mt-4 text-xs leading-relaxed text-text/60">
+						「臨時便」の印がない時刻は茨城交通の定期便（土曜ダイヤ・2026年10月1日時点）で、臨時便の運行時間帯のみ掲載しています。ダイヤが変更される場合があるため、最新の時刻は下記の時刻表もあわせてご確認ください。
+					</p>
 
 					<ul class="mt-8 list-disc space-y-2 pl-5 text-sm marker:text-text/60">
 						{
