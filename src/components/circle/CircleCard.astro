@@ -1,14 +1,21 @@
 ---
-import { CIRCLE_CATEGORY_LABELS, type CircleCategory } from "../../lib/circles";
+import {
+    CIRCLE_CATEGORY_LABELS,
+    CIRCLE_GENRE_LABELS,
+    type CircleCategory,
+    type CircleGenre,
+} from "../../lib/circles";
 
 interface Props {
     name: string;
     category: CircleCategory;
+    genre: CircleGenre;
+    summary: string;
     location: string;
     image?: string | undefined;
 }
 
-const { name, category, location, image } = Astro.props;
+const { name, category, genre, summary, location, image } = Astro.props;
 ---
 
 <article
@@ -32,12 +39,20 @@ const { name, category, location, image } = Astro.props;
         )
     }
     <div class="flex flex-1 flex-col gap-1.5 p-3">
-        <span
-            class="self-start rounded border border-text px-1.5 py-0.5 text-xs text-text"
-        >
-            {CIRCLE_CATEGORY_LABELS[category]}
-        </span>
+        <div class="flex flex-wrap gap-1">
+            <span
+                class="rounded border border-text px-1.5 py-0.5 text-xs text-text"
+            >
+                {CIRCLE_CATEGORY_LABELS[category]}
+            </span>
+            <span
+                class="rounded border border-text px-1.5 py-0.5 text-xs text-text"
+            >
+                {CIRCLE_GENRE_LABELS[genre]}
+            </span>
+        </div>
         <h3 class="font-medium text-text">{name}</h3>
+        <p class="line-clamp-2 text-xs text-text/80">{summary}</p>
         <p class="mt-auto text-sm text-text">{location}</p>
     </div>
 </article>

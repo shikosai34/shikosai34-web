@@ -3,7 +3,7 @@ import { render } from 'astro:content';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
 import SiteHeader from '../../components/layout/SiteHeader.astro';
 import Layout from '../../layouts/Layout.astro';
-import { CIRCLE_CATEGORY_LABELS } from '../../lib/circles';
+import { CIRCLE_CATEGORY_LABELS, CIRCLE_GENRE_LABELS } from '../../lib/circles';
 import { getCollectionOrEmpty } from '../../lib/content';
 
 export async function getStaticPaths() {
@@ -16,8 +16,26 @@ export async function getStaticPaths() {
 
 const { circle } = Astro.props;
 const { Content } = await render(circle);
-const { name, category, location, schedule, image, snsLinks, fesflowPlanned, fesflowUrl } =
-	circle.data;
+const {
+	name,
+	category,
+	genre,
+	summary,
+	highlights,
+	details,
+	location,
+	scheduleDay1,
+	scheduleDay2,
+	image,
+	otherImages,
+	snsLinks,
+	fesflowPlanned,
+	fesflowUrl,
+} = circle.data;
+const schedules = [
+	{ label: '10月24日（土）', value: scheduleDay1 },
+	{ label: '10月25日（日）', value: scheduleDay2 },
+];
 ---
 
 <Layout title={`${name} | サークル | 第34回 茨香祭`}>
@@ -42,21 +60,63 @@ const { name, category, location, schedule, image, snsLinks, fesflowPlanned, fes
 				}
 			</div>
 
-			<span class="mt-4 inline-block rounded border border-text px-2 py-0.5 text-xs text-text">
-				{CIRCLE_CATEGORY_LABELS[category]}
-			</span>
+			<div class="mt-4 flex flex-wrap gap-2">
+				<span class="rounded border border-text px-2 py-0.5 text-xs text-text">
+					{CIRCLE_CATEGORY_LABELS[category]}
+				</span>
+				<span class="rounded border border-text px-2 py-0.5 text-xs text-text">
+					{CIRCLE_GENRE_LABELS[genre]}
+				</span>
+			</div>
 			<h1 class="mt-2 text-2xl font-bold text-text">{name}</h1>
+			<p class="mt-2 text-sm text-text">{summary}</p>
 
-			<dl class="mt-4 grid grid-cols-[4rem_1fr] gap-y-2 text-sm text-text">
-				<dt class="font-medium">日時</dt>
-				<dd>{schedule}</dd>
+			<dl class="mt-4 grid grid-cols-[8rem_1fr] gap-y-2 text-sm text-text">
+				{
+					schedules.map((day) => (
+						<>
+							<dt class="font-medium">{day.label}</dt>
+							<dd>{day.value || '実施なし'}</dd>
+						</>
+					))
+				}
 				<dt class="font-medium">場所</dt>
 				<dd>{location}</dd>
 			</dl>
 
+			{
+				highlights && (
+					<section class="mt-6">
+						<h2 class="text-base font-bold text-text">見所</h2>
+						<p class="mt-1 whitespace-pre-line text-sm text-text">{highlights}</p>
+					</section>
+				)
+			}
+
+			{
+				details && (
+					<section class="mt-6">
+						<h2 class="text-base font-bold text-text">値段設定・企画詳細</h2>
+						<p class="mt-1 whitespace-pre-line text-sm text-text">{details}</p>
+					</section>
+				)
+			}
+
 			<div class="circle-body mt-4 flex flex-col gap-3 text-text">
 				<Content />
 			</div>
+
+			{
+				otherImages.length > 0 && (
+					<ul class="mt-6 grid grid-cols-2 gap-3">
+						{otherImages.map((src) => (
+							<li>
+								<img src={src} alt="" loading="lazy" class="aspect-video w-full rounded-xl object-cover" />
+							</li>
+						))}
+					</ul>
+				)
+			}
 
 			{
 				snsLinks.length > 0 && (
