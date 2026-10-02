@@ -143,4 +143,26 @@ const events = defineCollection({
 		}),
 });
 
-export const collections = { news, circles, events };
+/**
+ * 協賛企業（`/sponsor`）。
+ *
+ * お知らせなどと同じく Decap CMS から Markdown で管理する。
+ * リポジトリ直下の `content/sponsors/` に置く。本文（body）は使わない。
+ */
+const sponsors = defineCollection({
+	loader: glob({ pattern: '**/[^_]*.md', base: './content/sponsors' }),
+	schema: z.object({
+		/** 企業名 */
+		name: z.string().min(1),
+		/** 五十音順ソート用の読み仮名 */
+		nameKana: z.string().min(1),
+		/** 協賛金額（円）。表示には使わず、文字サイズの階級分けにのみ使用する。 */
+		amount: z.number().int().positive(),
+		/** 企業サイトの URL（任意）。ある場合は企業名からリンクする。 */
+		url: z.string().url().optional(),
+		/** 下書き。本番ビルドでは除外する。 */
+		draft: z.boolean().default(false),
+	}),
+});
+
+export const collections = { news, circles, events, sponsors };
