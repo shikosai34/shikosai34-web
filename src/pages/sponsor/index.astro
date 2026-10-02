@@ -26,7 +26,7 @@ const maxAmount = Math.max(0, ...sponsors.map(({ data }) => data.amount));
 							ここに深くお礼申し上げます。（敬称略・五十音順）
 						</p>
 
-						<ul class="flex flex-wrap items-baseline gap-x-6 gap-y-3">
+						<ul class="flex flex-wrap items-baseline justify-center gap-x-6 gap-y-3 text-center">
 							{sponsors.map(({ data }) => (
 								<li class={`text-text ${getSponsorSizeClass(data.amount, maxAmount)}`}>
 									{data.url ? (
