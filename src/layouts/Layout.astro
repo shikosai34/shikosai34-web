@@ -32,6 +32,17 @@ const {
 const siteOrigin = Astro.site ?? Astro.url;
 const canonicalURL = new URL(Astro.url.pathname, siteOrigin);
 const ogImageURL = new URL('/ogp.png', siteOrigin);
+
+// 検索結果でサイト名を「第34回 茨香祭」と出させるための構造化データ。
+// Google はトップページの WebSite だけを見るので、トップでのみ出す。
+const isHome = Astro.url.pathname === '/';
+const websiteJsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'WebSite',
+	name: '第34回 茨香祭',
+	alternateName: ['茨香祭', '第34回 茨城工業高等専門学校 文化祭'],
+	url: new URL('/', siteOrigin).href
+};
 ---
 
 <!doctype html>
@@ -40,7 +51,9 @@ const ogImageURL = new URL('/ogp.png', siteOrigin);
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
+		<link rel="icon" href="/favicon.ico" sizes="any" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<meta name="theme-color" content="#0b3041" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 		
@@ -54,6 +67,9 @@ const ogImageURL = new URL('/ogp.png', siteOrigin);
 		<meta property="og:url" content={canonicalURL} />
 		<meta property="og:image" content={ogImageURL} />
 		<meta name="twitter:card" content="summary_large_image" />
+		{isHome && (
+			<script type="application/ld+json" set:html={JSON.stringify(websiteJsonLd)} is:inline />
+		)}
 	</head>
 	<body class:list={[bodyClass ?? 'bg-text text-base']}>
 		{/*

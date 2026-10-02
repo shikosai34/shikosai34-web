@@ -24,16 +24,12 @@ const mapLinks = [
 const busLinks = [
 	{ label: 'アクセス（茨城高専ホームページ）', href: 'https://www.ibaraki-ct.ac.jp/access/' },
 	{
-		label: '茨城交通路線バス時刻表 勝田駅（茨城高専方面）',
-		href: 'http://bus.ibako.co.jp/timetable/result/?no=1052&de=2&week=1',
-	},
-	{
-		label: '茨城交通路線バス時刻表 勝田駅前（深谷津方面）',
+		label: '茨城交通路線バス時刻表 勝田駅前（茨城高専前・深谷津方面とも）',
 		href: 'http://bus.ibako.co.jp/timetable/result/?no=1052&de=2&week=1',
 	},
 	{
 		label: '茨城交通路線バス時刻表 茨城高専前（勝田駅方面）',
-		href: 'http://bus.ibako.co.jp/timetable/result/?no=436&de=1&week=1',
+		href: 'http://bus.ibako.co.jp/timetable/result/?no=436&de=2&week=1',
 	},
 	{
 		label: '茨城交通路線バス時刻表 深谷津（勝田駅方面）',
@@ -50,23 +46,57 @@ const busLinks = [
 ];
 
 // 臨時便（茨城高専スクールバス）は 1日目（10/24）のみ運行する。時刻は出発時刻。
-// regularTimes は、臨時便の最初〜最後の時刻の間に出る茨城交通の定期便（10/24 は土曜ダイヤ）の出発時刻。
-// 往路は勝田駅前（茨城高専前を経由する系統のみ）、復路は茨城高専前（勝田駅前行き）の
-// 茨城交通の時刻表（2026/10/01 時点）から転記している。ダイヤが変わったら見直す。
+// 茨城交通の定期便は 10/24 が土曜ダイヤ。臨時便の最初〜最後の時刻の間に出る便を載せている。
+//
+// 勝田駅から高専へ向かうバスは、下車する停留所が系統によって違うので系統ごとに表を分ける。
+//   - 「茨城高専前」下車: 勝田駅前の 海浜公園南口 行き（市役所・海浜公園西口・中央研修所経由）。正門の目の前。
+//   - 「深谷津」下車: 勝田駅前の 足崎団地 行き（市役所・勝田高校経由）。高専前は通らず、徒歩が必要。
+//     土曜ダイヤは 8:15 の次が 17:24 で、茨香祭の時間帯（9〜17 時）に走る便がない（2026/10/02 時点）。
+//     便がないことが分かるよう、前後の 8 時台・17 時台だけ参考として載せ、注記を添える。
+//     ほかに 6:56 / 19:10 / 19:50（第二工業団地入口止）があるが、時間帯が離れるため省く。
+// 復路も同様に、茨城高専前発（市役所経由 勝田駅前行き）と深谷津発（市役所経由 勝田駅前行き）で分ける。
+//   深谷津発の土曜ダイヤは 8:38 の次が 17:47 で、こちらも該当時間帯の便がない。
+//   ほかに 7:19 / 19:33 があるが、同じ理由で省く。
+//
+// 時刻は茨城交通の時刻表（2026/10/02 時点・土曜ダイヤ）から転記している。ダイヤが変わったら見直す。
 const extraBuses = [
 	{
-		id: 'outbound',
+		id: 'outbound-kosen',
 		direction: '往路',
 		route: '勝田駅発 → 茨城高専前',
+		stop: '茨城高専前',
+		stopNote: '下車後、北へ進むと正門です。',
 		times: ['9:35', '10:00', '10:25', '11:00', '11:30', '12:00', '12:30', '13:00'],
 		regularTimes: ['9:40', '10:00', '10:20', '10:40', '11:00', '11:20', '11:40', '12:00', '12:20', '12:40'],
 	},
 	{
-		id: 'inbound',
+		id: 'outbound-fukayatsu',
+		direction: '往路',
+		route: '勝田駅発 → 深谷津',
+		stop: '深谷津',
+		stopNote: '茨城高専前は通りません。',
+		times: [],
+		regularTimes: ['8:15', '17:24'],
+		caveat: '土曜ダイヤでは 8:15 の次が 17:24 です。茨香祭の時間帯（9〜17 時）に深谷津へ向かう便はありません。',
+	},
+	{
+		id: 'inbound-kosen',
 		direction: '復路',
 		route: '茨城高専前発 → 勝田駅',
+		stop: '茨城高専前',
+		stopNote: '正門を出て南へ進むと乗り場です。',
 		times: ['15:00', '15:30', '16:10', '16:50'],
 		regularTimes: ['15:01', '15:16', '15:31', '16:11', '16:31'],
+	},
+	{
+		id: 'inbound-fukayatsu',
+		direction: '復路',
+		route: '深谷津発 → 勝田駅',
+		stop: '深谷津',
+		stopNote: '茨城高専前からは離れています。',
+		times: [],
+		regularTimes: ['8:38', '17:47'],
+		caveat: '土曜ダイヤでは 8:38 の次が 17:47 です。茨香祭の時間帯（9〜17 時）に深谷津から勝田駅へ向かう便はありません。',
 	},
 ];
 
@@ -123,7 +153,10 @@ const timetables = extraBuses.map((bus) => ({
 				<section aria-labelledby="bus-heading">
 					<h2 id="bus-heading" class="border-b-2 border-text/25 pb-2 text-xl font-medium text-text">バスでのご来校</h2>
 					<p class="mt-4 text-sm leading-relaxed text-text/80">
-						JR勝田駅東口を出て左側にある、茨城交通バス2番乗り場から、定期便・臨時便のいずれかにお乗りください。茨城高専前で下車し、北へ進むと正門となります。
+						JR勝田駅東口を出て左側にある、茨城交通バス2番乗り場から、定期便・臨時便のいずれかにお乗りください。<strong class="font-medium text-text">「茨城高専前」で下車</strong>し、北へ進むと正門となります。
+					</p>
+					<p class="mt-3 text-sm leading-relaxed text-text/80">
+						勝田駅からのバスは行き先によって停まる停留所が違い、<strong class="font-medium text-text">「深谷津」行きは茨城高専前を通りません</strong>。下の時刻表は下車する停留所ごとに分けていますので、「下車：茨城高専前」の表から時刻をお選びください。
 					</p>
 
 					<div class="mt-5 rounded-xl border-2 border-main bg-main/10 p-4" role="note">
@@ -142,7 +175,7 @@ const timetables = extraBuses.map((bus) => ({
 					/>
 
 					<h3 class="mt-8 text-base font-medium text-text">バスの時刻表（10月24日・出発時刻）</h3>
-					<div class="mt-4 space-y-8 sm:grid sm:grid-cols-2 sm:gap-6 sm:space-y-0">
+					<div class="mt-4 space-y-8 sm:grid sm:grid-cols-2 sm:items-start sm:gap-x-6 sm:gap-y-8 sm:space-y-0">
 						{
 							timetables.map((bus) => (
 								<section aria-labelledby={`${bus.id}-heading`}>
@@ -151,6 +184,12 @@ const timetables = extraBuses.map((bus) => ({
 										<h4 id={`${bus.id}-heading`} class="text-base font-medium text-text">
 											{bus.route}
 										</h4>
+										<p class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-text/80">
+											<span class="rounded-full border border-text/30 px-2 py-0.5 text-xs font-medium text-text">
+												下車：{bus.stop}
+											</span>
+											<span class="text-xs text-text/60">{bus.stopNote}</span>
+										</p>
 									</div>
 									<ol class="divide-y divide-text/10 rounded-xl border border-text/20 bg-base">
 										{bus.departures.map(({ time, extra }) => (
@@ -167,12 +206,17 @@ const timetables = extraBuses.map((bus) => ({
 											</li>
 										))}
 									</ol>
+									{bus.caveat && (
+										<p class="mt-3 rounded-xl border border-dashed border-text/30 px-3 py-2 text-xs leading-relaxed text-text/70">
+											{bus.caveat}
+										</p>
+									)}
 								</section>
 							))
 						}
 					</div>
 					<p class="mt-4 text-xs leading-relaxed text-text/60">
-						「臨時便」の印がない時刻は茨城交通の定期便（土曜ダイヤ・2026年10月1日時点）で、臨時便の運行時間帯のみ掲載しています。ダイヤが変更される場合があるため、最新の時刻は下記の時刻表もあわせてご確認ください。
+						「臨時便」の印がない時刻は茨城交通の定期便（土曜ダイヤ・2026年10月2日時点）です。茨城高専前の表は臨時便の運行時間帯のみ、深谷津の表はその前後にあたる8時台・17時台のみを掲載しています。往路の茨城高専前行きは海浜公園南口行き（市役所・海浜公園西口・中央研修所経由）で、いずれも茨城高専前に停まります。ダイヤが変更される場合があるため、最新の時刻は下記の時刻表もあわせてご確認ください。
 					</p>
 
 					<ul class="mt-8 list-disc space-y-2 pl-5 text-sm marker:text-text/60">
