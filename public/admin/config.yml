@@ -274,3 +274,37 @@ collections:
         default: false
         hint: 'オンにしている間は本番サイトに表示されません。'
       - { label: 詳細, name: body, widget: markdown }
+
+  - name: sponsors
+    label: 協賛企業
+    label_singular: 協賛企業
+    description: '協賛企業を管理します。/sponsor に五十音順で表示され、協賛金額に応じて企業名の文字サイズが変わります。'
+    folder: content/sponsors
+    create: true
+    slug: '{{fields.name}}'
+    identifier_field: name
+    summary: '{{fields.nameKana}}｜{{fields.name}}'
+    sortable_fields: [nameKana, name, amount]
+    fields:
+      - { label: 企業名, name: name, widget: string }
+      - label: 読み仮名
+        name: nameKana
+        widget: string
+        hint: '五十音順の並び替えに使います。ひらがなで入力してください（例: みりおんすぽーつ）。'
+      - label: 協賛金額（円）
+        name: amount
+        widget: number
+        value_type: int
+        min: 1
+        hint: 'この値は画面には表示されません。文字サイズの算出にのみ使用します。'
+      - label: 企業サイト URL
+        name: url
+        widget: string
+        required: false
+        pattern: ['^https?://', 'http:// または https:// から始まる URL を入力してください']
+        hint: '未入力でも公開できます。入力すると企業名からリンクします。'
+      - label: 下書き
+        name: draft
+        widget: boolean
+        default: false
+        hint: 'オンにしている間は本番サイトに表示されません。'
