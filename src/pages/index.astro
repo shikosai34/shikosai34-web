@@ -2,10 +2,12 @@
 import SiteHeader from '../components/layout/SiteHeader.astro';
 import SiteFooter from '../components/layout/SiteFooter.astro';
 import BreakingNewsHero from '../components/home/BreakingNewsHero';
+import CountdownSection from '../components/home/CountdownSection';
 import ThemeModel from '../components/home/ThemeModel';
 import ThemeSection from '../components/home/ThemeSection';
 import NewsSection from '../components/home/NewsSection';
 import StageEventSection from '../components/home/StageEventSection';
+import logoG from '../assets/logo/yokogaki/HOL_G-trimmed.png';
 import Layout from '../layouts/Layout.astro';
 import { getVisibleEvents } from '../lib/events';
 import { formatNewsDate } from '../lib/news';
@@ -36,6 +38,8 @@ const stageEvents = (await getVisibleEvents()).map((entry) => ({
 	<SiteHeader />
 
 	<main class="mx-auto w-full max-w-5xl px-4 pb-16 sm:px-6">
+		<CountdownSection client:load logoSrc={logoG.src} />
+
 		<BreakingNewsHero
 			client:load
 			posterSrc={posterImage.src}
