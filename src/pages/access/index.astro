@@ -6,26 +6,13 @@ import SectionHeading from '../../components/ui/SectionHeading';
 import Layout from '../../layouts/Layout.astro';
 import busImage from '../../assets/access/access_bus.png';
 import taxiImage from '../../assets/access/access_taxi.png';
+import { BUS_FARES, getBusTimetables } from '../../lib/bus';
 
 const address = '〒312-8508 茨城県ひたちなか市中根866';
 
 // バス運賃（片道）。茨城交通の運賃（2026/10/04 時点）。改定されたら見直す。
 // 勝田駅〜深谷津は往復とも年齢を問わず 100 円。
-const busFares = [
-	{
-		id: 'kosen',
-		route: '勝田駅〜茨城高専前',
-		prices: [
-			{ label: '大人', price: '240円' },
-			{ label: '小人', price: '120円' },
-		],
-	},
-	{
-		id: 'fukayatsu',
-		route: '勝田駅〜深谷津',
-		prices: [{ label: '大人・小人とも', price: '100円' }],
-	},
-];
+const busFares = BUS_FARES;
 
 const mapEmbedUrl =
 	'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4022.053516903501!2d140.55073074446793!3d36.39699021221313!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60222faa16bfeb1b%3A0x8ee69992b50722b8!2z6Iyo5Z-O5bel5qWt6auY562J5bCC6ZaA5a2m5qCh!5e0!3m2!1sja!2sjp!4v1729150639038!5m2!1sja!2sjp';
@@ -62,73 +49,9 @@ const busLinks = [
 	},
 ];
 
-// 臨時便（茨城高専スクールバス）は 1日目（10/24）のみ運行する。時刻は出発時刻。
-// 茨城交通の定期便は 10/24 が土曜ダイヤ。臨時便の最初〜最後の時刻の間に出る便を載せている。
-//
-// 勝田駅から高専へ向かうバスは、下車する停留所が系統によって違うので系統ごとに表を分ける。
-//   - 「茨城高専前」下車: 勝田駅前の 海浜公園南口 行き（市役所・海浜公園西口・中央研修所経由）。正門の目の前。
-//   - 「深谷津」下車: 勝田駅前の 足崎団地 行き（市役所・勝田高校経由）。高専前は通らず、徒歩が必要。
-//     土曜ダイヤは 8:15 の次が 17:24 で、茨香祭の時間帯（9〜17 時）に走る便がない（2026/10/02 時点）。
-//     便がないことが分かるよう、前後の 8 時台・17 時台だけ参考として載せ、注記を添える。
-//     ほかに 6:56 / 19:10 / 19:50（第二工業団地入口止）があるが、時間帯が離れるため省く。
-// 復路も同様に、茨城高専前発（市役所経由 勝田駅前行き）と深谷津発（市役所経由 勝田駅前行き）で分ける。
-//   深谷津発の土曜ダイヤは 8:38 の次が 17:47 で、こちらも該当時間帯の便がない。
-//   ほかに 7:19 / 19:33 があるが、同じ理由で省く。
-//
-// 時刻は茨城交通の時刻表（2026/10/02 時点・土曜ダイヤ）から転記している。ダイヤが変わったら見直す。
-const extraBuses = [
-	{
-		id: 'outbound-kosen',
-		direction: '往路',
-		route: '勝田駅発 → 茨城高専前',
-		stop: '茨城高専前',
-		stopNote: '下車後、北へ進むと正門です。',
-		times: ['9:35', '10:00', '10:25', '11:00', '11:30', '12:00', '12:30', '13:00'],
-		regularTimes: ['9:40', '10:00', '10:20', '10:40', '11:00', '11:20', '11:40', '12:00', '12:20', '12:40'],
-	},
-	{
-		id: 'outbound-fukayatsu',
-		direction: '往路',
-		route: '勝田駅発 → 深谷津',
-		stop: '深谷津',
-		stopNote: '茨城高専前は通りません。',
-		times: [],
-		regularTimes: ['8:15', '17:24'],
-		caveat: '土曜ダイヤでは 8:15 の次が 17:24 です。茨香祭の時間帯（9〜17 時）に深谷津へ向かう便はありません。',
-	},
-	{
-		id: 'inbound-kosen',
-		direction: '復路',
-		route: '茨城高専前発 → 勝田駅',
-		stop: '茨城高専前',
-		stopNote: '正門を出て南へ進むと乗り場です。',
-		times: ['15:00', '15:30', '16:10', '16:50'],
-		regularTimes: ['15:01', '15:16', '15:31', '16:11', '16:31'],
-	},
-	{
-		id: 'inbound-fukayatsu',
-		direction: '復路',
-		route: '深谷津発 → 勝田駅',
-		stop: '深谷津',
-		stopNote: '茨城高専前からは離れています。',
-		times: [],
-		regularTimes: ['8:38', '17:47'],
-		caveat: '土曜ダイヤでは 8:38 の次が 17:47 です。茨香祭の時間帯（9〜17 時）に深谷津から勝田駅へ向かう便はありません。',
-	},
-];
-
-// 臨時便と定期便を 1 本の時刻順リストにまとめる（同時刻のときは定期便が先）。
-const toMinutes = (time: string) => {
-	const [hour, minute] = time.split(':').map(Number);
-	return hour * 60 + minute;
-};
-const timetables = extraBuses.map((bus) => ({
-	...bus,
-	departures: [
-		...bus.regularTimes.map((time) => ({ time, extra: false })),
-		...bus.times.map((time) => ({ time, extra: true })),
-	].sort((a, b) => toMinutes(a.time) - toMinutes(b.time)),
-}));
+// バスの時刻データ本体は lib/bus.ts にまとめている（トップページのバス発車
+// カウントダウンと共有するため）。経緯や出典のコメントもそちらを参照。
+const timetables = getBusTimetables();
 ---
 
 <Layout title="アクセス | 第34回 茨香祭">
