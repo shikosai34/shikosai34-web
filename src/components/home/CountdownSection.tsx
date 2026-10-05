@@ -32,7 +32,7 @@ export default function CountdownSection({ logoSrc }: Props) {
 	}, []);
 
 	return (
-		<section className="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 text-text sm:p-6">
+		<section className="surface-panel mt-6 rounded-2xl p-4 pt-6 pb-6 text-text sm:p-6">
 			<div className="mb-4 flex items-center justify-center gap-3">
 				<img src={logoSrc} alt="茨香祭" className="h-8 w-auto sm:h-10" />
 				<p className="text-lg tracking-widest text-text sm:text-2xl">開催まであと</p>

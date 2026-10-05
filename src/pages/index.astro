@@ -38,6 +38,8 @@ const stageEvents = (await getVisibleEvents()).map((entry) => ({
 	<SiteHeader />
 
 	<main class="mx-auto w-full max-w-5xl px-4 pb-16 sm:px-6">
+		<CountdownSection client:load logoSrc={logoG.src} />
+
 		<BreakingNewsHero
 			client:load
 			posterSrc={posterImage.src}
@@ -48,8 +50,6 @@ const stageEvents = (await getVisibleEvents()).map((entry) => ({
 			posterFullWidth={Number(posterFull.attributes.width)}
 			posterFullHeight={Number(posterFull.attributes.height)}
 		/>
-
-		<CountdownSection client:load logoSrc={logoG.src} />
 
 		<ThemeSection>
 			<ThemeModel slot="mark" client:only="react" />
