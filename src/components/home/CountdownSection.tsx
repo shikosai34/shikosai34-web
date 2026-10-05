@@ -2,10 +2,14 @@ import { useEffect, useState } from 'react';
 import { getCountdown, type Countdown } from '../../lib/countdown';
 import SectionHeading from '../ui/SectionHeading';
 
+function pad(value: number) {
+	return String(value).padStart(2, '0');
+}
+
 function Unit({ value, label }: { value: string; label: string }) {
 	return (
 		<span className="flex items-baseline gap-1">
-			<span className="font-primary text-5xl tabular-nums text-accent sm:text-6xl">{value}</span>
+			<span className="font-primary text-3xl tabular-nums text-accent sm:text-5xl">{value}</span>
 			<span className="text-base text-text/80 sm:text-lg">{label}</span>
 		</span>
 	);
@@ -19,7 +23,7 @@ export default function CountdownSection() {
 	useEffect(() => {
 		const update = () => setCountdown(getCountdown(new Date()));
 		update();
-		const timer = window.setInterval(update, 30_000);
+		const timer = window.setInterval(update, 1000);
 		return () => window.clearInterval(timer);
 	}, []);
 
@@ -30,9 +34,11 @@ export default function CountdownSection() {
 			{countdown?.finished ? (
 				<p className="text-center font-primary text-xl text-accent">茨香祭、開幕！</p>
 			) : (
-				<div className="flex items-baseline justify-center gap-6" role="timer" aria-label="開催までの残り時間">
+				<div className="flex items-baseline justify-center gap-3 sm:gap-6" role="timer" aria-label="開催までの残り時間">
 					<Unit value={countdown ? String(countdown.days) : '--'} label="日" />
-					<Unit value={countdown ? String(countdown.hours) : '--'} label="時間" />
+					<Unit value={countdown ? pad(countdown.hours) : '--'} label="時間" />
+					<Unit value={countdown ? pad(countdown.minutes) : '--'} label="分" />
+					<Unit value={countdown ? pad(countdown.seconds) : '--'} label="秒" />
 				</div>
 			)}
 		</section>
