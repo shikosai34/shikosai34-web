@@ -2,6 +2,7 @@
 import SiteHeader from '../components/layout/SiteHeader.astro';
 import SiteFooter from '../components/layout/SiteFooter.astro';
 import BreakingNewsHero from '../components/home/BreakingNewsHero';
+import CountdownSection from '../components/home/CountdownSection';
 import ThemeModel from '../components/home/ThemeModel';
 import ThemeSection from '../components/home/ThemeSection';
 import NewsSection from '../components/home/NewsSection';
@@ -46,6 +47,8 @@ const stageEvents = (await getVisibleEvents()).map((entry) => ({
 			posterFullWidth={Number(posterFull.attributes.width)}
 			posterFullHeight={Number(posterFull.attributes.height)}
 		/>
+
+		<CountdownSection client:load />
 
 		<ThemeSection>
 			<ThemeModel slot="mark" client:only="react" />
