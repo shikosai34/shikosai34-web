@@ -1,0 +1,12 @@
+---
+name: 漫画研究同好会
+nameKana: まんがけんきゅうどうこうかい
+slug: manga-kenkyu-doukoukai
+category: society
+location: 1号館3階 第二体育館
+genre: culture
+summary: 部員が作成したイラストを用いた缶バッチや部誌の販売を行います。
+details: 無料配布も計画中。
+fesflowPlanned: false
+---
+漫画研究同好会では、部員たちが作ったイラストを用いた缶バッチや部誌の販売、塗り絵の頒布を行います。ここまで作り上げてきた数々の作品たちを、どうぞご覧ください。ブース内にはフォトスポットも設置予定です。
