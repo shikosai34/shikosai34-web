@@ -128,6 +128,7 @@ collections:
           - { label: 同好会, value: society }
           - { label: その他, value: other }
       - { label: 実施場所, name: location, widget: string, hint: '教室名など。' }
+      - { label: 雨天時の場所・対応, name: rainLocation, widget: string, required: false, hint: '雨天時の場所、または中止などの対応。' }
       - label: サークルカテゴリ
         name: genre
         widget: select
@@ -153,12 +154,12 @@ collections:
         name: scheduleDay1
         widget: string
         required: false
-        hint: '例: 10:00〜16:00。この日に実施しない場合は空欄にしてください。'
+        hint: '開催時間（分かる場合）または「出店あり」。実施しない日は空欄にしてください。'
       - label: 実施時間（10月25日）
         name: scheduleDay2
         widget: string
         required: false
-        hint: '例: 10:00〜15:00。この日に実施しない場合は空欄にしてください。'
+        hint: '開催時間（分かる場合）または「出店あり」。実施しない日は空欄にしてください。'
       - { label: FesFlow 導入予定, name: fesflowPlanned, widget: boolean, default: false }
       - label: サムネイル画像
         name: image

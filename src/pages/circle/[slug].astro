@@ -24,6 +24,7 @@ const {
 	highlights,
 	details,
 	location,
+	rainLocation,
 	scheduleDay1,
 	scheduleDay2,
 	image,
@@ -82,6 +83,12 @@ const schedules = [
 				}
 				<dt class="font-medium">場所</dt>
 				<dd>{location}</dd>
+				{rainLocation && (
+					<>
+						<dt class="font-medium">雨天時</dt>
+						<dd>{rainLocation}</dd>
+					</>
+				)}
 			</dl>
 
 			{

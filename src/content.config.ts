@@ -61,6 +61,8 @@ const circles = defineCollection({
 		category: z.enum(CIRCLE_CATEGORIES),
 		/** 実施場所（教室名など） */
 		location: z.string().min(1),
+		/** 雨天時の場所または中止案内（任意）。 */
+		rainLocation: z.string().optional(),
 		/** サークルカテゴリ（文化・食品・技術）。学年・種別の `category` とは別軸。 */
 		genre: z.enum(CIRCLE_GENRES),
 		/** 紹介文（短文）。一覧カードと詳細冒頭に表示する。 */
@@ -69,9 +71,9 @@ const circles = defineCollection({
 		highlights: z.string().optional(),
 		/** 値段設定・企画詳細（任意） */
 		details: z.string().optional(),
-		/** 実施時間（自由記述）。10月24日 */
+		/** 実施時間または出店有無（自由記述）。10月24日 */
 		scheduleDay1: z.string().optional(),
-		/** 実施時間（自由記述）。10月25日 */
+		/** 実施時間または出店有無（自由記述）。10月25日 */
 		scheduleDay2: z.string().optional(),
 		/** FesFlow 導入予定（各団体の申告）。詳細ページのリンク表示判定に使う。 */
 		fesflowPlanned: z.boolean(),
