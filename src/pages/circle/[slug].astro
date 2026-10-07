@@ -49,10 +49,10 @@ const schedules = [
 			<div class="mt-4 overflow-hidden rounded-xl">
 				{
 					image ? (
-						<img src={image} alt="" class="aspect-video w-full object-cover" />
+						<img src={image} alt="" class="aspect-square w-full object-cover" />
 					) : (
 						<div
-							class="kikko flex aspect-video w-full items-center justify-center bg-text/5 text-sm text-text/60"
+							class="kikko flex aspect-square w-full items-center justify-center bg-text/5 text-sm text-text/60"
 							aria-hidden="true"
 						>
 							画像準備中
@@ -118,7 +118,7 @@ const schedules = [
 					<ul class="mt-6 grid grid-cols-2 gap-3">
 						{otherImages.map((src) => (
 							<li>
-								<img src={src} alt="" loading="lazy" class="aspect-video w-full rounded-xl object-cover" />
+								<img src={src} alt="" loading="lazy" class="aspect-square w-full rounded-xl object-cover" />
 							</li>
 						))}
 					</ul>
