@@ -2,6 +2,7 @@
 import SiteHeader from '../components/layout/SiteHeader.astro';
 import SiteFooter from '../components/layout/SiteFooter.astro';
 import BreakingNewsHero from '../components/home/BreakingNewsHero';
+import BusCountdownWidget from '../components/home/BusCountdownWidget';
 import CountdownSection from '../components/home/CountdownSection';
 import ThemeModel from '../components/home/ThemeModel';
 import ThemeSection from '../components/home/ThemeSection';
@@ -63,6 +64,8 @@ const stageEvents = (await getVisibleEvents()).map((entry) => ({
 			<NewsSection items={latestNews} />
 		</div>
 	</main>
+
+	<BusCountdownWidget client:load />
 
 	<SiteFooter />
 </Layout>
