@@ -8,6 +8,6 @@ genre: food
 summary: ティータイムセミナー同好会によるお嬢様カフェです。
 details: ソース焼きそば 400円 / 塩焼きそば 400円
 fesflowPlanned: false
-image: https://assets.34.shikosai.net/news/41d8cfe9-ec12-4906-aab5-296312fe9c1f.webp
+image: https://assets.34.shikosai.net/news/ebef37d1-f6c2-4d48-b8a7-80c9037dc7fb.webp
 ---
 ティータイムセミナー同好会が提供するのは、お嬢様カフェ。ティータイムといえば、もちろんお嬢様ですわね。ここでは、紅茶やコーヒー、小腹を満たす軽食がお楽しみいただけますわ。さあ、召し上がれ♪
