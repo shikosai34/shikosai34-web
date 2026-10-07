@@ -3,7 +3,7 @@ name: Tech.AGRI
 nameKana: てっくあぐり
 slug: tech-agri
 category: society
-location: "グラウンド"
+location: "グラウンド-8"
 genre: "food"
 summary: "こだわり選び抜いた干し芋フラペチーノをぜひご賞味ください！"
 details: "干し芋シェイク　300円"
@@ -15,7 +15,7 @@ otherImages:
 snsLinks:
   - label: 公式サイト
     url: https://script.google.com/a/macros/gm.ibaraki-ct.ac.jp/s/AKfycbwRY2bTfVLNXEN8LzlJ6pxWXm9w8HKfuIz2bIh4V_9M6ozeTwsHO7eu0VKtYBrvGqsu/exec
-scheduleDay1: "出店あり"
-scheduleDay2: "出店あり"
+scheduleDay1: "9:00〜17:00"
+scheduleDay2: "9:00〜15:00"
 ---
 ひたちなか市の特産物”干し芋”を発信するのは、Tech.AGRI。干し芋のおいしさや魅力をより感じてもらうべく、干し芋シェイクを販売します。自然を感じる優しい甘さと、なめらかな食感をぜひその舌で感じてください。

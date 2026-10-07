@@ -10,7 +10,7 @@ details: "ノンアルコールカクテル 500 円\n･グレナディンソー
 fesflowPlanned: false
 image: https://assets.34.shikosai.net/news/ee8e81dc-65d0-48cb-a499-35b7f0c88898.webp
 rainLocation: "マルチメディア"
-scheduleDay1: "出店あり"
-scheduleDay2: "出店あり"
+scheduleDay1: "9:00〜17:00"
+scheduleDay2: "9:00〜15:00"
 ---
 ダーツ同好会が営業するのは、本格ダーツバー。軽食やノンアルカクテルを楽しめるほか、プロ生徒とのダーツ対戦など様々な交流ができます。ちょっぴりダウナーなバーの雰囲気を感じながら、ダーツも楽しめます！
