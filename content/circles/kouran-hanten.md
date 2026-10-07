@@ -8,5 +8,6 @@ genre: food
 summary: スタッフこだわりの水餃子を中華スープと辛めのタレで提供します。
 details: 水餃子 200〜300円
 fesflowPlanned: false
+image: https://assets.34.shikosai.net/news/a056a6a2-72ef-4cd1-b0af-db3ea54ccb4c.webp
 ---
 紅蘭飯店では、スタッフこだわりの水餃子を販売。中華スープと辛めのタレというシンプルな味つけですが、その味は格別。一度食べたらもうそこは本場、中国。思わずトリップしてしまいそうになる水餃子、召し上がれ。
