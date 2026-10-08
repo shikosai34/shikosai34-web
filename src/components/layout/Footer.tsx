@@ -1,5 +1,4 @@
 import InstagramIcon from '../icons/InstagramIcon';
-import NoteIcon from '../icons/NoteIcon';
 import XLogoIcon from '../icons/XLogoIcon';
 import FooterLinkColumn from './FooterLinkColumn';
 
@@ -9,20 +8,17 @@ interface Props {
 }
 
 const snsLinks = [
-	{ label: 'X（Twitter）', href: 'https://x.com/', icon: <XLogoIcon className="h-4 w-4" /> },
-	{ label: 'Instagram', href: 'https://instagram.com/', icon: <InstagramIcon className="h-4 w-4" /> },
-	{ label: 'note', href: 'https://note.com/', icon: <NoteIcon className="h-4 w-4" /> },
-];
-
-const circleLinks = [
-	{ label: '学年ごとに見る', href: '/circle?filter=grade' },
-	{ label: '区分ごとにみる', href: '/circle?filter=category' },
-	{ label: '種別ごとに見る', href: '/circle?filter=type' },
+	{ label: 'X（公式）', href: 'https://x.com/Shikosai34', icon: <XLogoIcon className="h-4 w-4" /> },
+	{ label: 'Instagram（公式）', href: 'https://www.instagram.com/shikosai34/', icon: <InstagramIcon className="h-4 w-4" /> },
+	{ label: 'Instagram（情報部）', href: 'https://www.instagram.com/shikosai34_tech/', icon: <InstagramIcon className="h-4 w-4" /> },
 ];
 
 const eventLinks = [
 	{ label: '1日目（10月24日）', href: '/timetable#day-1' },
 	{ label: '2日目（10月25日）', href: '/timetable#day-2' },
+	{ label: 'サークル一覧（学年ごと）', href: '/circle?filter=grade' },
+	{ label: 'サークル一覧（区分ごと）', href: '/circle?filter=category' },
+	{ label: 'サークル一覧（種別ごと）', href: '/circle?filter=type' },
 ];
 
 const otherLinks = [
@@ -49,7 +45,6 @@ export default function Footer({ logoSrc, kosenLogoSrc }: Props) {
 	
 				<div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-8 md:flex md:flex-wrap md:justify-center md:gap-x-16">
 					<FooterLinkColumn heading="公式SNS" links={snsLinks} />
-					<FooterLinkColumn heading="サークル" links={circleLinks} />
 					<FooterLinkColumn heading="イベント" links={eventLinks} />
 					<FooterLinkColumn heading="その他のページ" links={otherLinks} />
 				</div>
