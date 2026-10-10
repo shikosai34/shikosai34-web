@@ -2,7 +2,7 @@
 name: ティータイムセミナー同好会
 nameKana: てぃーたいむせみなーどうこうかい
 slug: tea-time-seminar-doukoukai
-category: society
+category: culture
 location: "1号館3階"
 genre: "food"
 summary: ティータイムセミナー同好会によるお嬢様カフェです。

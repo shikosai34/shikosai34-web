@@ -2,7 +2,7 @@
 name: ジャグリング同好会
 nameKana: じゃぐりんぐどうこうかい
 slug: juggling-doukoukai
-category: society
+category: culture
 location: "グラウンド-32"
 genre: "culture"
 summary: "ジャグリング体験を企画しています。当日は簡単なお題に挑戦ができお菓子のプレゼントもあります。"

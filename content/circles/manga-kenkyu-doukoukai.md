@@ -2,7 +2,7 @@
 name: 漫画研究同好会
 nameKana: まんがけんきゅうどうこうかい
 slug: manga-kenkyu-doukoukai
-category: society
+category: culture
 location: "1号館3階"
 genre: "culture"
 summary: "部員が作成したイラストを用いた缶バッチや部誌の販売を行います。"

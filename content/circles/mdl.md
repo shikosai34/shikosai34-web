@@ -2,7 +2,7 @@
 name: MDL
 nameKana: えむでぃーえる
 slug: mdl
-category: society
+category: culture
 location: "ベンチャーラボ"
 genre: "culture"
 summary: "自作ゲームを中心に、メンバーそれぞれの発想をカタチにした作品を展示　しています。"

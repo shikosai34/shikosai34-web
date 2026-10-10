@@ -2,7 +2,7 @@
 name: ICE(国際交流同好会)
 nameKana: あいしーいーこくさいこうりゅうどうこうかい
 slug: ice
-category: society
+category: culture
 location: "グラウンド-29"
 genre: "culture"
 summary: "国際交流を通して、さまざまな文化や人との交流を楽しむ同好会です！"

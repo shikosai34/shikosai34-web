@@ -123,10 +123,10 @@ collections:
           - { label: 3年生, value: grade3 }
           - { label: 4年生, value: grade4 }
           - { label: 5年生, value: grade5 }
+          - { label: 専攻科, value: advanced }
           - { label: 運動部, value: sports }
           - { label: 文化部, value: culture }
-          - { label: 同好会, value: society }
-          - { label: その他, value: other }
+          - { label: 有志サークル, value: other }
       - { label: 実施場所, name: location, widget: string, hint: '教室名など。' }
       - { label: 雨天時の場所・対応, name: rainLocation, widget: string, required: false, hint: '雨天時の場所、または中止などの対応。' }
       - label: サークルカテゴリ
