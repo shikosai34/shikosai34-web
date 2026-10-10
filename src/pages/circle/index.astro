@@ -10,12 +10,11 @@ import {
 	CIRCLE_CATEGORY_LABELS,
 	CIRCLE_GENRE_LABELS,
 	normalizeForSearch,
+	sortCirclesByCategory,
 } from '../../lib/circles';
 import { getCollectionOrEmpty } from '../../lib/content';
 
-const circles = (await getCollectionOrEmpty('circles')).sort((a, b) =>
-	a.data.nameKana.localeCompare(b.data.nameKana, 'ja'),
-);
+const circles = sortCirclesByCategory(await getCollectionOrEmpty('circles'));
 
 const countByCategory = new Map<string, number>();
 for (const circle of circles) {
