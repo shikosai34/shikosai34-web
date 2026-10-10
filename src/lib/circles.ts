@@ -70,3 +70,42 @@ export const CIRCLE_GENRE_LABELS: Record<CircleGenre, string> = {
 export function normalizeForSearch(value: string): string {
 	return value.normalize('NFKC').toLowerCase();
 }
+
+/**
+ * クラス出店（1〜5年生）の slug（"1-1" 等）を組番号順に比較する。
+ * 数字部分を取り出して比較し、取れない場合は文字列として比較する。
+ */
+function compareClassSlug(a: string, b: string): number {
+	const parse = (slug: string) => {
+		const match = slug.match(/^(\d+)-(\d+)$/);
+		return match ? [Number(match[1]), Number(match[2])] : null;
+	};
+	const pa = parse(a);
+	const pb = parse(b);
+	if (pa && pb) {
+		return pa[0] - pb[0] || pa[1] - pb[1];
+	}
+	return a.localeCompare(b, 'ja');
+}
+
+/**
+ * サークル一覧をカテゴリ（学年→種別）ごとにまとめ、カテゴリ内で並べ替える。
+ * 学年（grade1, grade2）はクラス出店の組番号順（slug: "1-1", "1-2", ...）、
+ * それ以外のカテゴリは `nameKana` の五十音順。
+ */
+export function sortCirclesByCategory<T extends { data: { category: string; nameKana: string }; id: string }>(
+	circles: T[],
+): T[] {
+	const order = new Map(CIRCLE_CATEGORIES.map((category, index) => [category, index]));
+	return [...circles].sort((a, b) => {
+		const categoryDiff =
+			(order.get(a.data.category) ?? Number.MAX_SAFE_INTEGER) -
+			(order.get(b.data.category) ?? Number.MAX_SAFE_INTEGER);
+		if (categoryDiff !== 0) return categoryDiff;
+
+		if (a.data.category === 'grade1' || a.data.category === 'grade2') {
+			return compareClassSlug(a.id, b.id);
+		}
+		return a.data.nameKana.localeCompare(b.data.nameKana, 'ja');
+	});
+}
