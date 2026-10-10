@@ -29,12 +29,24 @@ export default function BreakingNewsHero({
 	 * めくった回数。1回ごとに同じ向きへ 180 度ずつ足していき、
 	 * 表へ戻すときも逆回転させずに一周（計 360 度）させる。
 	 */
+	const turnDurationMs = 700;
+
 	const [turns, setTurns] = useState(0);
 	const flipped = turns % 2 === 1;
+	// 表面・裏面それぞれの不透明度。rotateY の進行角度から毎フレーム計算する
+	// （下記コメント参照）。どちらも 1 のまま重なって見えることがないよう、
+	// 片方が上がるときはもう片方を必ず下げる。
+	const [frontOpacity, setFrontOpacity] = useState(1);
+	const [backOpacity, setBackOpacity] = useState(0);
 	const showButtonRef = useRef<HTMLButtonElement>(null);
 	const backButtonRef = useRef<HTMLButtonElement>(null);
 	// 初回描画ではフォーカスを動かさない（ページを開いた瞬間に奪わないため）。
 	const hasToggled = useRef(false);
+	const animationFrame = useRef<number | null>(null);
+
+	useEffect(() => () => {
+		if (animationFrame.current !== null) window.cancelAnimationFrame(animationFrame.current);
+	}, []);
 
 	/*
 	 * めくった先の面へフォーカスを移す。隠れた面は inert にするので、
@@ -49,6 +61,43 @@ export default function BreakingNewsHero({
 		if (next === flipped) return;
 		hasToggled.current = true;
 		setTurns((count) => count + 1);
+
+		if (animationFrame.current !== null) window.cancelAnimationFrame(animationFrame.current);
+
+		// reduced motion では transition が無効になり回転が一瞬で終わるため、
+		// アニメーションを待たずに即座に不透明度を確定させる。
+		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		if (reduceMotion) {
+			setFrontOpacity(next ? 0 : 1);
+			setBackOpacity(next ? 1 : 0);
+			return;
+		}
+
+		// rotateY と同じ ease-in-out（CSS の transition と揃える）で 0→1 の
+		// 進行度を作り、めくり始めに見えていた面を前半で 1→0 にフェードアウト、
+		// めくり終わりに見せたい面を後半で 0→1 にフェードインさせる。
+		// backface-visibility には一切頼らないので、Safari で鏡像が残る／
+		// 両面重なって見えるバグそのものが起こらない。
+		//
+		// next=true（表→裏）なら表が先、next=false（裏→表、表に戻る）なら
+		// 裏が先に消える面になる。
+		const fadingOutIsFront = next;
+		const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
+		const start = performance.now();
+		const step = (now: number) => {
+			const progress = Math.min(1, (now - start) / turnDurationMs);
+			const eased = easeInOut(progress);
+			const fadingOutOpacity = eased < 0.5 ? 1 - eased * 2 : 0;
+			const fadingInOpacity = eased >= 0.5 ? (eased - 0.5) * 2 : 0;
+			setFrontOpacity(fadingOutIsFront ? fadingOutOpacity : fadingInOpacity);
+			setBackOpacity(fadingOutIsFront ? fadingInOpacity : fadingOutOpacity);
+			if (progress < 1) {
+				animationFrame.current = window.requestAnimationFrame(step);
+			} else {
+				animationFrame.current = null;
+			}
+		};
+		animationFrame.current = window.requestAnimationFrame(step);
 	};
 
 	/*
@@ -58,6 +107,10 @@ export default function BreakingNewsHero({
 	 *
 	 * 表面が高さを決め、裏面はその上に重ねて（absolute）同じ大きさにする。
 	 * ポスターは縦長なので、裏面では高さに収まるよう object-contain で縮める。
+	 *
+	 * Safari は backface-hidden（backface-visibility）の合成が崩れ、回転中に
+	 * 両面が重なって見えることがある。backface-hidden に一切頼らず、
+	 * opacity で表裏を明示的に出し分けることで、ブラウザの実装差を踏まない。
 	 */
 	return (
 		<div
@@ -67,11 +120,12 @@ export default function BreakingNewsHero({
 			}}
 		>
 			<div
-				className="relative transition-transform duration-700 ease-in-out transform-3d motion-reduce:transition-none"
-				style={{ transform: `rotateY(${turns * 180}deg)` }}
+				className="relative transition-transform ease-in-out transform-3d motion-reduce:transition-none"
+				style={{ transform: `rotateY(${turns * 180}deg)`, transitionDuration: `${turnDurationMs}ms` }}
 			>
 				<section
-					className="surface-panel rounded-2xl px-4 pt-6 pb-4 backface-hidden sm:px-6 lg:px-10 lg:pb-8"
+					className="surface-panel rounded-2xl px-4 pt-6 pb-4 sm:px-6 lg:px-10 lg:pb-8"
+					style={{ opacity: frontOpacity, visibility: frontOpacity <= 0 ? 'hidden' : 'visible' }}
 					inert={flipped}
 					aria-hidden={flipped}
 				>
@@ -169,7 +223,8 @@ export default function BreakingNewsHero({
 
 				{/* 裏面。ポスター全体を貼り、表へ戻るボタンを添える。 */}
 				<section
-					className="surface-panel absolute inset-0 flex rotate-y-180 flex-col items-center gap-3 rounded-2xl p-4 backface-hidden"
+					className="surface-panel absolute inset-0 flex rotate-y-180 flex-col items-center gap-3 rounded-2xl p-4"
+					style={{ opacity: backOpacity, visibility: backOpacity <= 0 ? 'hidden' : 'visible' }}
 					inert={!flipped}
 					aria-hidden={!flipped}
 					aria-label="ポスター全体"

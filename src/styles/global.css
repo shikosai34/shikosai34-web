@@ -477,22 +477,28 @@
 
   /*
    * 見出しをネオン管のように光らせる。
-   * text-shadow を「芯の白・中間・外側」の3段で重ねるのが要点で、
-   * 1段だけだとただのぼやけた文字になる。
+   * 「芯の白・中間・外側」の3段を重ねるのが要点で、1段だけだとただの
+   * ぼやけた文字になる。
+   *
+   * text-shadow ではなく filter: drop-shadow() を使う。.outlined-text の
+   * -webkit-text-stroke と text-shadow を同じ要素に重ねると、Safari は
+   * 縁取り（stroke）にも影が別途乗って fill 側と二重に重なり、Chrome より
+   * 大幅に明るく（眩しく）レンダリングされる。drop-shadow は縁取り込みの
+   * 文字の輪郭全体に 1 回だけ影を落とすため、この重複が起きない。
    */
   .neon-text {
-    color: var(--color-text);
-    text-shadow:
-      0 0 4px color-mix(in srgb, var(--color-glow-pink) 90%, transparent),
-      0 0 11px color-mix(in srgb, var(--color-glitch) 75%, transparent),
-      0 0 24px color-mix(in srgb, var(--color-glitch) 45%, transparent);
+    color: var(--color-glow-pink);
+    filter:
+      drop-shadow(0 0 4px color-mix(in srgb, var(--color-glow-pink) 90%, transparent))
+      drop-shadow(0 0 11px color-mix(in srgb, var(--color-glitch) 75%, transparent))
+      drop-shadow(0 0 24px color-mix(in srgb, var(--color-glitch) 45%, transparent));
   }
 
   .neon-text--cyan {
-    text-shadow:
-      0 0 4px color-mix(in srgb, var(--color-accent) 90%, transparent),
-      0 0 11px color-mix(in srgb, var(--color-accent) 70%, transparent),
-      0 0 24px color-mix(in srgb, var(--color-accent) 40%, transparent);
+    filter:
+      drop-shadow(0 0 4px color-mix(in srgb, var(--color-accent) 90%, transparent))
+      drop-shadow(0 0 11px color-mix(in srgb, var(--color-accent) 70%, transparent))
+      drop-shadow(0 0 24px color-mix(in srgb, var(--color-accent) 40%, transparent));
   }
 
   /*
