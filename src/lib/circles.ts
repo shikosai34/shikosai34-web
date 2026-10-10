@@ -24,7 +24,6 @@ export const CIRCLE_CATEGORY_GROUPS = [
 		options: [
 			{ value: 'sports', label: '運動部' },
 			{ value: 'culture', label: '文化部' },
-			{ value: 'society', label: '同好会' },
 			{ value: 'other', label: 'その他' },
 		],
 	},
@@ -39,7 +38,6 @@ export const CIRCLE_CATEGORIES = [
 	'advanced',
 	'sports',
 	'culture',
-	'society',
 	'other',
 ] as const;
 
@@ -54,7 +52,6 @@ export const CIRCLE_CATEGORY_LABELS: Record<CircleCategory, string> = {
 	advanced: '専攻科',
 	sports: '運動部',
 	culture: '文化部',
-	society: '同好会',
 	other: 'その他',
 };
 

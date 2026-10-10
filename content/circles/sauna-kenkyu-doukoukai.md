@@ -2,7 +2,7 @@
 name: サウナ研究同好会
 nameKana: さうなけんきゅうどうこうかい
 slug: sauna-kenkyu-doukoukai
-category: society
+category: culture
 location: "グラウンド-24"
 genre: "culture"
 summary: "己との戦いはサウナだけじゃない。型抜きで限界を超えろ！"

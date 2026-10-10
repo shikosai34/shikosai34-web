@@ -2,7 +2,7 @@
 name: Tech.AGRI
 nameKana: てっくあぐり
 slug: tech-agri
-category: society
+category: culture
 location: "グラウンド-8"
 genre: "food"
 summary: "こだわり選び抜いた干し芋フラペチーノをぜひご賞味ください！"

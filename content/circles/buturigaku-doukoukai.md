@@ -2,7 +2,7 @@
 name: 物理学同好会
 nameKana: ぶつりがくどうこうかい
 slug: buturigaku-doukoukai
-category: society
+category: culture
 location: "グラウンド-31"
 genre: "culture"
 summary: "自作エレキギター演奏体験、物理学をミニマルデザインに落とし込んだアイテム販売"

@@ -2,7 +2,7 @@
 name: ダーツ同好会
 nameKana: だーつどうこうかい
 slug: darts-doukoukai
-category: society
+category: culture
 location: "2-5"
 genre: "food"
 summary: "ノンアルコールカクテルや美味しいお菓子と一緒にダーツを楽しめます！"
