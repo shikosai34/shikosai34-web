@@ -72,10 +72,10 @@ export function normalizeForSearch(value: string): string {
 }
 
 /**
- * クラス出店（1〜5年生）の slug（"1-1" 等）を組番号順に比較する。
+ * 1・2年生のクラス出店 slug（"1-1" 等）を組番号順に比較する。
  * 数字部分を取り出して比較し、取れない場合は文字列として比較する。
  */
-function compareClassSlug(a: string, b: string): number {
+function compareGrade12Slug(a: string, b: string): number {
 	const parse = (slug: string) => {
 		const match = slug.match(/^(\d+)-(\d+)$/);
 		return match ? [Number(match[1]), Number(match[2])] : null;
@@ -88,9 +88,33 @@ function compareClassSlug(a: string, b: string): number {
 	return a.localeCompare(b, 'ja');
 }
 
+/** 3〜5年生のコース記号の表示順（M1 → M2 → E → I → C）。 */
+const GRADE345_COURSE_ORDER = ['m1', 'm2', 'e', 'i', 'c'];
+
+/**
+ * 3〜5年生のクラス出店 slug（"3m1", "4e", "5c" 等）をコース順に比較する。
+ * 数字部分（学年）が同じであれば、コース記号を GRADE345_COURSE_ORDER の順で比較する。
+ */
+function compareGrade345Slug(a: string, b: string): number {
+	const parse = (slug: string) => {
+		const match = slug.match(/^(\d+)([a-z0-9]+)$/);
+		return match ? ([Number(match[1]), match[2]] as const) : null;
+	};
+	const pa = parse(a);
+	const pb = parse(b);
+	if (pa && pb) {
+		if (pa[0] !== pb[0]) return pa[0] - pb[0];
+		const courseDiff = GRADE345_COURSE_ORDER.indexOf(pa[1]) - GRADE345_COURSE_ORDER.indexOf(pb[1]);
+		if (courseDiff !== 0) return courseDiff;
+		return pa[1].localeCompare(pb[1], 'ja');
+	}
+	return a.localeCompare(b, 'ja');
+}
+
 /**
  * サークル一覧をカテゴリ（学年→種別）ごとにまとめ、カテゴリ内で並べ替える。
- * 学年（grade1, grade2）はクラス出店の組番号順（slug: "1-1", "1-2", ...）、
+ * 1・2年生（grade1, grade2）はクラス出店の組番号順（slug: "1-1", "1-2", ...）、
+ * 3〜5年生（grade3〜grade5）はコース順 M1 → M2 → E → I → C（slug: "3m1", "3m2", "3e", "3i", "3c" 等）、
  * それ以外のカテゴリは `nameKana` の五十音順。
  */
 export function sortCirclesByCategory<T extends { data: { category: string; nameKana: string }; id: string }>(
@@ -104,7 +128,10 @@ export function sortCirclesByCategory<T extends { data: { category: string; name
 		if (categoryDiff !== 0) return categoryDiff;
 
 		if (a.data.category === 'grade1' || a.data.category === 'grade2') {
-			return compareClassSlug(a.id, b.id);
+			return compareGrade12Slug(a.id, b.id);
+		}
+		if (a.data.category === 'grade3' || a.data.category === 'grade4' || a.data.category === 'grade5') {
+			return compareGrade345Slug(a.id, b.id);
 		}
 		return a.data.nameKana.localeCompare(b.data.nameKana, 'ja');
 	});
