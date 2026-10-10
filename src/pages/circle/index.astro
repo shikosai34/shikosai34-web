@@ -87,24 +87,21 @@ for (const circle of circles) {
 							/>
 						</label>
 
-						<div class="flex flex-col gap-2">
+						<div class="flex flex-wrap gap-2">
 							{filterGroups.map((group) => (
-								<div
-									class="flex flex-wrap gap-2"
-									role="group"
-									aria-label={`${group.label}で絞り込み`}
-								>
+								<Fragment>
 									{group.options.map((option) => (
 										<button
 											type="button"
 											class="rounded-full border border-text/30 px-3 py-1 text-sm text-text transition-colors aria-pressed:border-main aria-pressed:bg-main aria-pressed:font-medium aria-pressed:text-base"
 											data-filter={option.value}
 											aria-pressed="false"
+											aria-label={`${group.label}: ${option.label}`}
 										>
 											{option.label}
 										</button>
 									))}
-								</div>
+								</Fragment>
 							))}
 						</div>
 
