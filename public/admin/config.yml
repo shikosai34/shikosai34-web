@@ -126,7 +126,6 @@ collections:
           - { label: 専攻科, value: advanced }
           - { label: 運動部, value: sports }
           - { label: 文化部, value: culture }
-          - { label: 同好会, value: society }
           - { label: その他, value: other }
       - { label: 実施場所, name: location, widget: string, hint: '教室名など。' }
       - { label: 雨天時の場所・対応, name: rainLocation, widget: string, required: false, hint: '雨天時の場所、または中止などの対応。' }
