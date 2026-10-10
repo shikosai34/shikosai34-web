@@ -6,6 +6,13 @@ import mv03 from '../../assets/main-visual/03.png';
 import mv04 from '../../assets/main-visual/04.png';
 import mv05 from '../../assets/main-visual/05.png';
 import mv06 from '../../assets/main-visual/06.png';
+import ponzuAngle1 from '../../assets/main-visual/ponzu-angle-1.png';
+import ponzuAngle2 from '../../assets/main-visual/ponzu-angle-2.png';
+import ponzuAngle3 from '../../assets/main-visual/ponzu-angle-3.png';
+import ponzuFront1 from '../../assets/main-visual/ponzu-front-1.png';
+import ponzuFront2 from '../../assets/main-visual/ponzu-front-2.png';
+import ponzuFront3 from '../../assets/main-visual/ponzu-front-3.png';
+import ponzuFront4 from '../../assets/main-visual/ponzu-front-4.png';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
 import SiteHeader from '../../components/layout/SiteHeader.astro';
 import MainVisualLightbox from '../../components/main-visual/MainVisualLightbox';
@@ -16,6 +23,8 @@ import Layout from '../../layouts/Layout.astro';
 const visualSources = [mv03, mv01, mv02, mv04];
 // オリジナルキャラクターは別の括りとして扱う。
 const characterSources = [mv05, mv06];
+// ぽんずの表情差分。立ち絵・三面図とは縦横比が揃っているため同じグリッドに並べる。
+const ponzuSources = [ponzuFront1, ponzuFront2, ponzuFront3, ponzuFront4, ponzuAngle1, ponzuAngle2, ponzuAngle3];
 
 // 原寸は最大 4961×7016 と重いので、格子用とライトボックス用の 2 段階に縮小して
 // webp へ変換する（トップページのポスターと同じ `getImage` の使い方）。
@@ -38,11 +47,13 @@ async function toItems(sources: ImageMetadata[]) {
 
 const visualItems = await toItems(visualSources);
 const characterItems = await toItems(characterSources);
+const ponzuItems = await toItems(ponzuSources);
 
 // ライトボックスの送りはセクション内で完結させるため、グループごとに渡す。
 const groups = [
 	{ key: 'visual', items: visualItems },
 	{ key: 'character', items: characterItems },
+	{ key: 'ponzu', items: ponzuItems },
 ];
 ---
 
@@ -118,6 +129,36 @@ const groups = [
 							<a
 								href={item.src}
 								data-lightbox-group="character"
+								data-lightbox-index={index}
+								class="block overflow-hidden rounded-xl transition-transform hover:-translate-y-0.5"
+							>
+								<img
+									src={item.thumb}
+									alt=""
+									width={item.width}
+									height={item.height}
+									loading="lazy"
+									decoding="async"
+									class="w-full rounded-xl border border-text/80"
+								/>
+							</a>
+						</li>
+					))
+				}
+			</ul>
+
+			{/*
+			 * ポスターにも登場した「ぽんず」の表情差分。立ち絵・三面図とは
+			 * 役割が違う（表情のバリエーション）ため、上に余白を空けて区切る。
+			 * 縦横比はほぼ揃っているので Visual セクションと同じ格子で並べる。
+			 */}
+			<ul class="mt-8 grid grid-cols-2 items-start gap-3 lg:grid-cols-4 lg:gap-4">
+				{
+					ponzuItems.map((item, index) => (
+						<li>
+							<a
+								href={item.src}
+								data-lightbox-group="ponzu"
 								data-lightbox-index={index}
 								class="block overflow-hidden rounded-xl transition-transform hover:-translate-y-0.5"
 							>
