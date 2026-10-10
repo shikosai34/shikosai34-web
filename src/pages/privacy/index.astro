@@ -1,5 +1,93 @@
 ---
-import PlaceholderPage from '../../components/ui/PlaceholderPage.astro';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import SiteHeader from '../../components/layout/SiteHeader.astro';
+import SectionHeading from '../../components/ui/SectionHeading';
+import Layout from '../../layouts/Layout.astro';
+
+const lastUpdated = '2026年10月5日';
 ---
 
-<PlaceholderPage title="プライバシーポリシー" heading="Privacy Policy" icon="shield" />
+<Layout title="プライバシーポリシー | 第34回 茨香祭">
+	<SiteHeader />
+
+	<main class="mx-auto w-full max-w-3xl px-4 pb-16 sm:px-6">
+		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
+			<SectionHeading title="Privacy Policy" icon="shield" subtitle="プライバシーポリシー" />
+
+			<div class="space-y-10 border-t border-text/40 pt-6">
+				<p class="text-sm leading-relaxed text-text/80">
+					このページは、第34回茨香祭実行委員会（以下「当実行委員会」）が運営する本サイト（以下「当サイト」）のご利用にあたってのプライバシーポリシーです。当サイトをご利用いただく前に、内容をご確認ください。
+				</p>
+
+				<section aria-labelledby="collection-heading">
+					<h2 id="collection-heading" class="border-b-2 border-text/25 pb-2 text-xl font-medium text-text">
+						個人情報の収集について
+					</h2>
+					<p class="mt-4 text-sm leading-relaxed text-text/80">
+						当サイトは、お名前・ご住所・メールアドレスなどの個人情報を入力いただくフォームを設けておらず、<strong class="font-medium text-text">利用者の皆さまから個人情報を収集することはありません</strong>。
+					</p>
+					<p class="mt-3 text-sm leading-relaxed text-text/80">
+						なお、当サイトの閲覧に伴いご利用のブラウザから自動的に送信される情報（IPアドレス、ブラウザの種類、閲覧日時など）は、ホスティングサービスのアクセスログとして一時的に記録される場合がありますが、これらは個人を特定する目的では利用しません。
+					</p>
+				</section>
+
+				<section aria-labelledby="cookie-heading">
+					<h2 id="cookie-heading" class="border-b-2 border-text/25 pb-2 text-xl font-medium text-text">
+						Cookie（クッキー）について
+					</h2>
+					<p class="mt-4 text-sm leading-relaxed text-text/80">
+						当サイトでは、表示テーマの記憶など、利用者の操作性を高める目的でCookieやブラウザのローカルストレージを利用することがあります。これらは当サイトの外部に送信されるものではなく、広告の配信や第三者によるトラッキングには利用していません。
+					</p>
+				</section>
+
+				<section aria-labelledby="fesflow-heading">
+					<h2 id="fesflow-heading" class="border-b-2 border-text/25 pb-2 text-xl font-medium text-text">
+						外部サービス（FesFlow）について
+					</h2>
+					<p class="mt-4 text-sm leading-relaxed text-text/80">
+						サークル紹介ページなどから、「FesFlow」のページへ遷移する場合があります。FesFlowは当実行委員会が作成したサービスですが、<strong class="font-medium text-text">当サイトとは別のサービスとして運営</strong>しており、本ページの対象には含まれません。
+					</p>
+					<p class="mt-3 text-sm leading-relaxed text-text/80">
+						FesFlow上での情報の取り扱いについては、FesFlow側で別途定めるプライバシーポリシーをご確認ください。
+					</p>
+				</section>
+
+				<section aria-labelledby="terms-heading">
+					<h2 id="terms-heading" class="border-b-2 border-text/25 pb-2 text-xl font-medium text-text">
+						利用規約
+					</h2>
+					<p class="mt-4 text-sm leading-relaxed text-text/80">
+						当サイトに掲載する文章・画像・ロゴなどの著作物は、当実行委員会または正当な権利を持つ第三者に帰属します。私的利用の範囲を超えて、無断での転載・複製・改変を行うことはご遠慮ください。
+					</p>
+					<p class="mt-3 text-sm leading-relaxed text-text/80">
+						当サイトに掲載する情報は、公開後の状況変化（日程・催し物の変更や中止など）により、予告なく内容を変更・削除する場合があります。あらかじめご了承ください。
+					</p>
+				</section>
+
+				<section aria-labelledby="update-heading">
+					<h2 id="update-heading" class="border-b-2 border-text/25 pb-2 text-xl font-medium text-text">
+						プライバシーポリシーの変更について
+					</h2>
+					<p class="mt-4 text-sm leading-relaxed text-text/80">
+						当実行委員会は、必要に応じて本ページの内容を予告なく変更することがあります。変更後の内容は、当サイトに掲載した時点から効力を持つものとします。
+					</p>
+					<p class="mt-3 text-sm text-text/60">最終更新日：{lastUpdated}</p>
+				</section>
+
+				<section aria-labelledby="contact-heading">
+					<h2 id="contact-heading" class="border-b-2 border-text/25 pb-2 text-xl font-medium text-text">
+						お問い合わせ
+					</h2>
+					<p class="mt-4 text-sm leading-relaxed text-text/80">
+						本ページの内容に関するお問い合わせは、<a
+							href="/contact"
+							class="text-accent underline underline-offset-4 hover:decoration-2 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+						>お問い合わせページ</a>よりご連絡ください。
+					</p>
+				</section>
+			</div>
+		</section>
+	</main>
+
+	<SiteFooter />
+</Layout>
