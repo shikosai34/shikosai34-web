@@ -4,7 +4,7 @@ nameKana: さうなけんきゅうどうこうかい
 slug: sauna-kenkyu-doukoukai
 category: society
 location: "グラウンド-24"
-genre: "food"
+genre: "culture"
 summary: "己との戦いはサウナだけじゃない。型抜きで限界を超えろ！"
 details: "サウナ研究同好会は、型抜きをします！！\n己との戦いという観点では、サウナと一緒だからです。\n型を抜いて整いましょう！！！\n１枚100円で型抜きをして景品をゲット！！！！\n失敗しても参加証あるよ！"
 fesflowPlanned: false
