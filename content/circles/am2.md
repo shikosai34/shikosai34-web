@@ -2,7 +2,7 @@
 name: ネコミミメイドラーメン
 nameKana: ねこみみめいどらーめん
 slug: am2
-category: grade5
+category: advanced
 location: "グラウンド"
 genre: "food"
 summary: "本格味噌ラーメン×ネコミミメイドの異色コラボ！一杯のラーメンにたっぷりの萌えを込めてお届けします！"
