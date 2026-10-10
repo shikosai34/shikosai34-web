@@ -24,7 +24,7 @@ export const CIRCLE_CATEGORY_GROUPS = [
 		options: [
 			{ value: 'sports', label: '運動部' },
 			{ value: 'culture', label: '文化部' },
-			{ value: 'other', label: 'その他' },
+			{ value: 'other', label: '有志サークル' },
 		],
 	},
 ] as const;
@@ -52,7 +52,7 @@ export const CIRCLE_CATEGORY_LABELS: Record<CircleCategory, string> = {
 	advanced: '専攻科',
 	sports: '運動部',
 	culture: '文化部',
-	other: 'その他',
+	other: '有志サークル',
 };
 
 /** 出展内容の区分（学年・種別の `category` とは別。CMS の「サークルカテゴリ」）。 */
