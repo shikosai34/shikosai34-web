@@ -16,6 +16,7 @@ export const CIRCLE_CATEGORY_GROUPS = [
 			{ value: 'grade3', label: '3年生' },
 			{ value: 'grade4', label: '4年生' },
 			{ value: 'grade5', label: '5年生' },
+			{ value: 'advanced', label: '専攻科' },
 		],
 	},
 	{
@@ -35,6 +36,7 @@ export const CIRCLE_CATEGORIES = [
 	'grade3',
 	'grade4',
 	'grade5',
+	'advanced',
 	'sports',
 	'culture',
 	'society',
@@ -49,6 +51,7 @@ export const CIRCLE_CATEGORY_LABELS: Record<CircleCategory, string> = {
 	grade3: '3年生',
 	grade4: '4年生',
 	grade5: '5年生',
+	advanced: '専攻科',
 	sports: '運動部',
 	culture: '文化部',
 	society: '同好会',
@@ -115,7 +118,7 @@ function compareGrade345Slug(a: string, b: string): number {
  * サークル一覧をカテゴリ（学年→種別）ごとにまとめ、カテゴリ内で並べ替える。
  * 1・2年生（grade1, grade2）はクラス出店の組番号順（slug: "1-1", "1-2", ...）、
  * 3〜5年生（grade3〜grade5）はコース順 M1 → M2 → E → I → C（slug: "3m1", "3m2", "3e", "3i", "3c" 等）、
- * それ以外のカテゴリは `nameKana` の五十音順。
+ * それ以外のカテゴリ（専攻科を含む）は `nameKana` の五十音順。
  */
 export function sortCirclesByCategory<T extends { data: { category: string; nameKana: string }; id: string }>(
 	circles: T[],
