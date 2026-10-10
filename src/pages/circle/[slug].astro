@@ -144,24 +144,24 @@ const schedules = [
 				)
 			}
 
-			<div class="mt-6 border-t border-text pt-4">
-				{
-					fesflowPlanned && fesflowUrl ? (
-						<a
-							href={fesflowUrl}
-							target="_blank"
-							rel="noopener noreferrer"
-							class="inline-block rounded-lg bg-accent px-4 py-2 text-sm font-bold text-base"
-						>
-							FesFlow で見る
-						</a>
-					) : fesflowPlanned ? (
-						<p class="text-sm text-text">FesFlow ページは準備中です。</p>
-					) : (
-						<p class="text-sm text-text">当日は会場でのご案内となります。</p>
-					)
-				}
-			</div>
+			{
+				fesflowPlanned && (
+					<div class="mt-6 border-t border-text pt-4">
+						{fesflowUrl ? (
+							<a
+								href={fesflowUrl}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="inline-block rounded-lg bg-accent px-4 py-2 text-sm font-bold text-base"
+							>
+								FesFlow で見る
+							</a>
+						) : (
+							<p class="text-sm text-text">FesFlow ページは準備中です。</p>
+						)}
+					</div>
+				)
+			}
 		</article>
 	</main>
 
