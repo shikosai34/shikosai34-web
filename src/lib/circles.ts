@@ -61,10 +61,16 @@ export const CIRCLE_GENRES = ['culture', 'food', 'tech'] as const;
 export type CircleGenre = (typeof CIRCLE_GENRES)[number];
 
 export const CIRCLE_GENRE_LABELS: Record<CircleGenre, string> = {
-	culture: '文化',
-	food: '食品',
-	tech: '技術',
+	culture: '文化系',
+	food: '飲食系',
+	tech: '技術系',
 };
+
+/** 絞り込み UI 用の出展内容グループ（学年・種別とは別の軸）。 */
+export const CIRCLE_GENRE_GROUP = {
+	label: '出展内容',
+	options: CIRCLE_GENRES.map((genre) => ({ value: genre, label: CIRCLE_GENRE_LABELS[genre] })),
+} as const;
 
 /** 検索・比較用に文字列を正規化する（全角半角を畳み、小文字化）。 */
 export function normalizeForSearch(value: string): string {
