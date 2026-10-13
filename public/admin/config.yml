@@ -90,7 +90,6 @@ collections:
         widget: boolean
         default: false
         hint: 'オンにしている間は本番サイトに表示されません。'
-        hint: 'オンにしている間は本番サイトに表示されません。'
       - { label: 重要なお知らせ, name: important, widget: boolean, default: false }
       - { label: 本文, name: body, widget: markdown }
 
