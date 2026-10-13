@@ -90,6 +90,7 @@ collections:
         widget: boolean
         default: false
         hint: 'オンにしている間は本番サイトに表示されません。'
+        hint: 'オンにしている間は本番サイトに表示されません。'
       - { label: 重要なお知らせ, name: important, widget: boolean, default: false }
       - { label: 本文, name: body, widget: markdown }
 
@@ -308,4 +309,38 @@ collections:
         name: draft
         widget: boolean
         default: false
-        hint: 'オンにしている間は本番サイトに表示されません。'
+
+  - name: staff
+    label: 実行委員の部署紹介
+    label_singular: 部署
+    description: 'スタッフページの部署紹介を管理します。表示順の小さい順に掲載します。'
+    folder: content/staff
+    create: true
+    slug: '{{fields.sortOrder}}-{{slug}}'
+    identifier_field: department
+    summary: '{{fields.sortOrder}}｜{{fields.department}}'
+    sortable_fields: [sortOrder, department]
+    fields:
+      - label: 表示順
+        name: sortOrder
+        widget: number
+        value_type: int
+        min: 0
+        hint: '小さい番号の部署が先に表示されます。'
+      - { label: 部署名, name: department, widget: string }
+      - label: 部署の名簿
+        name: members
+        widget: list
+        required: false
+        label_singular: メンバー
+        summary: '{{fields.role}}｜{{fields.name}}（{{fields.kana}}）'
+        fields:
+          - { label: 役職, name: role, widget: string }
+          - { label: 氏名, name: name, widget: string }
+          - { label: ふりがな, name: kana, widget: string }
+      - { label: 部署の説明文, name: description, widget: text }
+      - label: 部署の写真
+        name: image
+        widget: image-r2
+        required: false
+        hint: 'スマホの写真をそのままで大丈夫です。未設定の場合は写真なしで表示します。'

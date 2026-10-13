@@ -167,4 +167,22 @@ const sponsors = defineCollection({
 	}),
 });
 
-export const collections = { news, circles, events, sponsors };
+/**
+ * 実行委員会の部署紹介（`/staff`）。
+ * 部署ごとの名簿・写真・紹介文を Decap CMS から管理する。
+ */
+const staff = defineCollection({
+	loader: glob({ pattern: '**/[^_]*.md', base: './content/staff' }),
+	schema: z.object({
+		/** 表示順。小さい番号を先に表示する。 */
+		sortOrder: z.number().int().nonnegative(),
+		department: z.string().min(1),
+		members: z
+			.array(z.object({ role: z.string().min(1), name: z.string().min(1), kana: z.string().min(1) }))
+			.default([]),
+		description: z.string().min(1),
+		image: z.string().optional(),
+	}),
+});
+
+export const collections = { news, circles, events, sponsors, staff };
