@@ -66,7 +66,11 @@ const ALL_PLACES = MAP_ROOMS.filter((r) => !r.plan);
 export default function VenueMap({ exhibits: exhibitsByWeather, defaultWeather }: Props) {
 	const [weather, setWeather] = useState<Weather>(() => readWeatherFromUrl(location.search) ?? defaultWeather);
 	const exhibits = exhibitsByWeather[weather];
-	const PLACES = useMemo(() => ALL_PLACES.filter((p) => isRoomInWeather(p, weather)), [weather]);
+	/** ピンを立てる会場（番号つきのテントは含まない） */
+	const PLACES = useMemo(() => ALL_PLACES.filter((p) => !p.parent && isRoomInWeather(p, weather)), [weather]);
+	/** 番号つきのテント（グラウンドの G-1〜G-33 など） */
+	const SLOTS = useMemo(() => ALL_PLACES.filter((p) => p.parent && isRoomInWeather(p, weather)), [weather]);
+	const findPlace = useCallback((key: string | null) => (key ? [...PLACES, ...SLOTS].find((p) => p.key === key) : undefined), [PLACES, SLOTS]);
 	const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
 	const narrow = useMediaQuery('(max-width: 767px)');
 	const [webgl] = useState(supportsWebGL);
@@ -87,9 +91,9 @@ export default function VenueMap({ exhibits: exhibitsByWeather, defaultWeather }
 
 	const counts = useMemo(() => {
 		const byBuilding = countExhibitsByBuilding(exhibits);
-		for (const p of PLACES) byBuilding[p.key] = exhibits[p.key]?.length ?? 0;
+		for (const p of [...PLACES, ...SLOTS]) byBuilding[p.key] = exhibits[p.key]?.length ?? 0;
 		return byBuilding;
-	}, [exhibits, PLACES]);
+	}, [exhibits, PLACES, SLOTS]);
 
 	useEffect(() => {
 		if (!webgl) return;
@@ -163,7 +167,7 @@ export default function VenueMap({ exhibits: exhibitsByWeather, defaultWeather }
 	};
 
 	const openPlace = (key: string) => {
-		const place = PLACES.find((p) => p.key === key);
+		const place = findPlace(key);
 		if (!place) return;
 		setPlaceKey(key);
 		setSelected(key);
@@ -194,10 +198,10 @@ export default function VenueMap({ exhibits: exhibitsByWeather, defaultWeather }
 
 	// その天候で使わない会場を開いていたら閉じる
 	useEffect(() => {
-		if (placeKey && !PLACES.some((p) => p.key === placeKey)) closePlace();
-	}, [PLACES]); // eslint-disable-line react-hooks/exhaustive-deps
+		if (placeKey && !findPlace(placeKey)) closePlace();
+	}, [PLACES, SLOTS]); // eslint-disable-line react-hooks/exhaustive-deps
 
-	const place = PLACES.find((p) => p.key === placeKey);
+	const place = findPlace(placeKey);
 	const planOpen = !!view.building && !!plan && plan.building === view.building;
 
 	return (
@@ -209,6 +213,7 @@ export default function VenueMap({ exhibits: exhibitsByWeather, defaultWeather }
 							campus={campus}
 							counts={counts}
 							places={PLACES}
+							slots={SLOTS}
 							selected={selected}
 							camera={camera}
 							animate={!reducedMotion}

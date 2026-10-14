@@ -15,6 +15,7 @@ import { getCollectionOrEmpty } from '../../lib/content';
 import { formatEventDate, formatEventTimeRange, getVisibleEvents } from '../../lib/events';
 import { exhibitGroupOfCategory, type ExhibitsByRoom, type MapExhibit } from '../../lib/map';
 import {
+	AGGREGATE_KEYS,
 	DEFAULT_WEATHER,
 	formatMapRoom,
 	getMapRoom,
@@ -76,6 +77,14 @@ for (const event of await getVisibleEvents()) {
 	for (const weather of WEATHERS) push(weather, STAGE_ROOM, item);
 }
 
+// グラウンドのように番号つきのテントを持つ会場は、その出展を番号順にまとめて見せる
+for (const weather of WEATHERS) {
+	for (const room of MAP_ROOMS) {
+		if (!room.parent) continue;
+		for (const item of exhibits[weather][room.key] ?? []) push(weather, room.parent, { ...item, spot: room.number ?? undefined });
+	}
+}
+
 /**
  * テキストの配置一覧（天候 → 建物 → 部屋）。出展のある部屋と、
  * 予選会場・休憩所などの使い道がある部屋を載せる。
@@ -83,7 +92,7 @@ for (const event of await getVisibleEvents()) {
 const listings = WEATHERS.map((weather) => {
 	const groups: { building: string; rooms: typeof MAP_ROOMS }[] = [];
 	for (const room of MAP_ROOMS) {
-		if (!isRoomInWeather(room, weather) || !(exhibits[weather][room.key]?.length || room.use?.[weather])) continue;
+		if (!isRoomInWeather(room, weather) || AGGREGATE_KEYS.has(room.key) || !(exhibits[weather][room.key]?.length || room.use?.[weather])) continue;
 		const group = groups.find((g) => g.building === room.building);
 		if (group) group.rooms.push(room);
 		else groups.push({ building: room.building, rooms: [room] });
@@ -155,7 +164,7 @@ const listings = WEATHERS.map((weather) => {
 														>
 															{formatMapRoom(room)}
 														</a>
-														{room.number && <span class="ml-2 text-text/60">{room.name}</span>}
+														{room.number && !room.parent && <span class="ml-2 text-text/60">{room.name}</span>}
 														{room.use?.[weather] && <span class="ml-2 text-glow-pink">{room.use[weather]}</span>}
 													</dt>
 													<dd>

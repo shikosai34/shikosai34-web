@@ -376,16 +376,69 @@ for (const [file, info] of Object.entries(CONFIG)) {
 }
 
 // 屋外の場所（図面を持たず、3D 上のピンで示す）
-if (fs.existsSync(OUTDOOR_FILE)) {
-	for (const o of JSON.parse(fs.readFileSync(OUTDOOR_FILE, 'utf-8')).places ?? []) {
-		roomIndex.push({ key: o.key, building: o.building ?? '屋外', floor: null, number: null, name: o.name, plan: null, at: o.at, ...(o.tents && { tents: o.tents }), ...(o.tentsInset !== undefined && { tentsInset: o.tentsInset }), ...(o.weather && { weather: o.weather }) });
+const outdoor = fs.existsSync(OUTDOOR_FILE) ? JSON.parse(fs.readFileSync(OUTDOOR_FILE, 'utf-8')) : {};
+for (const o of outdoor.places ?? []) {
+	roomIndex.push({ key: o.key, building: o.building ?? '屋外', floor: null, number: null, name: o.name, plan: null, at: o.at, ...(o.tents && { tents: o.tents }), ...(o.tentsInset !== undefined && { tentsInset: o.tentsInset }), ...(o.weather && { weather: o.weather }) });
+}
+
+// 番号つきの固定のテント（グラウンドの G-1〜G-33 など）。区画図の画像上の座標を、
+// 実際の区画（トラック）の形へ割り当てる。
+const M_PER_DEG_LAT = 110950;
+const MAP_CENTER = [140.5509, 36.4002]; // src/lib/map.ts の MAP_CENTER と揃える
+const M_PER_DEG_LON = 111320 * Math.cos((MAP_CENTER[1] * Math.PI) / 180);
+const toPlane = ([lon, lat]) => [(lon - MAP_CENTER[0]) * M_PER_DEG_LON, (lat - MAP_CENTER[1]) * M_PER_DEG_LAT];
+const toLonLat = ([e, n]) => [MAP_CENTER[0] + e / M_PER_DEG_LON, MAP_CENTER[1] + n / M_PER_DEG_LAT];
+
+const CAMPUS_FILE = path.join(ROOT, 'public/map/campus.geojson');
+for (const group of outdoor.numbered ?? []) {
+	if (!fs.existsSync(CAMPUS_FILE)) {
+		console.warn('⚠ public/map/campus.geojson がないため、番号つきのテントを置けません（先に bun scripts/map/build-campus.mjs）');
+		problems++;
+		break;
 	}
+	const campus = JSON.parse(fs.readFileSync(CAMPUS_FILE, 'utf-8'));
+	const area = campus.features.find((f) => f.properties.kind === group.area && f.geometry.type === 'Polygon');
+	if (!area) {
+		console.warn(`⚠ 番号つきのテント（${group.prefix}）の区画「${group.area}」が campus.geojson にありません`);
+		problems++;
+		continue;
+	}
+	// 区画の外形を inset m だけ内側へ寄せた線。テントはこの線の上に置く
+	const inner = turf.polygonToLine(turf.buffer(area, -group.inset, { units: 'meters' }));
+	const ring = inner.geometry.type === 'LineString' ? inner.geometry.coordinates : inner.geometry.coordinates[0];
+	const plane = area.geometry.coordinates[0].map(toPlane);
+	const [minE, maxE] = [Math.min(...plane.map((p) => p[0])), Math.max(...plane.map((p) => p[0]))];
+	const [minN, maxN] = [Math.min(...plane.map((p) => p[1])), Math.max(...plane.map((p) => p[1]))];
+	const [ix0, ix1] = group.image.x;
+	const [iy0, iy1] = group.image.y;
+
+	group.slots.forEach(([px, py], i) => {
+		// 画像の枠 → 区画の外接矩形（北が上）
+		const lonlat = toLonLat([minE + ((px - ix0) / (ix1 - ix0)) * (maxE - minE), maxN - ((py - iy0) / (iy1 - iy0)) * (maxN - minN)]);
+		const near = turf.nearestPointOnLine(turf.lineString(ring), turf.point(lonlat), { units: 'meters' });
+		// 縁の向き（テントの屋根を縁に沿わせる）
+		const k = near.properties.index;
+		const [a, b] = [toPlane(ring[k]), toPlane(ring[Math.min(k + 1, ring.length - 1)])];
+		const number = `${group.prefix}${i + 1}`;
+		roomIndex.push({
+			key: number,
+			building: group.building,
+			floor: null,
+			number,
+			name: group.slotName,
+			plan: null,
+			at: near.geometry.coordinates.map((v) => Math.round(v * 1e7) / 1e7),
+			angle: Math.round(Math.atan2(b[1] - a[1], b[0] - a[0]) * 1e4) / 1e4,
+			parent: group.parent,
+			...(group.weather && { weather: group.weather }),
+		});
+	});
 }
 
 // 館 → 階 → 部屋番号の順に並べる（CMS の選択肢とテキストの配置一覧の順になる）
 const planOrder = Object.keys(CONFIG);
 const orderOf = (r) => (r.plan ? planOrder.indexOf(r.plan) : planOrder.length);
-roomIndex.sort((a, b) => orderOf(a) - orderOf(b) || (a.floor ?? 0) - (b.floor ?? 0) || (a.number ? 0 : 1) - (b.number ? 0 : 1) || (a.number ?? '').localeCompare(b.number ?? '') || a.name.localeCompare(b.name, 'ja'));
+roomIndex.sort((a, b) => orderOf(a) - orderOf(b) || (a.floor ?? 0) - (b.floor ?? 0) || (a.number ? 0 : 1) - (b.number ? 0 : 1) || (a.number ?? '').localeCompare(b.number ?? '', 'ja', { numeric: true }) || a.name.localeCompare(b.name, 'ja'));
 
 const dupes = roomIndex.map((r) => r.key).filter((k, i, a) => a.indexOf(k) !== i);
 if (dupes.length) {
@@ -398,7 +451,10 @@ fs.writeFileSync(ROOMS_FILE, `${JSON.stringify(roomIndex, null, '\t')}\n`);
 
 // CMS の選択肢を書き換える（晴天時・雨天時のそれぞれ。片方の天候だけの屋外の会場は、その天候の選択肢にだけ出す）
 const q = (s) => `'${s.replaceAll("'", "''")}'`;
-const optionLabel = (r) => [r.building, r.floor ? `${r.floor}F` : null, r.number, r.name === r.building ? null : r.name].filter(Boolean).join(' ');
+const optionLabel = (r) =>
+	r.parent ? `${r.building} ${r.number}` : [r.building, r.floor ? `${r.floor}F` : null, r.number, r.name === r.building ? null : r.name].filter(Boolean).join(' ');
+/** 番号つきのテントをまとめる会場（グラウンド）。サークルは番号のほうで登録するので、選択肢には出さない */
+const aggregates = new Set(roomIndex.map((r) => r.parent).filter(Boolean));
 const blocks = [
 	{ id: 'map-rooms', weather: 'sunny', extra: [] },
 	{ id: 'map-rooms-rainy', weather: 'rainy', extra: [{ label: '雨天時は出展しない', value: 'none' }] },
@@ -416,7 +472,7 @@ for (const block of blocks) {
 	const indent = cms.slice(cms.lastIndexOf('\n', startAt) + 1, startAt);
 	const options = [
 		...block.extra,
-		...roomIndex.filter((r) => !r.weather || r.weather === block.weather).map((r) => ({ label: optionLabel(r), value: r.key })),
+		...roomIndex.filter((r) => (!r.weather || r.weather === block.weather) && !aggregates.has(r.key)).map((r) => ({ label: optionLabel(r), value: r.key })),
 	];
 	const lines = options.map((o) => `${indent}- { label: ${q(o.label)}, value: ${q(o.value)} }`);
 	cms = `${cms.slice(0, startAt)}${START}\n${lines.join('\n')}\n${indent}${cms.slice(endAt)}`;

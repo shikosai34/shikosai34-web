@@ -48,11 +48,21 @@ export interface MapRoom {
 	tentsInset?: number;
 	/** その天候のときだけ使う会場（省略時はどちらの天候でも使う） */
 	weather?: Weather;
+	/**
+	 * 番号つきのテント（グラウンドの G-1〜G-33 など）が属する会場の部屋キー。
+	 * サークルはこの番号で出店場所を登録し、親の会場はその出展をまとめて見せる。
+	 */
+	parent?: string;
+	/** 番号つきのテントの向き（平面でのラジアン。東向きが 0、北向きが正）。屋根を区画の縁に沿わせる */
+	angle?: number;
 }
 
 export const MAP_ROOMS = rooms as MapRoom[];
 
 export const MAP_ROOM_KEYS = new Set(MAP_ROOMS.map((room) => room.key));
+
+/** 番号つきのテントをまとめる会場（グラウンドなど）の部屋キー。サークルの登録先には使わない */
+export const AGGREGATE_KEYS = new Set(MAP_ROOMS.flatMap((room) => (room.parent ? [room.parent] : [])));
 
 export function getMapRoom(key: string | undefined): MapRoom | undefined {
 	return key ? MAP_ROOMS.find((room) => room.key === key) : undefined;

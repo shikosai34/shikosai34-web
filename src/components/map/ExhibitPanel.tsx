@@ -77,10 +77,10 @@ export function RoomDetail({ room, items, onBack }: DetailProps) {
 			)}
 			<div>
 				<p className="truncate text-xs tracking-wider text-accent">
-					{[room.building, room.floor ? `${room.floor}F` : null, room.number].filter(Boolean).join(' ・ ')}
+					{[room.building, room.floor ? `${room.floor}F` : null, room.parent ? null : room.number].filter(Boolean).join(' ・ ')}
 				</p>
 				<h3 className="truncate text-xl font-medium text-text" title={room.name}>
-					{room.name}
+					{room.parent ? room.number : room.name}
 				</h3>
 			</div>
 			{items.length === 0 ? (
@@ -93,6 +93,7 @@ export function RoomDetail({ room, items, onBack }: DetailProps) {
 								<Thumb item={item} className="h-20 w-20" />
 								<span className="min-w-0 flex-1">
 									<GroupChip item={item} />
+									{item.spot && <span className="ml-2 rounded-sm bg-accent/85 px-1 text-xs font-medium text-base">{item.spot}</span>}
 									<span
 										className="mt-1 block truncate font-medium text-text underline decoration-accent/50 underline-offset-4 group-hover:decoration-accent"
 										title={item.title}

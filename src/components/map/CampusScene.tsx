@@ -576,6 +576,83 @@ function Rain({ bounds, count, animate }: { bounds: MapBounds; count: number; an
 	);
 }
 
+/**
+ * 番号つきの固定のテント（グラウンドの G-1〜G-33 など）。区画図の位置どおりに全部描き、
+ * 出展のあるテントは幕に明かりを灯す。近づくと番号を出し、押すとその番号の出展を開く。
+ */
+function SlotTents({ slots, counts, selected, onPick }: { slots: MapRoom[]; counts: Record<string, number>; selected: string | null; onPick: (key: string) => void }) {
+	const canopy = useRef<THREE.InstancedMesh>(null);
+	const valance = useRef<THREE.InstancedMesh>(null);
+	const controls = useThree((s) => s.controls) as CameraControlsImpl | null;
+	/** 番号を出すくらい近づいているか。毎フレーム見て、変わったときだけ描き直す */
+	const [near, setNear] = useState(false);
+	useFrame(() => {
+		if (controls && controls.distance < 150 !== near) setNear(!near);
+	});
+
+	// 位置と向き（テントの数は変わらないので、置き直すのは slots が変わったときだけ）
+	useEffect(() => {
+		const m = new THREE.Matrix4();
+		const up = new THREE.Vector3(0, 1, 0);
+		slots.forEach((slot, i) => {
+			const [x, y] = project(slot.at!);
+			const yaw = new THREE.Quaternion().setFromAxisAngle(up, slot.angle ?? 0);
+			const roof = yaw.clone().multiply(new THREE.Quaternion().setFromAxisAngle(up, Math.PI / 4));
+			m.compose(new THREE.Vector3(x, 3.2, -y), roof, new THREE.Vector3(1, 1, 1));
+			canopy.current?.setMatrixAt(i, m);
+			m.compose(new THREE.Vector3(x, 1.9, -y), yaw, new THREE.Vector3(1, 1, 1));
+			valance.current?.setMatrixAt(i, m);
+		});
+		for (const mesh of [canopy.current, valance.current]) if (mesh) mesh.instanceMatrix.needsUpdate = true;
+	}, [slots]);
+
+	// 幕の色。出展のあるテントは明かり、空きは暗く、選んだテントは橙で強く
+	useEffect(() => {
+		const lit = [new THREE.Color(COLOR.main).multiplyScalar(1.6), new THREE.Color(COLOR.pink).multiplyScalar(1.4), new THREE.Color(COLOR.accent)];
+		const empty = new THREE.Color('#33505a');
+		const chosen = new THREE.Color(COLOR.main).multiplyScalar(3);
+		slots.forEach((slot, i) => {
+			const color = slot.key === selected ? chosen : (counts[slot.key] ?? 0) > 0 ? lit[i % lit.length] : empty;
+			valance.current?.setColorAt(i, color);
+		});
+		if (valance.current?.instanceColor) valance.current.instanceColor.needsUpdate = true;
+	}, [slots, counts, selected]);
+
+	const pick = (e: ThreeEvent<MouseEvent>) => {
+		e.stopPropagation();
+		if (e.instanceId !== undefined) onPick(slots[e.instanceId].key);
+	};
+
+	return (
+		<group>
+			<instancedMesh ref={canopy} args={[undefined, undefined, slots.length]} onClick={pick}>
+				<coneGeometry args={[3, 1.8, 4, 1]} />
+				<meshStandardMaterial color="#d9e6ea" emissive="#6fb8c4" emissiveIntensity={0.35} roughness={0.8} />
+			</instancedMesh>
+			<instancedMesh ref={valance} args={[undefined, undefined, slots.length]} onClick={pick}>
+				<boxGeometry args={[4.2, 0.6, 4.2]} />
+				<meshBasicMaterial toneMapped={false} />
+			</instancedMesh>
+			{near &&
+				slots.map((slot) => {
+					const [x, y] = project(slot.at!);
+					const chosen = slot.key === selected;
+					return (
+						<Html key={slot.key} position={[x, 4.8, -y]} center zIndexRange={[5, 0]} style={{ pointerEvents: 'none' }}>
+							<div
+								className={`whitespace-nowrap rounded-sm border px-1 text-[11px] leading-4 ${
+									chosen ? 'border-main bg-base text-main' : (counts[slot.key] ?? 0) > 0 ? 'border-accent/60 bg-base/85 text-text' : 'border-transparent bg-base/60 text-text/50'
+								}`}
+							>
+								{slot.number}
+							</div>
+						</Html>
+					);
+				})}
+		</group>
+	);
+}
+
 // ---------------------------------------------------------------------------
 // カメラ
 // ---------------------------------------------------------------------------
@@ -684,6 +761,8 @@ interface Props {
 	counts: Record<string, number>;
 	/** 屋外の会場（ピンを立てる） */
 	places: MapRoom[];
+	/** 番号つきの固定のテント（グラウンドの G-1〜G-33 など） */
+	slots: MapRoom[];
 	selected: string | null;
 	camera: CameraRequest;
 	animate: boolean;
@@ -698,7 +777,7 @@ interface Props {
 	onBackgroundClick: () => void;
 }
 
-export default function CampusScene({ campus, counts, places, selected, camera, animate, lowPower, paused, weather, onPickBuilding, onPickPlace, onBackgroundClick }: Props) {
+export default function CampusScene({ campus, counts, places, slots, selected, camera, animate, lowPower, paused, weather, onPickBuilding, onPickPlace, onBackgroundClick }: Props) {
 	const buildings = useMemo(() => buildingsOf(campus.features), [campus]);
 	const windows = useMemo(() => makeWindowTexture(), []);
 	const [hovered, setHovered] = useState<string | null>(null);
@@ -794,6 +873,8 @@ export default function CampusScene({ campus, counts, places, selected, camera, 
 						)}
 					</group>
 				))}
+
+			<SlotTents slots={slots} counts={counts} selected={selected} onPick={onPickPlace} />
 
 			{/* 建物名 */}
 			{buildings

@@ -96,6 +96,8 @@ export interface MapExhibit {
 	image?: string;
 	/** ステージ企画の時間（「10/24 13:00〜13:30」） */
 	time?: string;
+	/** 会場の中での場所（グラウンドの「G-12」など）。会場をまとめて見せる一覧で添える */
+	spot?: string;
 }
 
 /** 部屋キー → そこで行われる出展 */

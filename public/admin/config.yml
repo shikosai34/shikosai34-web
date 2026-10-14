@@ -237,7 +237,40 @@ collections:
           - { label: '第一体育館 1F 競技場（ステージ）', value: 'gym1-stage' }
           - { label: '第一体育館 2F トレーニング場', value: 'gym1-training' }
           - { label: '武道館 1F 剣道・柔道競技室', value: 'budokan-hall' }
-          - { label: '屋外 グラウンド', value: 'ground' }
+          - { label: 'グラウンド G-1', value: 'G-1' }
+          - { label: 'グラウンド G-2', value: 'G-2' }
+          - { label: 'グラウンド G-3', value: 'G-3' }
+          - { label: 'グラウンド G-4', value: 'G-4' }
+          - { label: 'グラウンド G-5', value: 'G-5' }
+          - { label: 'グラウンド G-6', value: 'G-6' }
+          - { label: 'グラウンド G-7', value: 'G-7' }
+          - { label: 'グラウンド G-8', value: 'G-8' }
+          - { label: 'グラウンド G-9', value: 'G-9' }
+          - { label: 'グラウンド G-10', value: 'G-10' }
+          - { label: 'グラウンド G-11', value: 'G-11' }
+          - { label: 'グラウンド G-12', value: 'G-12' }
+          - { label: 'グラウンド G-13', value: 'G-13' }
+          - { label: 'グラウンド G-14', value: 'G-14' }
+          - { label: 'グラウンド G-15', value: 'G-15' }
+          - { label: 'グラウンド G-16', value: 'G-16' }
+          - { label: 'グラウンド G-17', value: 'G-17' }
+          - { label: 'グラウンド G-18', value: 'G-18' }
+          - { label: 'グラウンド G-19', value: 'G-19' }
+          - { label: 'グラウンド G-20', value: 'G-20' }
+          - { label: 'グラウンド G-21', value: 'G-21' }
+          - { label: 'グラウンド G-22', value: 'G-22' }
+          - { label: 'グラウンド G-23', value: 'G-23' }
+          - { label: 'グラウンド G-24', value: 'G-24' }
+          - { label: 'グラウンド G-25', value: 'G-25' }
+          - { label: 'グラウンド G-26', value: 'G-26' }
+          - { label: 'グラウンド G-27', value: 'G-27' }
+          - { label: 'グラウンド G-28', value: 'G-28' }
+          - { label: 'グラウンド G-29', value: 'G-29' }
+          - { label: 'グラウンド G-30', value: 'G-30' }
+          - { label: 'グラウンド G-31', value: 'G-31' }
+          - { label: 'グラウンド G-32', value: 'G-32' }
+          - { label: 'グラウンド G-33', value: 'G-33' }
+          - { label: '屋外 グラウンド（ロボット部）', value: 'ground-robot' }
           - { label: '屋外 グラウンド（野球場側）', value: 'ground-baseball-side' }
           # <<< GENERATED: map-rooms
       - label: マップ上の場所（雨天時）
