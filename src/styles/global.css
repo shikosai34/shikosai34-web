@@ -195,9 +195,8 @@
     position: absolute;
     inset: 0;
     /*
-     * 走査線は雲（.neon-backdrop, z-index:0）より前に置く。
-     * 同じ 0 だと後から描かれるこちらが雲を覆い、
-     * screen の光が灰色に潰れる。
+     * 走査線は雲（.neon-backdrop）の手前、パネルの中身の後ろに置く。
+     * 中身は z-index:3 にして、文字や操作部品に縞が重ならないようにする。
      */
     z-index: 2;
     pointer-events: none;
@@ -209,13 +208,13 @@
   }
 
   /*
-   * 中身は走査線（::after）より前に出す。
+   * 中身は走査線（::after, z-index:2）より前に出す。
    * ただし背景として敷く装飾（.neon-backdrop）は例外で、
    * これを持ち上げるとポスターの上に雲がかぶさってしまう。
    */
   .surface-panel > *:not(.neon-backdrop) {
     position: relative;
-    z-index: 1;
+    z-index: 3;
   }
 
   /*

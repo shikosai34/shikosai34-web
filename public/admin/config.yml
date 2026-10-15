@@ -101,6 +101,7 @@ collections:
     create: true
     slug: '{{fields.slug}}'
     identifier_field: name
+    summary: '{{fields.slug}} - {{name}}'
     sortable_fields: [nameKana, name]
     fields:
       - { label: 団体名, name: name, widget: string }
@@ -145,7 +146,7 @@ collections:
         widget: text
         required: false
         hint: '来場者に見てほしいポイント。'
-      - label: 値段設定/企画詳細
+      - label: 価格・企画内容
         name: details
         widget: text
         required: false
@@ -165,7 +166,7 @@ collections:
         name: image
         widget: image-r2
         required: false
-        hint: 'スマホの写真をそのままで大丈夫です。自動でリサイズ・WebP 変換して R2 に保存します。'
+        hint: '画像は自動でリサイズ・WebP変換してR2へ保存されます。詳細ページで大きく表示され、押すと拡大できます。'
       - label: その他画像
         name: otherImages
         widget: list
@@ -175,19 +176,24 @@ collections:
           label: 画像
           name: image
           widget: image-r2
-        hint: '詳細ページに並べて表示する画像です。複数追加できます。'
-      - label: SNS リンク
+        hint: '詳細ページに並べて表示し、押すと拡大できます。複数追加できます。'
+      - label: SNS・公式サイトのリンク
         name: snsLinks
         widget: list
         required: false
-        label_singular: SNS リンク
+        label_singular: リンク
         summary: '{{fields.label}}'
         fields:
-          - { label: ラベル, name: label, widget: string, hint: '例: X / Instagram / 公式サイト' }
-          - label: URL
+          - { label: リンク名, name: label, widget: string, hint: '例: X / Instagram / 公式サイト' }
+          - label: リンク先 URL
             name: url
             widget: string
             pattern: ['^https?://', 'http:// または https:// で始まる URL を入力してください']
+          - label: リンクプレビュー画像（任意）
+            name: previewImage
+            widget: image-r2
+            required: false
+            hint: 'noteのリンクカードのように画像付きで表示します。未設定なら画像なしのリンクカードになります。'
       - label: FesFlow ページ URL
         name: fesflowUrl
         widget: string

@@ -2,6 +2,7 @@
 import { render } from 'astro:content';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
 import SiteHeader from '../../components/layout/SiteHeader.astro';
+import MainVisualLightbox from '../../components/main-visual/MainVisualLightbox';
 import Layout from '../../layouts/Layout.astro';
 import { CIRCLE_CATEGORY_LABELS, CIRCLE_GENRE_LABELS } from '../../lib/circles';
 import { getCollectionOrEmpty } from '../../lib/content';
@@ -37,6 +38,9 @@ const schedules = [
 	{ label: '10月24日（土）', value: scheduleDay1 },
 	{ label: '10月25日（日）', value: scheduleDay2 },
 ];
+const imageGallery = [image, ...otherImages]
+	.filter((src): src is string => Boolean(src))
+	.map((src) => ({ src, thumb: src }));
 ---
 
 <Layout title={`${name} | サークル | 第34回 茨香祭`}>
@@ -44,12 +48,29 @@ const schedules = [
 
 	<main class="mx-auto w-full max-w-3xl px-4 pb-16 sm:px-6">
 		<article class="surface-panel mt-8 rounded-2xl p-5 text-text sm:p-8">
-			<a href="/circle" class="text-sm text-text underline hover:no-underline">← サークル一覧へ</a>
+			<a
+				href="/circle"
+				class="inline-flex min-h-11 items-center gap-2 rounded-xl border border-text/40 px-5 py-3 text-base font-medium text-text transition-colors hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+			>
+				<span aria-hidden="true">←</span>
+				サークル一覧へ
+			</a>
 
 			<div class="mt-4 overflow-hidden rounded-xl">
 				{
 					image ? (
-						<img src={image} alt="" class="aspect-square w-full object-cover" />
+						<a
+							href={image}
+							aria-label={`${name}の画像を拡大して見る`}
+							data-lightbox-group={`circle-${circle.id}`}
+							data-lightbox-index="0"
+							class="group relative block cursor-zoom-in focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+						>
+							<img src={image} alt={`${name}の紹介画像`} class="aspect-square w-full object-cover" />
+							<span class="absolute right-3 bottom-3 rounded-full bg-black/75 px-3 py-1.5 text-xs font-bold text-white transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-visible:opacity-100">
+								拡大して見る
+							</span>
+						</a>
 					) : (
 						<div
 							class="kikko flex aspect-square w-full items-center justify-center bg-text/5 text-sm text-text/60"
@@ -70,22 +91,22 @@ const schedules = [
 				</span>
 			</div>
 			<h1 class="mt-2 text-2xl font-bold text-text">{name}</h1>
-			<p class="mt-2 text-sm text-text">{summary}</p>
+			<p class="mt-2 text-base leading-relaxed text-text">{summary}</p>
 
-			<dl class="mt-4 grid grid-cols-[8rem_1fr] gap-y-2 text-sm text-text">
+			<dl class="mt-6 grid grid-cols-[minmax(7.5rem,8rem)_1fr] gap-x-3 gap-y-3 text-base text-text">
 				{
 					schedules.map((day) => (
 						<>
-							<dt class="font-medium">{day.label}</dt>
+							<dt class="font-bold text-text/80">{day.label}</dt>
 							<dd>{day.value || '実施なし'}</dd>
 						</>
 					))
 				}
-				<dt class="font-medium">場所</dt>
+				<dt class="font-bold text-text/80">場所</dt>
 				<dd>{location}</dd>
 				{rainLocation && (
 					<>
-						<dt class="font-medium">雨天時</dt>
+						<dt class="font-bold text-text/80">雨天時</dt>
 						<dd>{rainLocation}</dd>
 					</>
 				)}
@@ -94,8 +115,8 @@ const schedules = [
 			{
 				highlights && (
 					<section class="mt-6">
-						<h2 class="text-base font-bold text-text">見所</h2>
-						<p class="mt-1 whitespace-pre-line text-sm text-text">{highlights}</p>
+						<h2 class="text-lg font-bold text-text sm:text-xl">見所</h2>
+						<p class="mt-2 whitespace-pre-line text-base leading-relaxed text-text">{highlights}</p>
 					</section>
 				)
 			}
@@ -103,44 +124,70 @@ const schedules = [
 			{
 				details && (
 					<section class="mt-6">
-						<h2 class="text-base font-bold text-text">値段設定・企画詳細</h2>
-						<p class="mt-1 whitespace-pre-line text-sm text-text">{details}</p>
+						<h2 class="text-lg font-bold text-text sm:text-xl">価格・企画内容</h2>
+						<p class="mt-2 whitespace-pre-line text-base leading-relaxed text-text">{details}</p>
 					</section>
 				)
 			}
 
-			<div class="circle-body mt-4 flex flex-col gap-3 text-text">
+			<div class="circle-body mt-6 flex flex-col gap-3 text-base leading-relaxed text-text">
 				<Content />
 			</div>
 
 			{
 				otherImages.length > 0 && (
-					<ul class="mt-6 grid grid-cols-2 gap-3">
-						{otherImages.map((src) => (
-							<li>
-								<img src={src} alt="" loading="lazy" class="aspect-square w-full rounded-xl object-cover" />
-							</li>
-						))}
-					</ul>
-				)
-			}
-
-			{
-				snsLinks.length > 0 && (
-					<ul class="mt-4 flex flex-wrap gap-4 text-sm">
-						{snsLinks.map((link) => (
+					<section class="mt-8">
+						<h2 class="mb-3 text-lg font-bold text-text sm:text-xl">その他の写真</h2>
+						<ul class="grid grid-cols-2 gap-3">
+						{otherImages.map((src, index) => (
 							<li>
 								<a
-									href={link.url}
-									target="_blank"
-									rel="noopener noreferrer"
-									class="text-text underline hover:no-underline"
+									href={src}
+									aria-label={`${name}の写真 ${index + 1}を拡大して見る`}
+									data-lightbox-group={`circle-${circle.id}`}
+									data-lightbox-index={image ? index + 1 : index}
+									class="group relative block cursor-zoom-in overflow-hidden rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
 								>
-									{link.label}
+									<img src={src} alt={`${name}の写真 ${index + 1}`} loading="lazy" class="aspect-square w-full rounded-xl object-cover transition-transform group-hover:scale-[1.02]" />
+									<span class="absolute right-2 bottom-2 rounded-full bg-black/75 px-2.5 py-1 text-xs font-bold text-white">拡大</span>
 								</a>
 							</li>
 						))}
 					</ul>
+					</section>
+				)
+			}
+			{imageGallery.length > 0 && <MainVisualLightbox group={`circle-${circle.id}`} items={imageGallery} client:load />}
+
+			{
+				snsLinks.length > 0 && (
+					<section class="mt-8">
+						<h2 class="mb-3 text-lg font-bold text-text sm:text-xl">SNS・公式サイト</h2>
+						<ul class="grid gap-3 sm:grid-cols-2">
+						{snsLinks.map((link) => (
+							<li class="overflow-hidden rounded-xl border border-text/20 bg-base/70">
+								<a
+									href={link.url}
+									target="_blank"
+									rel="noopener noreferrer"
+									aria-label={`${link.label}を新しいタブで開く`}
+								class:list={[
+									'group flex h-full min-h-16 gap-3 transition-colors hover:bg-accent/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
+									link.previewImage ? 'flex-col items-stretch' : 'items-center justify-between',
+								]}
+								>
+									{link.previewImage && (
+										<img src={link.previewImage} alt="" loading="lazy" class="aspect-[1.91/1] w-full object-cover" />
+									)}
+									<span class="flex min-w-0 flex-1 items-center justify-between gap-3 px-4 py-3">
+										<span class="font-bold text-text">{link.label}</span>
+										<span class="shrink-0 text-lg font-bold text-accent" aria-hidden="true">↗</span>
+									</span>
+								</a>
+							</li>
+						))}
+					</ul>
+					</section>
 				)
 			}
 
@@ -162,6 +209,14 @@ const schedules = [
 					</div>
 				)
 			}
+
+			<a
+				href="/circle"
+				class="mt-8 inline-flex min-h-11 items-center gap-2 rounded-xl border border-text/40 px-5 py-3 text-base font-medium text-text transition-colors hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+			>
+				<span aria-hidden="true">←</span>
+				サークル一覧へ
+			</a>
 		</article>
 	</main>
 
@@ -170,7 +225,21 @@ const schedules = [
 
 <style>
 	.circle-body :global(a) {
-		text-decoration: underline;
+		display: inline-flex;
+		align-items: center;
+		border: 1px solid currentColor;
+		border-radius: 0.75rem;
+		padding: 0.375rem 0.75rem;
+		font-weight: 700;
+		text-decoration: none;
+		transition: background-color 150ms ease, color 150ms ease;
+	}
+	.circle-body :global(a:hover) {
+		background-color: color-mix(in srgb, currentColor 10%, transparent);
+	}
+	.circle-body :global(a:focus-visible) {
+		outline: 2px solid currentColor;
+		outline-offset: 3px;
 	}
 	.circle-body :global(strong) {
 		font-weight: 700;
