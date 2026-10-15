@@ -1,4 +1,4 @@
-# Decap CMS 設定 — お知らせ、サークル、体育館ステージ企画
+# Decap CMS 設定 — お知らせ、サークル、ステージ企画
 #
 # アクセス制御と GitHub 書き込み:
 #   /admin/* と /cms/*（CMS Backend Worker）を Cloudflare Zero Trust Access で保護する。
@@ -205,19 +205,23 @@ collections:
   - name: events
     label: ステージ企画
     label_singular: ステージ企画
-    description: '体育館ステージの企画を管理します。開始日時順に /event と /timetable へ反映されます。'
+    description: 'イベント名の中に複数の企画を登録できます。開始日時順に /event と /timetable へ反映されます。'
     folder: content/events
     create: true
     slug: '{{fields.slug}}'
     identifier_field: title
-    summary: '{{fields.startAt}}｜{{fields.title}}'
-    sortable_fields: [startAt, endAt, title, performer]
+    summary: '{{fields.startAt}}｜{{fields.eventName}}｜{{fields.title}}'
+    sortable_fields: [startAt, endAt, eventName, title, performer, venue]
     view_filters:
       - { label: 1日目（10月24日）, field: startAt, pattern: '^2026-10-24' }
       - { label: 2日目（10月25日）, field: startAt, pattern: '^2026-10-25' }
       - { label: 時間変更あり, field: status, pattern: 'changed' }
       - { label: 中止, field: status, pattern: 'cancelled' }
     fields:
+      - label: イベント名
+        name: eventName
+        widget: string
+        hint: '複数の企画をまとめる名前です（例: 軽音ライブ）。同じイベント名で時間が連続する企画は、ページ上でひとまとまりに表示します。'
       - { label: 企画名, name: title, widget: string }
       - label: URL 識別子
         name: slug
@@ -256,6 +260,14 @@ collections:
           - { label: 大会・コンテスト, value: contest }
           - { label: 式典, value: ceremony }
           - { label: その他, value: other }
+      - label: 会場
+        name: venue
+        widget: select
+        default: main-stage
+        options:
+          - { label: メインステージ, value: main-stage }
+          - { label: 大教室, value: large-classroom }
+          - { label: 視聴覚室, value: audiovisual-room }
       - label: 当日の状態
         name: status
         widget: select
@@ -302,6 +314,12 @@ collections:
         widget: text
         required: false
         hint: '詳細ページの企画名の下に表示する1〜2文の説明です。'
+      - label: セットリスト
+        name: setlist
+        widget: list
+        required: false
+        field: { label: 曲名・項目, name: item, widget: string }
+        hint: '曲順がある場合に任意で追加します。未入力なら詳細ページに表示されません。'
       - label: 下書き
         name: draft
         widget: boolean

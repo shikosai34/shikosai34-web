@@ -2,10 +2,12 @@
 import {
 	EVENT_GENRE_LABELS,
 	EVENT_STATUS_LABELS,
+	EVENT_VENUE_LABELS,
 	formatEventDate,
 	formatEventTimeRange,
 	type EventGenre,
 	type EventStatus,
+	type EventVenue,
 } from '../../lib/events';
 
 interface Props {
@@ -15,10 +17,11 @@ interface Props {
 	endAt: Date;
 	genre: EventGenre;
 	status: EventStatus;
+	venue: EventVenue;
 	image?: string | undefined;
 }
 
-const { title, performer, startAt, endAt, genre, status, image } = Astro.props;
+const { title, performer, startAt, endAt, genre, status, venue, image } = Astro.props;
 ---
 
 <article
@@ -48,8 +51,8 @@ const { title, performer, startAt, endAt, genre, status, image } = Astro.props;
 			}
 		</div>
 		<p class="text-sm text-accent">{formatEventDate(startAt)} {formatEventTimeRange(startAt, endAt)}</p>
-		<h2 class:list={['text-lg font-medium', status === 'cancelled' && 'line-through']}>{title}</h2>
+		<h3 class:list={['text-lg font-medium', status === 'cancelled' && 'line-through']}>{title}</h3>
 		<p class="mt-auto text-sm text-text/80">{performer}</p>
-		<p class="text-xs text-text/70">体育館ステージ</p>
+		<p class="text-xs text-text/70">{EVENT_VENUE_LABELS[venue]}</p>
 	</div>
 </article>

@@ -5,91 +5,136 @@ import SiteFooter from '../../components/layout/SiteFooter.astro';
 import SiteHeader from '../../components/layout/SiteHeader.astro';
 import SectionHeading from '../../components/ui/SectionHeading';
 import Layout from '../../layouts/Layout.astro';
-import { EVENT_GENRE_LABELS, EVENT_GENRES, getVisibleEvents } from '../../lib/events';
+import {
+	EVENT_GENRE_LABELS,
+	EVENT_GENRES,
+	EVENT_VENUES,
+	EVENT_VENUE_LABELS,
+	getVisibleEvents,
+	groupConsecutiveEvents,
+} from '../../lib/events';
 
 const events = await getVisibleEvents();
+const venueGroups = EVENT_VENUES.map((venue) => ({
+	venue,
+	label: EVENT_VENUE_LABELS[venue],
+	events: events.filter((event) => event.data.venue === venue),
+	groups: groupConsecutiveEvents(events.filter((event) => event.data.venue === venue)),
+}));
 const genreFilters = EVENT_GENRES.map((value) => ({ value, label: EVENT_GENRE_LABELS[value] }));
+const venueFilters = EVENT_VENUES.map((value) => ({ value, label: EVENT_VENUE_LABELS[value] }));
 ---
 
-<Layout title="ステージ企画 | 第34回 茨香祭">
+<Layout title="イベント一覧 | 第34回 茨香祭">
 	<SiteHeader />
 
 	<main class="mx-auto w-full max-w-5xl px-4 pb-16 sm:px-6">
 		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
 			<div class="flex flex-wrap items-baseline justify-between gap-3">
-				<SectionHeading title="Stage Events" icon="mic" />
-				<a href="/timetable" class="text-sm text-text underline hover:no-underline">
-					時系列で見る
-				</a>
+				<SectionHeading title="Events" icon="mic" />
 			</div>
 
 			<p class="mb-5 text-sm leading-relaxed text-text/80">
-				体育館ステージで行われる企画の一覧です。時間は変更になる場合があります。
+				校内イベントの一覧です。{' '}
+				<a href="/timetable" class="text-accent underline hover:no-underline">タイムテーブルはこちら</a>
 			</p>
 
-			{
-				events.length === 0 ? (
-					<div class="hud-frame px-5 py-10 text-center">
-						<p class="font-medium text-text">ステージ企画は準備中です。</p>
-						<p class="mt-2 text-sm text-text/70">公開までしばらくお待ちください。</p>
-					</div>
-				) : (
-					<div id="event-list">
-						<label class="event-search mb-4 flex items-center gap-2 rounded-xl border border-text/30 px-3 py-2">
-							<SearchIcon className="h-4 w-4 shrink-0 text-text/70" />
-							<input
-								type="search"
-								name="q"
-								placeholder="企画名・出演団体を完全一致で検索"
-								class="w-full bg-transparent text-sm text-text placeholder:text-text/50 focus:outline-none"
-								autocomplete="off"
-							/>
-						</label>
+			<div id="event-list">
+				<label class="event-search mb-4 flex items-center gap-2 rounded-xl border border-text/30 px-3 py-2">
+					<SearchIcon className="h-4 w-4 shrink-0 text-text/70" />
+					<input
+						type="search"
+						name="q"
+						placeholder="イベント名・企画名・出演団体を完全一致で検索"
+						class="w-full bg-transparent text-sm text-text placeholder:text-text/50 focus:outline-none"
+						autocomplete="off"
+					/>
+				</label>
 
-						<div class="flex flex-wrap gap-2" role="group" aria-label="ジャンルで絞り込み">
-							{genreFilters.map((genre) => (
-								<button
-									type="button"
-									class="rounded-full border border-text/30 px-3 py-1 text-sm text-text transition-colors aria-pressed:border-main aria-pressed:bg-main aria-pressed:font-medium aria-pressed:text-base"
-									data-filter={genre.value}
-									aria-pressed="false"
-								>
-									{genre.label}
-								</button>
-							))}
-						</div>
+				<div class="flex flex-wrap gap-2" role="group" aria-label="会場で絞り込み">
+					<button
+						type="button"
+						class="rounded-full border border-text/30 px-3 py-1 text-sm text-text transition-colors aria-pressed:border-main aria-pressed:bg-main aria-pressed:font-medium aria-pressed:text-base"
+						data-venue-filter=""
+						aria-pressed="true"
+					>
+						すべて
+					</button>
+					{venueFilters.map((venue) => (
+						<button
+							type="button"
+							class="rounded-full border border-text/30 px-3 py-1 text-sm text-text transition-colors aria-pressed:border-main aria-pressed:bg-main aria-pressed:font-medium aria-pressed:text-base"
+							data-venue-filter={venue.value}
+							aria-pressed="false"
+						>
+							{venue.label}
+						</button>
+					))}
+				</div>
 
-						<div class="mt-4 flex items-center gap-3">
-							<p class="event-count text-sm text-text/70">全 {events.length} 件</p>
-							<button
-								type="button"
-								class="event-clear text-sm text-text underline hover:no-underline"
-								hidden
-							>
-								絞り込みを解除
-							</button>
-						</div>
+				<div class="mt-3 flex flex-wrap gap-2" role="group" aria-label="ジャンルで絞り込み">
+					{genreFilters.map((genre) => (
+						<button
+							type="button"
+							class="rounded-full border border-text/30 px-3 py-1 text-sm text-text transition-colors aria-pressed:border-main aria-pressed:bg-main aria-pressed:font-medium aria-pressed:text-base"
+							data-filter={genre.value}
+							aria-pressed="false"
+						>
+							{genre.label}
+						</button>
+					))}
+				</div>
 
-						<p class="event-empty mt-6 text-sm text-text/70" role="status" hidden>
-							該当するステージ企画はありません。
-						</p>
+				<div class="mt-4 flex items-center gap-3">
+					<p class="event-count text-sm text-text/70">全 {events.length} 件</p>
+					<button
+						type="button"
+						class="event-clear text-sm text-text underline hover:no-underline"
+						hidden
+					>
+						絞り込みを解除
+					</button>
+				</div>
 
-						<ul class="event-grid mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-							{events.map((event) => (
-								<li
-									data-genre={event.data.genre}
-									data-title={event.data.title}
-									data-performer={event.data.performer}
-								>
-									<a href={`/event/${event.id}`} data-event-detail class="block h-full rounded-xl focus:outline-2 focus:outline-offset-2 focus:outline-base">
-										<EventCard {...event.data} />
-									</a>
-								</li>
-							))}
-						</ul>
-					</div>
-				)
-			}
+				<p class="event-empty mt-6 text-sm text-text/70" role="status" hidden>
+					該当するイベントはありません。
+				</p>
+
+				<div class="event-groups mt-5 space-y-8">
+					{venueGroups.map((venueGroup) => (
+						<section data-venue-group={venueGroup.venue} aria-label={venueGroup.label}>
+							<h2 class="mb-4 border-b-2 border-text/25 pb-2 text-xl font-medium text-text">{venueGroup.label}</h2>
+							{venueGroup.events.length === 0 ? (
+								<p class="venue-empty rounded-xl border border-text/15 px-4 py-5 text-sm text-text/60">この会場のイベントはありません。</p>
+							) : (
+								<div class="space-y-4">
+									{venueGroup.groups.map((group) => (
+										<section data-event-group class="rounded-xl border border-text/20 p-4 sm:p-5">
+											<h3 class="mb-4 border-b border-text/20 pb-3 text-lg font-medium text-text">{group.name}</h3>
+											<ul class="event-grid grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+												{group.events.map((event) => (
+													<li
+														class="event-item"
+														data-venue={event.data.venue}
+														data-genre={event.data.genre}
+														data-title={event.data.title}
+														data-performer={event.data.performer}
+														data-event-name={event.data.eventName}
+													>
+														<a href={`/event/${event.id}`} data-event-detail class="block h-full rounded-xl focus:outline-2 focus:outline-offset-2 focus:outline-base">
+															<EventCard {...event.data} />
+														</a>
+													</li>
+												))}
+											</ul>
+										</section>
+									))}
+								</div>
+							)}
+						</section>
+					))}
+				</div>
+			</div>
 		</section>
 	</main>
 
@@ -143,15 +188,19 @@ const genreFilters = EVENT_GENRES.map((value) => ({ value, label: EVENT_GENRE_LA
 		});
 	}
 
-	const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('button[data-filter]'));
-	const items = Array.from(document.querySelectorAll<HTMLLIElement>('.event-grid > li'));
+	const venueButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('button[data-venue-filter]'));
+	const genreButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('button[data-filter]'));
+	const items = Array.from(document.querySelectorAll<HTMLLIElement>('.event-item'));
+	const groups = Array.from(document.querySelectorAll<HTMLElement>('[data-event-group]'));
+	const venues = Array.from(document.querySelectorAll<HTMLElement>('[data-venue-group]'));
 	const input = document.querySelector<HTMLInputElement>('.event-search input');
 	const empty = document.querySelector<HTMLElement>('.event-empty');
 	const count = document.querySelector<HTMLElement>('.event-count');
 	const clearButton = document.querySelector<HTMLButtonElement>('.event-clear');
 	const total = items.length;
 
-	if (buttons.length > 0 && items.length > 0) {
+	if (venueButtons.length > 0) {
+		let venue = '';
 		let genre = '';
 		let query = '';
 
@@ -160,33 +209,59 @@ const genreFilters = EVENT_GENRES.map((value) => ({ value, label: EVENT_GENRE_LA
 		const render = () => {
 			let shown = 0;
 			for (const item of items) {
+				const matchVenue = venue === '' || item.dataset.venue === venue;
 				const matchGenre = genre === '' || item.dataset.genre === genre;
 				const matchQuery =
 					query === '' ||
 					normalize(item.dataset.title ?? '') === query ||
-					normalize(item.dataset.performer ?? '') === query;
-				const visible = matchGenre && matchQuery;
+					normalize(item.dataset.performer ?? '') === query ||
+					normalize(item.dataset.eventName ?? '') === query;
+				const visible = matchVenue && matchGenre && matchQuery;
 				item.hidden = !visible;
 				if (visible) shown += 1;
 			}
 
-			for (const button of buttons) {
+			for (const group of groups) {
+				group.hidden = !group.querySelector('.event-item:not([hidden])');
+			}
+
+			for (const venueGroup of venues) {
+				const hasItems = Boolean(venueGroup.querySelector('.event-item'));
+				const hasVisibleEvents = Boolean(venueGroup.querySelector('.event-item:not([hidden])'));
+				const matchesVenue = venue === '' || venueGroup.dataset.venueGroup === venue;
+				venueGroup.hidden = !matchesVenue || (hasItems && !hasVisibleEvents) || (!hasItems && (genre !== '' || query !== ''));
+				const emptyMessage = venueGroup.querySelector<HTMLElement>('.venue-empty');
+				if (emptyMessage) emptyMessage.hidden = hasItems || genre !== '' || query !== '';
+			}
+
+			for (const button of venueButtons) {
+				button.setAttribute('aria-pressed', String(button.dataset.venueFilter === venue));
+			}
+			for (const button of genreButtons) {
 				button.setAttribute('aria-pressed', String(button.dataset.filter === genre));
 			}
 
-			const filtered = genre !== '' || query !== '';
+			const filtered = venue !== '' || genre !== '' || query !== '';
 			if (count) count.textContent = filtered ? `${shown} 件` : `全 ${total} 件`;
-			if (empty) empty.hidden = shown !== 0;
+			if (empty) empty.hidden = shown !== 0 || (total === 0 && genre === '' && query === '');
 			if (clearButton) clearButton.hidden = !filtered;
 
 			const params = new URLSearchParams();
+			if (venue) params.set('venue', venue);
 			if (genre) params.set('genre', genre);
 			if (query && input) params.set('q', input.value);
 			const qs = params.toString();
 			history.replaceState(null, '', qs ? `?${qs}` : location.pathname);
 		};
 
-		for (const button of buttons) {
+		for (const button of venueButtons) {
+			button.addEventListener('click', () => {
+				venue = button.dataset.venueFilter === venue ? '' : (button.dataset.venueFilter ?? '');
+				render();
+			});
+		}
+
+		for (const button of genreButtons) {
 			button.addEventListener('click', () => {
 				genre = button.dataset.filter === genre ? '' : (button.dataset.filter ?? '');
 				render();
@@ -199,6 +274,7 @@ const genreFilters = EVENT_GENRES.map((value) => ({ value, label: EVENT_GENRE_LA
 		});
 
 		clearButton?.addEventListener('click', () => {
+			venue = '';
 			genre = '';
 			query = '';
 			if (input) input.value = '';
@@ -206,8 +282,12 @@ const genreFilters = EVENT_GENRES.map((value) => ({ value, label: EVENT_GENRE_LA
 		});
 
 		const params = new URLSearchParams(location.search);
+		const initialVenue = params.get('venue') ?? '';
+		if (venueButtons.some((button) => button.dataset.venueFilter === initialVenue)) {
+			venue = initialVenue;
+		}
 		const initialGenre = params.get('genre') ?? '';
-		if (buttons.some((button) => button.dataset.filter === initialGenre)) {
+		if (genreButtons.some((button) => button.dataset.filter === initialGenre)) {
 			genre = initialGenre;
 		}
 		const initialQuery = params.get('q') ?? '';
@@ -215,6 +295,6 @@ const genreFilters = EVENT_GENRES.map((value) => ({ value, label: EVENT_GENRE_LA
 			input.value = initialQuery;
 			query = normalize(initialQuery.trim());
 		}
-		if (genre || query) render();
+		if (venue || genre || query || total === 0) render();
 	}
 </script>

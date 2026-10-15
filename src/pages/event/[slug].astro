@@ -8,6 +8,7 @@ import { getCollectionOrEmpty } from '../../lib/content';
 import {
 	EVENT_GENRE_LABELS,
 	EVENT_STATUS_LABELS,
+	EVENT_VENUE_LABELS,
 	formatEventDate,
 	formatEventTimeRange,
 } from '../../lib/events';
@@ -22,6 +23,7 @@ export async function getStaticPaths() {
 const { event } = Astro.props;
 const { Content } = await render(event);
 const {
+	eventName,
 	title,
 	performer,
 	startAt,
@@ -33,18 +35,19 @@ const {
 	otherImages,
 	snsLinks,
 	description,
+	setlist,
 } = event.data;
 const imageGallery = [image, ...otherImages]
 	.filter((src): src is string => Boolean(src))
 	.map((src) => ({ src, thumb: src }));
 ---
 
-<Layout title={`${title} | ステージ企画 | 第34回 茨香祭`}>
+<Layout title={`${title} | イベント一覧 | 第34回 茨香祭`}>
 	<SiteHeader />
 
 	<main class="mx-auto w-full max-w-3xl px-4 pb-16 sm:px-6">
 		<article class="surface-panel mt-8 rounded-2xl p-5 text-text sm:p-8">
-			<a href="/event" data-return-link class="text-base text-text underline hover:no-underline">← ステージ企画一覧へ</a>
+			<a href="/event" data-return-link class="text-base text-text underline hover:no-underline">← イベント一覧へ</a>
 
 			{
 				image && (
@@ -76,7 +79,8 @@ const imageGallery = [image, ...otherImages]
 				}
 			</div>
 
-			<h1 class:list={['mt-2 text-3xl font-bold', status === 'cancelled' && 'line-through']}>{title}</h1>
+			<p class="mt-3 text-base text-text/70">{eventName}</p>
+			<h1 class:list={['mt-1 text-3xl font-bold', status === 'cancelled' && 'line-through']}>{title}</h1>
 			{description && <p class="mt-3 text-base leading-relaxed text-text/90">{description}</p>}
 
 			<dl class="mt-6 grid grid-cols-[minmax(5rem,6rem)_1fr] gap-x-3 gap-y-3 border-y border-text/20 py-4 text-base">
@@ -85,8 +89,17 @@ const imageGallery = [image, ...otherImages]
 				<dt class="font-bold text-text/80">日時</dt>
 				<dd class="text-text">{formatEventDate(startAt)} {formatEventTimeRange(startAt, endAt)}</dd>
 				<dt class="font-bold text-text/80">会場</dt>
-				<dd class="text-text">{venue}ステージ</dd>
+				<dd class="text-text">{EVENT_VENUE_LABELS[venue]}</dd>
 			</dl>
+
+			{setlist.length > 0 && (
+				<section class="mt-6" aria-labelledby="setlist-heading">
+					<h2 id="setlist-heading" class="text-lg font-bold sm:text-xl">セットリスト</h2>
+					<ol class="mt-2 list-inside list-decimal space-y-1 text-base leading-relaxed text-text/90">
+						{setlist.map((item) => <li>{item}</li>)}
+					</ol>
+				</section>
+			)}
 
 			<div class="event-body mt-6 flex flex-col gap-3 text-base leading-relaxed text-text">
 				<Content />
@@ -172,14 +185,14 @@ const imageGallery = [image, ...otherImages]
 	) {
 		if (returnScrollY) returnUrl.searchParams.set('returnScrollY', returnScrollY);
 		returnLink.href = `${returnUrl.pathname}${returnUrl.search}${returnUrl.hash}`;
-		returnLink.textContent = returnUrl.pathname === '/timetable' ? '← タイムテーブルへ戻る' : '← ステージ企画一覧へ戻る';
+		returnLink.textContent = returnUrl.pathname === '/timetable' ? '← タイムテーブルへ戻る' : '← イベント一覧へ戻る';
 	} else if (
 		returnLink &&
 		referrer?.origin === location.origin &&
 		(referrer.pathname === '/event' || referrer.pathname === '/timetable')
 	) {
 		returnLink.href = `${referrer.pathname}${referrer.search}${referrer.hash}`;
-		returnLink.textContent = referrer.pathname === '/timetable' ? '← タイムテーブルへ戻る' : '← ステージ企画一覧へ戻る';
+		returnLink.textContent = referrer.pathname === '/timetable' ? '← タイムテーブルへ戻る' : '← イベント一覧へ戻る';
 		returnLink.dataset.historyBack = '';
 	}
 
