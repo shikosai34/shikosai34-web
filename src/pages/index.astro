@@ -9,7 +9,7 @@ import ThemeSection from '../components/home/ThemeSection';
 import NewsSection from '../components/home/NewsSection';
 import StageEventSection from '../components/home/StageEventSection';
 import Layout from '../layouts/Layout.astro';
-import { getVisibleEvents } from '../lib/events';
+import { EVENT_VENUE_LABELS, getVisibleEvents } from '../lib/events';
 import { formatNewsDate } from '../lib/news';
 import { getVisibleNews } from '../lib/news-collection';
 import { getPosterFullImage, getPosterImage, posterAlt as posterAltText } from '../lib/poster';
@@ -27,10 +27,12 @@ const latestNews = (await getVisibleNews()).slice(0, 3).map((entry) => ({
 const stageEvents = (await getVisibleEvents()).map((entry) => ({
 	href: `/event/${entry.id}`,
 	title: entry.data.title,
+	eventName: entry.data.eventName,
 	performer: entry.data.performer,
 	startAt: entry.data.startAt.toISOString(),
 	endAt: entry.data.endAt.toISOString(),
 	status: entry.data.status,
+	venue: EVENT_VENUE_LABELS[entry.data.venue],
 }));
 ---
 

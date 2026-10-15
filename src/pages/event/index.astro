@@ -5,9 +5,10 @@ import SiteFooter from '../../components/layout/SiteFooter.astro';
 import SiteHeader from '../../components/layout/SiteHeader.astro';
 import SectionHeading from '../../components/ui/SectionHeading';
 import Layout from '../../layouts/Layout.astro';
-import { EVENT_GENRE_LABELS, EVENT_GENRES, getVisibleEvents } from '../../lib/events';
+import { EVENT_GENRE_LABELS, EVENT_GENRES, getVisibleEvents, groupConsecutiveEvents } from '../../lib/events';
 
 const events = await getVisibleEvents();
+const eventGroups = groupConsecutiveEvents(events);
 const genreFilters = EVENT_GENRES.map((value) => ({ value, label: EVENT_GENRE_LABELS[value] }));
 ---
 
@@ -18,13 +19,11 @@ const genreFilters = EVENT_GENRES.map((value) => ({ value, label: EVENT_GENRE_LA
 		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
 			<div class="flex flex-wrap items-baseline justify-between gap-3">
 				<SectionHeading title="Stage Events" icon="mic" />
-				<a href="/timetable" class="text-sm text-text underline hover:no-underline">
-					時系列で見る
-				</a>
 			</div>
 
 			<p class="mb-5 text-sm leading-relaxed text-text/80">
-				体育館ステージで行われる企画の一覧です。時間は変更になる場合があります。
+				校内イベントの一覧です。{' '}
+				<a href="/timetable" class="text-accent underline hover:no-underline">タイムテーブルはこちら</a>
 			</p>
 
 			{
@@ -40,7 +39,7 @@ const genreFilters = EVENT_GENRES.map((value) => ({ value, label: EVENT_GENRE_LA
 							<input
 								type="search"
 								name="q"
-								placeholder="企画名・出演団体を完全一致で検索"
+								placeholder="イベント名・企画名・出演団体を完全一致で検索"
 								class="w-full bg-transparent text-sm text-text placeholder:text-text/50 focus:outline-none"
 								autocomplete="off"
 							/>
@@ -74,19 +73,28 @@ const genreFilters = EVENT_GENRES.map((value) => ({ value, label: EVENT_GENRE_LA
 							該当するステージ企画はありません。
 						</p>
 
-						<ul class="event-grid mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-							{events.map((event) => (
-								<li
-									data-genre={event.data.genre}
-									data-title={event.data.title}
-									data-performer={event.data.performer}
-								>
-									<a href={`/event/${event.id}`} data-event-detail class="block h-full rounded-xl focus:outline-2 focus:outline-offset-2 focus:outline-base">
-										<EventCard {...event.data} />
-									</a>
-								</li>
+						<div class="event-groups mt-5 space-y-5">
+							{eventGroups.map((group) => (
+								<section data-event-group class="rounded-xl border border-text/20 p-4 sm:p-5">
+									<h2 class="mb-4 border-b border-text/20 pb-3 text-lg font-medium text-text">{group.name}</h2>
+									<ul class="event-grid grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+										{group.events.map((event) => (
+											<li
+												class="event-item"
+												data-genre={event.data.genre}
+												data-title={event.data.title}
+												data-performer={event.data.performer}
+												data-event-name={event.data.eventName}
+											>
+												<a href={`/event/${event.id}`} data-event-detail class="block h-full rounded-xl focus:outline-2 focus:outline-offset-2 focus:outline-base">
+													<EventCard {...event.data} />
+												</a>
+											</li>
+										))}
+									</ul>
+								</section>
 							))}
-						</ul>
+						</div>
 					</div>
 				)
 			}
@@ -144,7 +152,8 @@ const genreFilters = EVENT_GENRES.map((value) => ({ value, label: EVENT_GENRE_LA
 	}
 
 	const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('button[data-filter]'));
-	const items = Array.from(document.querySelectorAll<HTMLLIElement>('.event-grid > li'));
+	const items = Array.from(document.querySelectorAll<HTMLLIElement>('.event-item'));
+	const groups = Array.from(document.querySelectorAll<HTMLElement>('[data-event-group]'));
 	const input = document.querySelector<HTMLInputElement>('.event-search input');
 	const empty = document.querySelector<HTMLElement>('.event-empty');
 	const count = document.querySelector<HTMLElement>('.event-count');
@@ -164,10 +173,15 @@ const genreFilters = EVENT_GENRES.map((value) => ({ value, label: EVENT_GENRE_LA
 				const matchQuery =
 					query === '' ||
 					normalize(item.dataset.title ?? '') === query ||
-					normalize(item.dataset.performer ?? '') === query;
+					normalize(item.dataset.performer ?? '') === query ||
+					normalize(item.dataset.eventName ?? '') === query;
 				const visible = matchGenre && matchQuery;
 				item.hidden = !visible;
 				if (visible) shown += 1;
+			}
+
+			for (const group of groups) {
+				group.hidden = !group.querySelector('.event-item:not([hidden])');
 			}
 
 			for (const button of buttons) {

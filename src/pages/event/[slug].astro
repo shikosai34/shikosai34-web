@@ -7,6 +7,7 @@ import { getCollectionOrEmpty } from '../../lib/content';
 import {
 	EVENT_GENRE_LABELS,
 	EVENT_STATUS_LABELS,
+	EVENT_VENUE_LABELS,
 	formatEventDate,
 	formatEventTimeRange,
 } from '../../lib/events';
@@ -20,7 +21,19 @@ export async function getStaticPaths() {
 
 const { event } = Astro.props;
 const { Content } = await render(event);
-const { title, performer, startAt, endAt, genre, status, venue, image, description } = event.data;
+const {
+	eventName,
+	title,
+	performer,
+	startAt,
+	endAt,
+	genre,
+	status,
+	venue,
+	image,
+	description,
+	setlist,
+} = event.data;
 ---
 
 <Layout title={`${title} | ステージ企画 | 第34回 茨香祭`}>
@@ -49,7 +62,8 @@ const { title, performer, startAt, endAt, genre, status, venue, image, descripti
 				}
 			</div>
 
-			<h1 class:list={['mt-2 text-2xl font-bold', status === 'cancelled' && 'line-through']}>{title}</h1>
+			<p class="mt-3 text-sm text-text/70">{eventName}</p>
+			<h1 class:list={['mt-1 text-2xl font-bold', status === 'cancelled' && 'line-through']}>{title}</h1>
 			{description && <p class="mt-3 text-sm leading-relaxed text-text/80">{description}</p>}
 
 			<dl class="mt-5 grid grid-cols-[5rem_1fr] gap-y-2 border-y border-text/20 py-4 text-sm">
@@ -58,8 +72,17 @@ const { title, performer, startAt, endAt, genre, status, venue, image, descripti
 				<dt class="font-medium">日時</dt>
 				<dd>{formatEventDate(startAt)} {formatEventTimeRange(startAt, endAt)}</dd>
 				<dt class="font-medium">会場</dt>
-				<dd>{venue}ステージ</dd>
+				<dd>{EVENT_VENUE_LABELS[venue]}</dd>
 			</dl>
+
+			{setlist.length > 0 && (
+				<section class="mt-5" aria-labelledby="setlist-heading">
+					<h2 id="setlist-heading" class="text-lg font-medium">セットリスト</h2>
+					<ol class="mt-2 list-inside list-decimal space-y-1 text-sm leading-relaxed text-text/80">
+						{setlist.map((item) => <li>{item}</li>)}
+					</ol>
+				</section>
+			)}
 
 			<div class="event-body mt-5 flex flex-col gap-3 leading-relaxed">
 				<Content />

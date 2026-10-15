@@ -77,7 +77,7 @@ export default function StageEventSection({ events = [] }: Props) {
 		<section className="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 text-text sm:p-6">
 			<SectionHeading title="Stage Events" icon="mic" />
 			<p className="text-sm leading-relaxed text-text/80">
-				体育館ステージのイベント情報はこちらから確認できます。
+				各会場のイベント情報はこちらから確認できます。
 			</p>
 
 			{/* 直近の演目は HUD 風の枠で囲って、他の要素より前に出す。 */}
@@ -104,8 +104,10 @@ export default function StageEventSection({ events = [] }: Props) {
 								</span>
 							) : null}
 						</div>
-						<h2 className="mt-2 text-xl font-medium text-text">{event.title}</h2>
+						<p className="mt-2 text-sm text-text/70">{event.eventName}</p>
+						<h2 className="text-xl font-medium text-text">{event.title}</h2>
 						<p className="mt-1 text-sm text-text/70">{event.performer}</p>
+						<p className="mt-1 text-xs text-text/70">{event.venue}</p>
 						<a
 							href={event.href}
 							className="mt-3 inline-flex items-center gap-1 text-sm text-accent underline hover:no-underline"
