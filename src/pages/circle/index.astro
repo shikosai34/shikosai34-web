@@ -25,6 +25,27 @@ for (const circle of circles) {
 // 学年（1〜5年生）・種別のボタンは常に全て出す。該当0のときは「該当なし」を表示する。
 const categoryFilterGroups = CIRCLE_CATEGORY_GROUPS.map((group) => ({ ...group, type: 'category' as const }));
 const genreFilterGroup = { ...CIRCLE_GENRE_GROUP, type: 'genre' as const };
+const circleSegments = [
+	{
+		id: 'class-circles',
+		label: 'クラスサークル',
+		subheading: '学年',
+		categories: CIRCLE_CATEGORY_GROUPS[0].options,
+		showCategoryHeading: true,
+	},
+	{
+		id: 'clubs',
+		label: '部活動・同好会',
+		categories: CIRCLE_CATEGORY_GROUPS[1].options.filter(({ value }) => value !== 'other'),
+		showCategoryHeading: true,
+	},
+	{
+		id: 'volunteer-groups',
+		label: '有志団体',
+		categories: CIRCLE_CATEGORY_GROUPS[1].options.filter(({ value }) => value === 'other'),
+		showCategoryHeading: false,
+	},
+];
 
 const searchTextById = new Map<string, string>();
 for (const circle of circles) {
@@ -139,26 +160,55 @@ for (const circle of circles) {
 							該当するサークルはありません。
 						</p>
 
-						<ul class="circle-grid mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-							{circles.map((circle) => (
-								<li
-									data-category={circle.data.category}
-									data-genre={circle.data.genre}
-									data-search={searchTextById.get(circle.id)}
-								>
-									<a href={`/circle/${circle.id}`} class="block h-full rounded-xl">
-										<CircleCard
-											name={circle.data.name}
-											category={circle.data.category}
-											genre={circle.data.genre}
-											summary={circle.data.summary}
-											location={circle.data.location}
-											image={circle.data.image}
-										/>
-									</a>
-								</li>
+						<div class="mt-6 space-y-10">
+							{circleSegments.map((segment) => (
+								<section data-circle-segment={segment.id}>
+									<h2 class="border-b border-text/20 pb-2 text-xl font-bold text-text sm:text-2xl">
+										{segment.label}
+									</h2>
+									{segment.subheading && (
+										<h3 class="mt-4 text-sm font-semibold text-text/70">{segment.subheading}</h3>
+									)}
+									<div class="mt-3 space-y-6">
+										{segment.categories.map((category) => {
+											const categoryCircles = circles.filter((circle) => circle.data.category === category.value);
+											return categoryCircles.length > 0 ? (
+												<section data-circle-category-group={category.value}>
+													{segment.showCategoryHeading && (
+														segment.subheading ? (
+															<h4 class="mb-3 text-lg font-semibold text-text">{category.label}</h4>
+														) : (
+															<h3 class="mb-3 text-lg font-semibold text-text">{category.label}</h3>
+														)
+													)}
+													<ul class="circle-grid grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+														{categoryCircles.map((circle) => (
+															<li
+																data-circle-item
+																data-category={circle.data.category}
+																data-genre={circle.data.genre}
+																data-search={searchTextById.get(circle.id)}
+															>
+																<a href={`/circle/${circle.id}`} class="block h-full rounded-xl">
+																	<CircleCard
+																		name={circle.data.name}
+																		category={circle.data.category}
+																		genre={circle.data.genre}
+																		summary={circle.data.summary}
+																		location={circle.data.location}
+																		image={circle.data.image}
+																	/>
+																</a>
+															</li>
+														))}
+													</ul>
+												</section>
+											) : null;
+										})}
+									</div>
+								</section>
 							))}
-						</ul>
+						</div>
 					</div>
 				)
 			}
@@ -189,7 +239,9 @@ for (const circle of circles) {
 	const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('button[data-filter]'));
 	const categoryButtons = buttons.filter((button) => button.dataset.filterType === 'category');
 	const genreButtons = buttons.filter((button) => button.dataset.filterType === 'genre');
-	const items = Array.from(document.querySelectorAll<HTMLLIElement>('.circle-grid > li'));
+	const items = Array.from(document.querySelectorAll<HTMLLIElement>('[data-circle-item]'));
+	const categoryGroups = Array.from(document.querySelectorAll<HTMLElement>('[data-circle-category-group]'));
+	const segments = Array.from(document.querySelectorAll<HTMLElement>('[data-circle-segment]'));
 	const input = document.querySelector<HTMLInputElement>('.search-box input');
 	const empty = document.querySelector<HTMLElement>('.circle-empty');
 	const count = document.querySelector<HTMLElement>('.circle-count');
@@ -212,6 +264,12 @@ for (const circle of circles) {
 				const visible = matchCategory && matchGenre && matchQuery;
 				item.hidden = !visible;
 				if (visible) shown += 1;
+			}
+			for (const group of categoryGroups) {
+				group.hidden = group.querySelector('[data-circle-item]:not([hidden])') === null;
+			}
+			for (const segment of segments) {
+				segment.hidden = segment.querySelector('[data-circle-item]:not([hidden])') === null;
 			}
 
 			for (const button of categoryButtons) {
