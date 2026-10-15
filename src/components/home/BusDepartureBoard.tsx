@@ -101,9 +101,13 @@ function TimetableSection({ timetable }: { timetable: BusTimetable }) {
 	);
 }
 
-/** 全系統・全便の時刻表ダイアログ。 */
+/**
+ * 全系統・全便の時刻表ダイアログ。
+ *
+ * 茨香祭の開催日（10/24・10/25）はどちらも土日祝ダイヤのため、平日ダイヤは
+ * 載せず土日祝ダイヤのみ表示する。
+ */
 function TimetableDialog({ dialogRef, isShuttleDay: shuttleDay }: { dialogRef: RefObject<HTMLDialogElement | null>; isShuttleDay: boolean }) {
-	const weekdayTimetables = getBusTimetables('weekday');
 	const weekendTimetables = getBusTimetables('weekend');
 
 	return (
@@ -140,23 +144,10 @@ function TimetableDialog({ dialogRef, isShuttleDay: shuttleDay }: { dialogRef: R
 						時刻は出発時刻の予定で、遅延は反映されません。
 					</p>
 
-					<div className="mt-5 space-y-6">
-						<div>
-							<h3 className="border-b-2 border-text/25 pb-2 text-sm font-medium text-main">平日ダイヤ</h3>
-							<div className="mt-3 space-y-4">
-								{weekdayTimetables.map((timetable) => (
-									<TimetableSection key={timetable.id} timetable={timetable} />
-								))}
-							</div>
-						</div>
-						<div>
-							<h3 className="border-b-2 border-text/25 pb-2 text-sm font-medium text-main">土日祝ダイヤ</h3>
-							<div className="mt-3 space-y-4">
-								{weekendTimetables.map((timetable) => (
-									<TimetableSection key={timetable.id} timetable={timetable} />
-								))}
-							</div>
-						</div>
+					<div className="mt-5 space-y-4">
+						{weekendTimetables.map((timetable) => (
+							<TimetableSection key={timetable.id} timetable={timetable} />
+						))}
 					</div>
 
 					<p className="mt-6 text-center text-xs leading-relaxed text-text/60">
