@@ -27,7 +27,7 @@ const events = await getVisibleEvents();
 			</div>
 
 			<div>
-				<p class="text-sm leading-relaxed text-text/80">
+				<p class="text-base leading-relaxed text-text/80">
 					各会場の予定を開始時刻順に掲載しています。同じイベント名の連続する企画をまとめ、当日の変更も表示します。
 				</p>
 				<nav class="mt-4 flex flex-wrap gap-2" aria-label="開催日">
@@ -82,7 +82,7 @@ const events = await getVisibleEvents();
 												<ol class="space-y-4">
 													{eventGroups.map((group) => group.events.length > 1 ? (
 														<li class="overflow-hidden rounded-xl border border-text/20 bg-text/[0.03]">
-															<h3 class="border-b border-text/20 bg-base px-4 py-3 text-base font-medium text-text sm:px-5">{group.name}</h3>
+															<h3 class="border-b border-text/20 bg-base px-4 py-3 text-lg font-medium text-text sm:px-5">{group.name}</h3>
 															<ol class="divide-y divide-text/15 px-3 sm:px-5">
 																{group.events.map((event) => <TimetableItem event={event} />)}
 															</ol>

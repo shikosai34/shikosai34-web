@@ -41,7 +41,7 @@ const { event } = Astro.props;
 					<span class="rounded bg-main px-2 py-0.5 font-medium text-on-main">{EVENT_STATUS_LABELS[event.data.status]}</span>
 				)}
 			</div>
-			<h4 class:list={['mt-2 font-medium', event.data.status === 'cancelled' && 'line-through']}>{event.data.title}</h4>
+			<h4 class:list={['mt-2 text-base font-medium text-text', event.data.status === 'cancelled' && 'line-through']}>{event.data.title}</h4>
 			<p class="mt-1 text-sm text-text/70">{event.data.performer}</p>
 		</div>
 	</a>
