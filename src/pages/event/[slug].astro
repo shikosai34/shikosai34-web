@@ -36,12 +36,12 @@ const {
 } = event.data;
 ---
 
-<Layout title={`${title} | ステージ企画 | 第34回 茨香祭`}>
+<Layout title={`${title} | イベント一覧 | 第34回 茨香祭`}>
 	<SiteHeader />
 
 	<main class="mx-auto w-full max-w-3xl px-4 pb-16 sm:px-6">
 		<article class="surface-panel mt-8 rounded-2xl p-5 text-text sm:p-8">
-			<a href="/event" data-return-link class="text-sm text-text underline hover:no-underline">← ステージ企画一覧へ</a>
+			<a href="/event" data-return-link class="text-sm text-text underline hover:no-underline">← イベント一覧へ</a>
 
 			{
 				image && (
@@ -112,14 +112,14 @@ const {
 	) {
 		if (returnScrollY) returnUrl.searchParams.set('returnScrollY', returnScrollY);
 		returnLink.href = `${returnUrl.pathname}${returnUrl.search}${returnUrl.hash}`;
-		returnLink.textContent = returnUrl.pathname === '/timetable' ? '← タイムテーブルへ戻る' : '← ステージ企画一覧へ戻る';
+		returnLink.textContent = returnUrl.pathname === '/timetable' ? '← タイムテーブルへ戻る' : '← イベント一覧へ戻る';
 	} else if (
 		returnLink &&
 		referrer?.origin === location.origin &&
 		(referrer.pathname === '/event' || referrer.pathname === '/timetable')
 	) {
 		returnLink.href = `${referrer.pathname}${referrer.search}${referrer.hash}`;
-		returnLink.textContent = referrer.pathname === '/timetable' ? '← タイムテーブルへ戻る' : '← ステージ企画一覧へ戻る';
+		returnLink.textContent = referrer.pathname === '/timetable' ? '← タイムテーブルへ戻る' : '← イベント一覧へ戻る';
 		returnLink.dataset.historyBack = '';
 	}
 

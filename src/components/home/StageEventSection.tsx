@@ -126,8 +126,8 @@ export default function StageEventSection({ events = [] }: Props) {
 			</div>
 
 			<div className="mt-5 grid gap-2 sm:flex sm:flex-wrap sm:justify-end">
-				<Button href="/event" variant="outline" className="justify-center">
-					イベント一覧
+				<Button href="/event?venue=main-stage" variant="outline" className="justify-center">
+					メインステージのイベント一覧
 				</Button>
 				<Button href="/timetable" variant="main" className="justify-center">
 					タイムテーブルを見る
