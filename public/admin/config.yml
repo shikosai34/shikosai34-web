@@ -101,6 +101,7 @@ collections:
     create: true
     slug: '{{fields.slug}}'
     identifier_field: name
+    summary: '{{fields.slug}} - {{name}}'
     sortable_fields: [nameKana, name]
     fields:
       - { label: 団体名, name: name, widget: string }
