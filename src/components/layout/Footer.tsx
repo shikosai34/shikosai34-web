@@ -14,11 +14,10 @@ const snsLinks = [
 ];
 
 const eventLinks = [
-	{ label: '1日目（10月24日）', href: '/timetable#day-1' },
-	{ label: '2日目（10月25日）', href: '/timetable#day-2' },
-	{ label: 'サークル一覧（学年ごと）', href: '/circle?filter=grade' },
-	{ label: 'サークル一覧（区分ごと）', href: '/circle?filter=category' },
-	{ label: 'サークル一覧（種別ごと）', href: '/circle?filter=type' },
+	{ label: '1日目', href: '/timetable#day-1' },
+	{ label: '2日目', href: '/timetable#day-2' },
+	{ label: 'イベント一覧', href: '/event' },
+	{ label: 'サークル一覧', href: '/circle' },
 ];
 
 const otherLinks = [
