@@ -114,6 +114,18 @@ const events = defineCollection({
 			status: z.enum(EVENT_STATUSES).default('scheduled'),
 			venue: z.literal('体育館').default('体育館'),
 			image: z.string().optional(),
+			/** 詳細ページに並べる追加画像（任意）。 */
+			otherImages: z.array(z.string()).default([]),
+			snsLinks: z
+				.array(
+					z.object({
+						label: z.string().min(1),
+						url: z.string().url(),
+						/** note風リンクカードに使う画像（任意）。 */
+						previewImage: z.string().optional(),
+					}),
+				)
+				.default([]),
 			description: z.string().optional(),
 			draft: z.boolean().default(false),
 		})
