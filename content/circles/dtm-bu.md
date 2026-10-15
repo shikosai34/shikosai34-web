@@ -12,5 +12,8 @@ scheduleDay1: 9:00〜17:00
 scheduleDay2: 9:00〜15:00
 fesflowPlanned: false
 image: https://assets.34.shikosai.net/news/c76e5dab-3ab8-44be-ae79-1bf799f4315f.webp
+snsLinks:
+  - url: https://niticdtm.bandcamp.com/
+    label: Instagram
 ---
 休憩所である視聴覚室をDTM部がジャック！時間限定でDJパフォーマンスをします｡また､DTM部オリジナルのアルバムCDも数量限定で頒布予定です｡
