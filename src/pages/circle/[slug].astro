@@ -24,6 +24,7 @@ const {
 	highlights,
 	details,
 	location,
+	rainLocation,
 	scheduleDay1,
 	scheduleDay2,
 	image,
@@ -48,10 +49,10 @@ const schedules = [
 			<div class="mt-4 overflow-hidden rounded-xl">
 				{
 					image ? (
-						<img src={image} alt="" class="aspect-video w-full object-cover" />
+						<img src={image} alt="" class="aspect-square w-full object-cover" />
 					) : (
 						<div
-							class="kikko flex aspect-video w-full items-center justify-center bg-text/5 text-sm text-text/60"
+							class="kikko flex aspect-square w-full items-center justify-center bg-text/5 text-sm text-text/60"
 							aria-hidden="true"
 						>
 							画像準備中
@@ -82,6 +83,12 @@ const schedules = [
 				}
 				<dt class="font-medium">場所</dt>
 				<dd>{location}</dd>
+				{rainLocation && (
+					<>
+						<dt class="font-medium">雨天時</dt>
+						<dd>{rainLocation}</dd>
+					</>
+				)}
 			</dl>
 
 			{
@@ -111,7 +118,7 @@ const schedules = [
 					<ul class="mt-6 grid grid-cols-2 gap-3">
 						{otherImages.map((src) => (
 							<li>
-								<img src={src} alt="" loading="lazy" class="aspect-video w-full rounded-xl object-cover" />
+								<img src={src} alt="" loading="lazy" class="aspect-square w-full rounded-xl object-cover" />
 							</li>
 						))}
 					</ul>
@@ -137,24 +144,24 @@ const schedules = [
 				)
 			}
 
-			<div class="mt-6 border-t border-text pt-4">
-				{
-					fesflowPlanned && fesflowUrl ? (
-						<a
-							href={fesflowUrl}
-							target="_blank"
-							rel="noopener noreferrer"
-							class="inline-block rounded-lg bg-accent px-4 py-2 text-sm font-bold text-base"
-						>
-							FesFlow で見る
-						</a>
-					) : fesflowPlanned ? (
-						<p class="text-sm text-text">FesFlow ページは準備中です。</p>
-					) : (
-						<p class="text-sm text-text">当日は会場でのご案内となります。</p>
-					)
-				}
-			</div>
+			{
+				fesflowPlanned && (
+					<div class="mt-6 border-t border-text pt-4">
+						{fesflowUrl ? (
+							<a
+								href={fesflowUrl}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="inline-block rounded-lg bg-accent px-4 py-2 text-sm font-bold text-base"
+							>
+								FesFlow で見る
+							</a>
+						) : (
+							<p class="text-sm text-text">FesFlow ページは準備中です。</p>
+						)}
+					</div>
+				)
+			}
 		</article>
 	</main>
 

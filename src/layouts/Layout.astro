@@ -2,7 +2,6 @@
 import '@fontsource/kiwi-maru/400.css';
 import '@fontsource/kiwi-maru/500.css';
 import '../styles/global.css';
-import LoadingScreen from '../components/layout/LoadingScreen.astro';
 import EdgeKasumi from '../components/layout/EdgeKasumi';
 
 interface Props {
@@ -72,11 +71,6 @@ const websiteJsonLd = {
 		)}
 	</head>
 	<body class:list={[bodyClass ?? 'bg-text text-base']}>
-		{/*
-		 * 読み込み中の覆い。どのページから入っても出るよう Layout に置く。
-		 * サイト内のページ遷移では出さない（LoadingScreen 側で判定する）。
-		 */}
-		<LoadingScreen />
 		{/* 画面の左右端に固定する霞。スクロールしても残る。 */}
 		{edgeKasumi && <EdgeKasumi />}
 		<slot />

@@ -123,11 +123,12 @@ collections:
           - { label: 3年生, value: grade3 }
           - { label: 4年生, value: grade4 }
           - { label: 5年生, value: grade5 }
+          - { label: 専攻科, value: advanced }
           - { label: 運動部, value: sports }
           - { label: 文化部, value: culture }
-          - { label: 同好会, value: society }
-          - { label: その他, value: other }
+          - { label: 有志サークル, value: other }
       - { label: 実施場所, name: location, widget: string, hint: '教室名など。' }
+      - { label: 雨天時の場所・対応, name: rainLocation, widget: string, required: false, hint: '雨天時の場所、または中止などの対応。' }
       - label: サークルカテゴリ
         name: genre
         widget: select
@@ -153,12 +154,12 @@ collections:
         name: scheduleDay1
         widget: string
         required: false
-        hint: '例: 10:00〜16:00。この日に実施しない場合は空欄にしてください。'
+        hint: '開催時間（分かる場合）または「出店あり」。実施しない日は空欄にしてください。'
       - label: 実施時間（10月25日）
         name: scheduleDay2
         widget: string
         required: false
-        hint: '例: 10:00〜15:00。この日に実施しない場合は空欄にしてください。'
+        hint: '開催時間（分かる場合）または「出店あり」。実施しない日は空欄にしてください。'
       - { label: FesFlow 導入予定, name: fesflowPlanned, widget: boolean, default: false }
       - label: サムネイル画像
         name: image
@@ -325,4 +326,38 @@ collections:
         name: draft
         widget: boolean
         default: false
-        hint: 'オンにしている間は本番サイトに表示されません。'
+
+  - name: staff
+    label: 実行委員の部署紹介
+    label_singular: 部署
+    description: 'スタッフページの部署紹介を管理します。表示順の小さい順に掲載します。'
+    folder: content/staff
+    create: true
+    slug: '{{fields.sortOrder}}-{{slug}}'
+    identifier_field: department
+    summary: '{{fields.sortOrder}}｜{{fields.department}}'
+    sortable_fields: [sortOrder, department]
+    fields:
+      - label: 表示順
+        name: sortOrder
+        widget: number
+        value_type: int
+        min: 0
+        hint: '小さい番号の部署が先に表示されます。'
+      - { label: 部署名, name: department, widget: string }
+      - label: 部署の名簿
+        name: members
+        widget: list
+        required: false
+        label_singular: メンバー
+        summary: '{{fields.role}}｜{{fields.name}}（{{fields.kana}}）'
+        fields:
+          - { label: 役職, name: role, widget: string }
+          - { label: 氏名, name: name, widget: string }
+          - { label: ふりがな, name: kana, widget: string }
+      - { label: 部署の説明文, name: description, widget: text }
+      - label: 部署の写真
+        name: image
+        widget: image-r2
+        required: false
+        hint: 'スマホの写真をそのままで大丈夫です。未設定の場合は写真なしで表示します。'

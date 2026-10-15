@@ -27,11 +27,11 @@ const { name, category, genre, summary, location, image } = Astro.props;
                 src={image}
                 alt=""
                 loading="lazy"
-                class="aspect-video w-full object-cover"
+                class="aspect-square w-full object-cover"
             />
         ) : (
             <div
-                class="kikko flex aspect-video w-full items-center justify-center bg-text/5 text-xs text-text/60"
+                class="kikko flex aspect-square w-full items-center justify-center bg-text/5 text-xs text-text/60"
                 aria-hidden="true"
             >
                 画像準備中

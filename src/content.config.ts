@@ -67,6 +67,8 @@ const circles = defineCollection({
 		category: z.enum(CIRCLE_CATEGORIES),
 		/** 実施場所（教室名など） */
 		location: z.string().min(1),
+		/** 雨天時の場所または中止案内（任意）。 */
+		rainLocation: z.string().optional(),
 		/** サークルカテゴリ（文化・食品・技術）。学年・種別の `category` とは別軸。 */
 		genre: z.enum(CIRCLE_GENRES),
 		/** 紹介文（短文）。一覧カードと詳細冒頭に表示する。 */
@@ -75,9 +77,9 @@ const circles = defineCollection({
 		highlights: z.string().optional(),
 		/** 値段設定・企画詳細（任意） */
 		details: z.string().optional(),
-		/** 実施時間（自由記述）。10月24日 */
+		/** 実施時間または出店有無（自由記述）。10月24日 */
 		scheduleDay1: z.string().optional(),
-		/** 実施時間（自由記述）。10月25日 */
+		/** 実施時間または出店有無（自由記述）。10月25日 */
 		scheduleDay2: z.string().optional(),
 		/** FesFlow 導入予定（各団体の申告）。詳細ページのリンク表示判定に使う。 */
 		fesflowPlanned: z.boolean(),
@@ -172,4 +174,22 @@ const sponsors = defineCollection({
 	}),
 });
 
-export const collections = { news, circles, events, sponsors };
+/**
+ * 実行委員会の部署紹介（`/staff`）。
+ * 部署ごとの名簿・写真・紹介文を Decap CMS から管理する。
+ */
+const staff = defineCollection({
+	loader: glob({ pattern: '**/[^_]*.md', base: './content/staff' }),
+	schema: z.object({
+		/** 表示順。小さい番号を先に表示する。 */
+		sortOrder: z.number().int().nonnegative(),
+		department: z.string().min(1),
+		members: z
+			.array(z.object({ role: z.string().min(1), name: z.string().min(1), kana: z.string().min(1) }))
+			.default([]),
+		description: z.string().min(1),
+		image: z.string().optional(),
+	}),
+});
+
+export const collections = { news, circles, events, sponsors, staff };

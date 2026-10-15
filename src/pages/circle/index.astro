@@ -8,14 +8,14 @@ import Layout from '../../layouts/Layout.astro';
 import {
 	CIRCLE_CATEGORY_GROUPS,
 	CIRCLE_CATEGORY_LABELS,
+	CIRCLE_GENRE_GROUP,
 	CIRCLE_GENRE_LABELS,
 	normalizeForSearch,
+	sortCirclesByCategory,
 } from '../../lib/circles';
 import { getCollectionOrEmpty } from '../../lib/content';
 
-const circles = (await getCollectionOrEmpty('circles')).sort((a, b) =>
-	a.data.nameKana.localeCompare(b.data.nameKana, 'ja'),
-);
+const circles = sortCirclesByCategory(await getCollectionOrEmpty('circles'));
 
 const countByCategory = new Map<string, number>();
 for (const circle of circles) {
@@ -23,7 +23,8 @@ for (const circle of circles) {
 }
 
 // 学年（1〜5年生）・種別のボタンは常に全て出す。該当0のときは「該当なし」を表示する。
-const filterGroups = CIRCLE_CATEGORY_GROUPS;
+const categoryFilterGroups = CIRCLE_CATEGORY_GROUPS.map((group) => ({ ...group, type: 'category' as const }));
+const genreFilterGroup = { ...CIRCLE_GENRE_GROUP, type: 'genre' as const };
 
 const searchTextById = new Map<string, string>();
 for (const circle of circles) {
@@ -82,30 +83,44 @@ for (const circle of circles) {
 							<input
 								type="search"
 								name="q"
-								placeholder="キーワードで検索（例: たこ焼き）"
+								placeholder="キーワードで検索（例: パンケーキ）"
 								class="w-full bg-transparent text-sm text-text placeholder:text-text/50 focus:outline-none"
 								autocomplete="off"
 							/>
 						</label>
 
-						<div class="flex flex-col gap-2">
-							{filterGroups.map((group) => (
-								<div
-									class="flex flex-wrap gap-2"
-									role="group"
-									aria-label={`${group.label}で絞り込み`}
-								>
+						<div class="flex flex-wrap gap-2">
+							{categoryFilterGroups.map((group) => (
+								<Fragment>
 									{group.options.map((option) => (
 										<button
 											type="button"
 											class="rounded-full border border-text/30 px-3 py-1 text-sm text-text transition-colors aria-pressed:border-main aria-pressed:bg-main aria-pressed:font-medium aria-pressed:text-base"
 											data-filter={option.value}
+											data-filter-type={group.type}
 											aria-pressed="false"
+											aria-label={`${group.label}: ${option.label}`}
 										>
 											{option.label}
 										</button>
 									))}
-								</div>
+								</Fragment>
+							))}
+						</div>
+
+						<div class="mt-2 flex flex-wrap items-center gap-2">
+							<span class="text-sm text-text/70">{genreFilterGroup.label}:</span>
+							{genreFilterGroup.options.map((option) => (
+								<button
+									type="button"
+									class="rounded-full border border-text/30 px-3 py-1 text-sm text-text transition-colors aria-pressed:border-main aria-pressed:bg-main aria-pressed:font-medium aria-pressed:text-base"
+									data-filter={option.value}
+									data-filter-type={genreFilterGroup.type}
+									aria-pressed="false"
+									aria-label={`${genreFilterGroup.label}: ${option.label}`}
+								>
+									{option.label}
+								</button>
 							))}
 						</div>
 
@@ -126,7 +141,11 @@ for (const circle of circles) {
 
 						<ul class="circle-grid mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
 							{circles.map((circle) => (
-								<li data-category={circle.data.category} data-search={searchTextById.get(circle.id)}>
+								<li
+									data-category={circle.data.category}
+									data-genre={circle.data.genre}
+									data-search={searchTextById.get(circle.id)}
+								>
 									<a href={`/circle/${circle.id}`} class="block h-full rounded-xl">
 										<CircleCard
 											name={circle.data.name}
@@ -164,9 +183,12 @@ for (const circle of circles) {
 </style>
 
 <script>
-	// カテゴリ絞り込み（学年 / 種別のどちらか1つ）＋ キーワード検索。
+	// カテゴリ絞り込み（学年 / 種別のどちらか1つ）＋ 出展内容絞り込み（食品 / 文化系 / 技術系のどちらか1つ）＋ キーワード検索。
+	// カテゴリと出展内容は別軸なので AND 条件で絞り込む。
 	// JS が動かない場合は全カード表示のまま（docs/design §4.1 / F-04）。
 	const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('button[data-filter]'));
+	const categoryButtons = buttons.filter((button) => button.dataset.filterType === 'category');
+	const genreButtons = buttons.filter((button) => button.dataset.filterType === 'genre');
 	const items = Array.from(document.querySelectorAll<HTMLLIElement>('.circle-grid > li'));
 	const input = document.querySelector<HTMLInputElement>('.search-box input');
 	const empty = document.querySelector<HTMLElement>('.circle-empty');
@@ -176,6 +198,7 @@ for (const circle of circles) {
 
 	if (buttons.length > 0 && items.length > 0) {
 		let category = '';
+		let genre = '';
 		let query = '';
 
 		const normalize = (value: string) => value.normalize('NFKC').toLowerCase();
@@ -184,31 +207,43 @@ for (const circle of circles) {
 			let shown = 0;
 			for (const item of items) {
 				const matchCategory = category === '' || item.dataset.category === category;
+				const matchGenre = genre === '' || item.dataset.genre === genre;
 				const matchQuery = query === '' || (item.dataset.search ?? '').includes(query);
-				const visible = matchCategory && matchQuery;
+				const visible = matchCategory && matchGenre && matchQuery;
 				item.hidden = !visible;
 				if (visible) shown += 1;
 			}
 
-			for (const button of buttons) {
+			for (const button of categoryButtons) {
 				button.setAttribute('aria-pressed', String(button.dataset.filter === category));
 			}
+			for (const button of genreButtons) {
+				button.setAttribute('aria-pressed', String(button.dataset.filter === genre));
+			}
 
-			const filtered = category !== '' || query !== '';
+			const filtered = category !== '' || genre !== '' || query !== '';
 			if (count) count.textContent = filtered ? `${shown} 件` : `全 ${total} 件`;
 			if (empty) empty.hidden = shown !== 0;
 			if (clearButton) clearButton.hidden = !filtered;
 
 			const params = new URLSearchParams();
 			if (category) params.set('category', category);
+			if (genre) params.set('genre', genre);
 			if (query && input) params.set('q', input.value);
 			const qs = params.toString();
 			history.replaceState(null, '', qs ? `?${qs}` : location.pathname);
 		};
 
-		for (const button of buttons) {
+		for (const button of categoryButtons) {
 			button.addEventListener('click', () => {
 				category = button.dataset.filter === category ? '' : (button.dataset.filter ?? '');
+				render();
+			});
+		}
+
+		for (const button of genreButtons) {
+			button.addEventListener('click', () => {
+				genre = button.dataset.filter === genre ? '' : (button.dataset.filter ?? '');
 				render();
 			});
 		}
@@ -220,6 +255,7 @@ for (const circle of circles) {
 
 		clearButton?.addEventListener('click', () => {
 			category = '';
+			genre = '';
 			query = '';
 			if (input) input.value = '';
 			render();
@@ -227,14 +263,18 @@ for (const circle of circles) {
 
 		const params = new URLSearchParams(location.search);
 		const initialCategory = params.get('category') ?? '';
-		if (buttons.some((button) => button.dataset.filter === initialCategory)) {
+		if (categoryButtons.some((button) => button.dataset.filter === initialCategory)) {
 			category = initialCategory;
+		}
+		const initialGenre = params.get('genre') ?? '';
+		if (genreButtons.some((button) => button.dataset.filter === initialGenre)) {
+			genre = initialGenre;
 		}
 		const initialQuery = params.get('q') ?? '';
 		if (initialQuery && input) {
 			input.value = initialQuery;
 			query = normalize(initialQuery.trim());
 		}
-		if (category || query) render();
+		if (category || genre || query) render();
 	}
 </script>
