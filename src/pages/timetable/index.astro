@@ -45,7 +45,7 @@ const events = await getVisibleEvents();
 					{EVENT_VENUES.map((venue) => (
 						<button
 							type="button"
-							class="rounded-full border border-text/30 px-3 py-1 text-sm text-text transition-colors hover:border-accent hover:text-accent aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:font-medium aria-pressed:text-on-accent focus:outline-2 focus:outline-offset-2 focus:outline-accent"
+							class="rounded-full border border-text/30 px-3 py-1 text-sm text-text transition-colors hover:border-main hover:text-main aria-pressed:border-main aria-pressed:bg-main aria-pressed:font-medium aria-pressed:text-on-main focus:outline-2 focus:outline-offset-2 focus:outline-accent"
 							data-timetable-venue-switch={venue}
 							aria-pressed={venue === EVENT_VENUES[0] ? 'true' : 'false'}
 						>
@@ -82,7 +82,7 @@ const events = await getVisibleEvents();
 												<ol class="space-y-4">
 													{eventGroups.map((group) => group.events.length > 1 ? (
 														<li class="overflow-hidden rounded-xl border border-text/20 bg-text/[0.03]">
-															<h3 class="border-b border-base/20 bg-accent px-4 py-3 text-base font-medium text-on-accent sm:px-5">{group.name}</h3>
+															<h3 class="border-b border-text/20 bg-base px-4 py-3 text-base font-medium text-text sm:px-5">{group.name}</h3>
 															<ol class="divide-y divide-text/15 px-3 sm:px-5">
 																{group.events.map((event) => <TimetableItem event={event} />)}
 															</ol>
