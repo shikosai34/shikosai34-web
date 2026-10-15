@@ -211,4 +211,19 @@ const staff = defineCollection({
 	}),
 });
 
-export const collections = { news, circles, events, sponsors, staff };
+/**
+ * よくある質問（`/faq`）。
+ * 質問とカテゴリ、参考リンクを frontmatter に、回答本文を Markdown で管理する。
+ */
+const faq = defineCollection({
+	loader: glob({ pattern: '**/[^_]*.md', base: './content/faq' }),
+	schema: z.object({
+		question: z.string().min(1),
+		category: z.string().min(1),
+		referenceLinks: z
+			.array(z.object({ label: z.string().min(1), url: z.string().url() }))
+			.default([]),
+	}),
+});
+
+export const collections = { news, circles, events, sponsors, staff, faq };

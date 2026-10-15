@@ -394,3 +394,35 @@ collections:
         widget: image-r2
         required: false
         hint: 'スマホの写真をそのままで大丈夫です。未設定の場合は写真なしで表示します。'
+
+  - name: faq
+    label: よくある質問
+    label_singular: 質問
+    description: '質問・カテゴリ・回答・参考リンクを管理します。公開後に /faq へ反映されます。'
+    folder: content/faq
+    create: true
+    slug: '{{slug}}'
+    identifier_field: question
+    summary: '{{fields.category}}｜{{fields.question}}'
+    sortable_fields: [category, question]
+    fields:
+      - { label: 質問, name: question, widget: string }
+      - label: 質問カテゴリ
+        name: category
+        widget: string
+        hint: '同じカテゴリ名の質問は、公開ページでひとまとまりに表示されます。'
+      - label: 回答
+        name: body
+        widget: markdown
+      - label: 参考リンク
+        name: referenceLinks
+        widget: list
+        required: false
+        label_singular: リンク
+        summary: '{{fields.label}}'
+        fields:
+          - { label: リンク名, name: label, widget: string }
+          - label: URL
+            name: url
+            widget: string
+            pattern: ['^https?://', 'http:// または https:// で始まる URL を入力してください']
