@@ -2,7 +2,7 @@
 import SiteHeader from '../components/layout/SiteHeader.astro';
 import SiteFooter from '../components/layout/SiteFooter.astro';
 import BreakingNewsHero from '../components/home/BreakingNewsHero';
-import BusCountdownWidget from '../components/home/BusCountdownWidget';
+import BusDepartureBoard from '../components/home/BusDepartureBoard';
 import CountdownSection from '../components/home/CountdownSection';
 import ThemeModel from '../components/home/ThemeModel';
 import ThemeSection from '../components/home/ThemeSection';
@@ -55,6 +55,9 @@ const stageEvents = (await getVisibleEvents()).map((entry) => ({
 		<ThemeSection>
 			<ThemeModel slot="mark" client:only="react" />
 		</ThemeSection>
+
+		<BusDepartureBoard client:load />
+
 		{/*
 		 * 広い画面では Stage Events と News を横に並べる。
 		 * どちらも縦に短いパネルなので、1 列に積むと PC では間延びする。
@@ -64,8 +67,6 @@ const stageEvents = (await getVisibleEvents()).map((entry) => ({
 			<NewsSection items={latestNews} />
 		</div>
 	</main>
-
-	<BusCountdownWidget client:load />
 
 	<SiteFooter />
 </Layout>

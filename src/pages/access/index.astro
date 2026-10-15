@@ -6,7 +6,7 @@ import SectionHeading from '../../components/ui/SectionHeading';
 import Layout from '../../layouts/Layout.astro';
 import busImage from '../../assets/access/access_bus.png';
 import taxiImage from '../../assets/access/access_taxi.png';
-import { BUS_FARES, getBusTimetables } from '../../lib/bus';
+import { BUS_FARES, BUS_ROUTES } from '../../lib/bus';
 
 const address = '〒312-8508 茨城県ひたちなか市中根866';
 
@@ -51,7 +51,9 @@ const busLinks = [
 
 // バスの時刻データ本体は lib/bus.ts にまとめている（トップページのバス発車
 // カウントダウンと共有するため）。経緯や出典のコメントもそちらを参照。
-const timetables = getBusTimetables();
+// このページでは臨時便（茨城高専スクールバス）の案内のみ載せる。定期便を
+// 含む最新の発車案内はトップページの発車カウントダウンから確認できる。
+const shuttleRoutes = BUS_ROUTES.filter((route) => route.shuttleTimes.length > 0);
 ---
 
 <Layout title="アクセス | 第34回 茨香祭">
@@ -96,18 +98,18 @@ const timetables = getBusTimetables();
 						JR勝田駅東口を出て左側にある、茨城交通バス2番乗り場から、定期便・臨時便のいずれかにお乗りください。<strong class="font-medium text-text">「茨城高専前」で下車</strong>し、北へ進むと正門となります。
 					</p>
 					<p class="mt-3 text-sm leading-relaxed text-text/80">
-						勝田駅からのバスは行き先によって停まる停留所が違い、<strong class="font-medium text-text">「深谷津」行きは茨城高専前を通りません</strong>。下の時刻表は下車する停留所ごとに分けていますので、「下車：茨城高専前」の表から時刻をお選びください。
+						勝田駅からのバスは行き先によって停まる停留所が違い、<strong class="font-medium text-text">「深谷津」行きは茨城高専前を通りません</strong>。茨城高専前で下車してください。
 					</p>
 
 					<div class="mt-5 rounded-xl border-2 border-main bg-main/10 p-4" role="note">
-						<p class="font-medium text-text">臨時便は1日目（10月24日）のみ運行します</p>
+						<p class="font-medium text-text">臨時便は開催日（10月24日・25日）に運行します</p>
 						<p class="mt-1 text-sm leading-relaxed text-text/80">
-							茨城交通の路線バス（定期便）に加えて、茨城高専スクールバスとして臨時便を増便します。時刻は出発時刻です。
+							茨城交通の路線バス（定期便）に加えて、茨城高専スクールバスとして臨時便を増便します。時刻は出発時刻です。通常の定期便を含む最新の発車案内は、トップページのバス発車カウントダウンからもご確認いただけます。
 						</p>
 					</div>
 
 					<div class="mt-5 rounded-xl border border-text/20 bg-base p-4">
-						<h3 class="text-base font-medium text-text">運賃（片道・行き帰りとも同額）</h3>
+						<h3 class="text-base font-medium text-text">運賃（片道）</h3>
 						<div class="mt-3 space-y-4">
 							{
 								busFares.map((fare) => (
@@ -140,10 +142,10 @@ const timetables = getBusTimetables();
 						sizes="(min-width: 640px) 320px, 80vw"
 					/>
 
-					<h3 class="mt-8 text-base font-medium text-text">バスの時刻表（10月24日・出発時刻）</h3>
+					<h3 class="mt-8 text-base font-medium text-text">臨時便の時刻表（出発時刻）</h3>
 					<div class="mt-4 space-y-8 sm:grid sm:grid-cols-2 sm:items-start sm:gap-x-6 sm:gap-y-8 sm:space-y-0">
 						{
-							timetables.map((bus) => (
+							shuttleRoutes.map((bus) => (
 								<section aria-labelledby={`${bus.id}-heading`}>
 									<div class="mb-3 border-b-2 border-text/25 pb-2">
 										<p class="text-sm font-medium text-main">{bus.direction}</p>
@@ -158,31 +160,18 @@ const timetables = getBusTimetables();
 										</p>
 									</div>
 									<ol class="divide-y divide-text/10 rounded-xl border border-text/20 bg-base">
-										{bus.departures.map(({ time, extra }) => (
-											<li
-												class:list={[
-													'relative px-4 py-2 text-center tabular-nums',
-													extra ? 'bg-main/10 font-medium text-text' : 'text-text/80',
-												]}
-											>
+										{bus.shuttleTimes.map((time) => (
+											<li class="px-4 py-2 text-center font-medium tabular-nums text-text">
 												<time>{time}</time>
-												{extra && (
-													<span class="absolute top-1/2 right-4 -translate-y-1/2 rounded-full bg-main px-2 py-0.5 text-xs font-medium text-base">臨時便</span>
-												)}
 											</li>
 										))}
 									</ol>
-									{bus.caveat && (
-										<p class="mt-3 rounded-xl border border-dashed border-text/30 px-3 py-2 text-xs leading-relaxed text-text/70">
-											{bus.caveat}
-										</p>
-									)}
 								</section>
 							))
 						}
 					</div>
 					<p class="mt-4 text-xs leading-relaxed text-text/60">
-						「臨時便」の印がない時刻は茨城交通の定期便（土曜ダイヤ・2026年10月2日時点）です。茨城高専前の表は臨時便の運行時間帯のみ、深谷津の表はその前後にあたる8時台・17時台のみを掲載しています。往路の茨城高専前行きは海浜公園南口行き（市役所・海浜公園西口・中央研修所経由）で、いずれも茨城高専前に停まります。ダイヤが変更される場合があるため、最新の時刻は下記の時刻表もあわせてご確認ください。
+						上記は茨城高専スクールバス（臨時便）のみの時刻です。茨城交通の定期便を含む最新の発車案内は、<a href="/" class="text-text underline hover:no-underline focus:outline-2 focus:outline-offset-2 focus:outline-accent">トップページのバス発車カウントダウン</a>からご確認ください。ダイヤが変更される場合があるため、下記の時刻表もあわせてご確認ください。
 					</p>
 
 					<ul class="mt-8 list-disc space-y-2 pl-5 text-sm marker:text-text/60">
