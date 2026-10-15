@@ -6,6 +6,9 @@
   --color-text: #e8e8e8;
   --color-main: #ff9933;
   --color-accent: #00ffcc;
+  /* 色面の上で使う前景色。色名ではなく意味で組み合わせを選ぶ。 */
+  --color-on-main: #0b3041;
+  --color-on-accent: #0b3041;
 
   /*
    * ポスターのマゼンタ（実物から抽出した #e7386f）。
