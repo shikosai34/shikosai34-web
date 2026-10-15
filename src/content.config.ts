@@ -168,6 +168,18 @@ const sponsors = defineCollection({
 });
 
 /**
+ * よくある質問（`/faq`）。質問ごとに Markdown の回答を持ち、CMS から管理する。
+ */
+const faq = defineCollection({
+	loader: glob({ pattern: '**/[^_]*.md', base: './content/faq' }),
+	schema: z.object({
+		/** 表示順。小さい番号を先に表示する。 */
+		sortOrder: z.number().int().nonnegative(),
+		question: z.string().min(1),
+	}),
+});
+
+/**
  * 実行委員会の部署紹介（`/staff`）。
  * 部署ごとの名簿・写真・紹介文を Decap CMS から管理する。
  */
@@ -185,4 +197,4 @@ const staff = defineCollection({
 	}),
 });
 
-export const collections = { news, circles, events, sponsors, staff };
+export const collections = { news, circles, events, sponsors, faq, staff };
