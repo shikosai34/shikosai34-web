@@ -1,44 +1,70 @@
 ---
-import { render } from 'astro:content';
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
 import SiteHeader from '../../components/layout/SiteHeader.astro';
 import SectionHeading from '../../components/ui/SectionHeading';
-import Layout from '../../layouts/Layout.astro';
-import { getCollectionOrEmpty } from '../../lib/content';
 
-const entries = (await getCollectionOrEmpty('faq')).sort(
-	(a, b) => a.data.sortOrder - b.data.sortOrder || a.data.question.localeCompare(b.data.question, 'ja'),
+const entries = await getCollection('faq');
+const sortedEntries = entries.toSorted((a, b) =>
+	a.data.category.localeCompare(b.data.category, 'ja') ||
+	a.data.question.localeCompare(b.data.question, 'ja'),
 );
-const faqs = await Promise.all(
-	entries.map(async (entry) => ({
-		question: entry.data.question,
-		Content: (await render(entry)).Content,
-	})),
-);
+const categories = [...new Set(sortedEntries.map((entry) => entry.data.category))];
+const answers = await Promise.all(sortedEntries.map((entry) => render(entry)));
 ---
 
-<Layout title="よくある質問 | 第34回 茨香祭" description="第34回 茨香祭についてのよくある質問と回答を掲載しています。">
+<Layout title="よくある質問 | 第34回 茨香祭" description="第34回 茨香祭について、よくある質問と回答をご案内します。">
 	<SiteHeader />
 
-	<main class="mx-auto w-full max-w-5xl px-4 pb-16 sm:px-6">
+	<main class="mx-auto w-full max-w-3xl px-4 pb-16 sm:px-6">
 		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
 			<SectionHeading title="FAQ" icon="question" subtitle="よくある質問" />
 
-			{faqs.length === 0 ? (
+			{categories.length === 0 ? (
 				<p class="py-8 text-center text-sm text-text/70">よくある質問は準備中です。</p>
 			) : (
-				<div class="mt-6 space-y-3">
-					{faqs.map(({ question, Content }) => (
-						<details class="faq-item bracket-frame group overflow-hidden rounded-xl bg-base/45">
-							<summary class="flex cursor-pointer items-center gap-3 px-4 py-4 text-left text-sm font-medium text-text transition-colors hover:bg-base/50 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent sm:px-5 sm:text-base">
-								<span aria-hidden="true" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-accent/40 text-xs font-semibold text-accent">Q</span>
-								<span class="min-w-0 flex-1">{question}</span>
-								<span aria-hidden="true" class="faq-toggle flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-main/15 text-xl leading-none text-accent">+</span>
-							</summary>
-							<div class="faq-answer border-t border-text/10 px-4 py-4 pl-[3.75rem] text-sm leading-7 text-text/85 sm:px-5 sm:pl-[4.25rem]">
-								<Content />
+				<div class="space-y-8">
+					{categories.map((category) => (
+						<section aria-labelledby={`faq-${category}`}>
+							<h2 id={`faq-${category}`} class="mb-3 border-b border-accent/30 pb-2 text-lg font-medium text-accent">
+								{category}
+							</h2>
+							<div class="space-y-3">
+								{sortedEntries
+									.map((entry, index) => ({ entry, index }))
+									.filter(({ entry }) => entry.data.category === category)
+									.map(({ entry, index }) => {
+										const { Content } = answers[index];
+										return (
+											<details class="group rounded-xl border border-white/10 bg-base/40 px-4 py-3 open:border-accent/40">
+												<summary class="flex cursor-pointer list-none items-start gap-3 font-medium text-text marker:hidden">
+													<span class="shrink-0 text-accent" aria-hidden="true">Q.</span>
+													<span class="min-w-0 flex-1">{entry.data.question}</span>
+													<span class="mt-1 shrink-0 text-accent transition-transform group-open:rotate-180" aria-hidden="true">⌄</span>
+												</summary>
+												<div class="faq-answer mt-4 border-t border-white/10 pt-4 pl-7 text-sm leading-7 text-text/80">
+													<Content />
+													{entry.data.referenceLinks.length > 0 && (
+														<div class="mt-4">
+															<p class="mb-1 text-xs font-medium text-text/60">参考リンク</p>
+															<ul class="space-y-1">
+																{entry.data.referenceLinks.map((link) => (
+																	<li>
+																		<a class="text-accent underline decoration-accent/40 underline-offset-4 hover:decoration-accent" href={link.url} target="_blank" rel="noreferrer">
+																			{link.label} <span aria-hidden="true">↗</span>
+																		</a>
+																	</li>
+																))}
+															</ul>
+														</div>
+													)}
+												</div>
+											</details>
+										);
+									})}
 							</div>
-						</details>
+						</section>
 					))}
 				</div>
 			)}
@@ -49,31 +75,27 @@ const faqs = await Promise.all(
 </Layout>
 
 <style>
-	.faq-item > summary {
-		list-style: none;
-	}
-	.faq-item > summary::-webkit-details-marker {
-		display: none;
-	}
-	.faq-item[open] .faq-toggle {
-		transform: rotate(45deg);
-	}
 	.faq-answer :global(p + p) {
 		margin-top: 0.75rem;
 	}
+
+	.faq-answer :global(ul),
+	.faq-answer :global(ol) {
+		margin: 0.75rem 0;
+		padding-left: 1.5rem;
+	}
+
+	.faq-answer :global(ul) {
+		list-style: disc;
+	}
+
+	.faq-answer :global(ol) {
+		list-style: decimal;
+	}
+
 	.faq-answer :global(a) {
 		color: var(--color-accent);
 		text-decoration: underline;
 		text-underline-offset: 0.2em;
-	}
-	.faq-answer :global(ul) {
-		margin-top: 0.5rem;
-		list-style: disc;
-		padding-left: 1.25rem;
-	}
-	.faq-answer :global(ol) {
-		margin-top: 0.5rem;
-		list-style: decimal;
-		padding-left: 1.25rem;
 	}
 </style>

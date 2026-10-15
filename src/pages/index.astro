@@ -10,7 +10,7 @@ import NewsSection from '../components/home/NewsSection';
 import StageEventSection from '../components/home/StageEventSection';
 import logoG from '../assets/logo/yokogaki/HOL_G-trimmed.png';
 import Layout from '../layouts/Layout.astro';
-import { getVisibleEvents } from '../lib/events';
+import { EVENT_VENUE_LABELS, getVisibleEvents } from '../lib/events';
 import { formatNewsDate } from '../lib/news';
 import { getVisibleNews } from '../lib/news-collection';
 import { getPosterFullImage, getPosterImage, posterAlt as posterAltText } from '../lib/poster';
@@ -28,10 +28,12 @@ const latestNews = (await getVisibleNews()).slice(0, 3).map((entry) => ({
 const stageEvents = (await getVisibleEvents()).map((entry) => ({
 	href: `/event/${entry.id}`,
 	title: entry.data.title,
+	eventName: entry.data.eventName,
 	performer: entry.data.performer,
 	startAt: entry.data.startAt.toISOString(),
 	endAt: entry.data.endAt.toISOString(),
 	status: entry.data.status,
+	venue: EVENT_VENUE_LABELS[entry.data.venue],
 }));
 ---
 
@@ -55,6 +57,26 @@ const stageEvents = (await getVisibleEvents()).map((entry) => ({
 		<ThemeSection>
 			<ThemeModel slot="mark" client:only="react" />
 		</ThemeSection>
+
+		<section class="surface-panel mt-6 rounded-2xl p-5 sm:p-6" aria-labelledby="staff-intro-title">
+			<div class="mb-5">
+				<h2 id="staff-intro-title" class="text-xl font-medium tracking-wide text-text">実行委員紹介</h2>
+				<p class="mt-1 text-xs tracking-[0.2em] text-accent/80">STAFF</p>
+			</div>
+			<div class="grid gap-4 sm:grid-cols-2">
+				<a href="/greeting/" class="bracket-frame group rounded-xl bg-base/45 p-5 transition-colors hover:border-accent/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:p-6">
+					<p class="mb-3 text-xs tracking-[0.2em] text-accent">MESSAGES</p>
+					<h3 class="text-lg font-medium text-text group-hover:text-accent">校長・実行委員長のご挨拶</h3>
+					<p class="mt-2 text-sm leading-7 text-text/75">第34回茨香祭に寄せたご挨拶を紹介します。</p>
+				</a>
+				<a href="/staff/" class="bracket-frame group rounded-xl bg-base/45 p-5 transition-colors hover:border-accent/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:p-6">
+					<p class="mb-3 text-xs tracking-[0.2em] text-accent">DEPARTMENTS</p>
+					<h3 class="text-lg font-medium text-text group-hover:text-accent">部署紹介</h3>
+					<p class="mt-2 text-sm leading-7 text-text/75">茨香祭をつくる各部署とメンバーを紹介します。</p>
+				</a>
+			</div>
+		</section>
+
 		{/*
 		 * 広い画面では Stage Events と News を横に並べる。
 		 * どちらも縦に短いパネルなので、1 列に積むと PC では間延びする。
