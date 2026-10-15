@@ -91,7 +91,14 @@ const circles = defineCollection({
 		/** その他画像（任意）。サムネイルとは別に詳細ページへ並べる。 */
 		otherImages: z.array(z.string()).default([]),
 		snsLinks: z
-			.array(z.object({ label: z.string().min(1), url: z.string().url() }))
+			.array(
+				z.object({
+					label: z.string().min(1),
+					url: z.string().url(),
+					/** note風リンクカードに使う画像（任意）。 */
+					previewImage: z.string().optional(),
+				}),
+			)
 			.default([]),
 
 		// 以下は実行委員会が後から付与する（§2.9.3）。収集時点では値がない。
@@ -120,6 +127,18 @@ const events = defineCollection({
 			status: z.enum(EVENT_STATUSES).default('scheduled'),
 			venue: z.enum(EVENT_VENUES).default('main-stage'),
 			image: z.string().optional(),
+			/** 詳細ページに並べる追加画像（任意）。 */
+			otherImages: z.array(z.string()).default([]),
+			snsLinks: z
+				.array(
+					z.object({
+						label: z.string().min(1),
+						url: z.string().url(),
+						/** note風リンクカードに使う画像（任意）。 */
+						previewImage: z.string().optional(),
+					}),
+				)
+				.default([]),
 			description: z.string().optional(),
 			setlist: z.array(z.string().min(1)).default([]),
 			draft: z.boolean().default(false),

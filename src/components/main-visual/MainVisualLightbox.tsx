@@ -7,8 +7,8 @@ export interface MainVisualItem {
 	src: string;
 	/** 格子に並べるサムネイル */
 	thumb: string;
-	width: number;
-	height: number;
+	width?: number;
+	height?: number;
 }
 
 interface Props {
