@@ -1,6 +1,7 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "shikosai34-web",
+	"preview_urls": true,
 	"compatibility_date": "2025-02-14",
 	"routes": [
 		{ "pattern": "34.shikosai.net", "custom_domain": true }
