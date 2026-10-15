@@ -17,6 +17,6 @@ fesflowPlanned: false
 image: https://assets.34.shikosai.net/news/8e03cd76-6c5b-4f97-bdb8-9002c5fae819.webp
 snsLinks:
   - url: https://x.com/nitic_radio
-    label: Instagram
+    label: X
 ---
 ラジオ部がお送りするのは「JunkYardRadio」。これまで部内で制作した品々を、実演・体験しながら、電子工学の楽しさ・手軽さに触れることができる、体験型ブースとなっております。ぜひ体験しに来てね！
