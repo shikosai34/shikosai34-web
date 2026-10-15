@@ -85,7 +85,14 @@ const circles = defineCollection({
 		/** その他画像（任意）。サムネイルとは別に詳細ページへ並べる。 */
 		otherImages: z.array(z.string()).default([]),
 		snsLinks: z
-			.array(z.object({ label: z.string().min(1), url: z.string().url() }))
+			.array(
+				z.object({
+					label: z.string().min(1),
+					url: z.string().url(),
+					/** note風リンクカードに使う画像（任意）。 */
+					previewImage: z.string().optional(),
+				}),
+			)
 			.default([]),
 
 		// 以下は実行委員会が後から付与する（§2.9.3）。収集時点では値がない。
