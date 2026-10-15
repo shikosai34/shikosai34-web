@@ -1,88 +1,290 @@
 /**
  * 茨香祭当日のバス時刻データ。
  *
- * /access ページの時刻表と、トップページ右下のバス発車カウントダウン
- * （BusCountdownWidget）の両方がここを参照する。データは /access 側の
- * コメントに合わせてある。変更する場合は両方の見え方を確認すること。
+ * /access ページの臨時便案内と、トップページのバス発車カウントダウン
+ * （BusDepartureBoard）の両方がここを参照する。変更する場合は両方の
+ * 見え方を確認すること。
  *
- * 臨時便（茨城高専スクールバス）は 1 日目（10/24）のみ運行する。時刻は出発時刻。
- * 茨城交通の定期便は 10/24 が土曜ダイヤ。臨時便の最初〜最後の時刻の間に出る便を載せている。
+ * 時間帯を絞らず、始発〜終発までの 1 日全便を載せる。「次のバス」案内
+ * （getUpcomingDepartures）はこのデータをもとに現在時刻以降の便を
+ * 計算するので、時間帯を限定するとその時間帯の外では案内が出せなくなる。
+ *
+ * 定期便は 2 事業者分を扱う。
+ *   - 茨城交通（ibako）: 曜日でダイヤが変わるため、平日ダイヤ（weekday）と
+ *     休日ダイヤ（weekend、土日祝。祝日判定はせず土日のみで近似）の 2 種類
+ *     を持つ。どちらを使うかは出発日の曜日から自動で決める
+ *     （getScheduleKind）。時刻は茨城交通の時刻表検索システム
+ *     （bus.ibako.co.jp、2026/10/15 時点）から転記。
+ *       - 勝田駅前 → 茨城高専前・海浜公園南口行き（no=1052, des_no=3）
+ *       - 勝田駅前 → 深谷津・足崎団地行き（no=1052, des_no=6）
+ *       - 茨城高専前 → 勝田駅前行き（no=436, des_no=1）
+ *       - 深谷津 → 勝田駅前行き（no=3710, des_no=1）
+ *     平日の「市役所経由 茨城高専」直行（no=1052, des_no=7）は 8:32 の
+ *     1 本のみで、海浜公園南口行きと合わせて茨城高専前発着の便として扱う。
+ *   - スマイルあおぞらバス（smile、ひたちなか市コミュニティバス）: 曜日に
+ *     よるダイヤの違いはなく、1 種類のみ。深谷津バス停を通るのは勝田北
+ *     コース・勝田中央コースで、どちらも勝田駅東口発の片方向循環のため、
+ *     往路（勝田駅 → 深谷津）のみ扱う。復路は深谷津から循環を一周しないと
+ *     勝田駅に戻れず実用的でないため含めない。時刻はひたちなか市公式サイト
+ *     掲載の時刻表 PDF（2026/5/30 改正）から転記。
+ *
+ * 平日ダイヤ（茨城交通）は実データを反映済み。
+ *
+ * 臨時便（茨城高専スクールバス）は 1 日目・2日目（10/24・10/25）のみ運行する。
+ * 時刻は出発時刻。曜日によらず、当日の臨時便時刻として扱う。
  *
  * 勝田駅から高専へ向かうバスは、下車する停留所が系統によって違うので系統ごとに表を分ける。
  *   - 「茨城高専前」下車: 勝田駅前の 海浜公園南口 行き（市役所・海浜公園西口・中央研修所経由）。正門の目の前。
- *   - 「深谷津」下車: 勝田駅前の 足崎団地 行き（市役所・勝田高校経由）。高専前は通らず、徒歩が必要。
- *     土曜ダイヤは 8:15 の次が 17:24 で、茨香祭の時間帯（9〜17 時）に走る便がない（2026/10/02 時点）。
- *     便がないことが分かるよう、前後の 8 時台・17 時台だけ参考として載せ、注記を添える。
- *     ほかに 6:56 / 19:10 / 19:50（第二工業団地入口止）があるが、時間帯が離れるため省く。
+ *   - 「深谷津」下車: 勝田駅前の 足崎団地 行き（市役所・勝田高校経由）、またはスマイルあおぞらバス。高専前は通らず、徒歩が必要。
  * 復路も同様に、茨城高専前発（市役所経由 勝田駅前行き）と深谷津発（市役所経由 勝田駅前行き）で分ける。
- *   深谷津発の土曜ダイヤは 8:38 の次が 17:47 で、こちらも該当時間帯の便がない。
- *   ほかに 7:19 / 19:33 があるが、同じ理由で省く。
  *
- * 時刻は茨城交通の時刻表（2026/10/02 時点・土曜ダイヤ）から転記している。ダイヤが変わったら見直す。
+ * 遅延情報は取得手段がないため扱わない（時刻表どおりの予定として案内する）。
  */
 
-/** 一般公開日（臨時便の運行日）。 */
-export const BUS_SERVICE_DATE = '2026-10-24';
+/** 臨時便（茨城高専スクールバス）の運行日。 */
+export const SHUTTLE_SERVICE_DATES = ['2026-10-24', '2026-10-25'];
 
 export type BusDirection = '往路' | '復路';
+
+/** 出発地点（発車標の列の単位）。 */
+export type DepartureStop = '勝田駅' | '茨城高専前' | '深谷津';
+
+/** 定期便のダイヤ種別。 */
+export type ScheduleKind = 'weekday' | 'weekend';
+
+/** 定期便の運行事業者。 */
+export type BusOperator = 'ibako' | 'smile';
+
+export const BUS_OPERATOR_LABELS: Record<BusOperator, string> = {
+	ibako: '茨城交通',
+	smile: 'スマイルあおぞらバス',
+};
 
 export interface BusRoute {
 	id: string;
 	direction: BusDirection;
 	/** 表示用の経路名（例: "勝田駅発 → 茨城高専前"）。 */
 	route: string;
-	/** 下車・乗車する停留所名。 */
+	/** 出発する停留所（発車標の列の単位）。 */
+	from: DepartureStop;
+	/** 下車・乗車する停留所名（表示用）。 */
 	stop: string;
 	/** 停留所についての短い補足（乗り場や徒歩の案内）。 */
 	stopNote: string;
-	/** 臨時便（茨城高専スクールバス）の出発時刻。 */
-	times: string[];
-	/** 茨城交通の定期便の出発時刻。 */
-	regularTimes: string[];
-	/** 時刻表の下に添える注記（深谷津のように便が少ない系統向け）。 */
+	/** 臨時便（茨城高専スクールバス）の出発時刻。曜日によらず当日共通。 */
+	shuttleTimes: string[];
+	/** 時刻表の下に添える注記（便が少ない・事業者が複数ある系統向け）。 */
 	caveat?: string;
 }
 
-export const BUS_ROUTES: BusRoute[] = [
+/** 系統の骨格（方向・停留所など、ダイヤ種別によらない部分）。 */
+const ROUTE_BASE: Omit<BusRoute, 'shuttleTimes'>[] = [
 	{
 		id: 'outbound-kosen',
 		direction: '往路',
 		route: '勝田駅発 → 茨城高専前',
+		from: '勝田駅',
 		stop: '茨城高専前',
 		stopNote: '下車後、北へ進むと正門です。',
-		times: ['9:35', '10:00', '10:25', '11:00', '11:30', '12:00', '12:30', '13:00'],
-		regularTimes: ['9:40', '10:00', '10:20', '10:40', '11:00', '11:20', '11:40', '12:00', '12:20', '12:40'],
 	},
 	{
 		id: 'outbound-fukayatsu',
 		direction: '往路',
 		route: '勝田駅発 → 深谷津',
+		from: '勝田駅',
 		stop: '深谷津',
 		stopNote: '茨城高専前は通りません。',
-		times: [],
-		regularTimes: ['8:15', '17:24'],
-		caveat: '土曜ダイヤでは 8:15 の次が 17:24 です。茨香祭の時間帯（9〜17 時）に深谷津へ向かう便はありません。',
+		caveat: 'スマイルあおぞらバス（勝田北・勝田中央コース）の便を含みます。',
 	},
 	{
 		id: 'inbound-kosen',
 		direction: '復路',
 		route: '茨城高専前発 → 勝田駅',
+		from: '茨城高専前',
 		stop: '茨城高専前',
 		stopNote: '正門を出て南へ進むと乗り場です。',
-		times: ['15:00', '15:30', '16:10', '16:50'],
-		regularTimes: ['15:01', '15:16', '15:31', '16:11', '16:31'],
 	},
 	{
 		id: 'inbound-fukayatsu',
 		direction: '復路',
 		route: '深谷津発 → 勝田駅',
+		from: '深谷津',
 		stop: '深谷津',
 		stopNote: '茨城高専前からは離れています。',
-		times: [],
-		regularTimes: ['8:38', '17:47'],
-		caveat: '土曜ダイヤでは 8:38 の次が 17:47 です。茨香祭の時間帯（9〜17 時）に深谷津から勝田駅へ向かう便はありません。',
+		caveat: 'スマイルあおぞらバスは深谷津からの直行復路がないため含みません。',
 	},
 ];
+
+/** 臨時便（茨城高専スクールバス）の出発時刻。曜日によらず運行日共通。 */
+const SHUTTLE_TIMES: Record<string, string[]> = {
+	'outbound-kosen': ['9:35', '10:00', '10:25', '11:00', '11:30', '12:00', '12:30', '13:00'],
+	'outbound-fukayatsu': [],
+	'inbound-kosen': ['15:00', '15:30', '16:10', '16:50'],
+	'inbound-fukayatsu': [],
+};
+
+function buildRoutes(): BusRoute[] {
+	return ROUTE_BASE.map((base) => ({ ...base, shuttleTimes: SHUTTLE_TIMES[base.id] ?? [] }));
+}
+
+export const BUS_ROUTES: BusRoute[] = buildRoutes();
+
+interface OperatorTime {
+	time: string;
+	operator: BusOperator;
+}
+
+function ibako(times: string[]): OperatorTime[] {
+	return times.map((time) => ({ time, operator: 'ibako' }));
+}
+
+function smile(times: string[]): OperatorTime[] {
+	return times.map((time) => ({ time, operator: 'smile' }));
+}
+
+/**
+ * 定期便の出発時刻。ダイヤ種別・系統ごと。
+ *
+ * 茨城交通（ibako）は bus.ibako.co.jp の時刻表検索（2026/10/15 時点）から
+ * 転記。スマイルあおぞらバス（smile）はひたちなか市公式サイトの勝田北・
+ * 勝田中央コース時刻表 PDF（2026/5/30 改正）から転記。どちらも曜日区分
+ * （week=1 平日 / week=2 土曜 / week=3 日曜・祝日）で引いた値。
+ */
+const REGULAR_TIMES: Record<ScheduleKind, Record<string, OperatorTime[]>> = {
+	weekday: {
+		// 勝田駅前 → 海浜公園南口（茨城高専前経由）de_no=3。市役所経由茨城高専直行(des_no=7)の 8:32 を含む。
+		'outbound-kosen': ibako([
+			'8:32',
+			'9:00',
+			'9:26',
+			'9:40',
+			'10:00',
+			'10:20',
+			'10:40',
+			'11:00',
+			'11:20',
+			'11:40',
+			'12:00',
+			'12:20',
+			'12:40',
+			'13:10',
+			'13:40',
+			'14:10',
+			'14:40',
+			'15:10',
+			'15:40',
+			'16:10',
+		]),
+		// 勝田駅前 → 足崎団地（深谷津経由）des_no=6 ＋ スマイルあおぞらバス 勝田北・勝田中央コース（深谷津 往路のみ）
+		'outbound-fukayatsu': [
+			...ibako(['6:56', '7:37', '7:55', '8:15', '8:28', '16:25', '16:55', '17:24', '18:10', '19:10', '19:50']),
+			...smile(['7:31', '8:14', '8:31', '10:17', '11:21', '12:51', '14:37', '15:41', '17:31', '18:52']),
+		],
+		// 茨城高専前 → 勝田駅前 des_no=1
+		'inbound-kosen': ibako([
+			'7:00',
+			'7:24',
+			'7:49',
+			'8:39',
+			'8:58',
+			'9:16',
+			'9:51',
+			'10:17',
+			'10:31',
+			'10:51',
+			'11:11',
+			'11:31',
+			'11:51',
+			'12:11',
+			'12:31',
+			'12:51',
+			'13:11',
+			'13:31',
+			'14:01',
+			'14:31',
+			'15:01',
+			'15:31',
+			'16:11',
+			'16:14',
+			'16:31',
+			'17:01',
+			'17:14',
+			'17:26',
+			'17:48',
+			'18:19',
+			'18:20',
+			'18:44',
+			'19:12',
+			'19:43',
+			'20:17',
+			'20:47',
+		]),
+		// 深谷津 → 勝田駅前 des_no=1
+		'inbound-fukayatsu': ibako(['6:14', '7:19', '8:00', '8:38', '8:51', '16:48', '17:18', '17:47', '18:33', '19:33']),
+	},
+	weekend: {
+		'outbound-kosen': ibako([
+			'9:00',
+			'9:40',
+			'10:00',
+			'10:20',
+			'10:40',
+			'11:00',
+			'11:20',
+			'11:40',
+			'12:00',
+			'12:20',
+			'12:40',
+			'13:10',
+			'13:40',
+			'14:10',
+			'14:25',
+			'14:40',
+			'15:10',
+			'15:40',
+			'16:10',
+		]),
+		'outbound-fukayatsu': [
+			...ibako(['6:56', '8:15', '17:24', '19:10', '19:50']),
+			...smile(['7:31', '8:14', '8:31', '10:17', '11:21', '12:51', '14:37', '15:41', '17:31', '18:52']),
+		],
+		'inbound-kosen': ibako([
+			'7:24',
+			'8:39',
+			'8:58',
+			'9:16',
+			'9:51',
+			'10:17',
+			'10:31',
+			'10:51',
+			'11:11',
+			'11:31',
+			'11:51',
+			'12:11',
+			'12:31',
+			'12:51',
+			'13:11',
+			'13:31',
+			'14:01',
+			'14:31',
+			'15:01',
+			'15:16',
+			'15:31',
+			'16:11',
+			'16:31',
+			'17:01',
+			'17:26',
+			'17:48',
+			'18:19',
+			'18:19',
+			'18:44',
+			'19:43',
+			'20:17',
+			'20:47',
+		]),
+		'inbound-fukayatsu': ibako(['7:19', '8:38', '17:47', '19:33']),
+	},
+};
 
 /** バス運賃（片道・行き帰りとも同額）。茨城交通の運賃（2026/10/04 時点）。改定されたら見直す。 */
 export const BUS_FARES = [
@@ -96,16 +298,23 @@ export const BUS_FARES = [
 	},
 	{
 		id: 'fukayatsu',
-		route: '勝田駅〜深谷津',
+		route: '勝田駅〜深谷津（茨城交通）',
 		prices: [{ label: '大人・小人とも', price: '100円' }],
+	},
+	{
+		id: 'fukayatsu-smile',
+		route: '勝田駅〜深谷津（スマイルあおぞらバス）',
+		prices: [{ label: '小学生以上', price: '100円' }],
 	},
 ] as const;
 
 export interface BusDeparture {
 	/** "HH:mm" 形式の出発時刻。 */
 	time: string;
-	/** 茨城高専スクールバス（臨時便）なら true、茨城交通の定期便なら false。 */
+	/** 茨城高専スクールバス（臨時便）なら true、定期便なら false。 */
 	extra: boolean;
+	/** 定期便の運行事業者。臨時便（extra: true）では undefined。 */
+	operator?: BusOperator;
 }
 
 export interface BusTimetable extends BusRoute {
@@ -118,13 +327,17 @@ function toMinutes(time: string): number {
 	return hour * 60 + minute;
 }
 
-/** 臨時便と定期便を 1 本の時刻順リストにまとめる（同時刻のときは定期便が先）。 */
-export function getBusTimetables(routes: BusRoute[] = BUS_ROUTES): BusTimetable[] {
+/**
+ * 臨時便と、指定したダイヤ種別の定期便を 1 本の時刻順リストにまとめる
+ * （同時刻のときは定期便が先）。
+ */
+export function getBusTimetables(kind: ScheduleKind, routes: BusRoute[] = BUS_ROUTES): BusTimetable[] {
+	const regularByRoute = REGULAR_TIMES[kind];
 	return routes.map((route) => ({
 		...route,
 		departures: [
-			...route.regularTimes.map((time) => ({ time, extra: false })),
-			...route.times.map((time) => ({ time, extra: true })),
+			...(regularByRoute[route.id] ?? []).map(({ time, operator }) => ({ time, extra: false, operator })),
+			...route.shuttleTimes.map((time) => ({ time, extra: true })),
 		].sort((a, b) => toMinutes(a.time) - toMinutes(b.time)),
 	}));
 }
@@ -132,6 +345,22 @@ export function getBusTimetables(routes: BusRoute[] = BUS_ROUTES): BusTimetable[
 /** JST の日付部分（YYYY-MM-DD）。 */
 function jstDateKey(date: Date): string {
 	return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo' }).format(date);
+}
+
+/** JST の曜日（0=日 〜 6=土）。 */
+function jstWeekday(date: Date): number {
+	const key = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Tokyo', weekday: 'short' }).format(date);
+	return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(key);
+}
+
+/**
+ * 指定した日の定期便ダイヤ種別を返す。土日は休日ダイヤ、それ以外は平日ダイヤ。
+ * 祝日は考慮しない簡易判定（茨城交通が祝日を土日と同じダイヤにしているため、
+ * 実務上の誤差は小さい）。
+ */
+export function getScheduleKind(date: Date): ScheduleKind {
+	const weekday = jstWeekday(date);
+	return weekday === 0 || weekday === 6 ? 'weekend' : 'weekday';
 }
 
 /** "HH:mm" の時刻を、指定した日付（YYYY-MM-DD）の JST の Date にする。 */
@@ -144,44 +373,46 @@ export interface UpcomingDeparture {
 	routeId: string;
 	direction: BusDirection;
 	route: string;
+	from: DepartureStop;
 	stop: string;
 	time: string;
 	extra: boolean;
+	operator?: BusOperator;
 	/** 出発までの残り分数（切り上げ）。発車済みなら 0。 */
 	minutesLeft: number;
 	departureDate: Date;
 }
 
 /**
- * 指定した時刻（now）以降に出発する便を、方向ごとに分けて返す。
- * 各方向とも出発時刻が早い順に並び、デフォルトで直近 3 本まで。
+ * 指定した時刻（now）以降に出発する便を、出発地点（from）ごとに分けて返す。
+ * 各地点とも出発時刻が早い順に並び、デフォルトで直近 3 本まで。
  *
- * 当日（serviceDate、既定は茨香祭 1 日目）は、臨時便を含めた実際のダイヤで
- * 計算する。当日以外は、茨城交通の定期便だけを「今日のダイヤ」とみなして
- * 計算する（土曜ダイヤかどうかなどは考慮しない、あくまで目安の案内）。
+ * 定期便は、出発日の曜日から平日・休日ダイヤを自動で選ぶ
+ * （getScheduleKind）。臨時便は運行日（SHUTTLE_SERVICE_DATES）に
+ * 含まれる日だけ加える。
  *
- * どちらの場合も、今日の残り時間に便がなければそのまま空にする
- * （＝「本日はもう発車しない」）。3 本に満たないからといって翌日の
- * 始発を混ぜることはしない。翌日の便を含めると、当日は最終便の案内が
- * 「本日はもうない」から「明日の始発」にすり替わってしまい、当日以外は
- * 実在しない「本日」の便として明日の時刻を見せてしまうため。
+ * 今日の残り時間に便がなければそのまま空にする（＝「本日はもう発車
+ * しない」）。3 本に満たないからといって翌日の始発を混ぜることはしない。
+ * 翌日の便を含めると、当日は最終便の案内が「本日はもうない」から
+ * 「明日の始発」にすり替わってしまうため。
  */
 export function getUpcomingDepartures(
 	now: Date,
-	options: { limit?: number; serviceDate?: string; timetables?: BusTimetable[] } = {},
-): Record<BusDirection, UpcomingDeparture[]> {
-	const { limit = 3, serviceDate = BUS_SERVICE_DATE, timetables = getBusTimetables() } = options;
+	options: { limit?: number; routes?: BusRoute[] } = {},
+): Record<DepartureStop, UpcomingDeparture[]> {
+	const { limit = 3, routes = BUS_ROUTES } = options;
 
-	const isServiceDay = jstDateKey(now) === serviceDate;
-	// 当日以外は定期便のみを対象にする（臨時便は 1 日目限定の増便のため）。
-	const effectiveTimetables = isServiceDay
+	const dateKey = jstDateKey(now);
+	const isShuttleDay = SHUTTLE_SERVICE_DATES.includes(dateKey);
+	const scheduleKind = getScheduleKind(now);
+	const timetables = getBusTimetables(scheduleKind, routes);
+
+	const effectiveTimetables = isShuttleDay
 		? timetables
 		: timetables.map((timetable) => ({
 				...timetable,
 				departures: timetable.departures.filter((departure) => !departure.extra),
 			}));
-
-	const dateKey = isServiceDay ? serviceDate : jstDateKey(now);
 
 	const all: UpcomingDeparture[] = effectiveTimetables.flatMap((timetable) =>
 		timetable.departures.map((departure) => {
@@ -190,9 +421,11 @@ export function getUpcomingDepartures(
 				routeId: timetable.id,
 				direction: timetable.direction,
 				route: timetable.route,
+				from: timetable.from,
 				stop: timetable.stop,
 				time: departure.time,
 				extra: departure.extra,
+				operator: departure.operator,
 				minutesLeft: Math.max(0, Math.ceil((departureDate.getTime() - now.getTime()) / 60_000)),
 				departureDate,
 			};
@@ -203,10 +436,10 @@ export function getUpcomingDepartures(
 		.filter((departure) => departure.departureDate.getTime() >= now.getTime())
 		.sort((a, b) => a.departureDate.getTime() - b.departureDate.getTime());
 
-	const byDirection: Record<BusDirection, UpcomingDeparture[]> = { 往路: [], 復路: [] };
+	const byStop: Record<DepartureStop, UpcomingDeparture[]> = { 勝田駅: [], 茨城高専前: [], 深谷津: [] };
 	for (const departure of upcoming) {
-		const bucket = byDirection[departure.direction];
+		const bucket = byStop[departure.from];
 		if (bucket.length < limit) bucket.push(departure);
 	}
-	return byDirection;
+	return byStop;
 }
