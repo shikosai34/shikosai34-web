@@ -11,6 +11,26 @@ export async function getVisibleSponsors(): Promise<SponsorEntry[]> {
 	return sponsors.sort((a, b) => a.data.nameKana.localeCompare(b.data.nameKana, 'ja'));
 }
 
+/** 同じ協賛金額の企業をまとめたグループ。金額の降順で並べ、中は五十音順。 */
+export interface SponsorGroup {
+	amount: number;
+	sponsors: SponsorEntry[];
+}
+
+export async function getSponsorGroups(): Promise<SponsorGroup[]> {
+	// getVisibleSponsors が五十音順で返すので、順序を保ったまま金額ごとに振り分ける
+	const sponsors = await getVisibleSponsors();
+	const byAmount = new Map<number, SponsorEntry[]>();
+	for (const sponsor of sponsors) {
+		const list = byAmount.get(sponsor.data.amount) ?? [];
+		list.push(sponsor);
+		byAmount.set(sponsor.data.amount, list);
+	}
+	return [...byAmount.entries()]
+		.sort(([a], [b]) => b - a)
+		.map(([amount, list]) => ({ amount, sponsors: list }));
+}
+
 /**
  * 協賛金額に応じた企業名の文字サイズ（Tailwind クラス）。
  *

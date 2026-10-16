@@ -58,6 +58,27 @@ const stageEvents = (await getVisibleEvents()).map((entry) => ({
 			<ThemeModel slot="mark" client:only="react" />
 		</ThemeSection>
 
+		<section class="surface-panel mt-6 rounded-2xl p-5 sm:p-6" aria-labelledby="festival-guide-title">
+			<div class="mb-5">
+				<h2 id="festival-guide-title" class="text-xl font-medium tracking-wide text-text">会場・サークル案内</h2>
+				<p class="mt-1 text-xs tracking-[0.2em] text-accent/80">GUIDE</p>
+			</div>
+			<div class="grid gap-4 sm:grid-cols-2">
+				<a href="/circle/" class="bracket-frame group rounded-xl bg-base/45 p-5 transition-colors hover:border-accent/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:p-6">
+					<p class="mb-3 text-xs tracking-[0.2em] text-accent">CIRCLE</p>
+					<h3 class="text-lg font-medium text-text group-hover:text-accent">サークルを探す</h3>
+					<p class="mt-2 text-sm leading-7 text-text/75">出展サークルの内容や場所をチェックできます。</p>
+					<p class="mt-4 text-sm text-accent underline underline-offset-4 group-hover:no-underline">サークル一覧を見る →</p>
+				</a>
+				<a href="/map/" class="bracket-frame group rounded-xl bg-base/45 p-5 transition-colors hover:border-accent/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:p-6">
+					<p class="mb-3 text-xs tracking-[0.2em] text-accent">VENUE MAP</p>
+					<h3 class="text-lg font-medium text-text group-hover:text-accent">会場マップを見る</h3>
+					<p class="mt-2 text-sm leading-7 text-text/75">会場マップは現在準備中です。公開後はこちらから確認できます。</p>
+					<p class="mt-4 text-sm text-accent underline underline-offset-4 group-hover:no-underline">会場マップのページへ →</p>
+				</a>
+			</div>
+		</section>
+
 		<section class="surface-panel mt-6 rounded-2xl p-5 sm:p-6" aria-labelledby="staff-intro-title">
 			<div class="mb-5">
 				<h2 id="staff-intro-title" class="text-xl font-medium tracking-wide text-text">実行委員紹介</h2>
