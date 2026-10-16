@@ -187,7 +187,8 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 													data-event-id={event.id}
 													aria-label={`${event.data.title}の詳細を表示。${formatEventTime(event.data.startAt)}から${formatEventTime(event.data.endAt)}`}
 												>
-													<span>{event.data.title}</span>
+												<span class="calendar-event-title">{event.data.title}</span>
+												<span class="calendar-event-time">{formatEventTime(event.data.startAt)}–{formatEventTime(event.data.endAt)}</span>
 												</button>
 											))}
 										</div>
@@ -424,8 +425,10 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 		overflow: hidden;
 		border: 1px solid color-mix(in srgb, var(--color-main) 72%, transparent);
 		border-radius: 0.5rem;
-		background: color-mix(in srgb, var(--color-main) 12%, transparent);
-		padding: 0 0.3rem;
+		background: var(--color-base);
+		padding: 0.15rem 0.3rem;
+		display: flex;
+		flex-direction: column;
 	}
 	.event-group-heading {
 		width: fit-content;
@@ -439,32 +442,48 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 	}
 	.event-group-items {
 		display: flex;
-		max-height: 100%;
+		min-height: 0;
+		flex: 1 1 auto;
 		flex-direction: column;
 		overflow: auto;
 	}
-	.event-group-heading + .event-group-items { max-height: calc(100% - 1.2rem); }
 	.calendar-event {
-		flex: 0 0 auto;
+		display: grid;
+		flex: 1 0 0;
 		width: 100%;
 		min-height: 1.35rem;
+		grid-template-columns: minmax(0, 1fr) auto;
+		align-items: center;
+		gap: 0.25rem;
 		border: 0;
 		border-radius: 0.2rem;
 		background: transparent;
 		padding: 0.1rem 0.2rem;
 		color: var(--color-text);
-		font-size: 0.75rem;
+		font-size: 0.6875rem;
 		line-height: 1.15;
 		text-align: left;
 	}
 	.calendar-event + .calendar-event {
 		border-top: 1px solid color-mix(in srgb, var(--color-accent) 26%, transparent);
 	}
-	.calendar-event > span {
-		display: -webkit-box;
+	.calendar-event-title {
 		overflow: hidden;
-		-webkit-box-orient: vertical;
-		-webkit-line-clamp: 2;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.calendar-event-time {
+		color: var(--color-accent);
+		font-size: 0.625rem;
+		font-variant-numeric: tabular-nums;
+		white-space: nowrap;
+	}
+	.calendar-event-group {
+		container-type: inline-size;
+	}
+	@container (max-width: 180px) {
+		.calendar-event { grid-template-columns: minmax(0, 1fr); gap: 0; }
+		.calendar-event-time { justify-self: end; }
 	}
 	.calendar-event-cancelled {
 		color: var(--color-main);
@@ -546,6 +565,6 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 		.hour-row { grid-template-columns: 3.5rem 1fr; }
 		.calendar-event-layer { left: 3.75rem; }
 		.current-time-line { left: 3.5rem; }
-		.calendar-event { padding: 0.2rem 0.35rem; font-size: 0.8125rem; }
+		.calendar-event { padding: 0.2rem 0.35rem; font-size: 0.75rem; }
 	}
 </style>
