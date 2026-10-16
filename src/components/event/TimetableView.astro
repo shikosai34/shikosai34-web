@@ -21,7 +21,7 @@ interface Props {
 
 const { events, completeEdition = false } = Astro.props;
 const startHour = 9;
-const hourHeight = 87;
+const hourHeight = 130.5;
 const visibleDays = completeEdition ? FESTIVAL_DAYS : FESTIVAL_DAYS.filter((day) => day.date !== '2026-10-23');
 const venueTabs = [
 	{ value: 'main-stage', label: '中ステージ' },
@@ -384,7 +384,7 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 		top: -0.55rem;
 		padding-right: 0.35rem;
 		color: rgb(255 255 255 / 62%);
-		font-size: 0.6875rem;
+		font-size: 0.75rem;
 		font-variant-numeric: tabular-nums;
 		text-align: right;
 	}
@@ -419,11 +419,11 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 		background: var(--color-main);
 		padding: 0.1rem 0.35rem;
 		color: var(--color-on-main);
-		font-size: 0.6875rem;
+		font-size: 0.75rem;
 		line-height: 1.3;
 	}
 	.event-group-heading > span { display: inline-block; }
-	.event-group-venue { margin-left: 0.35rem; font-size: 0.625rem; }
+	.event-group-venue { margin-left: 0.35rem; font-size: 0.6875rem; }
 	.event-group-items {
 		display: flex;
 		min-height: 0;
@@ -444,7 +444,7 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 		background: transparent;
 		padding: 0.1rem 0.2rem;
 		color: var(--color-text);
-		font-size: 0.6875rem;
+		font-size: 0.75rem;
 		line-height: 1.15;
 		text-align: left;
 	}
@@ -467,12 +467,12 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 	.calendar-event-venue {
 		flex: 0 0 auto;
 		color: var(--color-accent);
-		font-size: 0.5625rem;
+		font-size: 0.625rem;
 		white-space: nowrap;
 	}
 	.calendar-event-time {
 		color: var(--color-accent);
-		font-size: 0.625rem;
+		font-size: 0.6875rem;
 		font-variant-numeric: tabular-nums;
 		white-space: nowrap;
 	}
