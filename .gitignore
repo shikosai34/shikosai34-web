@@ -9,8 +9,6 @@ dist/
 .astro/
 .wrangler/
 .unlighthouse/
-public/_generated/circle-ogp/
-circle-ogp-manifest.generated.json
 
 # 環境変数・シークレット
 .env
