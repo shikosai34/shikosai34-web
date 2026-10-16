@@ -3,10 +3,10 @@ import SiteFooter from '../../components/layout/SiteFooter.astro';
 import SiteHeader from '../../components/layout/SiteHeader.astro';
 import SectionHeading from '../../components/ui/SectionHeading';
 import Layout from '../../layouts/Layout.astro';
-import { getSponsorSizeClass, getVisibleSponsors } from '../../lib/sponsors';
+import { getSponsorGroups, getSponsorSizeClass } from '../../lib/sponsors';
 
-const sponsors = await getVisibleSponsors();
-const maxAmount = Math.max(0, ...sponsors.map(({ data }) => data.amount));
+const groups = await getSponsorGroups();
+const maxAmount = groups[0]?.amount ?? 0;
 ---
 
 <Layout title="協賛 | 第34回 茨香祭">
@@ -17,7 +17,7 @@ const maxAmount = Math.max(0, ...sponsors.map(({ data }) => data.amount));
 			<SectionHeading title="Sponsor" icon="handshake" />
 
 			{
-				sponsors.length === 0 ? (
+				groups.length === 0 ? (
 					<p class="py-8 text-center text-sm text-text/70">協賛企業情報は準備中です。</p>
 				) : (
 					<>
@@ -26,24 +26,30 @@ const maxAmount = Math.max(0, ...sponsors.map(({ data }) => data.amount));
 							ここに深くお礼申し上げます。（敬称略・五十音順）
 						</p>
 
-						<ul class="flex flex-wrap items-baseline justify-center gap-x-6 gap-y-3 text-center">
-							{sponsors.map(({ data }) => (
-								<li class={`text-text ${getSponsorSizeClass(data.amount, maxAmount)}`}>
-									{data.url ? (
-										<a
-											href={data.url}
-											target="_blank"
-											rel="noopener noreferrer"
-											class="text-accent underline underline-offset-4 hover:decoration-2 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-										>
-											{data.name}
-										</a>
-									) : (
-										<span>{data.name}</span>
-									)}
-								</li>
+						<div class="flex flex-col items-center gap-10 text-center">
+							{groups.map(({ amount, sponsors }) => (
+								<ul
+									class={`flex flex-wrap items-baseline justify-center gap-x-6 gap-y-3 ${getSponsorSizeClass(amount, maxAmount)}`}
+								>
+									{sponsors.map(({ data }) => (
+										<li class="text-text">
+											{data.url ? (
+												<a
+													href={data.url}
+													target="_blank"
+													rel="noopener noreferrer"
+													class="text-accent underline underline-offset-4 hover:decoration-2 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+												>
+													{data.name}
+												</a>
+											) : (
+												<span>{data.name}</span>
+											)}
+										</li>
+									))}
+								</ul>
 							))}
-						</ul>
+						</div>
 					</>
 				)
 			}

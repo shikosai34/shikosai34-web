@@ -5,6 +5,8 @@ import FooterLinkColumn from './FooterLinkColumn';
 interface Props {
 	logoSrc: string;
 	kosenLogoSrc: string;
+	/** 協賛企業。金額に関係なく同じ大きさで並べる。 */
+	sponsors?: { name: string; url?: string }[];
 }
 
 const snsLinks = [
@@ -28,7 +30,7 @@ const otherLinks = [
 	{ label: 'お問い合わせ', href: '/contact' },
 ];
 
-export default function Footer({ logoSrc, kosenLogoSrc }: Props) {
+export default function Footer({ logoSrc, kosenLogoSrc, sponsors = [] }: Props) {
 	return (
 		<footer
 			className="mt-14 border-t border-accent/20 bg-base px-6 pb-8 pt-10"
@@ -49,6 +51,30 @@ export default function Footer({ logoSrc, kosenLogoSrc }: Props) {
 					<FooterLinkColumn heading="その他のページ" links={otherLinks} />
 				</div>
 	
+				{sponsors.length > 0 && (
+					<div className="mt-10 border-t border-text/10 pt-6">
+						<p className="text-center text-xs text-text/60">協賛（五十音順・敬称略）</p>
+						<ul className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-text/70">
+							{sponsors.map(({ name, url }) => (
+								<li key={name}>
+									{url ? (
+										<a
+											href={url}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="underline underline-offset-2 hover:text-accent"
+										>
+											{name}
+										</a>
+									) : (
+										name
+									)}
+								</li>
+							))}
+						</ul>
+					</div>
+				)}
+
 				<div className="mt-10 border-t border-text/10 pt-6 text-xs leading-relaxed text-text/70 md:flex md:flex-col md:items-center md:text-center">
 					<img src={kosenLogoSrc} alt="茨城工業高等専門学校" className="h-15 w-auto" />
 					<p className="mt-2">〒312-8508 茨城県ひたちなか市中根866</p>
