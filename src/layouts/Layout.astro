@@ -7,7 +7,6 @@ import EdgeKasumi from '../components/layout/EdgeKasumi';
 interface Props {
 	title?: string;
 	description?: string;
-	noIndex?: boolean;
 	/**
 	 * body の地色を差し替えるクラス。
 	 * 既定はポスターに合わせた濃紺＋亀甲で、全ページがこれを使う。
@@ -23,7 +22,6 @@ interface Props {
 const {
 	title = '茨香祭 | 第34回 茨城工業高等専門学校 文化祭',
 	description = '第34回 茨城工業高等専門学校 文化祭（茨香祭）の公式Webサイトです。テーマ「守破離」のもと、和風×サイバーパンクの新しい文化祭をお届けします。',
-	noIndex = false,
 	bodyClass = 'kikko bg-base text-text',
 	edgeKasumi = true
 } = Astro.props;
@@ -60,7 +58,6 @@ const websiteJsonLd = {
 		
 		<!-- SEO & OGP -->
 		<meta name="description" content={description} />
-		{noIndex && <meta name="robots" content="noindex, nofollow" />}
 		<link rel="canonical" href={canonicalURL} />
 		<meta property="og:site_name" content="第34回 茨香祭" />
 		<meta property="og:title" content={title} />

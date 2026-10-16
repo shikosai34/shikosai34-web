@@ -3,6 +3,7 @@ import { glob } from 'astro/loaders';
 import { CIRCLE_CATEGORIES, CIRCLE_GENRES } from './lib/circles';
 import {
 	EVENT_GENRES,
+	EVENT_DISPLAY_MODES,
 	EVENT_STATUSES,
 	EVENT_VENUES,
 	FESTIVAL_DAYS,
@@ -127,6 +128,7 @@ const events = defineCollection({
 			status: z.enum(EVENT_STATUSES).default('scheduled'),
 			venue: z.enum(EVENT_VENUES).default('main-stage'),
 			image: z.string().optional(),
+			displayMode: z.enum(EVENT_DISPLAY_MODES).default('timed'),
 			/** 詳細ページに並べる追加画像（任意）。 */
 			otherImages: z.array(z.string()).default([]),
 			snsLinks: z

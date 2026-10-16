@@ -8,6 +8,7 @@ endAt: 2026-10-24T17:10:00+09:00
 genre: other
 status: scheduled
 venue: other
+displayMode: long
 committeeOnly: false
 draft: false
 ---

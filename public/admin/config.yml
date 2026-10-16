@@ -205,7 +205,7 @@ collections:
   - name: events
     label: ステージ企画
     label_singular: ステージ企画
-    description: 'イベント名の中に複数の企画を登録できます。開始日時順に /event と /timetable へ反映されます。'
+    description: '開催ごとの企画を登録します。通常版は一般向けのみ、完全版（/timetable/committee-events）は実行委員向けを含みます。'
     folder: content/events
     create: true
     slug: '{{fields.slug}}'
@@ -282,6 +282,14 @@ collections:
           - { label: 時間変更あり, value: changed }
           - { label: 中止, value: cancelled }
         hint: '直前の変更を来場者へ目立たせたい場合に切り替えます。'
+      - label: タイムテーブル上の表示
+        name: displayMode
+        widget: select
+        default: timed
+        options:
+          - { label: 時刻に配置, value: timed }
+          - { label: 長時間の予定として表示, value: long }
+        hint: '終日営業や本祭運営など、長い時間続く予定は「長時間の予定として表示」を選ぶと、時刻軸を大きく占有しません。'
       - label: 見出し画像
         name: image
         widget: image-r2
@@ -323,7 +331,7 @@ collections:
         name: committeeOnly
         widget: boolean
         default: false
-        hint: '通常のイベント一覧・タイムテーブルには表示せず、「実行委員限定のイベントを表示」を選んだ場合に表示します。'
+        hint: 'オンにすると通常版には出ず、完全版（/timetable/committee-events）だけに表示します。'
       - label: セットリスト
         name: setlist
         widget: list

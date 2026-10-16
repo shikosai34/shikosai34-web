@@ -10,7 +10,7 @@ export default defineConfig({
   site: 'https://34.shikosai.net',
   integrations: [
     react(),
-    sitemap({ filter: (page) => !page.includes('/admin/committee-events') })
+    sitemap()
   ],
 
   vite: {

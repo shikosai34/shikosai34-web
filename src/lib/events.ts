@@ -25,6 +25,9 @@ export const EVENT_STATUSES = ['scheduled', 'changed', 'cancelled'] as const;
 
 export type EventStatus = (typeof EVENT_STATUSES)[number];
 
+export const EVENT_DISPLAY_MODES = ['timed', 'long'] as const;
+export type EventDisplayMode = (typeof EVENT_DISPLAY_MODES)[number];
+
 export const EVENT_STATUS_LABELS: Record<EventStatus, string> = {
 	scheduled: '予定どおり',
 	changed: '時間変更あり',
@@ -126,9 +129,9 @@ export async function getVisibleEvents(): Promise<EventEntry[]> {
 		.sort((a, b) => a.data.startAt.getTime() - b.data.startAt.getTime());
 }
 
-export async function getCommitteeEvents(): Promise<EventEntry[]> {
+export async function getCompleteEvents(): Promise<EventEntry[]> {
 	const events = await getCollectionOrEmpty('events', ({ data }) =>
-		data.committeeOnly && (import.meta.env.PROD ? !data.draft : true),
+		import.meta.env.PROD ? !data.draft : true,
 	);
 	return events.sort((a, b) => a.data.startAt.getTime() - b.data.startAt.getTime());
 }

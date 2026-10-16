@@ -8,6 +8,7 @@ endAt: 2026-10-24T17:00:00+09:00
 genre: other
 status: scheduled
 venue: general-circles
+displayMode: long
 committeeOnly: false
 draft: false
 ---
