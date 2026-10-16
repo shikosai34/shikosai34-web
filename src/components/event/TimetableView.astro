@@ -6,7 +6,6 @@ import Layout from '../../layouts/Layout.astro';
 import {
 	EVENT_GENRE_LABELS,
 	EVENT_STATUS_LABELS,
-	EVENT_VENUES,
 	EVENT_VENUE_LABELS,
 	FESTIVAL_DAYS,
 	formatEventTime,
@@ -22,17 +21,11 @@ interface Props {
 
 const { events, completeEdition = false } = Astro.props;
 const startHour = 9;
-const endHour = 20;
 const hourHeight = 87;
-const timelineHeight = (endHour - startHour) * hourHeight;
 const visibleDays = completeEdition ? FESTIVAL_DAYS : FESTIVAL_DAYS.filter((day) => day.date !== '2026-10-23');
 const venueTabs = [
 	{ value: 'main-stage', label: '中ステージ' },
 	{ value: 'all-other', label: 'その他の会場' },
-	...EVENT_VENUES.filter((venue) => venue !== 'main-stage').map((venue) => ({
-		value: venue,
-		label: EVENT_VENUE_LABELS[venue],
-	})),
 ];
 
 function minutesInJapan(date: Date): number {
@@ -56,7 +49,6 @@ interface TimedEventGroup {
 
 function groupTimedEvents(dayEvents: EventEntry[]): TimedEventGroup[] {
 	const eventsByTime = dayEvents
-		.filter((event) => event.data.displayMode !== 'long')
 		.sort((a, b) => a.data.startAt.getTime() - b.data.startAt.getTime());
 	const groups: TimedEventGroup[] = [];
 
@@ -82,16 +74,15 @@ function groupTimedEvents(dayEvents: EventEntry[]): TimedEventGroup[] {
 
 const dayViews = visibleDays.map((day) => {
 	const dayEvents = events.filter((event) => getEventDayKey(event.data.startAt) === day.date);
+	const endHour = completeEdition ? 20 : day.date === '2026-10-24' ? 17 : 15;
 	return {
 		...day,
-		longEvents: dayEvents.filter((event) => event.data.displayMode === 'long'),
+		endHour,
+		timelineHeight: (endHour - startHour) * hourHeight,
 		timedEventGroups: groupTimedEvents(dayEvents),
 	};
 });
-const activeDay = dayViews.find((day) =>
-	day.timedEventGroups.some((group) => group.venue === 'main-stage') ||
-	day.longEvents.some((event) => event.data.venue === 'main-stage'),
-) ?? dayViews[0];
+const activeDay = dayViews.find((day) => day.timedEventGroups.some((group) => group.venue === 'main-stage')) ?? dayViews[0];
 const initialVenue = 'main-stage';
 const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 茨香祭' : 'タイムテーブル | 第34回 茨香祭';
 ---
@@ -107,12 +98,6 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 					{completeEdition ? '通常版を見る' : '実行委員向けを見る'}
 				</a>
 			</div>
-			<p class="mt-2 text-sm leading-relaxed text-text/75">
-				{completeEdition
-					? '日付と場所を選ぶと、その日の予定を時間軸で確認できます。企画名をタップすると詳細が開きます。'
-					: '一般向けの予定を、日付と場所を選んで確認できます。企画名をタップすると詳細が開きます。'}
-			</p>
-
 			<div class="mt-5 space-y-4 rounded-xl border border-text/20 bg-text/[0.03] p-3 sm:p-4">
 				<section aria-labelledby="date-selector-label">
 					<h2 id="date-selector-label" class="mb-2 text-xs font-medium text-text/70">日付</h2>
@@ -140,22 +125,10 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 			<div class="mt-5">
 				{dayViews.map((day) => (
 					<section data-day-panel={day.date} aria-label={`${day.label}の予定`} hidden={day.date !== activeDay.date}>
-						{day.longEvents.length > 0 && (
-							<section class="mb-4 rounded-lg border border-text/15 bg-base/70 p-2.5" aria-label="長時間の予定">
-								<p class="mb-2 text-[11px] font-medium text-text/65">長時間の予定</p>
-								<div class="flex flex-wrap gap-2">
-									{day.longEvents.map((event) => (
-										<button type="button" class="long-event-chip" data-calendar-event data-event-venue={event.data.venue} data-event-id={event.id} aria-label={`${event.data.title}の詳細を表示`}>
-											{event.data.title}
-										</button>
-									))}
-								</div>
-							</section>
-						)}
 						<p class="mb-3 rounded-lg border border-text/15 bg-base/60 px-3 py-2 text-sm text-text/65" data-empty-schedule hidden>この場所の予定はありません。</p>
 
-						<div class="schedule-canvas" style={`--timeline-height:${timelineHeight}px`} data-schedule-date={day.date}>
-							{Array.from({ length: endHour - startHour + 1 }, (_, index) => {
+						<div class="schedule-canvas" style={`--timeline-height:${day.timelineHeight}px`} data-schedule-date={day.date} data-start-hour={startHour} data-end-hour={day.endHour} data-hour-height={hourHeight}>
+							{Array.from({ length: day.endHour - startHour + 1 }, (_, index) => {
 								const hour = startHour + index;
 								return (
 									<div class="hour-row" style={`--hour-top:${index * hourHeight}px`} aria-hidden="true">
@@ -176,7 +149,12 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 										role="group"
 										aria-label={`${group.name}、${formatEventTime(group.startAt)}から${formatEventTime(group.endAt)}`}
 									>
-										{group.events.length > 1 && <h3 class="event-group-heading">{group.name}</h3>}
+										{group.events.length > 1 && (
+											<h3 class="event-group-heading">
+												<span>{group.name}</span>
+												{group.venue !== 'main-stage' && <span class="event-group-venue">{EVENT_VENUE_LABELS[group.venue]}</span>}
+											</h3>
+										)}
 										<div class="event-group-items">
 											{group.events.map((event) => (
 												<button
@@ -187,7 +165,10 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 													data-event-id={event.id}
 													aria-label={`${event.data.title}の詳細を表示。${formatEventTime(event.data.startAt)}から${formatEventTime(event.data.endAt)}`}
 												>
-												<span class="calendar-event-title">{event.data.title}</span>
+												<span class="calendar-event-title">
+													<span>{event.data.title}</span>
+													{group.events.length === 1 && group.venue !== 'main-stage' && <span class="calendar-event-venue">{EVENT_VENUE_LABELS[group.venue]}</span>}
+												</span>
 												<span class="calendar-event-time">{formatEventTime(event.data.startAt)}–{formatEventTime(event.data.endAt)}</span>
 												</button>
 											))}
@@ -298,10 +279,8 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 			const visibleEvents = Array.from(panel.querySelectorAll<HTMLButtonElement>('[data-calendar-event]')).filter((button) => !button.hidden);
 			const visibleGroups = Array.from(panel.querySelectorAll<HTMLElement>('[data-calendar-group]')).filter((group) => !group.hidden);
 			arrangeGroups(visibleGroups);
-			const longSection = panel.querySelector<HTMLElement>('[aria-label="長時間の予定"]');
 			const canvas = panel.querySelector<HTMLElement>('.schedule-canvas');
 			const emptyState = panel.querySelector<HTMLElement>('[data-empty-schedule]');
-			if (longSection) longSection.hidden = !visibleEvents.some((button) => button.closest('[aria-label="長時間の予定"]'));
 			if (canvas) canvas.hidden = isActiveDay && visibleEvents.length === 0;
 			if (emptyState) emptyState.hidden = !isActiveDay || visibleEvents.length > 0;
 		}
@@ -339,9 +318,13 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 		for (const panel of dayPanels) {
 			const line = panel.querySelector<HTMLElement>('[data-current-time-line]');
 			if (!line) continue;
-			const visible = panel.dataset.dayPanel === currentDay && minutes >= 9 * 60 && minutes <= 20 * 60;
+			const canvas = panel.querySelector<HTMLElement>('.schedule-canvas');
+			const startHour = Number(canvas?.dataset.startHour ?? 9);
+			const endHour = Number(canvas?.dataset.endHour ?? 20);
+			const hourHeight = Number(canvas?.dataset.hourHeight ?? 87);
+			const visible = panel.dataset.dayPanel === currentDay && minutes >= startHour * 60 && minutes <= endHour * 60;
 			line.hidden = !visible;
-			if (visible) line.style.top = `${((minutes - 9 * 60) / 60) * 87}px`;
+			if (visible) line.style.top = `${((minutes - startHour * 60) / 60) * hourHeight}px`;
 		}
 	};
 
@@ -378,8 +361,7 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 		font-weight: 600;
 	}
 	.selector-chip:focus-visible,
-	.calendar-event:focus-visible,
-	.long-event-chip:focus-visible {
+	.calendar-event:focus-visible {
 		outline: 2px solid var(--color-accent);
 		outline-offset: 2px;
 	}
@@ -440,6 +422,8 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 		font-size: 0.6875rem;
 		line-height: 1.3;
 	}
+	.event-group-heading > span { display: inline-block; }
+	.event-group-venue { margin-left: 0.35rem; font-size: 0.625rem; }
 	.event-group-items {
 		display: flex;
 		min-height: 0;
@@ -468,8 +452,22 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 		border-top: 1px solid color-mix(in srgb, var(--color-accent) 26%, transparent);
 	}
 	.calendar-event-title {
+		display: flex;
+		min-width: 0;
+		align-items: baseline;
+		gap: 0.25rem;
+		overflow: hidden;
+	}
+	.calendar-event-title > span:first-child {
+		min-width: 0;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.calendar-event-venue {
+		flex: 0 0 auto;
+		color: var(--color-accent);
+		font-size: 0.5625rem;
 		white-space: nowrap;
 	}
 	.calendar-event-time {
@@ -482,21 +480,14 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 		container-type: inline-size;
 	}
 	@container (max-width: 180px) {
-		.calendar-event { grid-template-columns: minmax(0, 1fr); gap: 0; }
+		.calendar-event { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto; align-content: start; gap: 0.1rem; }
+		.calendar-event-title { flex-wrap: wrap; }
+		.calendar-event-title > span:first-child { display: -webkit-box; flex: 1 1 100%; white-space: normal; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 		.calendar-event-time { justify-self: end; }
 	}
 	.calendar-event-cancelled {
 		color: var(--color-main);
 		text-decoration: line-through;
-	}
-	.long-event-chip {
-		min-height: 2rem;
-		border: 1px solid var(--color-main);
-		border-radius: 0.5rem;
-		background: var(--color-main);
-		padding: 0.35rem 0.6rem;
-		color: var(--color-on-main);
-		font-size: 0.75rem;
 	}
 	.current-time-line {
 		position: absolute;
