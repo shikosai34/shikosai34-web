@@ -1,0 +1,596 @@
+---
+import SiteFooter from '../layout/SiteFooter.astro';
+import SiteHeader from '../layout/SiteHeader.astro';
+import SectionHeading from '../ui/SectionHeading';
+import SquareImage from '../ui/SquareImage.astro';
+import Layout from '../../layouts/Layout.astro';
+import {
+	EVENT_GENRE_LABELS,
+	EVENT_STATUS_LABELS,
+	EVENT_VENUE_LABELS,
+	FESTIVAL_DAYS,
+	formatEventTime,
+	getEventDayKey,
+	type EventEntry,
+	type EventVenue,
+} from '../../lib/events';
+
+interface Props {
+	events: EventEntry[];
+	completeEdition?: boolean;
+}
+
+const { events, completeEdition = false } = Astro.props;
+const startHour = 9;
+const hourHeight = 130.5;
+const visibleDays = completeEdition ? FESTIVAL_DAYS : FESTIVAL_DAYS.filter((day) => day.date !== '2026-10-23');
+const venueTabs = [
+	{ value: 'main-stage', label: '中ステージ' },
+	{ value: 'all-other', label: 'その他の会場' },
+];
+
+function minutesInJapan(date: Date): number {
+	const parts = new Intl.DateTimeFormat('en-GB', {
+		timeZone: 'Asia/Tokyo',
+		hour: '2-digit',
+		minute: '2-digit',
+		hourCycle: 'h23',
+	}).formatToParts(date);
+	return Number(parts.find((part) => part.type === 'hour')?.value ?? 0) * 60 +
+		Number(parts.find((part) => part.type === 'minute')?.value ?? 0);
+}
+
+interface TimedEventGroup {
+	name: string;
+	venue: EventVenue;
+	events: EventEntry[];
+	startAt: Date;
+	endAt: Date;
+}
+
+function groupTimedEvents(dayEvents: EventEntry[]): TimedEventGroup[] {
+	const eventsByTime = dayEvents
+		.sort((a, b) => a.data.startAt.getTime() - b.data.startAt.getTime());
+	const groups: TimedEventGroup[] = [];
+
+	for (const event of eventsByTime) {
+		const previous = groups.find((group) => group.name === event.data.eventName && group.venue === event.data.venue);
+		if (previous) {
+			previous.events.push(event);
+			if (event.data.startAt < previous.startAt) previous.startAt = event.data.startAt;
+			if (event.data.endAt > previous.endAt) previous.endAt = event.data.endAt;
+		} else {
+			groups.push({
+				name: event.data.eventName,
+				venue: event.data.venue,
+				events: [event],
+				startAt: event.data.startAt,
+				endAt: event.data.endAt,
+			});
+		}
+	}
+
+	return groups.sort((a, b) => a.startAt.getTime() - b.startAt.getTime());
+}
+
+const dayViews = visibleDays.map((day) => {
+	const dayEvents = events.filter((event) => getEventDayKey(event.data.startAt) === day.date);
+	const endHour = completeEdition ? 20 : day.date === '2026-10-24' ? 17 : 15;
+	return {
+		...day,
+		endHour,
+		timelineHeight: (endHour - startHour) * hourHeight,
+		timedEventGroups: groupTimedEvents(dayEvents),
+	};
+});
+const activeDay = dayViews.find((day) => day.timedEventGroups.some((group) => group.venue === 'main-stage')) ?? dayViews[0];
+const initialVenue = 'main-stage';
+const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 茨香祭' : 'タイムテーブル | 第34回 茨香祭';
+---
+
+<Layout title={pageTitle}>
+	<SiteHeader />
+
+	<main class="mx-auto w-full max-w-6xl px-3 pb-16 sm:px-6">
+		<section class="surface-panel mt-6 rounded-2xl p-3 pt-5 pb-6 sm:mt-8 sm:p-6">
+			<div class="flex flex-wrap items-baseline justify-between gap-3">
+				<SectionHeading title="Timetable" icon="clock" />
+				<a href={completeEdition ? '/timetable' : '/timetable/committee-events'} class="text-sm text-main underline underline-offset-4 hover:no-underline">
+					{completeEdition ? '通常版を見る' : '実行委員向けを見る'}
+				</a>
+			</div>
+			<div class="mt-5 space-y-4 rounded-xl border border-text/20 bg-text/[0.03] p-3 sm:p-4">
+				<section aria-labelledby="date-selector-label">
+					<h2 id="date-selector-label" class="mb-2 text-xs font-medium text-text/70">日付</h2>
+					<div class="selector-rail" role="group" aria-label="日付を選択">
+						{dayViews.map((day) => (
+							<button type="button" class="selector-chip" data-day-select={day.date} aria-pressed={day.date === activeDay.date ? 'true' : 'false'}>
+								{day.label}
+							</button>
+						))}
+					</div>
+				</section>
+				<section aria-labelledby="venue-selector-label">
+					<h2 id="venue-selector-label" class="mb-2 text-xs font-medium text-text/70">場所</h2>
+					<div class="selector-rail" role="group" aria-label="場所を選択">
+						{venueTabs.map((venue) => (
+							<button type="button" class="selector-chip" data-venue-select={venue.value} aria-pressed={venue.value === initialVenue ? 'true' : 'false'}>
+								{venue.label}
+							</button>
+						))}
+					</div>
+				</section>
+				<p class="rounded-lg bg-base px-3 py-2 text-xs text-text/75" data-selection-summary aria-live="polite">{activeDay.label}・{EVENT_VENUE_LABELS[initialVenue]}</p>
+			</div>
+
+			<div class="mt-5">
+				{dayViews.map((day) => (
+					<section data-day-panel={day.date} aria-label={`${day.label}の予定`} hidden={day.date !== activeDay.date}>
+						<p class="mb-3 rounded-lg border border-text/15 bg-base/60 px-3 py-2 text-sm text-text/65" data-empty-schedule hidden>この場所の予定はありません。</p>
+
+						<div class="schedule-canvas" style={`--timeline-height:${day.timelineHeight}px`} data-schedule-date={day.date} data-start-hour={startHour} data-end-hour={day.endHour} data-hour-height={hourHeight}>
+							{Array.from({ length: day.endHour - startHour + 1 }, (_, index) => {
+								const hour = startHour + index;
+								return (
+									<div class="hour-row" style={`--hour-top:${index * hourHeight}px`} aria-hidden="true">
+										<span class="hour-label">{String(hour).padStart(2, '0')}:00</span>
+										<span class="hour-rule"></span>
+									</div>
+								);
+							})}
+							<div class="calendar-event-layer">
+								{day.timedEventGroups.map((group) => (
+									<div
+										class="calendar-event-group"
+										style={`--group-top:${((minutesInJapan(group.startAt) - startHour * 60) / 60) * hourHeight}px;--group-height:${Math.max(24, ((minutesInJapan(group.endAt) - minutesInJapan(group.startAt)) / 60) * hourHeight)}px`}
+										data-calendar-group
+										data-group-venue={group.venue}
+										data-group-start={minutesInJapan(group.startAt)}
+										data-group-end={minutesInJapan(group.endAt)}
+										role="group"
+										aria-label={`${group.name}、${formatEventTime(group.startAt)}から${formatEventTime(group.endAt)}`}
+									>
+										{group.events.length > 1 && (
+											<h3 class="event-group-heading">
+												<span>{group.name}</span>
+												{group.venue !== 'main-stage' && <span class="event-group-venue">{EVENT_VENUE_LABELS[group.venue]}</span>}
+											</h3>
+										)}
+										<div class="event-group-items">
+											{group.events.map((event) => (
+												<button
+													type="button"
+													class:list={['calendar-event', event.data.status === 'cancelled' && 'calendar-event-cancelled']}
+													data-calendar-event
+													data-event-venue={event.data.venue}
+													data-event-id={event.id}
+													aria-label={`${event.data.title}の詳細を表示。${formatEventTime(event.data.startAt)}から${formatEventTime(event.data.endAt)}`}
+												>
+												<span class="calendar-event-title">
+													<span>{event.data.title}</span>
+													{group.events.length === 1 && group.venue !== 'main-stage' && <span class="calendar-event-venue">{EVENT_VENUE_LABELS[group.venue]}</span>}
+												</span>
+												<span class="calendar-event-time">{formatEventTime(event.data.startAt)}–{formatEventTime(event.data.endAt)}</span>
+												</button>
+											))}
+										</div>
+									</div>
+								))}
+							</div>
+							<div class="current-time-line" data-current-time-line hidden aria-hidden="true"><span>現在</span></div>
+						</div>
+						<p class="mt-2 text-right text-[11px] text-text/55">時刻は日本時間</p>
+					</section>
+				))}
+			</div>
+		</section>
+	</main>
+
+	<dialog class="event-dialog" data-event-dialog aria-labelledby="event-dialog-title">
+		<div class="event-dialog-panel">
+			<button type="button" class="event-dialog-close" data-dialog-close aria-label="詳細を閉じる">
+				<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+			</button>
+			<div data-event-dialog-content></div>
+		</div>
+	</dialog>
+
+	{events.filter((event) => visibleDays.some((day) => day.date === getEventDayKey(event.data.startAt))).map((event) => (
+		<template id={`event-detail-${event.id}`}>
+			<article class="event-detail-layout">
+				<div class="event-dialog-image">
+					<SquareImage src={event.data.image} className="w-full" />
+				</div>
+				<div class="event-dialog-copy">
+					<p class="text-xs text-accent">{event.data.eventName}</p>
+					<h2 id="event-dialog-title" class="event-dialog-title mt-1 text-lg font-medium text-text">{event.data.title}</h2>
+					<dl class="mt-3 grid gap-2 border-t border-text/15 pt-3 text-sm">
+						<div class="flex gap-2"><dt class="w-16 shrink-0 text-text/60">時間</dt><dd>{formatEventTime(event.data.startAt)}〜{formatEventTime(event.data.endAt)}</dd></div>
+						<div class="flex gap-2"><dt class="w-16 shrink-0 text-text/60">場所</dt><dd>{EVENT_VENUE_LABELS[event.data.venue]}</dd></div>
+						<div class="flex gap-2"><dt class="w-16 shrink-0 text-text/60">出演</dt><dd>{event.data.performer}</dd></div>
+						<div class="flex gap-2"><dt class="w-16 shrink-0 text-text/60">ジャンル</dt><dd>{EVENT_GENRE_LABELS[event.data.genre]}{event.data.status !== 'scheduled' ? `・${EVENT_STATUS_LABELS[event.data.status]}` : ''}</dd></div>
+					</dl>
+					{event.data.description && <p class="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-text/80">{event.data.description}</p>}
+					{event.data.setlist.length > 0 && <ul class="mt-3 space-y-1 text-sm text-text/80">{event.data.setlist.map((item) => <li>{item}</li>)}</ul>}
+				</div>
+			</article>
+		</template>
+	))}
+
+	<SiteFooter />
+</Layout>
+
+<script>
+	const dayButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-day-select]'));
+	const venueButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-venue-select]'));
+	const dayPanels = Array.from(document.querySelectorAll<HTMLElement>('[data-day-panel]'));
+	const eventButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-calendar-event]'));
+	const calendarGroups = Array.from(document.querySelectorAll<HTMLElement>('[data-calendar-group]'));
+	const summary = document.querySelector<HTMLElement>('[data-selection-summary]');
+	const eventDialog = document.querySelector<HTMLDialogElement>('[data-event-dialog]');
+	const dialogContent = document.querySelector<HTMLElement>('[data-event-dialog-content]');
+	let selectedDay = dayButtons.find((button) => button.getAttribute('aria-pressed') === 'true')?.dataset.daySelect ?? '';
+	let selectedVenue = 'main-stage';
+
+	const matchesVenue = (venue: string) => {
+		if (selectedVenue === 'all-other') return venue !== 'main-stage';
+		return venue === selectedVenue;
+	};
+
+	const arrangeGroups = (groups: HTMLElement[]) => {
+		const sorted = groups.sort((a, b) => Number(a.dataset.groupStart) - Number(b.dataset.groupStart));
+		let cluster: HTMLElement[] = [];
+		let clusterEnd = 0;
+		const flush = () => {
+			if (cluster.length === 0) return;
+			const laneEnds: number[] = [];
+			const assignments = cluster.map((group) => {
+				const start = Number(group.dataset.groupStart);
+				const end = Number(group.dataset.groupEnd);
+				let lane = laneEnds.findIndex((laneEnd) => laneEnd <= start);
+				if (lane < 0) lane = laneEnds.length;
+				laneEnds[lane] = end;
+				return { group, lane };
+			});
+			const laneCount = Math.max(1, laneEnds.length);
+			for (const { group, lane } of assignments) {
+				group.style.setProperty('--group-left', `${(lane / laneCount) * 100}%`);
+				group.style.setProperty('--group-width', `${100 / laneCount}%`);
+			}
+			cluster = [];
+			clusterEnd = 0;
+		};
+
+		for (const group of sorted) {
+			const start = Number(group.dataset.groupStart);
+			const end = Number(group.dataset.groupEnd);
+			if (cluster.length > 0 && start >= clusterEnd) flush();
+			cluster.push(group);
+			clusterEnd = Math.max(clusterEnd, end);
+		}
+		flush();
+	};
+
+	const renderSelection = () => {
+		for (const button of dayButtons) button.setAttribute('aria-pressed', String(button.dataset.daySelect === selectedDay));
+		for (const button of venueButtons) button.setAttribute('aria-pressed', String(button.dataset.venueSelect === selectedVenue));
+		for (const panel of dayPanels) panel.hidden = panel.dataset.dayPanel !== selectedDay;
+		for (const button of eventButtons) button.hidden = !matchesVenue(button.dataset.eventVenue ?? '');
+		for (const group of calendarGroups) group.hidden = !matchesVenue(group.dataset.groupVenue ?? '');
+		for (const panel of dayPanels) {
+			const isActiveDay = panel.dataset.dayPanel === selectedDay;
+			const visibleEvents = Array.from(panel.querySelectorAll<HTMLButtonElement>('[data-calendar-event]')).filter((button) => !button.hidden);
+			const visibleGroups = Array.from(panel.querySelectorAll<HTMLElement>('[data-calendar-group]')).filter((group) => !group.hidden);
+			arrangeGroups(visibleGroups);
+			const canvas = panel.querySelector<HTMLElement>('.schedule-canvas');
+			const emptyState = panel.querySelector<HTMLElement>('[data-empty-schedule]');
+			if (canvas) canvas.hidden = isActiveDay && visibleEvents.length === 0;
+			if (emptyState) emptyState.hidden = !isActiveDay || visibleEvents.length > 0;
+		}
+		const day = dayButtons.find((button) => button.dataset.daySelect === selectedDay)?.textContent?.trim() ?? '';
+		const venue = venueButtons.find((button) => button.dataset.venueSelect === selectedVenue)?.textContent?.trim() ?? '';
+		if (summary) summary.textContent = `${day}・${venue}`;
+	};
+
+	for (const button of dayButtons) button.addEventListener('click', () => {
+		selectedDay = button.dataset.daySelect ?? selectedDay;
+		renderSelection();
+	});
+	for (const button of venueButtons) button.addEventListener('click', () => {
+		selectedVenue = button.dataset.venueSelect ?? selectedVenue;
+		renderSelection();
+	});
+
+	for (const button of eventButtons) button.addEventListener('click', () => {
+		const template = document.getElementById(`event-detail-${button.dataset.eventId}`) as HTMLTemplateElement | null;
+		if (!template || !eventDialog || !dialogContent) return;
+		dialogContent.replaceChildren(template.content.cloneNode(true));
+		eventDialog.showModal();
+	});
+	document.querySelector('[data-dialog-close]')?.addEventListener('click', () => eventDialog?.close());
+	eventDialog?.addEventListener('click', (event) => {
+		if (event.target === eventDialog) eventDialog.close();
+	});
+
+	const updateCurrentTime = () => {
+		const now = new Date();
+		const dayParts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(now);
+		const currentDay = `${dayParts.find((part) => part.type === 'year')?.value}-${dayParts.find((part) => part.type === 'month')?.value}-${dayParts.find((part) => part.type === 'day')?.value}`;
+		const parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(now);
+		const minutes = Number(parts.find((part) => part.type === 'hour')?.value ?? 0) * 60 + Number(parts.find((part) => part.type === 'minute')?.value ?? 0);
+		for (const panel of dayPanels) {
+			const line = panel.querySelector<HTMLElement>('[data-current-time-line]');
+			if (!line) continue;
+			const canvas = panel.querySelector<HTMLElement>('.schedule-canvas');
+			const startHour = Number(canvas?.dataset.startHour ?? 9);
+			const endHour = Number(canvas?.dataset.endHour ?? 20);
+			const hourHeight = Number(canvas?.dataset.hourHeight ?? 87);
+			const visible = panel.dataset.dayPanel === currentDay && minutes >= startHour * 60 && minutes <= endHour * 60;
+			line.hidden = !visible;
+			if (visible) line.style.top = `${((minutes - startHour * 60) / 60) * hourHeight}px`;
+		}
+	};
+
+	renderSelection();
+	updateCurrentTime();
+	window.setInterval(updateCurrentTime, 60_000);
+</script>
+
+<style>
+	.selector-rail {
+		display: flex;
+		gap: 0.5rem;
+		overflow-x: auto;
+		overscroll-behavior-x: contain;
+		scrollbar-width: thin;
+		padding: 0.1rem 0 0.4rem;
+		-webkit-overflow-scrolling: touch;
+	}
+	.selector-chip {
+		flex: 0 0 auto;
+		min-height: 2.5rem;
+		border: 1px solid rgb(255 255 255 / 24%);
+		border-radius: 999px;
+		padding: 0.5rem 0.85rem;
+		color: var(--color-text);
+		font-size: 0.8125rem;
+		white-space: nowrap;
+		transition: background-color 120ms ease, border-color 120ms ease;
+	}
+	.selector-chip[aria-pressed='true'] {
+		border-color: var(--color-main);
+		background: var(--color-main);
+		color: var(--color-on-main);
+		font-weight: 600;
+	}
+	.selector-chip:focus-visible,
+	.calendar-event:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 2px;
+	}
+	.schedule-canvas {
+		position: relative;
+		height: var(--timeline-height);
+		margin-right: 0.1rem;
+	}
+	.hour-row {
+		position: absolute;
+		top: var(--hour-top);
+		left: 0;
+		display: grid;
+		width: 100%;
+		grid-template-columns: 2.8rem 1fr;
+		align-items: start;
+	}
+	.hour-label {
+		position: relative;
+		top: -0.55rem;
+		padding-right: 0.35rem;
+		color: rgb(255 255 255 / 62%);
+		font-size: 0.75rem;
+		font-variant-numeric: tabular-nums;
+		text-align: right;
+	}
+	.hour-rule {
+		border-top: 1px solid color-mix(in srgb, var(--color-accent) 32%, transparent);
+	}
+	.calendar-event-layer {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 3rem;
+		right: 0;
+	}
+	.calendar-event-group {
+		position: absolute;
+		top: var(--group-top);
+		left: calc(var(--group-left, 0%) + 2px);
+		width: calc(var(--group-width, 100%) - 4px);
+		height: var(--group-height);
+		overflow: hidden;
+		border: 1px solid color-mix(in srgb, var(--color-main) 72%, transparent);
+		border-radius: 0.5rem;
+		background: var(--color-base);
+		padding: 0.15rem 0.3rem;
+		display: flex;
+		flex-direction: column;
+	}
+	.event-group-heading {
+		width: fit-content;
+		max-width: 100%;
+		border-radius: 0.25rem;
+		background: var(--color-main);
+		padding: 0.1rem 0.35rem;
+		color: var(--color-on-main);
+		font-size: 0.75rem;
+		line-height: 1.3;
+	}
+	.event-group-heading > span { display: inline-block; }
+	.event-group-venue { margin-left: 0.35rem; font-size: 0.6875rem; }
+	.event-group-items {
+		display: flex;
+		min-height: 0;
+		flex: 1 1 auto;
+		flex-direction: column;
+		overflow: auto;
+	}
+	.calendar-event {
+		display: grid;
+		flex: 1 0 0;
+		width: 100%;
+		min-height: 1.35rem;
+		grid-template-columns: minmax(0, 1fr) auto;
+		align-items: center;
+		gap: 0.25rem;
+		border: 0;
+		border-radius: 0.2rem;
+		background: transparent;
+		padding: 0.1rem 0.2rem;
+		color: var(--color-text);
+		font-size: 0.75rem;
+		line-height: 1.15;
+		text-align: left;
+	}
+	.calendar-event + .calendar-event {
+		border-top: 1px solid color-mix(in srgb, var(--color-accent) 26%, transparent);
+	}
+	.calendar-event-title {
+		display: flex;
+		min-width: 0;
+		align-items: baseline;
+		gap: 0.25rem;
+		overflow: hidden;
+	}
+	.calendar-event-title > span:first-child {
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.calendar-event-venue {
+		flex: 0 0 auto;
+		color: var(--color-accent);
+		font-size: 0.625rem;
+		white-space: nowrap;
+	}
+	.calendar-event-time {
+		color: var(--color-accent);
+		font-size: 0.6875rem;
+		font-variant-numeric: tabular-nums;
+		white-space: nowrap;
+	}
+	.calendar-event-group {
+		container-type: inline-size;
+	}
+	@container (max-width: 180px) {
+		.calendar-event { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto; align-content: start; gap: 0.1rem; }
+		.calendar-event-title { flex-wrap: wrap; }
+		.calendar-event-title > span:first-child { display: -webkit-box; flex: 1 1 100%; white-space: normal; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+		.calendar-event-time { justify-self: end; }
+	}
+	.calendar-event-cancelled {
+		color: var(--color-main);
+		text-decoration: line-through;
+	}
+	.current-time-line {
+		position: absolute;
+		z-index: 20;
+		left: 2.8rem;
+		right: 0;
+		border-top: 2px solid var(--color-accent);
+		pointer-events: none;
+	}
+	.current-time-line::before {
+		position: absolute;
+		top: -5px;
+		left: -3px;
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: var(--color-accent);
+		content: '';
+	}
+	.current-time-line > span {
+		position: absolute;
+		top: -0.65rem;
+		left: 0.45rem;
+		border-radius: 0.25rem;
+		background: var(--color-accent);
+		padding: 0.1rem 0.3rem;
+		color: var(--color-on-accent);
+		font-size: 0.625rem;
+		font-weight: 600;
+	}
+	.event-dialog {
+		width: min(92vw, 28rem);
+		max-width: 28rem;
+		max-height: min(80vh, 36rem);
+		margin: auto;
+		border: 1px solid rgb(255 255 255 / 24%);
+		border-radius: 1rem;
+		background: #102f3c;
+		padding: 0;
+		color: var(--color-text);
+		box-shadow: 0 1rem 3rem rgb(0 0 0 / 40%);
+	}
+	.event-dialog::backdrop {
+		background: rgb(0 13 19 / 72%);
+		backdrop-filter: blur(2px);
+	}
+	.event-dialog-panel {
+		position: relative;
+		max-height: min(80vh, 36rem);
+		overflow-y: auto;
+		padding: 0;
+	}
+	.event-detail-layout {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+		align-items: start;
+		gap: 0;
+	}
+	.event-dialog-image { display: flex; min-width: 0; align-items: center; justify-content: center; padding: 0.5rem; }
+	.event-dialog-copy { min-width: 0; padding: 0.875rem 0.875rem 0.875rem 0; }
+	.event-dialog-title { padding-right: 2.5rem; }
+	.event-dialog-copy dl > div {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: 0.125rem;
+	}
+	.event-dialog-copy dl dd { min-width: 0; overflow-wrap: anywhere; }
+	.event-dialog-close {
+		position: absolute;
+		top: 0.5rem;
+		right: 0.5rem;
+		display: grid;
+		width: 2.25rem;
+		height: 2.25rem;
+		place-items: center;
+		padding: 0;
+		border-radius: 999px;
+		background: var(--color-main);
+		color: var(--color-on-main);
+	}
+	.event-dialog-close svg {
+		display: block;
+		width: 1.125rem;
+		height: 1.125rem;
+		fill: none;
+		stroke: currentColor;
+		stroke-linecap: round;
+		stroke-width: 2;
+	}
+	.event-dialog-close:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 3px;
+	}
+	@media (min-width: 640px) {
+		.hour-row { grid-template-columns: 3.5rem 1fr; }
+		.calendar-event-layer { left: 3.75rem; }
+		.current-time-line { left: 3.5rem; }
+		.calendar-event { padding: 0.2rem 0.35rem; font-size: 0.75rem; }
+		.event-detail-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); }
+		.event-dialog-copy { padding: 1.25rem 1.25rem 1.25rem 0; }
+		.event-dialog-copy dl > div { grid-template-columns: 4rem minmax(0, 1fr); gap: 0.5rem; }
+	}
+</style>
