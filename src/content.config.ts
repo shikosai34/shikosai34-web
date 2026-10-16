@@ -167,4 +167,30 @@ const sponsors = defineCollection({
 	}),
 });
 
-export const collections = { news, circles, events, sponsors };
+/**
+ * グッズ（`/goods`）。
+ *
+ * Decap CMS から Markdown で管理する。本文（body）は一覧カードのクリックで開く
+ * ポップアップの詳細説明文として表示する。リポジトリ直下の `content/goods/` に置く。
+ */
+const goods = defineCollection({
+	loader: glob({ pattern: '**/[^_]*.md', base: './content/goods' }),
+	schema: z.object({
+		/** グッズ名 */
+		name: z.string().min(1),
+		/** URL 識別子（任意）。未指定のときはファイル名。 */
+		slug: z.string().optional(),
+		/** 価格（円・税込）。 */
+		price: z.number().int().nonnegative(),
+		/** 画像（任意）。ローカルパスまたは R2 の配信 URL。 */
+		image: z.string().optional(),
+		/** 売り切れ。 */
+		soldOut: z.boolean().default(false),
+		/** 表示順（小さいほど先頭）。同順位は名前順。 */
+		order: z.number().int().default(100),
+		/** 下書き。本番ビルドでは除外する。 */
+		draft: z.boolean().default(false),
+	}),
+});
+
+export const collections = { news, circles, events, sponsors, goods };
