@@ -198,11 +198,9 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 	{events.filter((event) => visibleDays.some((day) => day.date === getEventDayKey(event.data.startAt))).map((event) => (
 		<template id={`event-detail-${event.id}`}>
 			<article class="event-detail-layout">
-				<SquareImage
-					src={event.data.image}
-					className="w-20 sm:w-28"
-					roundedClassName="rounded-tl-[15px] rounded-tr-lg rounded-br-lg rounded-bl-lg"
-				/>
+				<div class="event-dialog-image">
+					<SquareImage src={event.data.image} className="w-full" />
+				</div>
 				<div class="event-dialog-copy">
 					<p class="text-xs text-accent">{event.data.eventName}</p>
 					<h2 id="event-dialog-title" class="event-dialog-title mt-1 text-lg font-medium text-text">{event.data.title}</h2>
@@ -547,10 +545,11 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 	}
 	.event-detail-layout {
 		display: grid;
-		grid-template-columns: 5rem minmax(0, 1fr);
+		grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
 		align-items: start;
-		gap: 0.75rem;
+		gap: 0;
 	}
+	.event-dialog-image { display: flex; min-width: 0; align-items: center; justify-content: center; padding: 0.5rem; }
 	.event-dialog-copy { min-width: 0; padding: 0.875rem 0.875rem 0.875rem 0; }
 	.event-dialog-title { padding-right: 2.5rem; }
 	.event-dialog-copy dl > div {
@@ -590,7 +589,7 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 		.calendar-event-layer { left: 3.75rem; }
 		.current-time-line { left: 3.5rem; }
 		.calendar-event { padding: 0.2rem 0.35rem; font-size: 0.75rem; }
-		.event-detail-layout { grid-template-columns: 7rem minmax(0, 1fr); gap: 1rem; }
+		.event-detail-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); }
 		.event-dialog-copy { padding: 1.25rem 1.25rem 1.25rem 0; }
 		.event-dialog-copy dl > div { grid-template-columns: 4rem minmax(0, 1fr); gap: 0.5rem; }
 	}
