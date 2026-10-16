@@ -54,7 +54,7 @@ export const EVENT_VENUE_LABELS: Record<EventVenue, string> = {
 };
 
 export const FESTIVAL_DAYS = [
-	{ id: 'eve', date: '2026-10-23', shortLabel: '前夜祭', label: '10月23日（金）' },
+	{ id: 'eve', date: '2026-10-23', shortLabel: '10月23日', label: '10月23日（金）' },
 	{ id: 'day-1', date: '2026-10-24', shortLabel: '1日目', label: '10月24日（土）' },
 	{ id: 'day-2', date: '2026-10-25', shortLabel: '2日目', label: '10月25日（日）' },
 ] as const;
@@ -117,11 +117,18 @@ export function formatEventTimeRange(startAt: Date, endAt: Date): string {
 	return `${formatEventTime(startAt)}〜${formatEventTime(endAt)}`;
 }
 
-export async function getVisibleEvents(includeCommittee = false): Promise<EventEntry[]> {
+export async function getVisibleEvents(): Promise<EventEntry[]> {
 	const events = await getCollectionOrEmpty('events', ({ data }) =>
 		import.meta.env.PROD ? !data.draft : true,
 	);
 	return events
-		.filter((event) => includeCommittee || !event.data.committeeOnly)
+		.filter((event) => !event.data.committeeOnly)
 		.sort((a, b) => a.data.startAt.getTime() - b.data.startAt.getTime());
+}
+
+export async function getCommitteeEvents(): Promise<EventEntry[]> {
+	const events = await getCollectionOrEmpty('events', ({ data }) =>
+		data.committeeOnly && (import.meta.env.PROD ? !data.draft : true),
+	);
+	return events.sort((a, b) => a.data.startAt.getTime() - b.data.startAt.getTime());
 }

@@ -8,6 +8,6 @@ endAt: 2026-10-25T18:40:00+09:00
 genre: other
 status: scheduled
 venue: main-stage
-committeeOnly: false
+committeeOnly: true
 draft: false
 ---

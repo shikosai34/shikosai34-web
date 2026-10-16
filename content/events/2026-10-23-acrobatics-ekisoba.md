@@ -8,6 +8,6 @@ endAt: 2026-10-23T19:30:00+09:00
 genre: music
 status: scheduled
 venue: main-stage
-committeeOnly: false
+committeeOnly: true
 draft: false
 ---

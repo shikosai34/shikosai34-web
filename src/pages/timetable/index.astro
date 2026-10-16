@@ -13,8 +13,7 @@ import {
 	groupConsecutiveEvents,
 } from '../../lib/events';
 
-const includeCommittee = false;
-const events = await getVisibleEvents(true);
+const events = await getVisibleEvents();
 ---
 
 <Layout title="タイムテーブル | 第34回 茨香祭">
@@ -24,41 +23,45 @@ const events = await getVisibleEvents(true);
 		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
 			<div class="flex flex-wrap items-baseline justify-between gap-3">
 				<SectionHeading title="Timetable" icon="clock" />
-				<a href={includeCommittee ? '/event?committee=1' : '/event'} class="text-sm text-text underline hover:no-underline">企画一覧で見る</a>
+				<a href="/event" class="text-sm text-text underline hover:no-underline">企画一覧で見る</a>
 			</div>
 
 			<div>
 				<p class="text-base leading-relaxed text-text/80">
 					各会場の予定を開始時刻順に掲載しています。同じイベント名の連続する企画をまとめ、当日の変更も表示します。
 				</p>
-				<div class="mt-3">
-					<label class="inline-flex items-center gap-2 text-sm text-text">
-						<input type="checkbox" checked={includeCommittee} data-committee-toggle />
-						実行委員限定のイベントを表示
-					</label>
-				</div>
-				<nav class="mt-4 flex flex-wrap gap-2" aria-label="開催日">
-					{FESTIVAL_DAYS.map((day) => (
-						<a
-							href={`#${day.id}`}
-							class="rounded-full border border-text/30 px-3 py-1 text-sm text-text transition-colors hover:border-accent hover:text-accent focus:outline-2 focus:outline-offset-2 focus:outline-accent"
-						>
-							<span class="font-medium">{day.shortLabel}</span>
-							<span class="ml-1 text-xs text-text/60">{day.label}</span>
-						</a>
-					))}
-				</nav>
-				<div class="mt-3 flex flex-wrap gap-2" role="group" aria-label="会場を切り替え">
-					{EVENT_VENUES.map((venue) => (
-						<button
-							type="button"
-							class="rounded-full border border-text/30 px-3 py-1 text-sm text-text transition-colors hover:border-main hover:text-main aria-pressed:border-main aria-pressed:bg-main aria-pressed:font-medium aria-pressed:text-on-main focus:outline-2 focus:outline-offset-2 focus:outline-accent"
-							data-timetable-venue-switch={venue}
-							aria-pressed={venue === EVENT_VENUES[0] ? 'true' : 'false'}
-						>
-							{EVENT_VENUE_LABELS[venue]}
-						</button>
-					))}
+				<aside class="mt-5 flex flex-col gap-3 rounded-xl border border-main/50 bg-main/10 p-4 sm:flex-row sm:items-center sm:justify-between" aria-label="実行委員向けイベント">
+					<div>
+						<p class="text-sm font-medium text-main">実行委員限定</p>
+						<p class="mt-1 text-sm leading-relaxed text-text/80">実行委員限定の予定は、Access認証後に専用ページで確認できます。</p>
+					</div>
+					<a href="/admin/committee-events/" class="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-lg bg-main px-4 py-2 text-sm font-medium text-on-main underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+						実行委員向けページを開く <span aria-hidden="true">→</span>
+					</a>
+				</aside>
+
+				<div class="mt-6 rounded-xl border border-text/20 bg-text/[0.03] p-4 sm:p-5">
+					<div class="flex flex-wrap items-center justify-between gap-2">
+						<h2 class="text-base font-medium text-text">表示する予定を選ぶ</h2>
+						<p class="text-xs text-text/70">日程と会場は、それぞれ1つ選べます。</p>
+					</div>
+					<div class="mt-4 grid gap-4 sm:grid-cols-2">
+						<label class="grid gap-1.5 text-sm font-medium text-text">
+							<span>開催日で絞る</span>
+							<select class="min-h-11 rounded-lg border border-text/30 bg-base px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent" data-timetable-day-select aria-label="開催日で絞る">
+								<option value="all">すべての日程</option>
+								{FESTIVAL_DAYS.map((day) => <option value={day.id}>{day.label}</option>)}
+							</select>
+						</label>
+						<label class="grid gap-1.5 text-sm font-medium text-text">
+							<span>会場で絞る</span>
+							<select class="min-h-11 rounded-lg border border-text/30 bg-base px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent" data-timetable-venue-select aria-label="会場で絞る">
+								<option value="all">すべての会場</option>
+								{EVENT_VENUES.map((venue) => <option value={venue}>{EVENT_VENUE_LABELS[venue]}</option>)}
+							</select>
+						</label>
+					</div>
+					<p class="mt-3 rounded-lg bg-base px-3 py-2 text-sm text-text/80" data-filter-summary aria-live="polite">表示中：すべての日程・すべての会場</p>
 				</div>
 			</div>
 
@@ -68,10 +71,9 @@ const events = await getVisibleEvents(true);
 					FESTIVAL_DAYS.map((day) => {
 						const dayEvents = events.filter((event) => getEventDayKey(event.data.startAt) === day.date);
 						return (
-							<section id={day.id} class="scroll-mt-24" aria-labelledby={`${day.id}-heading`}>
+							<section id={day.id} data-timetable-day-panel={day.id} aria-labelledby={`${day.id}-heading`}>
 								<div class="mb-5 flex items-end justify-between gap-4 border-b-2 border-text/25 pb-2">
 									<div>
-										<p class="text-sm font-medium text-main">{day.shortLabel}</p>
 										<h2 id={`${day.id}-heading`} class="text-xl font-medium text-text">{day.label}</h2>
 									</div>
 								</div>
@@ -80,15 +82,16 @@ const events = await getVisibleEvents(true);
 									const venueEvents = dayEvents.filter((event) => event.data.venue === venue);
 									const eventGroups = groupConsecutiveEvents(venueEvents);
 									return (
-										<div data-timetable-venue-panel={venue} hidden={venue !== EVENT_VENUES[0]}>
+										<div data-timetable-venue-panel={venue} data-timetable-venue-count={venueEvents.length} hidden>
+											<h3 class="mb-3 text-sm font-medium text-text">{EVENT_VENUE_LABELS[venue]} <span class="font-normal text-text/60">（{venueEvents.length}件）</span></h3>
 											{venueEvents.length === 0 ? (
 												<div class="rounded-xl border border-text/20 px-5 py-8 text-center text-sm text-text/70">
-													この会場の予定は準備中です。
+													この日程に、この会場の予定はありません。
 												</div>
 											) : (
 												<ol class="space-y-4">
 													{eventGroups.map((group) => group.events.length > 1 ? (
-										<li class="overflow-hidden rounded-xl border border-text/20 bg-text/[0.03]" data-committee-group={group.events.every((event) => event.data.committeeOnly) ? 'true' : undefined} hidden={group.events.every((event) => event.data.committeeOnly) && !includeCommittee}>
+														<li class="overflow-hidden rounded-xl border border-text/20 bg-text/[0.03]">
 															<h3 class="border-b border-text/20 bg-base px-4 py-3 text-lg font-medium text-text sm:px-5">{group.name}</h3>
 															<ol class="divide-y divide-text/15 px-3 sm:px-5">
 																{group.events.map((event) => <TimetableItem event={event} />)}
@@ -144,35 +147,35 @@ const events = await getVisibleEvents(true);
 		});
 	}
 
-	const venueSwitches = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-timetable-venue-switch]'));
+	const venueSelect = document.querySelector<HTMLSelectElement>('[data-timetable-venue-select]');
 	const venuePanels = Array.from(document.querySelectorAll<HTMLElement>('[data-timetable-venue-panel]'));
-	for (const button of venueSwitches) {
-		button.addEventListener('click', () => {
-			const selectedVenue = button.dataset.timetableVenueSwitch;
-			for (const switchButton of venueSwitches) {
-				switchButton.setAttribute('aria-pressed', String(switchButton === button));
-			}
-			for (const panel of venuePanels) {
-				panel.hidden = panel.dataset.timetableVenuePanel !== selectedVenue;
-			}
-		});
-	}
-</script>
+	const daySelect = document.querySelector<HTMLSelectElement>('[data-timetable-day-select]');
+	const dayPanels = Array.from(document.querySelectorAll<HTMLElement>('[data-timetable-day-panel]'));
+	const filterSummary = document.querySelector<HTMLElement>('[data-filter-summary]');
+	let selectedDay = 'all';
+let selectedVenue = 'all';
 
-<script>
-	const committeeToggle = document.querySelector<HTMLInputElement>('[data-committee-toggle]');
-	const committeeItems = Array.from(document.querySelectorAll<HTMLElement>('[data-committee-only="true"]'));
-	const committeeGroups = Array.from(document.querySelectorAll<HTMLElement>('[data-committee-group="true"]'));
-	let committeeEnabled = sessionStorage.getItem('show-committee-events') === 'true';
-	if (committeeToggle) committeeToggle.checked = committeeEnabled;
-	const renderCommitteeEvents = () => {
-		for (const item of committeeItems) item.hidden = !committeeEnabled;
-		for (const group of committeeGroups) group.hidden = !committeeEnabled;
+	const renderTimetableFilters = () => {
+		if (daySelect) daySelect.value = selectedDay;
+		if (venueSelect) venueSelect.value = selectedVenue;
+		for (const panel of dayPanels) panel.hidden = selectedDay !== 'all' && panel.dataset.timetableDayPanel !== selectedDay;
+		for (const panel of venuePanels) {
+			const selected = selectedVenue === 'all' || panel.dataset.timetableVenuePanel === selectedVenue;
+			const hasEvents = Number(panel.dataset.timetableVenueCount) > 0;
+			panel.hidden = !selected || (selectedVenue === 'all' && !hasEvents);
+		}
+		const dayLabel = daySelect?.selectedOptions[0]?.textContent ?? 'すべての日程';
+		const venueLabel = venueSelect?.selectedOptions[0]?.textContent ?? 'すべての会場';
+		if (filterSummary) filterSummary.textContent = `表示中：${dayLabel}・${venueLabel}`;
 	};
-	renderCommitteeEvents();
-	committeeToggle?.addEventListener('change', () => {
-		committeeEnabled = committeeToggle.checked;
-		sessionStorage.setItem('show-committee-events', String(committeeEnabled));
-		renderCommitteeEvents();
+
+	daySelect?.addEventListener('change', () => {
+		selectedDay = daySelect.value;
+		renderTimetableFilters();
 	});
+	venueSelect?.addEventListener('change', () => {
+		selectedVenue = venueSelect.value;
+		renderTimetableFilters();
+	});
+	renderTimetableFilters();
 </script>

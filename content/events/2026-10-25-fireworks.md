@@ -8,7 +8,7 @@ endAt: 2026-10-25T19:40:00+09:00
 genre: performance
 status: scheduled
 venue: other
-committeeOnly: false
+committeeOnly: true
 draft: false
 description: 公演時間は10分です。
 ---

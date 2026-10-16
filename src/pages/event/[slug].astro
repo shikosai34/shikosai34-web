@@ -15,7 +15,7 @@ import {
 
 export async function getStaticPaths() {
 	const events = await getCollectionOrEmpty('events', ({ data }) =>
-		import.meta.env.PROD ? !data.draft : true,
+		!data.committeeOnly && (import.meta.env.PROD ? !data.draft : true),
 	);
 	return events.map((event) => ({ params: { slug: event.id }, props: { event } }));
 }
