@@ -22,7 +22,9 @@ const venueGroups = EVENT_VENUES.map((venue) => ({
 	groups: groupConsecutiveEvents(events.filter((event) => event.data.venue === venue)),
 }));
 const genreFilters = EVENT_GENRES.map((value) => ({ value, label: EVENT_GENRE_LABELS[value] }));
-const venueLinks = EVENT_VENUES.map((value) => ({ value, label: EVENT_VENUE_LABELS[value] }));
+const venueLinks = venueGroups
+	.filter((venueGroup) => venueGroup.events.length > 0)
+	.map(({ venue, label }) => ({ value: venue, label }));
 ---
 
 <Layout title="イベント一覧 | 第34回 茨香祭">
@@ -43,91 +45,96 @@ const venueLinks = EVENT_VENUES.map((value) => ({ value, label: EVENT_VENUE_LABE
 			</p>
 
 			<div id="event-list">
-				<label class="event-search mb-4 flex items-center gap-2 rounded-xl border border-text/30 px-3 py-2">
-					<SearchIcon className="h-4 w-4 shrink-0 text-text/70" />
-					<input
-						type="search"
-						name="q"
-						placeholder="イベント名・企画名・出演団体を完全一致で検索"
-						class="w-full bg-transparent text-sm text-text placeholder:text-text/50 focus:outline-none"
-						autocomplete="off"
-					/>
-				</label>
-
-				<nav class="flex flex-wrap gap-2" aria-label="会場へ移動">
-					{venueLinks.map((venue) => (
-						<a
-							href={`#venue-${venue.value}`}
-							class="rounded-full border border-text/30 px-3 py-1 text-sm text-text transition-colors hover:border-accent hover:text-accent focus:outline-2 focus:outline-offset-2 focus:outline-accent"
-						>
-							{venue.label}へ
-						</a>
-					))}
-				</nav>
-
-				<div class="mt-5">
-					<p class="mb-2 text-sm font-medium text-text">ジャンルで絞り込む</p>
-					<div class="flex flex-wrap gap-2" role="group" aria-label="ジャンルで絞り込み">
-						{genreFilters.map((genre) => (
+				<section class="mb-6 rounded-xl border border-text/20 bg-base/60 p-3 sm:p-4" aria-labelledby="event-filter-title">
+					<div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+						<h2 id="event-filter-title" class="text-base font-medium text-text">イベントを探す</h2>
+						<div class="flex items-center gap-3">
+							<p class="event-count text-sm text-text/70" role="status" aria-live="polite">全 {events.length} 件</p>
 							<button
 								type="button"
-								class="rounded-full border border-text/30 px-3 py-1 text-sm text-text transition-colors aria-pressed:border-main aria-pressed:bg-main aria-pressed:font-medium aria-pressed:text-on-main"
-								data-filter={genre.value}
-								aria-pressed="false"
+								class="event-clear min-h-10 text-sm text-accent underline underline-offset-2 hover:no-underline focus:outline-2 focus:outline-offset-2 focus:outline-accent"
+								hidden
 							>
-								{genre.label}
+								条件をクリア
 							</button>
-						))}
+						</div>
 					</div>
-				</div>
 
-				<div class="mt-4 flex items-center gap-3">
-					<p class="event-count text-sm text-text/70">全 {events.length} 件</p>
-					<button
-						type="button"
-						class="event-clear text-sm text-text underline hover:no-underline"
-						hidden
-					>
-						絞り込みを解除
-					</button>
-				</div>
+					<label class="event-search flex min-h-11 items-center gap-2 rounded-lg border border-text/30 bg-base px-3 py-2 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent">
+						<SearchIcon className="h-4 w-4 shrink-0 text-text/70" />
+						<input
+							type="search"
+							name="q"
+							aria-label="イベント名・企画名・出演団体で検索"
+							placeholder="企画名・出演者で検索"
+							class="w-full bg-transparent text-sm text-text placeholder:text-text/50 focus:outline-none"
+							autocomplete="off"
+						/>
+					</label>
 
-				<p class="event-empty mt-6 text-sm text-text/70" role="status" hidden>
-					該当するイベントはありません。
+					<div class="mt-4" data-venue-nav>
+						<h3 class="mb-2 text-sm font-medium text-text">会場から見る</h3>
+						<nav class="flex flex-wrap gap-2" aria-label="会場別の一覧へ移動">
+							{venueLinks.map((venue) => (
+								<a
+									href={`#venue-${venue.value}`}
+									data-venue-filter-link={venue.value}
+									class="inline-flex min-h-10 items-center gap-2 rounded-lg border border-text/25 px-3 py-1.5 text-sm text-text/80 transition-colors hover:border-accent hover:text-accent focus:outline-2 focus:outline-offset-2 focus:outline-accent"
+								>
+									{venue.label}<span aria-hidden="true" class="text-text/50">↓</span>
+								</a>
+							))}
+						</nav>
+					</div>
+
+					<div class="mt-4">
+						<h3 class="mb-2 text-sm font-medium text-text">ジャンルで絞り込む</h3>
+						<div class="flex flex-wrap gap-2" role="group" aria-label="ジャンルで絞り込む">
+							{genreFilters.map((genre) => (
+								<button
+									type="button"
+									class="min-h-10 rounded-full border border-text/30 px-4 py-1.5 text-sm text-text transition-colors hover:border-main aria-pressed:border-main aria-pressed:bg-main aria-pressed:font-medium aria-pressed:text-on-main focus:outline-2 focus:outline-offset-2 focus:outline-accent"
+									data-filter={genre.value}
+									aria-pressed="false"
+								>
+									{genre.label}
+								</button>
+							))}
+						</div>
+					</div>
+				</section>
+
+				<p class="event-empty mb-6 rounded-lg border border-text/20 px-4 py-5 text-sm text-text/80" role="status" hidden>
+					条件に合うイベントはありません。検索語やジャンルを変更するか、条件をクリアしてください。
 				</p>
 
 				<div class="event-groups mt-5 space-y-8">
-					{venueGroups.map((venueGroup) => (
+					{venueGroups.filter((venueGroup) => venueGroup.events.length > 0).map((venueGroup) => (
 						<section id={`venue-${venueGroup.venue}`} data-venue-group={venueGroup.venue} class="scroll-mt-24" aria-label={venueGroup.label}>
 							<h2 class="mb-4 border-b-2 border-text/25 pb-2 text-xl font-medium text-text">{venueGroup.label}</h2>
-							{venueGroup.events.length === 0 ? (
-								<p class="venue-empty rounded-xl border border-text/15 px-4 py-5 text-sm text-text/60">この会場のイベントはありません。</p>
-							) : (
-								<div class="space-y-4">
-									<p data-venue-filter-empty class="rounded-xl border border-text/15 px-4 py-5 text-sm text-text/60" hidden>この会場には条件に合うイベントがありません。</p>
-									{venueGroup.groups.map((group) => (
-										<section data-event-group class:list={[group.events.length > 1 && 'rounded-xl border border-text/20 p-4 sm:p-5']}>
-											{group.events.length > 1 && <h3 class="mb-4 border-b border-text/20 pb-3 text-lg font-medium text-text">{group.name}</h3>}
-												<ul class="event-grid grid grid-cols-1 gap-3 lg:grid-cols-2">
-												{group.events.map((event) => (
-								<li
-									class="event-item"
-														data-venue={event.data.venue}
-														data-genre={event.data.genre}
-														data-title={event.data.title}
-														data-performer={event.data.performer}
-														data-event-name={event.data.eventName}
-													>
-														<a href={`/event/${event.id}`} data-event-detail class="block h-full rounded-xl focus:outline-2 focus:outline-offset-2 focus:outline-base">
-															<EventCard {...event.data} />
-														</a>
-													</li>
-												))}
-											</ul>
-										</section>
-									))}
-								</div>
-							)}
+							<div class="space-y-4">
+								{venueGroup.groups.map((group) => (
+									<section data-event-group class:list={[group.events.length > 1 && 'rounded-xl border border-text/20 p-4 sm:p-5']}>
+										{group.events.length > 1 && <h3 class="mb-4 border-b border-text/20 pb-3 text-lg font-medium text-text">{group.name}</h3>}
+										<ul class="event-grid grid grid-cols-1 gap-3 lg:grid-cols-2">
+											{group.events.map((event) => (
+												<li
+													class="event-item"
+													data-venue={event.data.venue}
+													data-genre={event.data.genre}
+													data-title={event.data.title}
+													data-performer={event.data.performer}
+													data-event-name={event.data.eventName}
+												>
+													<a href={`/event/${event.id}`} data-event-detail class="block h-full rounded-xl focus:outline-2 focus:outline-offset-2 focus:outline-base">
+														<EventCard {...event.data} />
+													</a>
+												</li>
+											))}
+										</ul>
+									</section>
+								))}
+							</div>
 						</section>
 					))}
 				</div>
@@ -189,6 +196,9 @@ const venueLinks = EVENT_VENUES.map((value) => ({ value, label: EVENT_VENUE_LABE
 	const items = Array.from(document.querySelectorAll<HTMLLIElement>('.event-item'));
 	const groups = Array.from(document.querySelectorAll<HTMLElement>('[data-event-group]'));
 	const venues = Array.from(document.querySelectorAll<HTMLElement>('[data-venue-group]'));
+	const venueLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-venue-filter-link]'));
+	const venueNav = document.querySelector<HTMLElement>('[data-venue-nav]');
+	const groupContainer = document.querySelector<HTMLElement>('.event-groups');
 	const input = document.querySelector<HTMLInputElement>('.event-search input');
 	const empty = document.querySelector<HTMLElement>('.event-empty');
 	const count = document.querySelector<HTMLElement>('.event-count');
@@ -206,9 +216,9 @@ const venueLinks = EVENT_VENUES.map((value) => ({ value, label: EVENT_VENUE_LABE
 				const matchGenre = genre === '' || item.dataset.genre === genre;
 				const matchQuery =
 					query === '' ||
-					normalize(item.dataset.title ?? '') === query ||
-					normalize(item.dataset.performer ?? '') === query ||
-					normalize(item.dataset.eventName ?? '') === query;
+					[item.dataset.title, item.dataset.performer, item.dataset.eventName].some((value) =>
+						normalize(value ?? '').includes(query),
+					);
 				const visible = matchGenre && matchQuery;
 				item.hidden = !visible;
 				if (visible) shown += 1;
@@ -218,19 +228,23 @@ const venueLinks = EVENT_VENUES.map((value) => ({ value, label: EVENT_VENUE_LABE
 				group.hidden = !group.querySelector('.event-item:not([hidden])');
 			}
 
+			const filtered = genre !== '' || query !== '';
 			for (const venueGroup of venues) {
-				const hasItems = Boolean(venueGroup.querySelector('.event-item'));
 				const hasVisibleEvents = Boolean(venueGroup.querySelector('.event-item:not([hidden])'));
-				const filteredMessage = venueGroup.querySelector<HTMLElement>('[data-venue-filter-empty]');
-				if (filteredMessage) filteredMessage.hidden = !hasItems || hasVisibleEvents || (genre === '' && query === '');
+				venueGroup.hidden = filtered && !hasVisibleEvents;
 			}
+			for (const link of venueLinks) {
+				const venueGroup = document.getElementById(`venue-${link.dataset.venueFilterLink}`);
+				link.hidden = Boolean(venueGroup?.hidden);
+			}
+			if (venueNav) venueNav.hidden = venueLinks.every((link) => link.hidden);
 			for (const button of genreButtons) {
 				button.setAttribute('aria-pressed', String(button.dataset.filter === genre));
 			}
 
-			const filtered = genre !== '' || query !== '';
 			if (count) count.textContent = filtered ? `${shown} 件` : `全 ${shown} 件`;
 			if (empty) empty.hidden = shown !== 0;
+			if (groupContainer) groupContainer.hidden = shown === 0;
 			if (clearButton) clearButton.hidden = !filtered;
 
 			const params = new URLSearchParams();
