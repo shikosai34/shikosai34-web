@@ -108,7 +108,7 @@ const venueLinks = EVENT_VENUES.map((value) => ({ value, label: EVENT_VENUE_LABE
 									{venueGroup.groups.map((group) => (
 										<section data-event-group class:list={[group.events.length > 1 && 'rounded-xl border border-text/20 p-4 sm:p-5']}>
 											{group.events.length > 1 && <h3 class="mb-4 border-b border-text/20 pb-3 text-lg font-medium text-text">{group.name}</h3>}
-											<ul class="event-grid grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+											<ul class="event-grid grid gap-3">
 												{group.events.map((event) => (
 								<li
 									class="event-item"

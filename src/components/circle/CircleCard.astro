@@ -19,7 +19,7 @@ const { name, category, genre, summary, location, image } = Astro.props;
 ---
 
 <article
-    class="flex h-full flex-col overflow-hidden rounded-xl border border-base bg-base text-text transition-transform hover:-translate-y-0.5"
+    class="flex min-w-0 items-stretch overflow-hidden rounded-xl border border-base bg-base text-text transition-transform hover:-translate-y-0.5"
 >
     {
         image ? (
@@ -27,18 +27,18 @@ const { name, category, genre, summary, location, image } = Astro.props;
                 src={image}
                 alt=""
                 loading="lazy"
-                class="aspect-square w-full object-cover"
+                class="aspect-square w-[30%] min-w-24 max-w-72 shrink-0 object-cover"
             />
         ) : (
             <div
-                class="kikko flex aspect-square w-full items-center justify-center bg-text/5 text-xs text-text/60"
+                class="kikko flex aspect-square w-[30%] min-w-24 max-w-72 shrink-0 items-center justify-center bg-text/5 text-center text-xs text-text/60"
                 aria-hidden="true"
             >
                 画像準備中
             </div>
         )
     }
-    <div class="flex flex-1 flex-col gap-1.5 p-3">
+    <div class="flex min-w-0 flex-1 flex-col justify-center gap-1.5 p-3 sm:gap-2 sm:p-4">
         <div class="flex flex-wrap gap-1">
             <span
                 class="rounded border border-text px-1.5 py-0.5 text-xs text-text"
@@ -52,7 +52,7 @@ const { name, category, genre, summary, location, image } = Astro.props;
             </span>
         </div>
         <h3 class="font-medium text-text">{name}</h3>
-        <p class="line-clamp-2 text-xs text-text/80">{summary}</p>
-        <p class="mt-auto text-sm text-text">{location}</p>
+        <p class="line-clamp-2 text-sm text-text/80">{summary}</p>
+        <p class="text-sm text-text">{location}</p>
     </div>
 </article>
