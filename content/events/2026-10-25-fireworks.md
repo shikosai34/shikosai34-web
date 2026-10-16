@@ -1,5 +1,5 @@
 ---
-eventName: 花火公演
+eventName: 後夜祭
 title: 花火公演
 slug: 2026-10-25-fireworks
 performer: 茨香祭実行委員会

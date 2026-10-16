@@ -222,7 +222,7 @@ collections:
       - label: イベント名
         name: eventName
         widget: string
-        hint: '複数の企画をまとめる名前です（例: 軽音ライブ）。同じイベント名で時間が連続する企画は、ページ上でひとまとまりに表示します。'
+        hint: 'タイムテーブル上のグループ名です。同じ開催日の同じ会場にある企画は、この名前ごとにまとめて表示します（例: 軽音ライブ、前夜祭）。'
       - { label: 企画名, name: title, widget: string }
       - label: URL 識別子
         name: slug

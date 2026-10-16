@@ -1,5 +1,5 @@
 ---
-eventName: 軽音ライブ
+eventName: 前夜祭
 title: 木工用バンド
 slug: 2026-10-23-mokko-you-band
 performer: 木工用バンド

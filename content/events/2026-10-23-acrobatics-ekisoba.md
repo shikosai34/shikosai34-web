@@ -1,5 +1,5 @@
 ---
-eventName: 軽音ライブ
+eventName: 前夜祭
 title: アクロバティック駅そば
 slug: 2026-10-23-acrobatics-ekisoba
 performer: アクロバティック駅そば

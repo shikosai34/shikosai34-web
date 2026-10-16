@@ -1,5 +1,5 @@
 ---
-eventName: 軽音ライブ
+eventName: 後夜祭
 title: bright night sp ver.
 slug: 2026-10-25-bright-night-special
 performer: bright night sp ver.

@@ -1,5 +1,5 @@
 ---
-eventName: 運営
+eventName: 前夜祭
 title: 前夜祭
 slug: 2026-10-23-eve-operations
 performer: 茨香祭実行委員会

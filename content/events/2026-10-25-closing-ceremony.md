@@ -1,5 +1,5 @@
 ---
-eventName: クロージング
+eventName: 後夜祭
 title: クロージング
 slug: 2026-10-25-closing-ceremony
 performer: 茨香祭実行委員会

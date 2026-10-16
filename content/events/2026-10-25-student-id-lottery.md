@@ -1,5 +1,5 @@
 ---
-eventName: 学籍番号くじ
+eventName: 後夜祭
 title: 学籍番号くじ
 slug: 2026-10-25-student-id-lottery
 performer: 茨香祭実行委員会
