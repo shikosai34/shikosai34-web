@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import ArrowRightIcon from '../icons/ArrowRightIcon';
-import Button, { buttonClassName } from '../ui/Button';
+import { buttonClassName } from '../ui/Button';
 import NeonClouds from '../ui/NeonClouds';
 import PosterCircle from '../ui/PosterCircle';
 import SectionHeading from '../ui/SectionHeading';
@@ -188,30 +188,24 @@ export default function BreakingNewsHero({
 							 * 円から外れる情報（開催日時・QR コード・学校名）は紙面の四隅に
 							 * あるため、切り抜くと読めなくなる。全体を見られる導線を必ず添える。
 							 */}
-							<div className="mt-3 flex justify-center">
+							<div className="mt-4 sm:mx-auto sm:max-w-md lg:mx-0 lg:max-w-none">
 								<button
 									ref={showButtonRef}
 									type="button"
 									onClick={() => flip(true)}
-									className={buttonClassName('outline')}
+									className={buttonClassName('accent', 'w-full justify-center font-bold')}
 								>
 									ポスター全体を見る
 								</button>
-							</div>
 
-							{/*
-							 * 紙面の下に、ポスターのマゼンタの斜線とハーフトーンを重ねた区切りを敷く。
-							 */}
-							<div className="relative mt-4 h-3 w-full overflow-hidden" aria-hidden="true">
-								<span className="halftone absolute inset-0 opacity-40" />
-								<span className="glitch-sweep absolute inset-0" />
-							</div>
-
-							<div className="flex justify-end pt-3">
-								<Button href="/poster/backnumber" variant="primary-dark">
+								{/* 主導線ではないので、ボタンにせず文字のリンクに落として主従をつける。 */}
+								<a
+									href="/poster/backnumber"
+									className="mt-3 flex min-h-11 items-center justify-center gap-1.5 text-sm text-accent underline underline-offset-4 transition-colors hover:text-accent/80"
+								>
 									過去のポスターを見る
 									<ArrowRightIcon className="h-4 w-4" />
-								</Button>
+								</a>
 							</div>
 						</div>
 					</div>

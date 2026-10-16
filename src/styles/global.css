@@ -78,34 +78,6 @@
 
 @layer components {
   /*
-   * ポスター下部のハーフトーン（オレンジの点描）。
-   * 面全体に敷くと煩いので、当てる側で高さを絞って使う。
-   */
-  .halftone {
-    background-image: radial-gradient(
-      var(--color-main) 1px,
-      transparent 1.4px
-    );
-    background-size: 7px 7px;
-  }
-
-  /*
-   * 紙面を斜めに走るマゼンタのスイープ。
-   * 装飾のみなので、当てる要素には aria-hidden を付ける。
-   */
-  .glitch-sweep {
-    background-image: linear-gradient(
-      100deg,
-      transparent 0%,
-      transparent 42%,
-      color-mix(in srgb, var(--color-glitch) 85%, transparent) 42%,
-      color-mix(in srgb, var(--color-glitch) 85%, transparent) 44%,
-      transparent 44%,
-      transparent 100%
-    );
-  }
-
-  /*
    * セクションを載せる面。地色と同じ濃紺のままだと境界が消えるので、
    * わずかに持ち上げた明度と細い縁で紙面の重なりを作る。
    */
