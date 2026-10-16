@@ -70,7 +70,7 @@ const websiteJsonLd = {
 			<script type="application/ld+json" set:html={JSON.stringify(websiteJsonLd)} is:inline />
 		)}
 	</head>
-	<body class:list={[bodyClass ?? 'bg-text text-base']}>
+	<body class:list={[bodyClass ?? 'bg-text text-base', 'isolate']}>
 		{/* 画面の左右端に固定する霞。スクロールしても残る。 */}
 		{edgeKasumi && <EdgeKasumi />}
 		<slot />
