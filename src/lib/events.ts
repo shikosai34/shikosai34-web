@@ -31,12 +31,41 @@ export const EVENT_STATUS_LABELS: Record<EventStatus, string> = {
 	cancelled: '中止',
 };
 
+export const EVENT_VENUES = ['main-stage', 'large-classroom', 'audiovisual-room'] as const;
+
+export type EventVenue = (typeof EVENT_VENUES)[number];
+
+export const EVENT_VENUE_LABELS: Record<EventVenue, string> = {
+	'main-stage': 'メインステージ',
+	'large-classroom': '大教室',
+	'audiovisual-room': '視聴覚室',
+};
+
 export const FESTIVAL_DAYS = [
 	{ id: 'day-1', date: '2026-10-24', shortLabel: '1日目', label: '10月24日（土）' },
 	{ id: 'day-2', date: '2026-10-25', shortLabel: '2日目', label: '10月25日（日）' },
 ] as const;
 
 export type EventEntry = CollectionEntry<'events'>;
+
+export interface EventGroup {
+	name: string;
+	events: EventEntry[];
+}
+
+/** 開始時刻順の企画を、連続する同じイベント名ごとにまとめる。 */
+export function groupConsecutiveEvents(events: EventEntry[]): EventGroup[] {
+	const groups: EventGroup[] = [];
+	for (const event of events) {
+		const current = groups.at(-1);
+		if (current?.name === event.data.eventName) {
+			current.events.push(event);
+		} else {
+			groups.push({ name: event.data.eventName, events: [event] });
+		}
+	}
+	return groups;
+}
 
 const dateFormatter = new Intl.DateTimeFormat('ja-JP', {
 	month: 'numeric',

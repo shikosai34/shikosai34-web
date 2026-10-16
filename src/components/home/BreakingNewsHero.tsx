@@ -29,12 +29,24 @@ export default function BreakingNewsHero({
 	 * めくった回数。1回ごとに同じ向きへ 180 度ずつ足していき、
 	 * 表へ戻すときも逆回転させずに一周（計 360 度）させる。
 	 */
+	const turnDurationMs = 700;
+
 	const [turns, setTurns] = useState(0);
 	const flipped = turns % 2 === 1;
+	// 表面・裏面それぞれの不透明度。rotateY の進行角度から毎フレーム計算する
+	// （下記コメント参照）。どちらも 1 のまま重なって見えることがないよう、
+	// 片方が上がるときはもう片方を必ず下げる。
+	const [frontOpacity, setFrontOpacity] = useState(1);
+	const [backOpacity, setBackOpacity] = useState(0);
 	const showButtonRef = useRef<HTMLButtonElement>(null);
 	const backButtonRef = useRef<HTMLButtonElement>(null);
 	// 初回描画ではフォーカスを動かさない（ページを開いた瞬間に奪わないため）。
 	const hasToggled = useRef(false);
+	const animationFrame = useRef<number | null>(null);
+
+	useEffect(() => () => {
+		if (animationFrame.current !== null) window.cancelAnimationFrame(animationFrame.current);
+	}, []);
 
 	/*
 	 * めくった先の面へフォーカスを移す。隠れた面は inert にするので、
@@ -49,6 +61,43 @@ export default function BreakingNewsHero({
 		if (next === flipped) return;
 		hasToggled.current = true;
 		setTurns((count) => count + 1);
+
+		if (animationFrame.current !== null) window.cancelAnimationFrame(animationFrame.current);
+
+		// reduced motion では transition が無効になり回転が一瞬で終わるため、
+		// アニメーションを待たずに即座に不透明度を確定させる。
+		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		if (reduceMotion) {
+			setFrontOpacity(next ? 0 : 1);
+			setBackOpacity(next ? 1 : 0);
+			return;
+		}
+
+		// rotateY と同じ ease-in-out（CSS の transition と揃える）で 0→1 の
+		// 進行度を作り、めくり始めに見えていた面を前半で 1→0 にフェードアウト、
+		// めくり終わりに見せたい面を後半で 0→1 にフェードインさせる。
+		// backface-visibility には一切頼らないので、Safari で鏡像が残る／
+		// 両面重なって見えるバグそのものが起こらない。
+		//
+		// next=true（表→裏）なら表が先、next=false（裏→表、表に戻る）なら
+		// 裏が先に消える面になる。
+		const fadingOutIsFront = next;
+		const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
+		const start = performance.now();
+		const step = (now: number) => {
+			const progress = Math.min(1, (now - start) / turnDurationMs);
+			const eased = easeInOut(progress);
+			const fadingOutOpacity = eased < 0.5 ? 1 - eased * 2 : 0;
+			const fadingInOpacity = eased >= 0.5 ? (eased - 0.5) * 2 : 0;
+			setFrontOpacity(fadingOutIsFront ? fadingOutOpacity : fadingInOpacity);
+			setBackOpacity(fadingOutIsFront ? fadingInOpacity : fadingOutOpacity);
+			if (progress < 1) {
+				animationFrame.current = window.requestAnimationFrame(step);
+			} else {
+				animationFrame.current = null;
+			}
+		};
+		animationFrame.current = window.requestAnimationFrame(step);
 	};
 
 	/*
@@ -58,6 +107,10 @@ export default function BreakingNewsHero({
 	 *
 	 * 表面が高さを決め、裏面はその上に重ねて（absolute）同じ大きさにする。
 	 * ポスターは縦長なので、裏面では高さに収まるよう object-contain で縮める。
+	 *
+	 * Safari は backface-hidden（backface-visibility）の合成が崩れ、回転中に
+	 * 両面が重なって見えることがある。backface-hidden に一切頼らず、
+	 * opacity で表裏を明示的に出し分けることで、ブラウザの実装差を踏まない。
 	 */
 	return (
 		<div
@@ -67,11 +120,12 @@ export default function BreakingNewsHero({
 			}}
 		>
 			<div
-				className="relative transition-transform duration-700 ease-in-out transform-3d motion-reduce:transition-none"
-				style={{ transform: `rotateY(${turns * 180}deg)` }}
+				className="relative transition-transform ease-in-out transform-3d motion-reduce:transition-none"
+				style={{ transform: `rotateY(${turns * 180}deg)`, transitionDuration: `${turnDurationMs}ms` }}
 			>
 				<section
-					className="surface-panel rounded-2xl px-4 pt-6 pb-4 backface-hidden sm:px-6 lg:px-10 lg:pb-8"
+					className="surface-panel rounded-2xl px-4 pt-6 pb-4 sm:px-6 lg:px-10 lg:pb-8"
+					style={{ opacity: frontOpacity, visibility: frontOpacity <= 0 ? 'hidden' : 'visible' }}
 					inert={flipped}
 					aria-hidden={flipped}
 				>
@@ -104,31 +158,27 @@ export default function BreakingNewsHero({
 							 * 円と重ねるぶん、地は不透明にして紙面が透けないようにする。
 							 */}
 							<div className="bracket-frame stripes relative z-10 -mt-5 bg-base/55 px-4 py-3 backdrop-blur-[2px] sm:mx-auto sm:max-w-md lg:mx-0 lg:mt-0 lg:max-w-none lg:px-6 lg:py-5">
-								{/*
-								 * 見出し → 何の → いつ の順に並べる。日付を見出しより前に置くと
-								 * 「10月24日に新ポスター解禁」という予告に読めてしまうため、
-								 * 日付は「一般公開」の直後に添えて開催日だとわかるようにする。
-								 */}
+								{/* ポスターの掲示と開催日がひと目で伝わる順に並べる。 */}
 
 								{/* 主文。地から浮かせるため縁取りする。 */}
 								{/*
-								 * 主文はピンクで光らせる。ポスターのマゼンタを
-								 * 一番目立つ一行に回して、シアンの日付と対にする。
+								 * ポスター掲示をピンクで、開催日をシアンで目立たせる。
 								 */}
 								<p className="outlined-text neon-text text-xl font-bold tracking-tight lg:text-3xl">
-									新ポスター解禁！
+									ポスター掲示中！
 								</p>
 
 								{/* 補足とハザード帯。 */}
 								<div className="mt-2 flex items-center gap-3">
-									<p className="shrink-0 text-xs text-text/75">第34回 茨香祭 一般公開</p>
+									<p className="shrink-0 text-xs text-text/75">第34回 茨香祭 開催日</p>
 									<span className="hazard-stripes h-3 flex-1 opacity-70" aria-hidden="true" />
 								</div>
 
-								{/* 日付＋注記。参考サイトは大きな日付の右に小さく添える。 */}
+								{/* 24・25日の両日開催を主表示し、25日の入場条件を補足する。 */}
 								<div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1 lg:mt-2">
-									<p className="outlined-text neon-text--cyan text-2xl font-bold tracking-tight text-accent lg:text-4xl">
-										10月24日(土)
+									<p className="outlined-text neon-text--cyan flex flex-wrap gap-x-2 text-xl font-bold tracking-tight text-accent sm:text-2xl lg:text-3xl">
+										<span className="whitespace-nowrap">10月24日(土)</span>
+										<span className="whitespace-nowrap">・25日(日)</span>
 									</p>
 									<p className="text-xs text-text/80">※25日(日)は学内限定</p>
 								</div>
@@ -169,7 +219,8 @@ export default function BreakingNewsHero({
 
 				{/* 裏面。ポスター全体を貼り、表へ戻るボタンを添える。 */}
 				<section
-					className="surface-panel absolute inset-0 flex rotate-y-180 flex-col items-center gap-3 rounded-2xl p-4 backface-hidden"
+					className="surface-panel absolute inset-0 flex rotate-y-180 flex-col items-center gap-3 rounded-2xl p-4"
+					style={{ opacity: backOpacity, visibility: backOpacity <= 0 ? 'hidden' : 'visible' }}
 					inert={!flipped}
 					aria-hidden={!flipped}
 					aria-label="ポスター全体"
