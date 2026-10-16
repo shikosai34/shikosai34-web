@@ -202,26 +202,6 @@ collections:
         hint: '実行委員会が後から入力します。'
       - { label: 詳細, name: body, widget: markdown }
 
-  - name: faq
-    label: よくある質問
-    label_singular: 質問
-    description: '質問と回答を管理します。表示順の小さい順に /faq へ掲載します。'
-    folder: content/faq
-    create: true
-    slug: '{{fields.sortOrder}}-{{slug}}'
-    identifier_field: question
-    summary: '{{fields.sortOrder}}｜{{fields.question}}'
-    sortable_fields: [sortOrder, question]
-    fields:
-      - label: 表示順
-        name: sortOrder
-        widget: number
-        value_type: int
-        min: 0
-        hint: '小さい番号の質問が先に表示されます。'
-      - { label: 質問, name: question, widget: string }
-      - { label: 回答, name: body, widget: markdown }
-
   - name: events
     label: ステージ企画
     label_singular: ステージ企画
