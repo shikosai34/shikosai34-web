@@ -29,10 +29,12 @@ const { title, performer, startAt, endAt, genre, status, venue, image } = Astro.
 >
 	{
 		image ? (
-			<img src={image} alt="" loading="lazy" class="aspect-square w-[30%] min-w-24 max-w-72 shrink-0 object-cover" />
+			<div class="aspect-square w-[30%] min-w-24 max-w-72 shrink-0 self-start overflow-hidden">
+				<img src={image} alt="" loading="lazy" class="h-full w-full object-cover" />
+			</div>
 		) : (
 			<div
-				class="kikko flex aspect-square w-[30%] min-w-24 max-w-72 shrink-0 items-center justify-center bg-text/5 text-center text-xs text-text/60"
+				class="kikko flex aspect-square w-[30%] min-w-24 max-w-72 shrink-0 self-start items-center justify-center bg-text/5 text-center text-xs text-text/60"
 				aria-hidden="true"
 			>
 				画像準備中
