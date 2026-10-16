@@ -25,23 +25,39 @@ export const EVENT_STATUSES = ['scheduled', 'changed', 'cancelled'] as const;
 
 export type EventStatus = (typeof EVENT_STATUSES)[number];
 
+export const EVENT_DISPLAY_MODES = ['timed', 'long'] as const;
+export type EventDisplayMode = (typeof EVENT_DISPLAY_MODES)[number];
+
 export const EVENT_STATUS_LABELS: Record<EventStatus, string> = {
 	scheduled: '予定どおり',
 	changed: '時間変更あり',
 	cancelled: '中止',
 };
 
-export const EVENT_VENUES = ['main-stage', 'large-classroom', 'audiovisual-room'] as const;
+export const EVENT_VENUES = [
+	'main-stage',
+	'large-classroom',
+	'audiovisual-room',
+	'preliminary-venue',
+	'rotary',
+	'general-circles',
+	'other',
+] as const;
 
 export type EventVenue = (typeof EVENT_VENUES)[number];
 
 export const EVENT_VENUE_LABELS: Record<EventVenue, string> = {
-	'main-stage': 'メインステージ',
+	'main-stage': '中ステージ（第一体育館）',
 	'large-classroom': '大教室',
 	'audiovisual-room': '視聴覚室',
+	'preliminary-venue': '予選会場',
+	rotary: 'ロータリー',
+	'general-circles': '一般サークル会場',
+	other: 'その他',
 };
 
 export const FESTIVAL_DAYS = [
+	{ id: 'eve', date: '2026-10-23', shortLabel: '10月23日', label: '10月23日（金）' },
 	{ id: 'day-1', date: '2026-10-24', shortLabel: '1日目', label: '10月24日（土）' },
 	{ id: 'day-2', date: '2026-10-25', shortLabel: '2日目', label: '10月25日（日）' },
 ] as const;
@@ -105,6 +121,15 @@ export function formatEventTimeRange(startAt: Date, endAt: Date): string {
 }
 
 export async function getVisibleEvents(): Promise<EventEntry[]> {
+	const events = await getCollectionOrEmpty('events', ({ data }) =>
+		import.meta.env.PROD ? !data.draft : true,
+	);
+	return events
+		.filter((event) => !event.data.committeeOnly)
+		.sort((a, b) => a.data.startAt.getTime() - b.data.startAt.getTime());
+}
+
+export async function getCompleteEvents(): Promise<EventEntry[]> {
 	const events = await getCollectionOrEmpty('events', ({ data }) =>
 		import.meta.env.PROD ? !data.draft : true,
 	);

@@ -8,7 +8,10 @@ import sitemap from '@astrojs/sitemap';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://34.shikosai.net',
-  integrations: [react(), sitemap()],
+  integrations: [
+    react(),
+    sitemap()
+  ],
 
   vite: {
     plugins: [tailwindcss()],

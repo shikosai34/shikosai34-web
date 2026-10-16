@@ -85,8 +85,8 @@ for (const circle of circles) {
 <Layout title="サークル一覧 | 第34回 茨香祭">
 	<SiteHeader />
 
-	<main class="mx-auto w-full max-w-5xl px-4 pb-16 sm:px-6">
-		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
+	<main class="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6">
+		<section class="surface-panel mt-8 rounded-2xl p-3 pt-5 pb-6 sm:p-6">
 			<div class="flex items-baseline justify-between gap-4">
 				<SectionHeading title="Circle" icon="users" />
 				<a href="#circle-list" class="shrink-0 text-sm text-text underline hover:no-underline">
@@ -99,7 +99,7 @@ for (const circle of circles) {
 					<p class="py-8 text-center text-sm text-text/70">サークル情報は準備中です。</p>
 				) : (
 					<div id="circle-list">
-						<label class="search-box mb-4 flex items-center gap-2 rounded-xl border border-text/30 px-3 py-2">
+							<label class="search-box mb-5 flex min-h-11 items-center gap-2 rounded-lg border border-text/30 bg-base/50 px-3 py-2 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent">
 							<SearchIcon className="h-4 w-4 shrink-0 text-text/70" />
 							<input
 								type="search"
@@ -110,42 +110,46 @@ for (const circle of circles) {
 							/>
 						</label>
 
-						<div class="flex flex-wrap gap-2">
-							{categoryFilterGroups.map((group) => (
-								<Fragment>
-									{group.options.map((option) => (
-										<button
-											type="button"
-											class="rounded-full border border-text/30 px-3 py-1 text-sm text-text transition-colors aria-pressed:border-main aria-pressed:bg-main aria-pressed:font-medium aria-pressed:text-base"
-											data-filter={option.value}
-											data-filter-type={group.type}
-											aria-pressed="false"
-											aria-label={`${group.label}: ${option.label}`}
-										>
-											{option.label}
-										</button>
-									))}
-								</Fragment>
-							))}
-						</div>
+							<div class="circle-filter-groups grid gap-4 sm:grid-cols-2">
+								{categoryFilterGroups.map((group) => (
+									<fieldset class="min-w-0">
+										<legend class="mb-2 text-sm font-medium text-text/75">{group.label}</legend>
+										<div class="flex flex-wrap gap-2">
+											{group.options.map((option) => (
+												<button
+													type="button"
+													class="min-h-10 rounded-full border border-text/30 px-3 py-1.5 text-sm text-text transition-colors hover:border-main aria-pressed:border-main aria-pressed:bg-main aria-pressed:font-medium aria-pressed:text-on-main focus:outline-2 focus:outline-offset-2 focus:outline-accent"
+													data-filter={option.value}
+													data-filter-type={group.type}
+													aria-pressed="false"
+													aria-label={`${group.label}: ${option.label}`}
+												>
+													{option.label}
+												</button>
+											))}
+										</div>
+									</fieldset>
+								))}
+								<fieldset class="min-w-0 sm:col-span-2">
+									<legend class="mb-2 text-sm font-medium text-text/75">{genreFilterGroup.label}</legend>
+									<div class="flex flex-wrap gap-2">
+										{genreFilterGroup.options.map((option) => (
+											<button
+												type="button"
+												class="min-h-10 rounded-full border border-text/30 px-3 py-1.5 text-sm text-text transition-colors hover:border-main aria-pressed:border-main aria-pressed:bg-main aria-pressed:font-medium aria-pressed:text-on-main focus:outline-2 focus:outline-offset-2 focus:outline-accent"
+												data-filter={option.value}
+												data-filter-type={genreFilterGroup.type}
+												aria-pressed="false"
+												aria-label={`${genreFilterGroup.label}: ${option.label}`}
+												>
+												{option.label}
+											</button>
+										))}
+									</div>
+								</fieldset>
+							</div>
 
-						<div class="mt-2 flex flex-wrap items-center gap-2">
-							<span class="text-sm text-text/70">{genreFilterGroup.label}:</span>
-							{genreFilterGroup.options.map((option) => (
-								<button
-									type="button"
-									class="rounded-full border border-text/30 px-3 py-1 text-sm text-text transition-colors aria-pressed:border-main aria-pressed:bg-main aria-pressed:font-medium aria-pressed:text-base"
-									data-filter={option.value}
-									data-filter-type={genreFilterGroup.type}
-									aria-pressed="false"
-									aria-label={`${genreFilterGroup.label}: ${option.label}`}
-								>
-									{option.label}
-								</button>
-							))}
-						</div>
-
-						<div class="mt-4 flex items-center gap-3">
+							<div class="mt-4 flex items-center gap-3 border-t border-text/15 pt-3">
 							<p class="circle-count text-sm text-text/70">全 {circles.length} 件</p>
 							<button
 								type="button"
@@ -181,7 +185,7 @@ for (const circle of circles) {
 															<h3 class="mb-3 text-lg font-semibold text-text">{category.label}</h3>
 														)
 													)}
-													<ul class="circle-grid grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+											<ul class="circle-grid grid grid-cols-1 gap-3 md:grid-cols-2">
 														{categoryCircles.map((circle) => (
 															<li
 																data-circle-item

@@ -16,7 +16,13 @@ import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
 import kosenLogo from '../../assets/logo/kosen/footer.svg';
 import Footer from './Footer';
 import WagasaRow from './WagasaRow.astro';
+import { getVisibleSponsors } from '../../lib/sponsors';
+
+const sponsors = (await getVisibleSponsors()).map(({ data }) => ({
+	name: data.name,
+	url: data.url,
+}));
 ---
 
 <WagasaRow />
-<Footer logoSrc={logoG.src} kosenLogoSrc={kosenLogo.src} />
+<Footer logoSrc={logoG.src} kosenLogoSrc={kosenLogo.src} sponsors={sponsors} />

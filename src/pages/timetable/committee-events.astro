@@ -1,0 +1,8 @@
+---
+import TimetableView from '../../components/event/TimetableView.astro';
+import { getCompleteEvents } from '../../lib/events';
+
+const events = await getCompleteEvents();
+---
+
+<TimetableView events={events} completeEdition />
