@@ -27,13 +27,13 @@ const { title, performer, startAt, endAt, genre, status, venue, image } = Astro.
 <article
 	class="flex min-w-0 items-stretch overflow-hidden rounded-xl border border-base bg-base text-text transition-transform hover:-translate-y-0.5"
 >
-	<div class="flex w-[30%] min-w-24 max-w-72 shrink-0 items-center justify-center self-stretch p-2 sm:p-3">
+	<div class="flex w-24 aspect-square shrink-0 self-center items-center justify-center rounded-lg border border-text/15 bg-text/5 p-2 sm:w-28 sm:p-3">
 		{
 			image ? (
-				<img src={image} alt="" loading="lazy" class="aspect-square w-full rounded-lg object-cover" />
+				<img src={image} alt="" loading="lazy" class="aspect-square w-full rounded-md object-cover" />
 			) : (
 				<div
-					class="kikko flex aspect-square w-full items-center justify-center rounded-lg bg-text/5 text-center text-xs text-text/60"
+					class="kikko flex aspect-square w-full items-center justify-center rounded-md text-center text-xs text-text/60"
 					aria-hidden="true"
 				>
 					画像準備中

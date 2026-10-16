@@ -30,8 +30,8 @@ const venueLinks = venueGroups
 <Layout title="イベント一覧 | 第34回 茨香祭">
 	<SiteHeader />
 
-	<main class="mx-auto w-full max-w-5xl px-4 pb-16 sm:px-6">
-		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
+	<main class="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6">
+		<section class="surface-panel mt-8 rounded-2xl p-3 pt-5 pb-6 sm:p-6">
 			<div class="flex flex-wrap items-baseline justify-between gap-3">
 				<SectionHeading title="Events" icon="mic" />
 				<a href="/timetable/committee-events" class="text-sm text-main underline underline-offset-4 hover:no-underline">
@@ -74,12 +74,12 @@ const venueLinks = venueGroups
 
 					<div class="mt-4" data-venue-nav>
 						<h3 class="mb-2 text-sm font-medium text-text">会場から見る</h3>
-						<nav class="flex flex-wrap gap-2" aria-label="会場別の一覧へ移動">
+						<nav class="flex gap-2 overflow-x-auto overscroll-x-contain pb-1" aria-label="会場別の一覧へ移動">
 							{venueLinks.map((venue) => (
 								<a
 									href={`#venue-${venue.value}`}
 									data-venue-filter-link={venue.value}
-									class="inline-flex min-h-10 items-center gap-2 rounded-lg border border-text/25 px-3 py-1.5 text-sm text-text/80 transition-colors hover:border-accent hover:text-accent focus:outline-2 focus:outline-offset-2 focus:outline-accent"
+									class="inline-flex min-h-10 shrink-0 items-center gap-2 whitespace-nowrap rounded-lg border border-text/25 px-3 py-1.5 text-sm text-text/80 transition-colors hover:border-accent hover:text-accent focus:outline-2 focus:outline-offset-2 focus:outline-accent"
 								>
 									{venue.label}<span aria-hidden="true" class="text-text/50">↓</span>
 								</a>
@@ -112,11 +112,16 @@ const venueLinks = venueGroups
 					{venueGroups.filter((venueGroup) => venueGroup.events.length > 0).map((venueGroup) => (
 						<section id={`venue-${venueGroup.venue}`} data-venue-group={venueGroup.venue} class="scroll-mt-24" aria-label={venueGroup.label}>
 							<h2 class="mb-4 border-b-2 border-text/25 pb-2 text-xl font-medium text-text">{venueGroup.label}</h2>
-							<div class="space-y-4">
+					<div class="event-group-grid grid grid-cols-1 gap-4 md:grid-cols-2">
 								{venueGroup.groups.map((group) => (
-									<section data-event-group class:list={[group.events.length > 1 && 'rounded-xl border border-text/20 p-4 sm:p-5']}>
+									<section
+										data-event-group
+										class:list={[
+											group.events.length > 1 && 'rounded-xl border border-text/20 p-4 sm:p-5 md:col-span-2',
+										]}
+									>
 										{group.events.length > 1 && <h3 class="mb-4 border-b border-text/20 pb-3 text-lg font-medium text-text">{group.name}</h3>}
-										<ul class="event-grid grid grid-cols-1 gap-3 lg:grid-cols-2">
+												<ul class:list={['event-grid grid grid-cols-1 gap-3', group.events.length > 1 && 'md:grid-cols-2']}>
 											{group.events.map((event) => (
 												<li
 													class="event-item"
