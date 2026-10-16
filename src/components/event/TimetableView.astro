@@ -194,22 +194,28 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 
 	{events.filter((event) => visibleDays.some((day) => day.date === getEventDayKey(event.data.startAt))).map((event) => (
 		<template id={`event-detail-${event.id}`}>
-			<article>
-				<div class="flex items-start gap-3 pr-9">
-					{event.data.image && <img src={event.data.image} alt="" class="h-9 w-9 shrink-0 rounded-md object-cover" />}
-					<div class="min-w-0">
-						<p class="text-xs text-accent">{event.data.eventName}</p>
-						<h2 id="event-dialog-title" class="mt-1 text-lg font-medium text-text">{event.data.title}</h2>
-					</div>
+			<article class="flex items-stretch">
+				<div class="flex w-[30%] min-w-20 max-w-36 shrink-0 items-center justify-center self-stretch p-2 sm:p-3">
+					{event.data.image ? (
+						<img src={event.data.image} alt="" class="aspect-square w-full rounded-lg object-cover" />
+					) : (
+						<div class="kikko flex aspect-square w-full items-center justify-center rounded-lg bg-text/5 px-1 text-center text-xs text-text/60" aria-hidden="true">
+							画像準備中
+						</div>
+					)}
 				</div>
-				<dl class="mt-4 grid gap-2 border-t border-text/15 pt-3 text-sm">
-					<div class="flex gap-3"><dt class="w-14 shrink-0 text-text/60">時間</dt><dd>{formatEventTime(event.data.startAt)}〜{formatEventTime(event.data.endAt)}</dd></div>
-					<div class="flex gap-3"><dt class="w-14 shrink-0 text-text/60">場所</dt><dd>{EVENT_VENUE_LABELS[event.data.venue]}</dd></div>
-					<div class="flex gap-3"><dt class="w-14 shrink-0 text-text/60">出演</dt><dd>{event.data.performer}</dd></div>
-					<div class="flex gap-3"><dt class="w-16 shrink-0 whitespace-nowrap text-text/60">ジャンル</dt><dd>{EVENT_GENRE_LABELS[event.data.genre]}{event.data.status !== 'scheduled' ? `・${EVENT_STATUS_LABELS[event.data.status]}` : ''}</dd></div>
-				</dl>
-				{event.data.description && <p class="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-text/80">{event.data.description}</p>}
-				{event.data.setlist.length > 0 && <ul class="mt-3 space-y-1 text-sm text-text/80">{event.data.setlist.map((item) => <li>{item}</li>)}</ul>}
+				<div class="min-w-0 flex-1 pr-9">
+					<p class="text-xs text-accent">{event.data.eventName}</p>
+					<h2 id="event-dialog-title" class="mt-1 text-lg font-medium text-text">{event.data.title}</h2>
+					<dl class="mt-3 grid gap-2 border-t border-text/15 pt-3 text-sm">
+						<div class="flex gap-2"><dt class="w-12 shrink-0 text-text/60">時間</dt><dd>{formatEventTime(event.data.startAt)}〜{formatEventTime(event.data.endAt)}</dd></div>
+						<div class="flex gap-2"><dt class="w-12 shrink-0 text-text/60">場所</dt><dd>{EVENT_VENUE_LABELS[event.data.venue]}</dd></div>
+						<div class="flex gap-2"><dt class="w-12 shrink-0 text-text/60">出演</dt><dd>{event.data.performer}</dd></div>
+						<div class="flex gap-2"><dt class="w-12 shrink-0 text-text/60">ジャンル</dt><dd>{EVENT_GENRE_LABELS[event.data.genre]}{event.data.status !== 'scheduled' ? `・${EVENT_STATUS_LABELS[event.data.status]}` : ''}</dd></div>
+					</dl>
+					{event.data.description && <p class="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-text/80">{event.data.description}</p>}
+					{event.data.setlist.length > 0 && <ul class="mt-3 space-y-1 text-sm text-text/80">{event.data.setlist.map((item) => <li>{item}</li>)}</ul>}
+				</div>
 			</article>
 		</template>
 	))}
