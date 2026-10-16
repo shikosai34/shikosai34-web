@@ -2,6 +2,7 @@
 import SiteFooter from '../layout/SiteFooter.astro';
 import SiteHeader from '../layout/SiteHeader.astro';
 import SectionHeading from '../ui/SectionHeading';
+import SquareImage from '../ui/SquareImage.astro';
 import Layout from '../../layouts/Layout.astro';
 import {
 	EVENT_GENRE_LABELS,
@@ -197,15 +198,11 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 	{events.filter((event) => visibleDays.some((day) => day.date === getEventDayKey(event.data.startAt))).map((event) => (
 		<template id={`event-detail-${event.id}`}>
 			<article class="event-detail-layout">
-				<div class="event-dialog-image-frame">
-					{event.data.image ? (
-						<img src={event.data.image} alt="" class="event-dialog-image" />
-					) : (
-						<div class="kikko event-dialog-image-placeholder" aria-hidden="true">
-							画像準備中
-						</div>
-					)}
-				</div>
+				<SquareImage
+					src={event.data.image}
+					className="w-20 sm:w-28"
+					roundedClassName="rounded-tl-[15px] rounded-tr-lg rounded-br-lg rounded-bl-lg"
+				/>
 				<div class="event-dialog-copy">
 					<p class="text-xs text-accent">{event.data.eventName}</p>
 					<h2 id="event-dialog-title" class="event-dialog-title mt-1 text-lg font-medium text-text">{event.data.title}</h2>
@@ -546,7 +543,7 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 		position: relative;
 		max-height: min(80vh, 36rem);
 		overflow-y: auto;
-		padding: 0.875rem;
+		padding: 0;
 	}
 	.event-detail-layout {
 		display: grid;
@@ -554,33 +551,7 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 		align-items: start;
 		gap: 0.75rem;
 	}
-	.event-dialog-image-frame {
-		display: grid;
-		width: 5rem;
-		aspect-ratio: 1;
-		place-items: center;
-		border: 1px solid rgb(255 255 255 / 16%);
-		border-radius: 0.75rem;
-		background: rgb(255 255 255 / 4%);
-		padding: 0.5rem;
-	}
-	.event-dialog-image,
-	.event-dialog-image-placeholder {
-		width: 100%;
-		aspect-ratio: 1;
-		border-radius: 0.5rem;
-	}
-	.event-dialog-image { display: block; object-fit: cover; }
-	.event-dialog-image-placeholder {
-		display: grid;
-		place-items: center;
-		padding: 0.25rem;
-		background: rgb(255 255 255 / 5%);
-		color: rgb(255 255 255 / 60%);
-		font-size: 0.75rem;
-		text-align: center;
-	}
-	.event-dialog-copy { min-width: 0; }
+	.event-dialog-copy { min-width: 0; padding: 0.875rem 0.875rem 0.875rem 0; }
 	.event-dialog-title { padding-right: 2.5rem; }
 	.event-dialog-copy dl > div {
 		display: grid;
@@ -619,9 +590,8 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 		.calendar-event-layer { left: 3.75rem; }
 		.current-time-line { left: 3.5rem; }
 		.calendar-event { padding: 0.2rem 0.35rem; font-size: 0.75rem; }
-		.event-dialog-panel { padding: 1.25rem; }
 		.event-detail-layout { grid-template-columns: 7rem minmax(0, 1fr); gap: 1rem; }
-		.event-dialog-image-frame { width: 7rem; }
+		.event-dialog-copy { padding: 1.25rem 1.25rem 1.25rem 0; }
 		.event-dialog-copy dl > div { grid-template-columns: 4rem minmax(0, 1fr); gap: 0.5rem; }
 	}
 </style>

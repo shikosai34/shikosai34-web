@@ -5,6 +5,7 @@ import {
     type CircleCategory,
     type CircleGenre,
 } from "../../lib/circles";
+import SquareImage from "../ui/SquareImage.astro";
 
 interface Props {
     name: string;
@@ -21,20 +22,7 @@ const { name, category, genre, summary, location, image } = Astro.props;
 <article
     class="flex min-w-0 items-stretch overflow-hidden rounded-xl border border-base bg-base text-text transition-transform hover:-translate-y-0.5"
 >
-    <div class="flex w-24 aspect-square shrink-0 self-center items-center justify-center rounded-lg border border-text/15 bg-text/5 p-2 sm:w-28 sm:p-3">
-        {
-            image ? (
-                <img src={image} alt="" loading="lazy" class="aspect-square w-full rounded-md object-cover" />
-            ) : (
-                <div
-                    class="kikko flex aspect-square w-full items-center justify-center rounded-md text-center text-xs text-text/60"
-                    aria-hidden="true"
-                >
-                    画像準備中
-                </div>
-            )
-        }
-    </div>
+    <SquareImage src={image} className="w-24 self-start sm:w-28 lg:w-36 xl:w-44" />
     <div class="flex min-w-0 flex-1 flex-col justify-center gap-1.5 p-3 sm:gap-2 sm:p-4">
         <div class="flex flex-wrap gap-1">
             <span
