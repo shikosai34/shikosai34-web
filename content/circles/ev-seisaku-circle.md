@@ -3,7 +3,7 @@ name: EV試乗会
 nameKana: いーぶいしじょうかい
 slug: ev-seisaku-circle
 category: other
-location: 2-5
+location: 新日本電工eng創造スクエア
 rainLocation: 中止
 genre: tech
 summary: 茨城高専で作られた電気自動車に試乗してみませんか？
