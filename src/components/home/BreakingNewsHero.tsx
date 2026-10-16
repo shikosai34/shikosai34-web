@@ -138,7 +138,7 @@ export default function BreakingNewsHero({
 								ref={showButtonRef}
 								type="button"
 								onClick={open}
-								className={buttonClassName('accent', 'w-full justify-center font-bold')}
+								className={buttonClassName('outline', 'w-full justify-center')}
 							>
 								ポスター全体を見る
 							</button>
