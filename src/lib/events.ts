@@ -31,17 +31,30 @@ export const EVENT_STATUS_LABELS: Record<EventStatus, string> = {
 	cancelled: '中止',
 };
 
-export const EVENT_VENUES = ['main-stage', 'large-classroom', 'audiovisual-room'] as const;
+export const EVENT_VENUES = [
+	'main-stage',
+	'large-classroom',
+	'audiovisual-room',
+	'preliminary-venue',
+	'rotary',
+	'general-circles',
+	'other',
+] as const;
 
 export type EventVenue = (typeof EVENT_VENUES)[number];
 
 export const EVENT_VENUE_LABELS: Record<EventVenue, string> = {
-	'main-stage': 'メインステージ',
+	'main-stage': '中ステージ（第一体育館）',
 	'large-classroom': '大教室',
 	'audiovisual-room': '視聴覚室',
+	'preliminary-venue': '予選会場',
+	rotary: 'ロータリー',
+	'general-circles': '一般サークル会場',
+	other: 'その他',
 };
 
 export const FESTIVAL_DAYS = [
+	{ id: 'eve', date: '2026-10-23', shortLabel: '前夜祭', label: '10月23日（金）' },
 	{ id: 'day-1', date: '2026-10-24', shortLabel: '1日目', label: '10月24日（土）' },
 	{ id: 'day-2', date: '2026-10-25', shortLabel: '2日目', label: '10月25日（日）' },
 ] as const;
@@ -104,9 +117,11 @@ export function formatEventTimeRange(startAt: Date, endAt: Date): string {
 	return `${formatEventTime(startAt)}〜${formatEventTime(endAt)}`;
 }
 
-export async function getVisibleEvents(): Promise<EventEntry[]> {
+export async function getVisibleEvents(includeCommittee = false): Promise<EventEntry[]> {
 	const events = await getCollectionOrEmpty('events', ({ data }) =>
 		import.meta.env.PROD ? !data.draft : true,
 	);
-	return events.sort((a, b) => a.data.startAt.getTime() - b.data.startAt.getTime());
+	return events
+		.filter((event) => includeCommittee || !event.data.committeeOnly)
+		.sort((a, b) => a.data.startAt.getTime() - b.data.startAt.getTime());
 }

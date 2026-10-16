@@ -13,7 +13,8 @@ import {
 	groupConsecutiveEvents,
 } from '../../lib/events';
 
-const events = await getVisibleEvents();
+const includeCommittee = false;
+const events = await getVisibleEvents(true);
 ---
 
 <Layout title="タイムテーブル | 第34回 茨香祭">
@@ -23,13 +24,19 @@ const events = await getVisibleEvents();
 		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
 			<div class="flex flex-wrap items-baseline justify-between gap-3">
 				<SectionHeading title="Timetable" icon="clock" />
-				<a href="/event" class="text-sm text-text underline hover:no-underline">企画一覧で見る</a>
+				<a href={includeCommittee ? '/event?committee=1' : '/event'} class="text-sm text-text underline hover:no-underline">企画一覧で見る</a>
 			</div>
 
 			<div>
 				<p class="text-base leading-relaxed text-text/80">
 					各会場の予定を開始時刻順に掲載しています。同じイベント名の連続する企画をまとめ、当日の変更も表示します。
 				</p>
+				<div class="mt-3">
+					<label class="inline-flex items-center gap-2 text-sm text-text">
+						<input type="checkbox" checked={includeCommittee} data-committee-toggle />
+						実行委員限定のイベントを表示
+					</label>
+				</div>
 				<nav class="mt-4 flex flex-wrap gap-2" aria-label="開催日">
 					{FESTIVAL_DAYS.map((day) => (
 						<a
@@ -55,7 +62,7 @@ const events = await getVisibleEvents();
 				</div>
 			</div>
 
-			{/* 開催日は 2 日だけなので、広い画面では日ごとの列を横に並べる。 */}
+			{/* 3日分の開催予定を、広い画面では日ごとの列に並べる。 */}
 			<div class="mt-8 space-y-12 lg:grid lg:grid-cols-2 lg:gap-8 lg:space-y-0">
 				{
 					FESTIVAL_DAYS.map((day) => {
@@ -81,7 +88,7 @@ const events = await getVisibleEvents();
 											) : (
 												<ol class="space-y-4">
 													{eventGroups.map((group) => group.events.length > 1 ? (
-														<li class="overflow-hidden rounded-xl border border-text/20 bg-text/[0.03]">
+										<li class="overflow-hidden rounded-xl border border-text/20 bg-text/[0.03]" data-committee-group={group.events.every((event) => event.data.committeeOnly) ? 'true' : undefined} hidden={group.events.every((event) => event.data.committeeOnly) && !includeCommittee}>
 															<h3 class="border-b border-text/20 bg-base px-4 py-3 text-lg font-medium text-text sm:px-5">{group.name}</h3>
 															<ol class="divide-y divide-text/15 px-3 sm:px-5">
 																{group.events.map((event) => <TimetableItem event={event} />)}
@@ -150,4 +157,22 @@ const events = await getVisibleEvents();
 			}
 		});
 	}
+</script>
+
+<script>
+	const committeeToggle = document.querySelector<HTMLInputElement>('[data-committee-toggle]');
+	const committeeItems = Array.from(document.querySelectorAll<HTMLElement>('[data-committee-only="true"]'));
+	const committeeGroups = Array.from(document.querySelectorAll<HTMLElement>('[data-committee-group="true"]'));
+	let committeeEnabled = sessionStorage.getItem('show-committee-events') === 'true';
+	if (committeeToggle) committeeToggle.checked = committeeEnabled;
+	const renderCommitteeEvents = () => {
+		for (const item of committeeItems) item.hidden = !committeeEnabled;
+		for (const group of committeeGroups) group.hidden = !committeeEnabled;
+	};
+	renderCommitteeEvents();
+	committeeToggle?.addEventListener('change', () => {
+		committeeEnabled = committeeToggle.checked;
+		sessionStorage.setItem('show-committee-events', String(committeeEnabled));
+		renderCommitteeEvents();
+	});
 </script>

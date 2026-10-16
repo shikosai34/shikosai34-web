@@ -213,6 +213,7 @@ collections:
     summary: '{{fields.startAt}}｜{{fields.eventName}}｜{{fields.title}}'
     sortable_fields: [startAt, endAt, eventName, title, performer, venue]
     view_filters:
+      - { label: 前夜祭（10月23日）, field: startAt, pattern: '^2026-10-23' }
       - { label: 1日目（10月24日）, field: startAt, pattern: '^2026-10-24' }
       - { label: 2日目（10月25日）, field: startAt, pattern: '^2026-10-25' }
       - { label: 時間変更あり, field: status, pattern: 'changed' }
@@ -240,7 +241,7 @@ collections:
         time_format: 'HH:mm'
         format: 'YYYY-MM-DD[T]HH:mm:ss[+09:00]'
         picker_utc: false
-        hint: '開催日の2026年10月24日または25日を選んでください。'
+        hint: '開催日の2026年10月23日〜25日を選んでください。'
       - label: 終了日時
         name: endAt
         widget: datetime
@@ -248,7 +249,7 @@ collections:
         time_format: 'HH:mm'
         format: 'YYYY-MM-DD[T]HH:mm:ss[+09:00]'
         picker_utc: false
-        hint: '開始日時と同じ日で、開始より後の時刻を選んでください。'
+        hint: '開始日時と同じ日で、開始より後の時刻を選んでください。10月23日〜25日のいずれかを選んでください。'
       - label: ジャンル
         name: genre
         widget: select
@@ -265,9 +266,13 @@ collections:
         widget: select
         default: main-stage
         options:
-          - { label: メインステージ, value: main-stage }
+          - { label: 中ステージ（第一体育館）, value: main-stage }
           - { label: 大教室, value: large-classroom }
           - { label: 視聴覚室, value: audiovisual-room }
+          - { label: 予選会場, value: preliminary-venue }
+          - { label: ロータリー, value: rotary }
+          - { label: 一般サークル会場, value: general-circles }
+          - { label: その他, value: other }
       - label: 当日の状態
         name: status
         widget: select
@@ -314,6 +319,11 @@ collections:
         widget: text
         required: false
         hint: '詳細ページの企画名の下に表示する1〜2文の説明です。'
+      - label: 実行委員限定
+        name: committeeOnly
+        widget: boolean
+        default: false
+        hint: '通常のイベント一覧・タイムテーブルには表示せず、「実行委員限定のイベントを表示」を選んだ場合に表示します。'
       - label: セットリスト
         name: setlist
         widget: list
@@ -325,7 +335,10 @@ collections:
         widget: boolean
         default: false
         hint: 'オンにしている間は本番サイトに表示されません。'
-      - { label: 詳細, name: body, widget: markdown }
+      - label: 詳細
+        name: body
+        widget: markdown
+        required: false
 
   - name: sponsors
     label: 協賛企業

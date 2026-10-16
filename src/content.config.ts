@@ -141,6 +141,7 @@ const events = defineCollection({
 				.default([]),
 			description: z.string().optional(),
 			setlist: z.array(z.string().min(1)).default([]),
+			committeeOnly: z.boolean().default(false),
 			draft: z.boolean().default(false),
 		})
 		.superRefine((event, ctx) => {
@@ -158,7 +159,7 @@ const events = defineCollection({
 				ctx.addIssue({
 					code: 'custom',
 					path: ['startAt'],
-					message: '開始日時は開催日（2026年10月24日または25日）を指定してください。',
+					message: '開始日時は開催日（2026年10月23日〜25日）を指定してください。',
 				});
 			}
 			if (startDay !== endDay) {

@@ -13,7 +13,7 @@ interface Props {
 const { event } = Astro.props;
 ---
 
-<li class="grid grid-cols-[4.5rem_1fr] gap-3 py-4 sm:grid-cols-[6rem_1fr] lg:grid-cols-[4.5rem_1fr]">
+<li class="grid grid-cols-[4.5rem_1fr] gap-3 py-4 sm:grid-cols-[6rem_1fr] lg:grid-cols-[4.5rem_1fr]" data-committee-only={event.data.committeeOnly ? 'true' : undefined} hidden={event.data.committeeOnly}>
 	<div class="pt-1 text-right">
 		<time datetime={event.data.startAt.toISOString()} class="block font-medium text-text">
 			{formatEventTime(event.data.startAt)}
