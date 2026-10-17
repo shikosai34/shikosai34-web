@@ -1,5 +1,79 @@
 ---
-import PlaceholderPage from '../../components/ui/PlaceholderPage.astro';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import SiteHeader from '../../components/layout/SiteHeader.astro';
+import SectionHeading from '../../components/ui/SectionHeading';
+import Layout from '../../layouts/Layout.astro';
 ---
 
-<PlaceholderPage title="注意事項" heading="Cautions" icon="alert" />
+<Layout title="注意事項 | 第34回 茨香祭">
+	<SiteHeader />
+
+	<main class="mx-auto w-full max-w-3xl px-4 pb-16 sm:px-6">
+		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
+			<SectionHeading title="Cautions" icon="alert" subtitle="注意事項" />
+
+			<div class="space-y-10 border-t border-text/40 pt-6">
+				<p class="text-sm leading-relaxed text-text/80">
+					第34回茨香祭にご来場いただく皆さまへ、安全に、気持ちよくお過ごしいただくためのお願いです。ご来場前にご一読ください。
+				</p>
+
+				<div class="rounded-xl border-2 border-main bg-main/10 p-4" role="note">
+					<p class="font-medium text-text">10月25日（日）は学内限定公開です</p>
+					<p class="mt-1 text-sm leading-relaxed text-text/80">
+						一般公開は10月24日（土）9:00〜17:00のみです。25日（日）は茨城高専の学生・保護者等の学内関係者限定の公開となります。
+					</p>
+				</div>
+
+				<section aria-labelledby="manner-heading">
+					<h2 id="manner-heading" class="border-b-2 border-text/25 pb-2 text-xl font-medium text-text">
+						ご来場にあたってのお願い
+					</h2>
+					<ul class="mt-4 list-disc space-y-2 pl-5 text-sm leading-relaxed text-text/80 marker:text-text/60">
+						<li>構内は全面禁煙です。喫煙はご遠慮ください。</li>
+						<li>敷地内での飲酒はご遠慮ください。</li>
+						<li>ペットを同伴してのご来場はご遠慮ください（介助犬等を除く）。</li>
+						<li>ゴミは備え付けのゴミ箱に分別のうえお捨てください。ゴミ箱がない場所では各自でお持ち帰りください。</li>
+						<li>通路や出入り口をふさぐ行為、走り回るなど他のお客さまの迷惑になる行為はお控えください。</li>
+						<li>展示物・設備には手を触れず、係員の案内・指示に従ってください。</li>
+						<li>荒天時は内容を変更・中止する場合があります。最新情報は当サイトや公式SNSでご確認ください。</li>
+					</ul>
+				</section>
+
+				<section aria-labelledby="photo-heading">
+					<h2 id="photo-heading" class="border-b-2 border-text/25 pb-2 text-xl font-medium text-text">
+						撮影・SNS投稿について
+					</h2>
+					<p class="mt-4 text-sm leading-relaxed text-text/80">
+						会場内での写真・動画撮影は、他のお客さまや周囲の安全に配慮したうえで行ってください。ステージ企画等、撮影や配信を制限させていただく場合は係員がご案内します。
+					</p>
+					<p class="mt-3 text-sm leading-relaxed text-text/80">
+						来場者やスタッフなど、他の方が写り込んだ写真・動画をSNS等へ投稿される際は、写っている方への配慮をお願いします。
+					</p>
+				</section>
+
+				<section aria-labelledby="car-heading">
+					<h2 id="car-heading" class="border-b-2 border-text/25 pb-2 text-xl font-medium text-text">
+						お車でのご来場について
+					</h2>
+					<p class="mt-4 text-sm leading-relaxed text-text/80">
+						一般参加者向けの駐車場は設置していません。構内への自動車の進入もできませんので、お車でのご来場はお控えください。詳しいアクセス方法は<a
+							href="/access"
+							class="text-accent underline underline-offset-4 hover:decoration-2 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+						>アクセスページ</a>をご覧ください。
+					</p>
+				</section>
+
+				<section aria-labelledby="emergency-heading">
+					<h2 id="emergency-heading" class="border-b-2 border-text/25 pb-2 text-xl font-medium text-text">
+						体調不良・緊急時
+					</h2>
+					<p class="mt-4 text-sm leading-relaxed text-text/80">
+						会場内で気分が優れない方、お困りの方がいらっしゃいましたら、お近くのスタッフまたは本部までお声がけください。
+					</p>
+				</section>
+			</div>
+		</section>
+	</main>
+
+	<SiteFooter />
+</Layout>
