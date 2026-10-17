@@ -8,6 +8,5 @@ endAt: 2026-10-25T19:05:00+09:00
 genre: ceremony
 status: scheduled
 venue: main-stage
-committeeOnly: true
 draft: false
 ---
