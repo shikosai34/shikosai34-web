@@ -23,7 +23,7 @@ interface Props {
 const { events, completeEdition = false } = Astro.props;
 const startHour = 9;
 const hourHeight = 130.5;
-const visibleDays = completeEdition ? FESTIVAL_DAYS : FESTIVAL_DAYS.filter((day) => day.date !== '2026-10-23');
+const visibleDays = FESTIVAL_DAYS;
 const venueTabs = [
 	{ value: 'main-stage', label: '中ステージ' },
 	{ value: 'all-other', label: 'その他の会場' },
@@ -75,7 +75,12 @@ function groupTimedEvents(dayEvents: EventEntry[]): TimedEventGroup[] {
 
 const dayViews = visibleDays.map((day) => {
 	const dayEvents = events.filter((event) => getEventDayKey(event.data.startAt) === day.date);
-	const endHour = completeEdition ? 20 : day.date === '2026-10-24' ? 17 : 15;
+	const minimumEndHour = completeEdition ? 20 : day.date === '2026-10-24' ? 17 : 15;
+	const lastEventEnd = dayEvents.reduce(
+		(latest, event) => Math.max(latest, minutesInJapan(event.data.endAt)),
+		startHour * 60,
+	);
+	const endHour = Math.max(minimumEndHour, Math.ceil(lastEventEnd / 60) + 1);
 	return {
 		...day,
 		endHour,
@@ -120,7 +125,6 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 						))}
 					</div>
 				</section>
-				<p class="rounded-lg bg-base px-3 py-2 text-xs text-text/75" data-selection-summary aria-live="polite">{activeDay.label}・{EVENT_VENUE_LABELS[initialVenue]}</p>
 			</div>
 
 			<div class="mt-5">
@@ -226,7 +230,6 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 	const dayPanels = Array.from(document.querySelectorAll<HTMLElement>('[data-day-panel]'));
 	const eventButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-calendar-event]'));
 	const calendarGroups = Array.from(document.querySelectorAll<HTMLElement>('[data-calendar-group]'));
-	const summary = document.querySelector<HTMLElement>('[data-selection-summary]');
 	const eventDialog = document.querySelector<HTMLDialogElement>('[data-event-dialog]');
 	const dialogContent = document.querySelector<HTMLElement>('[data-event-dialog-content]');
 	let selectedDay = dayButtons.find((button) => button.getAttribute('aria-pressed') === 'true')?.dataset.daySelect ?? '';
@@ -287,9 +290,6 @@ const pageTitle = completeEdition ? 'タイムテーブル完全版 | 第34回 �
 			if (canvas) canvas.hidden = isActiveDay && visibleEvents.length === 0;
 			if (emptyState) emptyState.hidden = !isActiveDay || visibleEvents.length > 0;
 		}
-		const day = dayButtons.find((button) => button.dataset.daySelect === selectedDay)?.textContent?.trim() ?? '';
-		const venue = venueButtons.find((button) => button.dataset.venueSelect === selectedVenue)?.textContent?.trim() ?? '';
-		if (summary) summary.textContent = `${day}・${venue}`;
 	};
 
 	for (const button of dayButtons) button.addEventListener('click', () => {
