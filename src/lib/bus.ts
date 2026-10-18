@@ -282,7 +282,7 @@ const REGULAR_TIMES: Record<ScheduleKind, Record<string, OperatorTime[]>> = {
 			'20:17',
 			'20:47',
 		]),
-		'inbound-fukayatsu': ibako(['7:19', '8:38', '17:47', '19:33']),
+		'inbound-fukayatsu': ibako(['7:03', '8:22', '17:31', '19:17']),
 	},
 };
 
