@@ -380,6 +380,56 @@ collections:
         name: draft
         widget: boolean
         default: false
+        hint: 'オンにしている間は本番サイトに表示されません。'
+
+  - name: goods
+    label: グッズ
+    label_singular: グッズ
+    description: 'グッズを管理します。/goods に表示順で並び、カードを開くと本文が詳細説明として表示されます。'
+    folder: content/goods
+    create: true
+    slug: '{{fields.slug}}'
+    identifier_field: name
+    summary: '{{fields.name}}｜{{fields.price}}円'
+    sortable_fields: [order, name, price]
+    fields:
+      - { label: グッズ名, name: name, widget: string }
+      - label: URL 識別子
+        name: slug
+        widget: string
+        hint: 'ファイル名に使う半角英数字とハイフン（例: tote-bag）。公開後は変更しないでください。'
+        pattern:
+          ['^[a-z0-9]+(?:-[a-z0-9]+)*$', '半角の英小文字・数字・ハイフンのみで入力してください']
+      - label: 価格（円）
+        name: price
+        widget: number
+        value_type: int
+        min: 0
+      - label: 画像
+        name: image
+        widget: image-r2
+        required: false
+        hint: 'スマホの写真をそのままで大丈夫です。自動でリサイズ・WebP 変換して R2 に保存します。'
+      - label: 売り切れ
+        name: soldOut
+        widget: boolean
+        default: false
+        hint: 'オンにすると一覧に「売り切れ」と表示されます。'
+      - label: 表示順
+        name: order
+        widget: number
+        value_type: int
+        default: 100
+        hint: '小さい数字ほど先頭に表示されます。'
+      - label: 下書き
+        name: draft
+        widget: boolean
+        default: false
+        hint: 'オンにしている間は本番サイトに表示されません。'
+      - label: 詳細説明
+        name: body
+        widget: markdown
+        hint: 'カードを開いたときのポップアップに表示されます。'
 
   - name: staff
     label: 実行委員の部署紹介
