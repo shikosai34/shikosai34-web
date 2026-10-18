@@ -3,6 +3,8 @@ import '@fontsource/kiwi-maru/400.css';
 import '@fontsource/kiwi-maru/500.css';
 import '../styles/global.css';
 import EdgeKasumi from '../components/layout/EdgeKasumi';
+import fs from 'node:fs';
+import path from 'node:path';
 import { ogPageTitles } from '../lib/og-pages';
 
 interface Props {
@@ -32,11 +34,13 @@ const {
 const siteOrigin = Astro.site ?? Astro.url;
 const canonicalURL = new URL(Astro.url.pathname, siteOrigin);
 
-// サークルの個別ページはそのサークルの画像入りの /og/circle/{slug}.png、
-// それ以外のページは共通の /ogp.png を使う。
+// サークルの個別ページは、事前に作ってある /og/circle/{slug}.png（bun run og:circles で生成）があればそれを、
+// 無ければ（画像が未提出・新しく増えたサークルなど）、ほかのページと同じ共通の /ogp.png を使う。
 const ogPageSlug = Astro.url.pathname.replace(/^\/|\/$/g, '');
 const isCircleDetail = /^circle\/[^/]+$/.test(ogPageSlug);
-const ogImagePath = isCircleDetail ? `/og/${ogPageSlug}.png` : '/ogp.png';
+const hasCircleOgImage =
+	isCircleDetail && fs.existsSync(path.resolve('public', `og/${ogPageSlug}.png`));
+const ogImagePath = hasCircleOgImage ? `/og/${ogPageSlug}.png` : '/ogp.png';
 const ogImageURL = new URL(ogImagePath, siteOrigin);
 
 // SNS のシェアカードで画像の下に出る og:title には、ページの階層を「親 › 子」で出す。

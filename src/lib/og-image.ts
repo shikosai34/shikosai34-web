@@ -304,18 +304,10 @@ function buildTemplate(center: CenterImage) {
 /**
  * OGP 画像(PNG)を生成する。ポスターの円・茨香祭ロゴ・茨城高専ロゴをベースデザインの上に載せる。
  * circleImageUrl を渡すと、中央の円をポスターではなくそのサークルの画像にする。
- * 取得に失敗したときはポスターに戻す（画像が取れないだけでビルドを落とさない）。
+ * 画像を取得できないときは例外を投げる（ポスターで代用した画像を、そのサークルのものとして残さないため）。
  */
 export async function renderOgImage(options: { circleImageUrl?: string } = {}): Promise<Buffer> {
-	let center: CenterImage | undefined;
-	if (options.circleImageUrl) {
-		try {
-			center = await getCircleImage(options.circleImageUrl);
-		} catch (error) {
-			console.warn(`[og-image] サークル画像を読めなかったのでポスターで代用します: ${options.circleImageUrl}`, error);
-		}
-	}
-	center ??= await getPosterImage();
+	const center = options.circleImageUrl ? await getCircleImage(options.circleImageUrl) : await getPosterImage();
 
 	// satori は JSX (ReactNode) を受け取る型だが、ここでは JSX を使わずプレーンオブジェクトで
 	// 同じ形（{ type, props }）のノードツリーを組み立てている。satori 自身はこの形をそのまま解釈する。
@@ -328,5 +320,8 @@ export async function renderOgImage(options: { circleImageUrl?: string } = {}): 
 	});
 
 	const resvg = new Resvg(svg, { fitTo: { mode: 'width', value: WIDTH } });
-	return resvg.render().asPng();
+	// resvg の PNG は圧縮が甘く、同じ見た目のまま作り直すだけで約 1/5 になる（リポジトリに置く画像なので小さくする）。
+	return sharp(resvg.render().asPng())
+		.png({ compressionLevel: 9, adaptiveFiltering: true })
+		.toBuffer();
 }
