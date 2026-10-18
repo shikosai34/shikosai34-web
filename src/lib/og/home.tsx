@@ -12,16 +12,32 @@ const POSTER_PATH = path.resolve('src/assets/poster/sokuhou/01-poster.png');
 const POSTER_HEIGHT = 440;
 const POSTER_WIDTH = Math.round(POSTER_HEIGHT * (5000 / 7074));
 
-/** ポスター + 題名・説明 + 場所・日時のカード。summary は配列なら 1 要素 1 行。 */
-export async function renderPosterOgImage({ title, summary }: { title: string; summary: string | string[] }): Promise<Buffer> {
+const FESTIVAL_LOCATION = '茨城工業高等専門学校';
+const FESTIVAL_SCHEDULE = [
+	{ label: '10/24（土）', value: '9:00〜17:00' },
+	{ label: '10/25（日）', value: '学内限定' },
+];
+
+/**
+ * ポスター + 題名・説明 + 場所・日時のカード。summary は配列なら 1 要素 1 行。
+ * 場所と日時を省略すると、茨香祭全体の開催情報を載せる。
+ */
+export async function renderPosterOgImage({
+	title,
+	summary,
+	location = FESTIVAL_LOCATION,
+	schedule = FESTIVAL_SCHEDULE,
+}: {
+	title: string;
+	summary: string | string[];
+	location?: string;
+	schedule?: { label: string; value: string }[];
+}): Promise<Buffer> {
 	return renderOgCard({
 		title,
 		summary,
-		location: '茨城工業高等専門学校',
-		schedule: [
-			{ label: '10/24（土）', value: '9:00〜17:00' },
-			{ label: '10/25（日）', value: '学内限定' },
-		],
+		location,
+		schedule,
 		mediaWidth: POSTER_WIDTH,
 		mediaHeight: POSTER_HEIGHT,
 		textLayout: 'compact',
