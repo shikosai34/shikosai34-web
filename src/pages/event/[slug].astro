@@ -12,7 +12,7 @@ import {
 	formatEventDate,
 	formatEventTimeRange,
 } from '../../lib/events';
-import { eventOgImagePath, hasEventOgImage } from '../../lib/og/event-path';
+import { eventOgImagePath } from '../../lib/og/event-path';
 
 export async function getStaticPaths() {
 	const events = await getCollectionOrEmpty('events', ({ data }) =>
@@ -43,7 +43,7 @@ const imageGallery = [image, ...otherImages]
 	.map((src) => ({ src, thumb: src }));
 ---
 
-<Layout title={`${title} | イベント一覧 | 第34回 茨香祭`} ogImage={hasEventOgImage(startAt) ? eventOgImagePath(event.id) : undefined}>
+<Layout title={`${title} | イベント一覧 | 第34回 茨香祭`} ogImage={eventOgImagePath(event.id)}>
 	<SiteHeader />
 
 	<main class="mx-auto w-full max-w-3xl px-4 pb-16 sm:px-6">
