@@ -17,5 +17,8 @@ otherImages:
   - https://assets.34.shikosai.net/news/69e260a2-152a-4c19-a076-f0930da61cdd.webp
   - https://assets.34.shikosai.net/news/29a50964-fdc7-4963-acb3-c725a1615bfa.webp
   - https://assets.34.shikosai.net/news/ab4747f7-6be1-4377-a02b-ca3709cb0f38.webp
+snsLinks:
+  - label: Instagram
+    url: https://www.instagram.com/pan._.nko/
 ---
 高専といえば男子が多いイメージ。でも私たちは女子寮メンバーで結成した、食品系サークルです！文化祭では、みんな大好きなジャンクフードをご用意してお待ちしています。当日はケモミミを付けたメンバーがお出迎え！高専の中でひときわ華やかな女子チームが、おいしい料理と笑顔をお届けします。
