@@ -1,6 +1,6 @@
 /*
  * 霞（かすみ）の雲の線。
- * サイトの霞（components/ui/KasumiCloud.tsx）と OGP 画像（lib/og-image.ts）で同じ形を使うため、
+ * サイトの霞（components/ui/KasumiCloud.tsx）と OGP 画像（lib/og-image.ts、lib/og/card.tsx）で同じ形を使うため、
  * 線のデータだけをここに置く。viewBox は 0 0 210 226 を基準にした座標。
  */
 

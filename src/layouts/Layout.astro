@@ -3,9 +3,8 @@ import '@fontsource/kiwi-maru/400.css';
 import '@fontsource/kiwi-maru/500.css';
 import '../styles/global.css';
 import EdgeKasumi from '../components/layout/EdgeKasumi';
-import fs from 'node:fs';
-import path from 'node:path';
-import { ogPageTitles, ogPageNameSlugs } from '../lib/og-pages';
+import { ogPageTitles } from '../lib/og-pages';
+import { getPageOgImagePath } from '../lib/og/pages';
 
 interface Props {
 	title?: string;
@@ -20,34 +19,27 @@ interface Props {
 	 * 既定で全ページに出す。全画面の演出を持つページ（404 など）では切る。
 	 */
 	edgeKasumi?: boolean;
+	/**
+	 * OGP 画像のパス（サイト内の絶対パス）。
+	 * 未指定なら、固定ページは lib/og/pages.ts の画像、それ以外は共通の /ogp.jpg。
+	 * サークル詳細とトップは、それぞれのページから専用の画像を渡す。
+	 */
+	ogImage?: string;
 }
 
 const {
 	title = '茨香祭 | 第34回 茨城工業高等専門学校 文化祭',
 	description = '第34回 茨城工業高等専門学校 文化祭（茨香祭）の公式Webサイトです。テーマ「守破離」のもと、和風×サイバーパンクの新しい文化祭をお届けします。',
 	bodyClass = 'kikko bg-base text-text',
-	edgeKasumi = true
+	edgeKasumi = true,
+	ogImage = getPageOgImagePath(Astro.url.pathname) ?? '/ogp.jpg'
 } = Astro.props;
 
 // astro.config.mjs の site を基準に絶対 URL を組み立てる。
 // site 未設定の環境（古い設定で起動した dev サーバーなど）でも落ちないようリクエスト元にフォールバックする。
 const siteOrigin = Astro.site ?? Astro.url;
 const canonicalURL = new URL(Astro.url.pathname, siteOrigin);
-
-// サークルの個別ページは、事前に作ってある /og/circle/{slug}.jpg（bun run og:circles で生成）があればそれを、
-// 無ければ（画像が未提出・新しく増えたサークルなど）、ほかのページと同じ共通の /ogp.jpg を使う。
-const ogPageSlug = Astro.url.pathname.replace(/^\/|\/$/g, '');
-const isCircleDetail = /^circle\/[^/]+$/.test(ogPageSlug);
-const hasCircleOgImage =
-	isCircleDetail && fs.existsSync(path.resolve('public', `og/${ogPageSlug}.jpg`));
-// サークル以外の固定ページは、右下にページ名を載せた /og/{先頭のパス}.jpg（個別記事は一覧ページと同じ画像）。
-const ogSection = ogPageSlug.split('/')[0];
-const ogImagePath = hasCircleOgImage
-	? `/og/${ogPageSlug}.jpg`
-	: ogPageNameSlugs.includes(ogSection)
-		? `/og/${ogSection}.jpg`
-		: '/ogp.jpg';
-const ogImageURL = new URL(ogImagePath, siteOrigin);
+const ogImageURL = new URL(ogImage, siteOrigin);
 
 // SNS のシェアカードで画像の下に出る og:title には、ページの階層を「親 › 子」で出す。
 // 先頭のパスが og-pages.ts に登録された固定ページなら、サイト名 › 一覧ページ名（› 個別記事名）にする。

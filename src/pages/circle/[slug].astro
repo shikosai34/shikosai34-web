@@ -9,6 +9,7 @@ import MainVisualLightbox from '../../components/main-visual/MainVisualLightbox'
 import Layout from '../../layouts/Layout.astro';
 import { CIRCLE_CATEGORY_LABELS, CIRCLE_GENRE_LABELS } from '../../lib/circles';
 import { getCollectionOrEmpty } from '../../lib/content';
+import { circleOgImagePath } from '../../lib/og/circle-path';
 
 export async function getStaticPaths() {
 	const circles = await getCollectionOrEmpty('circles');
@@ -66,7 +67,10 @@ const imageGallery = [image, ...otherImages]
 	.map((src) => ({ src, thumb: src }));
 ---
 
-<Layout title={`${name} | サークル | 第34回 茨香祭`}>
+<Layout
+	title={`${name} | サークル | 第34回 茨香祭`}
+	ogImage={circleOgImagePath(circle.id)}
+>
 	<SiteHeader />
 
 	<main class="mx-auto w-full max-w-3xl px-4 pb-16 sm:px-6">

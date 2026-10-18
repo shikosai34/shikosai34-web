@@ -12,8 +12,7 @@
     "astro": "astro",
     "deploy": "astro build && wrangler deploy",
     "pages:deploy": "astro build && wrangler pages deploy ./dist",
-    "check": "astro check",
-    "og:circles": "bun scripts/generate-circle-og.ts"
+    "check": "astro check"
   },
   "dependencies": {
     "@astrojs/react": "^6.0.4",
@@ -39,9 +38,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
-    "@types/js-yaml": "^4.0.9",
     "@types/three": "^0.186.0",
-    "js-yaml": "^4.3.0",
     "typescript": "6",
     "wrangler": "^4.128.0"
   }
