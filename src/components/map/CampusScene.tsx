@@ -1,7 +1,7 @@
 import { CameraControls, CameraControlsImpl, Edges, Html, Line, Stars } from '@react-three/drei';
 import { Canvas, useFrame, useThree, type ThreeEvent } from '@react-three/fiber';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import * as THREE from 'three';
 import { PLAN_FILES, project } from '../../lib/map';
 import type { MapRoom, Weather } from '../../lib/map-rooms';
@@ -763,6 +763,8 @@ interface Props {
 	places: MapRoom[];
 	/** 番号つきの固定のテント（グラウンドの G-1〜G-33 など） */
 	slots: MapRoom[];
+	/** 選んだテントの真上に出す吹き出し（部屋キーと中身）。なければ出さない */
+	bubble?: { key: string; node: ReactNode } | null;
 	selected: string | null;
 	camera: CameraRequest;
 	animate: boolean;
@@ -777,7 +779,7 @@ interface Props {
 	onBackgroundClick: () => void;
 }
 
-export default function CampusScene({ campus, counts, places, slots, selected, camera, animate, lowPower, paused, weather, onPickBuilding, onPickPlace, onBackgroundClick }: Props) {
+export default function CampusScene({ campus, counts, places, slots, bubble, selected, camera, animate, lowPower, paused, weather, onPickBuilding, onPickPlace, onBackgroundClick }: Props) {
 	const buildings = useMemo(() => buildingsOf(campus.features), [campus]);
 	const windows = useMemo(() => makeWindowTexture(), []);
 	const [hovered, setHovered] = useState<string | null>(null);
@@ -875,6 +877,17 @@ export default function CampusScene({ campus, counts, places, slots, selected, c
 				))}
 
 			<SlotTents slots={slots} counts={counts} selected={selected} onPick={onPickPlace} />
+			{bubble &&
+				(() => {
+					const slot = slots.find((s) => s.key === bubble.key);
+					if (!slot?.at) return null;
+					const [x, y] = project(slot.at);
+					return (
+						<Html position={[x, 6.5, -y]} zIndexRange={[30, 0]}>
+							{bubble.node}
+						</Html>
+					);
+				})()}
 
 			{/* 建物名 */}
 			{buildings

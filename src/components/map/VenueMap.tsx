@@ -15,6 +15,7 @@ import {
 import { isRoomInWeather, MAP_ROOMS, type Weather } from '../../lib/map-rooms';
 import type { CameraRequest, CampusData } from './CampusScene';
 import { RoomDetail } from './ExhibitPanel';
+import { ExhibitBubble } from './ExhibitPopover';
 import FloorPlanView from './FloorPlanView';
 import WeatherToggle from './WeatherToggle';
 
@@ -202,6 +203,21 @@ export default function VenueMap({ exhibits: exhibitsByWeather, defaultWeather }
 	}, [PLACES, SLOTS]); // eslint-disable-line react-hooks/exhaustive-deps
 
 	const place = findPlace(placeKey);
+	/** 番号つきのテント（1 張り）を選んだときは、ダイアログではなくそのテントの真上に吹き出しで出す */
+	const bubble =
+		place?.parent && !(view.building && plan)
+			? {
+					key: place.key,
+					node: (
+						<ExhibitBubble
+							badge={place.number}
+							title={`${place.building} ${place.number ?? ''}`}
+							items={exhibits[place.key] ?? []}
+							onClose={closePlace}
+						/>
+					),
+				}
+			: null;
 	const planOpen = !!view.building && !!plan && plan.building === view.building;
 
 	return (
@@ -214,6 +230,7 @@ export default function VenueMap({ exhibits: exhibitsByWeather, defaultWeather }
 							counts={counts}
 							places={PLACES}
 							slots={SLOTS}
+							bubble={bubble}
 							selected={selected}
 							camera={camera}
 							animate={!reducedMotion}
@@ -303,7 +320,7 @@ export default function VenueMap({ exhibits: exhibitsByWeather, defaultWeather }
 				</div>
 			)}
 
-			{place && !planOpen && (
+			{place && !bubble && !planOpen && (
 				<div
 					role="dialog"
 					aria-label={place.name}
