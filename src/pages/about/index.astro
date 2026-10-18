@@ -1,5 +1,30 @@
 ---
-import PlaceholderPage from '../../components/ui/PlaceholderPage.astro';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import SiteHeader from '../../components/layout/SiteHeader.astro';
+import SectionHeading from '../../components/ui/SectionHeading';
+import Layout from '../../layouts/Layout.astro';
 ---
 
-<PlaceholderPage title="茨香祭について" heading="About" icon="info" message="茨香祭についての情報は準備中です。" />
+<Layout title="茨香祭について | 第34回 茨香祭">
+	<SiteHeader />
+
+	<main class="mx-auto w-full max-w-3xl px-4 pb-16 sm:px-6">
+		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
+			<SectionHeading title="About" icon="info" subtitle="茨香祭について" />
+
+			<div class="space-y-4 text-sm leading-loose text-text/90 sm:text-base">
+				<p>
+					茨香祭は茨城高専が開催する文化祭で、今年で34回目を迎えます。また、茨香祭は二年に一度開催するため茨城高専全体として気合が入っております。
+				</p>
+				<p>
+					茨城高専といえば、個性豊かで明るくにぎやかな学校です。茨香祭でもそんなユーモア溢れるイベント、出し物、ライブで会場を盛り上げます。そして、高専ならではの技術を活用した実験やプログラミング、ロボコンのイベントも開催しております。
+				</p>
+				<p>
+					さらに今年の茨香祭の最大の魅力はシステムです。今年はリストバンドを活用したネットサービスに力を入れております。茨香祭ならではの活気あふれた空気感をお楽しみください。
+				</p>
+			</div>
+		</section>
+	</main>
+
+	<SiteFooter />
+</Layout>
