@@ -22,7 +22,7 @@ details: |-
 scheduleDay1: 9:00〜17:00
 scheduleDay2: 9:00〜15:00
 fesflowPlanned: false
-image: https://assets.34.shikosai.net/news/2dcc2b38-09eb-437b-b09d-bbc6556927c5.webp
+image: https://assets.34.shikosai.net/news/e959f76a-134f-4e33-9dfa-40c868552bf9.webp
 snsLinks:
   - url: https://www.instagram.com/nitic_astronomy?igsi=ZDNlZDc0MzIxNw%3D%3D
     label: Instagram
