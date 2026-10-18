@@ -1,7 +1,8 @@
 /**
  * 固定ページの名前（先頭のパス → ページ名）。
- * Layout.astro が og:title に「第34回 茨香祭 › ページ名」の階層を出すために使う。
- * 画像には載せないので、OGP 画像の生成には関係しない。
+ * Layout.astro が og:title に「第34回 茨香祭 › ページ名」の階層を出すのと、
+ * OGP 画像の右下にページ名を載せる（src/pages/og/[slug].jpg.ts）のに使う。
+ * サークルの画像は別に用意するので、OGP 画像のページ名には使わない（ogPageNameSlugs を参照）。
  */
 export const ogPageTitles: Record<string, string> = {
 	about: '茨香祭について',
@@ -23,3 +24,6 @@ export const ogPageTitles: Record<string, string> = {
 	theme: 'テーマ',
 	timetable: 'タイムテーブル',
 };
+
+/** OGP 画像の右下にページ名を載せるページ。サークルは個別の画像を持つので除く。 */
+export const ogPageNameSlugs = Object.keys(ogPageTitles).filter((slug) => slug !== 'circle');

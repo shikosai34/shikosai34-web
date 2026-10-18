@@ -5,7 +5,7 @@ import '../styles/global.css';
 import EdgeKasumi from '../components/layout/EdgeKasumi';
 import fs from 'node:fs';
 import path from 'node:path';
-import { ogPageTitles } from '../lib/og-pages';
+import { ogPageTitles, ogPageNameSlugs } from '../lib/og-pages';
 
 interface Props {
 	title?: string;
@@ -34,13 +34,19 @@ const {
 const siteOrigin = Astro.site ?? Astro.url;
 const canonicalURL = new URL(Astro.url.pathname, siteOrigin);
 
-// サークルの個別ページは、事前に作ってある /og/circle/{slug}.png（bun run og:circles で生成）があればそれを、
-// 無ければ（画像が未提出・新しく増えたサークルなど）、ほかのページと同じ共通の /ogp.png を使う。
+// サークルの個別ページは、事前に作ってある /og/circle/{slug}.jpg（bun run og:circles で生成）があればそれを、
+// 無ければ（画像が未提出・新しく増えたサークルなど）、ほかのページと同じ共通の /ogp.jpg を使う。
 const ogPageSlug = Astro.url.pathname.replace(/^\/|\/$/g, '');
 const isCircleDetail = /^circle\/[^/]+$/.test(ogPageSlug);
 const hasCircleOgImage =
-	isCircleDetail && fs.existsSync(path.resolve('public', `og/${ogPageSlug}.png`));
-const ogImagePath = hasCircleOgImage ? `/og/${ogPageSlug}.png` : '/ogp.png';
+	isCircleDetail && fs.existsSync(path.resolve('public', `og/${ogPageSlug}.jpg`));
+// サークル以外の固定ページは、右下にページ名を載せた /og/{先頭のパス}.jpg（個別記事は一覧ページと同じ画像）。
+const ogSection = ogPageSlug.split('/')[0];
+const ogImagePath = hasCircleOgImage
+	? `/og/${ogPageSlug}.jpg`
+	: ogPageNameSlugs.includes(ogSection)
+		? `/og/${ogSection}.jpg`
+		: '/ogp.jpg';
 const ogImageURL = new URL(ogImagePath, siteOrigin);
 
 // SNS のシェアカードで画像の下に出る og:title には、ページの階層を「親 › 子」で出す。
