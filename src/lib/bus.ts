@@ -101,7 +101,7 @@ const ROUTE_BASE: Omit<BusRoute, 'shuttleTimes'>[] = [
 		direction: '復路',
 		route: '茨城高専前発 → 勝田駅',
 		from: '茨城高専前',
-		stop: '茨城高専前',
+		stop: '勝田駅',
 		stopNote: '正門を出て南へ進むと乗り場です。',
 	},
 	{
@@ -109,7 +109,7 @@ const ROUTE_BASE: Omit<BusRoute, 'shuttleTimes'>[] = [
 		direction: '復路',
 		route: '深谷津発 → 勝田駅',
 		from: '深谷津',
-		stop: '深谷津',
+		stop: '勝田駅',
 		stopNote: '茨城高専前からは離れています。',
 		caveat: 'スマイルあおぞらバスは深谷津からの直行復路がないため含みません。',
 	},
