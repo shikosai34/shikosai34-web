@@ -2,7 +2,7 @@
 import SiteHeader from '../components/layout/SiteHeader.astro';
 import SiteFooter from '../components/layout/SiteFooter.astro';
 import BreakingNewsHero from '../components/home/BreakingNewsHero';
-import BusCountdownWidget from '../components/home/BusCountdownWidget';
+import BusDepartureBoard from '../components/home/BusDepartureBoard';
 import CountdownSection from '../components/home/CountdownSection';
 import ThemeModel from '../components/home/ThemeModel';
 import ThemeSection from '../components/home/ThemeSection';
@@ -60,6 +60,8 @@ const stageEvents = (await getCompleteEvents())
 			<ThemeModel slot="mark" client:only="react" />
 		</ThemeSection>
 
+		<BusDepartureBoard client:load />
+
 		<section class="surface-panel mt-6 rounded-2xl p-5 sm:p-6" aria-labelledby="festival-guide-title">
 			<div class="mb-5">
 				<h2 id="festival-guide-title" class="text-xl font-medium tracking-wide text-text">会場・サークル案内</h2>
@@ -109,8 +111,6 @@ const stageEvents = (await getCompleteEvents())
 			<NewsSection items={latestNews} />
 		</div>
 	</main>
-
-	<BusCountdownWidget client:load />
 
 	<SiteFooter />
 </Layout>
