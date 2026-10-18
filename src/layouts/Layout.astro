@@ -32,12 +32,11 @@ const {
 const siteOrigin = Astro.site ?? Astro.url;
 const canonicalURL = new URL(Astro.url.pathname, siteOrigin);
 
-// 固定ページ（src/lib/og-pages.ts に登録済みのもの）は /og/{slug}.png、
-// サークルの個別ページはそのサークルの画像入りの /og/circle/{slug}.png を使う。
-// トップページ・404・event/news の個別記事などはベースの /ogp.png にフォールバックする。
+// サークルの個別ページはそのサークルの画像入りの /og/circle/{slug}.png、
+// それ以外のページは共通の /ogp.png を使う。
 const ogPageSlug = Astro.url.pathname.replace(/^\/|\/$/g, '');
 const isCircleDetail = /^circle\/[^/]+$/.test(ogPageSlug);
-const ogImagePath = isCircleDetail || ogPageSlug in ogPageTitles ? `/og/${ogPageSlug}.png` : '/ogp.png';
+const ogImagePath = isCircleDetail ? `/og/${ogPageSlug}.png` : '/ogp.png';
 const ogImageURL = new URL(ogImagePath, siteOrigin);
 
 // SNS のシェアカードで画像の下に出る og:title には、ページの階層を「親 › 子」で出す。

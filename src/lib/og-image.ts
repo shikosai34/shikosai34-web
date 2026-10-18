@@ -12,14 +12,12 @@ const POSTER_PATH = path.resolve('src/assets/poster/sokuhou/01-poster.png');
 const KOSEN_LOGO_PATH = path.resolve('src/assets/logo/kosen/footer.svg');
 
 /*
- * KiwiMaru-{Regular,Medium}.ttf は Google Fonts の Kiwi Maru から、このファイルで
- * 実際に組版する文字（og-pages.ts の見出し一覧 + 英数字記号）だけを pyftsubset で
- * 抜き出したサブセット版（4.7MB→52KB）。見出しに新しい文字種を使う場合は、
- * フルセットの TTF から文字を再抽出して差し替える必要がある。
+ * 画像には文字を載せていない（ロゴとポスターは画像）が、satori はフォントを 1 つも
+ * 渡さないと描画できないため、Kiwi Maru を必要最小限に絞ったサブセット（52KB）を渡している。
+ * 画像に文字を載せるときは、使う文字を含むようフルセットの TTF から pyftsubset で抜き出し直すこと。
  */
 
 const kiwiMaruRegular = fs.readFileSync(path.join(FONTS_DIR, 'KiwiMaru-Regular.ttf'));
-const kiwiMaruMedium = fs.readFileSync(path.join(FONTS_DIR, 'KiwiMaru-Medium.ttf'));
 const logoDataUri = `data:image/png;base64,${fs.readFileSync(LOGO_PATH).toString('base64')}`;
 const kosenLogoDataUri = `data:image/svg+xml;base64,${fs.readFileSync(KOSEN_LOGO_PATH).toString('base64')}`;
 
@@ -326,7 +324,6 @@ export async function renderOgImage(options: { circleImageUrl?: string } = {}): 
 		height: HEIGHT,
 		fonts: [
 			{ name: 'Kiwi Maru', data: kiwiMaruRegular, weight: 400, style: 'normal' },
-			{ name: 'Kiwi Maru', data: kiwiMaruMedium, weight: 500, style: 'normal' },
 		],
 	});
 

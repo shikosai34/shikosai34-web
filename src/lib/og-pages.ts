@@ -1,11 +1,7 @@
 /**
- * ページごとに動的生成する OGP 画像の見出し一覧。
- * キーはパス（先頭スラッシュなし、末尾スラッシュなし）。
- * `src/pages/og/[slug].png.ts` の静的生成と、Layout.astro の og:image 解決の両方から参照する。
- *
- * 対象は URL が固定されている一覧・案内ページのみ。
- * circle/event/news の個別記事（content collection で件数が増える動的ページ）と
- * トップページ・404 は対象外（トップは /ogp.png、他は Layout 既定の /ogp.png にフォールバックする）。
+ * 固定ページの名前（先頭のパス → ページ名）。
+ * Layout.astro が og:title に「第34回 茨香祭 › ページ名」の階層を出すために使う。
+ * 画像には載せないので、OGP 画像の生成には関係しない。
  */
 export const ogPageTitles: Record<string, string> = {
 	about: '茨香祭について',
@@ -27,5 +23,3 @@ export const ogPageTitles: Record<string, string> = {
 	theme: 'テーマ',
 	timetable: 'タイムテーブル',
 };
-
-export type OgPageSlug = keyof typeof ogPageTitles;
