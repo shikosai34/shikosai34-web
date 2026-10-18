@@ -5,6 +5,7 @@ import SiteHeader from '../../components/layout/SiteHeader.astro';
 import Layout from '../../layouts/Layout.astro';
 import { CIRCLE_CATEGORY_LABELS } from '../../lib/circles';
 import { getCollectionOrEmpty } from '../../lib/content';
+import MiniMap from '../../components/map/MiniMap.astro';
 import { formatMapRoom, getMapRoom, NOT_IN_RAIN } from '../../lib/map-rooms';
 
 export async function getStaticPaths() {
@@ -23,6 +24,12 @@ const room = getMapRoom(mapRoom);
 // 雨天時に場所が変わる（または出展しない）ときだけ、雨天時の案内を添える
 const rainyRoom = mapRoomRainy && mapRoomRainy !== mapRoom ? getMapRoom(mapRoomRainy) : undefined;
 const absentInRain = mapRoomRainy === NOT_IN_RAIN;
+// ミニマップに出す場所。天候で場所が変わるときだけ、晴天時・雨天時を分けて見出しをつける
+const places = [
+	room && { weather: '晴天時', room, href: `/map?room=${encodeURIComponent(room.key)}` },
+	rainyRoom && { weather: '雨天時', room: rainyRoom, href: `/map?room=${encodeURIComponent(rainyRoom.key)}&weather=rainy` },
+].filter((p): p is { weather: string; room: NonNullable<typeof room>; href: string } => !!p);
+const labelWeather = places.length > 1 || absentInRain || (!room && !!rainyRoom);
 ---
 
 <Layout title={`${name} | サークル | 第34回 茨香祭`}>
@@ -81,6 +88,25 @@ const absentInRain = mapRoomRainy === NOT_IN_RAIN;
 					{absentInRain && <span class="ml-2 whitespace-nowrap text-text/70">雨天時は出展しません</span>}
 				</dd>
 			</dl>
+
+			{
+				places.length > 0 && (
+					<section class="mt-4 flex max-w-xl flex-col gap-5" aria-label="出店場所の地図">
+						{places.map((place) => (
+							<figure class="flex flex-col gap-1.5">
+								<figcaption class="text-xs text-text/70">
+									{labelWeather && <span class="mr-1 text-main">{place.weather}</span>}
+									{formatMapRoom(place.room)}
+								</figcaption>
+								<MiniMap room={place.room} />
+								<a href={place.href} class="self-start text-xs text-accent underline hover:no-underline">
+									地図で大きく見る →
+								</a>
+							</figure>
+						))}
+					</section>
+				)
+			}
 
 			<div class="circle-body mt-4 flex flex-col gap-3 text-text">
 				<Content />
