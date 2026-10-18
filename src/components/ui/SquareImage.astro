@@ -1,0 +1,20 @@
+---
+interface Props {
+	src?: string | undefined;
+	className?: string;
+	roundedClassName?: string;
+	alt?: string;
+}
+
+const { src, className = '', roundedClassName = 'rounded-lg', alt = '' } = Astro.props;
+---
+
+<div class:list={['aspect-square shrink-0 overflow-hidden', roundedClassName, className]}>
+	{src ? (
+		<img src={src} alt={alt} loading="lazy" class="block h-full w-full object-cover" />
+	) : (
+		<div class="kikko flex h-full w-full items-center justify-center text-center text-xs text-text/60" aria-hidden="true">
+			画像準備中
+		</div>
+	)}
+</div>

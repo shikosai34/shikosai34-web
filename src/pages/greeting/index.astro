@@ -1,0 +1,49 @@
+---
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import SiteHeader from '../../components/layout/SiteHeader.astro';
+import SectionHeading from '../../components/ui/SectionHeading';
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="ご挨拶 | 第34回 茨香祭" description="第34回茨香祭に寄せた校長と実行委員長のご挨拶です。">
+	<SiteHeader />
+
+	<main class="mx-auto w-full max-w-5xl px-4 pb-16 sm:px-6">
+		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
+			<SectionHeading title="Messages" icon="badge" subtitle="ご挨拶" />
+		</section>
+
+		<section id="principal-message" class="surface-panel mt-6 scroll-mt-6 rounded-2xl p-4 sm:p-6" aria-labelledby="principal-message-title">
+			<article class="bracket-frame rounded-xl bg-base/45 p-5 sm:p-6">
+				<p class="mb-3 text-xs tracking-[0.2em] text-accent">MESSAGE 01</p>
+				<div class="grid gap-6 sm:grid-cols-[minmax(0,1fr)_12rem] sm:items-start">
+					<div>
+						<h2 id="principal-message-title" class="mb-4 text-lg font-medium text-text">校長挨拶</h2>
+						<p class="whitespace-pre-line text-sm leading-8 text-text/85">いよいよ第34回茨香祭が開催されます。茨香祭は2年に1回開催される茨城高専の文化祭であり、1回に2年分のエネルギーが注入される分、気合の入ったイベントになることでしょう。多くのイベントや出店もあり、にぎやかなお祭りになりそうです。さて、今回のテーマは「守破離」です。その意味は茨香祭公式ウェブページなどで解説されているのでここでは割愛しますが、かっこいい言葉なので守破離が大好きなおじさんは数多く、もともとの分野である茶の湯や武道のみならず、調べてみると医療、企業経営、ものづくり、人材育成、高等教育、サービス産業など、あらゆる分野で「守破離」が使われています。今年は茨香祭がそのリストに加わったわけですが、これまでの茨香祭の伝統を受け継ぐ「守」に加えて、学生諸君がどのような「破離」を見せてくれるのか、大いに期待しています。最後に、学生を見守っていただく先生方、茨香祭にご協力いただいた後援会と同窓会の皆様、地域の皆様に改めてお礼を申し上げます。</p>
+						<p class="mt-5 text-right text-sm leading-7 text-text">第13代校長<br /><span class="text-accent">伊藤 彰則</span></p>
+					</div>
+					<img src="/images/staff/ito-akinori.jpg" alt="第13代校長 伊藤 彰則" loading="lazy" class="mx-auto aspect-[3/4] w-full max-w-48 rounded-lg object-cover object-top sm:mx-0" />
+				</div>
+			</article>
+		</section>
+
+		<section id="chairperson-message" class="surface-panel mt-6 scroll-mt-6 rounded-2xl p-4 sm:p-6" aria-labelledby="chairperson-message-title">
+			<article class="bracket-frame rounded-xl bg-base/45 p-5 sm:p-6">
+				<p class="mb-3 text-xs tracking-[0.2em] text-accent">MESSAGE 02</p>
+				<h2 id="chairperson-message-title" class="mb-4 text-lg font-medium text-text">実行委員長挨拶</h2>
+				<div class="space-y-4 text-sm leading-8 text-text/85">
+					<p>2年に一度開催される茨香祭は、学生一人ひとりの「やってみたい」が形になる、茨城高専ならではの舞台です。</p>
+					<p>今回のテーマは「守破離」。これまで先輩方が築いてきた伝統を大切にしながらも、その枠にとらわれず、新しい茨香祭を創り上げることに挑戦してきました。企画の充実はもちろん、デジタル技術の活用や他高専との交流など、高専生ならではの発想を随所に取り入れています。</p>
+					<p>準備を進める中では、数多くの困難もありました。しかし、実行委員をはじめとする学生の皆さん、先生方、そして地域・関係者の皆様のご協力によって、今日を迎えることができました。この場を借りて、心より感謝申し上げます。</p>
+					<p>この2日間が、皆様にとって新たな発見や出会いにあふれ、記憶に残る時間となれば幸いです。</p>
+					<p>どうぞ、第34回茨香祭を最後までお楽しみください。</p>
+				</div>
+				<p class="mt-5 text-right text-sm leading-7 text-text">第34回茨香祭実行委員長<br /><span class="text-accent">國井 真帆</span></p>
+			</article>
+		</section>
+
+		<p class="mt-6 text-center"><a href="/staff/" class="inline-flex min-h-11 items-center rounded-lg border border-text/20 bg-base/60 px-4 py-2 text-sm text-text transition-colors hover:border-accent/50 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">部署紹介を見る</a></p>
+	</main>
+
+	<SiteFooter />
+</Layout>

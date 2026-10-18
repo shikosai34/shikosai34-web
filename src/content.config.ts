@@ -1,7 +1,14 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { CIRCLE_CATEGORIES, CIRCLE_GENRES } from './lib/circles';
-import { EVENT_GENRES, EVENT_STATUSES, FESTIVAL_DAYS, getEventDayKey } from './lib/events';
+import {
+	EVENT_GENRES,
+	EVENT_DISPLAY_MODES,
+	EVENT_STATUSES,
+	EVENT_VENUES,
+	FESTIVAL_DAYS,
+	getEventDayKey,
+} from './lib/events';
 import { NEWS_CATEGORIES } from './lib/news';
 
 /**
@@ -85,7 +92,14 @@ const circles = defineCollection({
 		/** その他画像（任意）。サムネイルとは別に詳細ページへ並べる。 */
 		otherImages: z.array(z.string()).default([]),
 		snsLinks: z
-			.array(z.object({ label: z.string().min(1), url: z.string().url() }))
+			.array(
+				z.object({
+					label: z.string().min(1),
+					url: z.string().url(),
+					/** note風リンクカードに使う画像（任意）。 */
+					previewImage: z.string().optional(),
+				}),
+			)
 			.default([]),
 
 		// 以下は実行委員会が後から付与する（§2.9.3）。収集時点では値がない。
@@ -95,15 +109,15 @@ const circles = defineCollection({
 });
 
 /**
- * 体育館ステージの企画（`/event`、`/timetable`）。
+ * ステージ企画（`/event`、`/timetable`）。
  *
- * CMS では開始・終了をタイムゾーン付き日時として入力する。会場は体育館のみのため
- * 編集項目にはせず、コンテンツ側で固定値を補う。
+ * CMS ではイベント名の中に複数の企画を登録できる。開始・終了はタイムゾーン付き日時。
  */
 const events = defineCollection({
 	loader: glob({ pattern: '**/[^_]*.md', base: './content/events' }),
 	schema: z
 		.object({
+			eventName: z.string().min(1),
 			title: z.string().min(1),
 			slug: z.string().optional(),
 			/** 出演団体名。個人名や連絡先は掲載しない。 */
@@ -112,9 +126,24 @@ const events = defineCollection({
 			endAt: z.coerce.date(),
 			genre: z.enum(EVENT_GENRES).default('other'),
 			status: z.enum(EVENT_STATUSES).default('scheduled'),
-			venue: z.literal('体育館').default('体育館'),
+			venue: z.enum(EVENT_VENUES).default('main-stage'),
 			image: z.string().optional(),
+			displayMode: z.enum(EVENT_DISPLAY_MODES).default('timed'),
+			/** 詳細ページに並べる追加画像（任意）。 */
+			otherImages: z.array(z.string()).default([]),
+			snsLinks: z
+				.array(
+					z.object({
+						label: z.string().min(1),
+						url: z.string().url(),
+						/** note風リンクカードに使う画像（任意）。 */
+						previewImage: z.string().optional(),
+					}),
+				)
+				.default([]),
 			description: z.string().optional(),
+			setlist: z.array(z.string().min(1)).default([]),
+			committeeOnly: z.boolean().default(false),
 			draft: z.boolean().default(false),
 		})
 		.superRefine((event, ctx) => {
@@ -132,7 +161,7 @@ const events = defineCollection({
 				ctx.addIssue({
 					code: 'custom',
 					path: ['startAt'],
-					message: '開始日時は開催日（2026年10月24日または25日）を指定してください。',
+					message: '開始日時は開催日（2026年10月23日〜25日）を指定してください。',
 				});
 			}
 			if (startDay !== endDay) {
@@ -167,4 +196,37 @@ const sponsors = defineCollection({
 	}),
 });
 
-export const collections = { news, circles, events, sponsors };
+/**
+ * 実行委員会の部署紹介（`/staff`）。
+ * 部署ごとの名簿・写真・紹介文を Decap CMS から管理する。
+ */
+const staff = defineCollection({
+	loader: glob({ pattern: '**/[^_]*.md', base: './content/staff' }),
+	schema: z.object({
+		/** 表示順。小さい番号を先に表示する。 */
+		sortOrder: z.number().int().nonnegative(),
+		department: z.string().min(1),
+		members: z
+			.array(z.object({ role: z.string().min(1), name: z.string().min(1), kana: z.string().min(1) }))
+			.default([]),
+		description: z.string().min(1),
+		image: z.string().optional(),
+	}),
+});
+
+/**
+ * よくある質問（`/faq`）。
+ * 質問とカテゴリ、参考リンクを frontmatter に、回答本文を Markdown で管理する。
+ */
+const faq = defineCollection({
+	loader: glob({ pattern: '**/[^_]*.md', base: './content/faq' }),
+	schema: z.object({
+		question: z.string().min(1),
+		category: z.string().min(1),
+		referenceLinks: z
+			.array(z.object({ label: z.string().min(1), url: z.string().url() }))
+			.default([]),
+	}),
+});
+
+export const collections = { news, circles, events, sponsors, staff, faq };

@@ -6,6 +6,9 @@
   --color-text: #e8e8e8;
   --color-main: #ff9933;
   --color-accent: #00ffcc;
+  /* 色面の上で使う前景色。色名ではなく意味で組み合わせを選ぶ。 */
+  --color-on-main: #0b3041;
+  --color-on-accent: #0b3041;
 
   /*
    * ポスターのマゼンタ（実物から抽出した #e7386f）。
@@ -74,34 +77,6 @@
 }
 
 @layer components {
-  /*
-   * ポスター下部のハーフトーン（オレンジの点描）。
-   * 面全体に敷くと煩いので、当てる側で高さを絞って使う。
-   */
-  .halftone {
-    background-image: radial-gradient(
-      var(--color-main) 1px,
-      transparent 1.4px
-    );
-    background-size: 7px 7px;
-  }
-
-  /*
-   * 紙面を斜めに走るマゼンタのスイープ。
-   * 装飾のみなので、当てる要素には aria-hidden を付ける。
-   */
-  .glitch-sweep {
-    background-image: linear-gradient(
-      100deg,
-      transparent 0%,
-      transparent 42%,
-      color-mix(in srgb, var(--color-glitch) 85%, transparent) 42%,
-      color-mix(in srgb, var(--color-glitch) 85%, transparent) 44%,
-      transparent 44%,
-      transparent 100%
-    );
-  }
-
   /*
    * セクションを載せる面。地色と同じ濃紺のままだと境界が消えるので、
    * わずかに持ち上げた明度と細い縁で紙面の重なりを作る。
@@ -195,9 +170,8 @@
     position: absolute;
     inset: 0;
     /*
-     * 走査線は雲（.neon-backdrop, z-index:0）より前に置く。
-     * 同じ 0 だと後から描かれるこちらが雲を覆い、
-     * screen の光が灰色に潰れる。
+     * 走査線は雲（.neon-backdrop）の手前、パネルの中身の後ろに置く。
+     * 中身は z-index:3 にして、文字や操作部品に縞が重ならないようにする。
      */
     z-index: 2;
     pointer-events: none;
@@ -209,13 +183,13 @@
   }
 
   /*
-   * 中身は走査線（::after）より前に出す。
+   * 中身は走査線（::after, z-index:2）より前に出す。
    * ただし背景として敷く装飾（.neon-backdrop）は例外で、
    * これを持ち上げるとポスターの上に雲がかぶさってしまう。
    */
   .surface-panel > *:not(.neon-backdrop) {
     position: relative;
-    z-index: 1;
+    z-index: 3;
   }
 
   /*

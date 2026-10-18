@@ -1,4 +1,4 @@
-# Decap CMS 設定 — お知らせ、サークル、体育館ステージ企画
+# Decap CMS 設定 — お知らせ、サークル、ステージ企画
 #
 # アクセス制御と GitHub 書き込み:
 #   /admin/* と /cms/*（CMS Backend Worker）を Cloudflare Zero Trust Access で保護する。
@@ -101,6 +101,7 @@ collections:
     create: true
     slug: '{{fields.slug}}'
     identifier_field: name
+    summary: '{{fields.slug}} - {{name}}'
     sortable_fields: [nameKana, name]
     fields:
       - { label: 団体名, name: name, widget: string }
@@ -126,7 +127,7 @@ collections:
           - { label: 専攻科, value: advanced }
           - { label: 運動部, value: sports }
           - { label: 文化部, value: culture }
-          - { label: 有志サークル, value: other }
+          - { label: 有志団体, value: other }
       - { label: 実施場所, name: location, widget: string, hint: '教室名など。' }
       - { label: 雨天時の場所・対応, name: rainLocation, widget: string, required: false, hint: '雨天時の場所、または中止などの対応。' }
       - label: サークルカテゴリ
@@ -145,7 +146,7 @@ collections:
         widget: text
         required: false
         hint: '来場者に見てほしいポイント。'
-      - label: 値段設定/企画詳細
+      - label: 価格・企画内容
         name: details
         widget: text
         required: false
@@ -165,7 +166,7 @@ collections:
         name: image
         widget: image-r2
         required: false
-        hint: 'スマホの写真をそのままで大丈夫です。自動でリサイズ・WebP 変換して R2 に保存します。'
+        hint: '画像は自動でリサイズ・WebP変換してR2へ保存されます。詳細ページで大きく表示され、押すと拡大できます。'
       - label: その他画像
         name: otherImages
         widget: list
@@ -175,19 +176,24 @@ collections:
           label: 画像
           name: image
           widget: image-r2
-        hint: '詳細ページに並べて表示する画像です。複数追加できます。'
-      - label: SNS リンク
+        hint: '詳細ページに並べて表示し、押すと拡大できます。複数追加できます。'
+      - label: SNS・公式サイトのリンク
         name: snsLinks
         widget: list
         required: false
-        label_singular: SNS リンク
+        label_singular: リンク
         summary: '{{fields.label}}'
         fields:
-          - { label: ラベル, name: label, widget: string, hint: '例: X / Instagram / 公式サイト' }
-          - label: URL
+          - { label: リンク名, name: label, widget: string, hint: '例: X / Instagram / 公式サイト' }
+          - label: リンク先 URL
             name: url
             widget: string
             pattern: ['^https?://', 'http:// または https:// で始まる URL を入力してください']
+          - label: リンクプレビュー画像（任意）
+            name: previewImage
+            widget: image-r2
+            required: false
+            hint: 'noteのリンクカードのように画像付きで表示します。未設定なら画像なしのリンクカードになります。'
       - label: FesFlow ページ URL
         name: fesflowUrl
         widget: string
@@ -199,19 +205,24 @@ collections:
   - name: events
     label: ステージ企画
     label_singular: ステージ企画
-    description: '体育館ステージの企画を管理します。開始日時順に /event と /timetable へ反映されます。'
+    description: '開催ごとの企画を登録します。通常版は一般向けのみ、完全版（/timetable/committee-events）は実行委員向けを含みます。'
     folder: content/events
     create: true
     slug: '{{fields.slug}}'
     identifier_field: title
-    summary: '{{fields.startAt}}｜{{fields.title}}'
-    sortable_fields: [startAt, endAt, title, performer]
+    summary: '{{fields.startAt}}｜{{fields.eventName}}｜{{fields.title}}'
+    sortable_fields: [startAt, endAt, eventName, title, performer, venue]
     view_filters:
+      - { label: 前夜祭（10月23日）, field: startAt, pattern: '^2026-10-23' }
       - { label: 1日目（10月24日）, field: startAt, pattern: '^2026-10-24' }
       - { label: 2日目（10月25日）, field: startAt, pattern: '^2026-10-25' }
       - { label: 時間変更あり, field: status, pattern: 'changed' }
       - { label: 中止, field: status, pattern: 'cancelled' }
     fields:
+      - label: イベント名
+        name: eventName
+        widget: string
+        hint: 'タイムテーブル上のグループ名です。同じ開催日の同じ会場にある企画は、この名前ごとにまとめて表示します（例: 軽音ライブ、前夜祭）。'
       - { label: 企画名, name: title, widget: string }
       - label: URL 識別子
         name: slug
@@ -230,7 +241,7 @@ collections:
         time_format: 'HH:mm'
         format: 'YYYY-MM-DD[T]HH:mm:ss[+09:00]'
         picker_utc: false
-        hint: '開催日の2026年10月24日または25日を選んでください。'
+        hint: '開催日の2026年10月23日〜25日を選んでください。'
       - label: 終了日時
         name: endAt
         widget: datetime
@@ -238,7 +249,7 @@ collections:
         time_format: 'HH:mm'
         format: 'YYYY-MM-DD[T]HH:mm:ss[+09:00]'
         picker_utc: false
-        hint: '開始日時と同じ日で、開始より後の時刻を選んでください。'
+        hint: '開始日時と同じ日で、開始より後の時刻を選んでください。10月23日〜25日のいずれかを選んでください。'
       - label: ジャンル
         name: genre
         widget: select
@@ -250,6 +261,18 @@ collections:
           - { label: 大会・コンテスト, value: contest }
           - { label: 式典, value: ceremony }
           - { label: その他, value: other }
+      - label: 会場
+        name: venue
+        widget: select
+        default: main-stage
+        options:
+          - { label: 中ステージ（第一体育館）, value: main-stage }
+          - { label: 大教室, value: large-classroom }
+          - { label: 視聴覚室, value: audiovisual-room }
+          - { label: 予選会場, value: preliminary-venue }
+          - { label: ロータリー, value: rotary }
+          - { label: 一般サークル会場, value: general-circles }
+          - { label: その他, value: other }
       - label: 当日の状態
         name: status
         widget: select
@@ -259,22 +282,71 @@ collections:
           - { label: 時間変更あり, value: changed }
           - { label: 中止, value: cancelled }
         hint: '直前の変更を来場者へ目立たせたい場合に切り替えます。'
+      - label: タイムテーブル上の表示
+        name: displayMode
+        widget: select
+        default: timed
+        options:
+          - { label: 時刻に配置, value: timed }
+          - { label: 長時間の予定として表示, value: long }
+        hint: '終日営業や本祭運営など、長い時間続く予定は「長時間の予定として表示」を選ぶと、時刻軸を大きく占有しません。'
       - label: 見出し画像
         name: image
         widget: image-r2
         required: false
-        hint: '未入力でも公開できます。画像がある場合は自動でリサイズ・WebP 変換して R2 に保存します。'
+        hint: '未入力でも公開できます。詳細ページで大きく表示し、押すと拡大できます。画像は自動でリサイズ・WebP 変換して R2 に保存します。'
+      - label: その他の写真
+        name: otherImages
+        widget: list
+        required: false
+        label_singular: 写真
+        field:
+          label: 写真
+          name: image
+          widget: image-r2
+        hint: '詳細ページに並べて表示し、押すと拡大できます。複数追加できます。'
+      - label: SNS・公式サイトのリンク
+        name: snsLinks
+        widget: list
+        required: false
+        label_singular: リンク
+        summary: '{{fields.label}}'
+        fields:
+          - { label: リンク名, name: label, widget: string, hint: '例: X / Instagram / 公式サイト' }
+          - label: リンク先 URL
+            name: url
+            widget: string
+            pattern: ['^https?://', 'http:// または https:// で始まる URL を入力してください']
+          - label: リンクプレビュー画像（任意）
+            name: previewImage
+            widget: image-r2
+            required: false
+            hint: 'noteのリンクカードのように画像付きで表示します。未設定なら画像なしのリンクカードになります。'
       - label: 短い説明
         name: description
         widget: text
         required: false
-        hint: '詳細ページの冒頭に表示する1〜2文の説明です。'
+        hint: '詳細ページの企画名の下に表示する1〜2文の説明です。'
+      - label: 実行委員限定
+        name: committeeOnly
+        widget: boolean
+        default: false
+        hint: 'オンにすると通常版には出ず、完全版（/timetable/committee-events）だけに表示します。'
+      - label: セットリスト
+        name: setlist
+        widget: list
+        required: false
+        field: { label: 曲名・項目, name: item, widget: string }
+        hint: '曲順がある場合に任意で追加します。未入力なら詳細ページに表示されません。'
       - label: 下書き
         name: draft
         widget: boolean
         default: false
         hint: 'オンにしている間は本番サイトに表示されません。'
-      - { label: 詳細, name: body, widget: markdown }
+      - label: 詳細
+        name: body
+        widget: markdown
+        required: false
 
   - name: sponsors
     label: 協賛企業
@@ -308,4 +380,70 @@ collections:
         name: draft
         widget: boolean
         default: false
-        hint: 'オンにしている間は本番サイトに表示されません。'
+
+  - name: staff
+    label: 実行委員の部署紹介
+    label_singular: 部署
+    description: 'スタッフページの部署紹介を管理します。表示順の小さい順に掲載します。'
+    folder: content/staff
+    create: true
+    slug: '{{fields.sortOrder}}-{{slug}}'
+    identifier_field: department
+    summary: '{{fields.sortOrder}}｜{{fields.department}}'
+    sortable_fields: [sortOrder, department]
+    fields:
+      - label: 表示順
+        name: sortOrder
+        widget: number
+        value_type: int
+        min: 0
+        hint: '小さい番号の部署が先に表示されます。'
+      - { label: 部署名, name: department, widget: string }
+      - label: 部署の名簿
+        name: members
+        widget: list
+        required: false
+        label_singular: メンバー
+        summary: '{{fields.role}}｜{{fields.name}}（{{fields.kana}}）'
+        fields:
+          - { label: 役職, name: role, widget: string }
+          - { label: 氏名, name: name, widget: string }
+          - { label: ふりがな, name: kana, widget: string }
+      - { label: 部署の説明文, name: description, widget: text }
+      - label: 部署の写真
+        name: image
+        widget: image-r2
+        required: false
+        hint: 'スマホの写真をそのままで大丈夫です。未設定の場合は写真なしで表示します。'
+
+  - name: faq
+    label: よくある質問
+    label_singular: 質問
+    description: '質問・カテゴリ・回答・参考リンクを管理します。公開後に /faq へ反映されます。'
+    folder: content/faq
+    create: true
+    slug: '{{slug}}'
+    identifier_field: question
+    summary: '{{fields.category}}｜{{fields.question}}'
+    sortable_fields: [category, question]
+    fields:
+      - { label: 質問, name: question, widget: string }
+      - label: 質問カテゴリ
+        name: category
+        widget: string
+        hint: '同じカテゴリ名の質問は、公開ページでひとまとまりに表示されます。'
+      - label: 回答
+        name: body
+        widget: markdown
+      - label: 参考リンク
+        name: referenceLinks
+        widget: list
+        required: false
+        label_singular: リンク
+        summary: '{{fields.label}}'
+        fields:
+          - { label: リンク名, name: label, widget: string }
+          - label: URL
+            name: url
+            widget: string
+            pattern: ['^https?://', 'http:// または https:// で始まる URL を入力してください']

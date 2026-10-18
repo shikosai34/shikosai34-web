@@ -1,5 +1,119 @@
 ---
-import PlaceholderPage from '../../components/ui/PlaceholderPage.astro';
+import { getCollection } from 'astro:content';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import SiteHeader from '../../components/layout/SiteHeader.astro';
+import SectionHeading from '../../components/ui/SectionHeading';
+import Layout from '../../layouts/Layout.astro';
+
+const cmsDepartments = await getCollection('staff');
+const demoDepartments = [
+	{
+		id: 'local-demo-planning',
+		data: {
+			sortOrder: 1,
+			department: '企画部（ローカルデモ）',
+			members: [
+				{ role: '部長', name: 'デモ 太郎', kana: 'でも たろう' },
+				{ role: '副部長', name: 'サンプル 花子', kana: 'さんぷる はなこ' },
+				{ role: '部長', name: 'テスト 次郎', kana: 'てすと じろう' },
+			],
+			description: '役職ごとの表示確認用サンプルです。同じ「部長」のメンバーをまとめて表示しています。',
+			image: undefined,
+		},
+	},
+	{
+		id: 'local-demo-publicity',
+		data: {
+			sortOrder: 2,
+			department: '広報部（ローカルデモ）',
+			members: [{ role: '担当', name: '見本 三花', kana: 'みほん みか' }],
+			description: 'CMSに写真を登録していない場合の表示例です。',
+			image: undefined,
+		},
+	},
+];
+const departmentEntries = import.meta.env.DEV && cmsDepartments.length === 0 ? demoDepartments : cmsDepartments;
+
+const departments = departmentEntries
+	.sort((a, b) => a.data.sortOrder - b.data.sortOrder || a.data.department.localeCompare(b.data.department, 'ja'))
+	.map((department, index) => {
+		const membersByRole = new Map<string, typeof department.data.members>();
+		for (const member of department.data.members) {
+			const members = membersByRole.get(member.role) ?? [];
+			members.push(member);
+			membersByRole.set(member.role, members);
+		}
+		return { ...department, anchorId: `department-${index + 1}`, membersByRole: [...membersByRole] };
+	});
 ---
 
-<PlaceholderPage title="実行委員紹介" heading="Staff" icon="badge" />
+<Layout title="部署紹介 | 第34回 茨香祭" description="第34回茨香祭をつくる実行委員会の各部署を紹介します。">
+	<SiteHeader />
+
+	<main class="mx-auto w-full max-w-5xl px-4 pb-16 sm:px-6">
+		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
+			<SectionHeading title="Staff" icon="badge" subtitle="部署紹介" />
+		</section>
+
+		<section id="departments" class="surface-panel mt-6 scroll-mt-6 rounded-2xl p-4 pt-6 pb-6 sm:p-6" aria-label="部署紹介">
+			<div class="mb-6">
+				<SectionHeading title="Departments" icon="badge" subtitle="部署紹介" />
+			</div>
+			<nav aria-label="部署紹介の目次" class="mb-6 rounded-xl border border-text/10 bg-base/35 p-4 sm:p-5">
+				<h3 class="mb-3 text-sm font-medium text-text">部署紹介の目次</h3>
+				{departments.length > 0 ? (
+					<ul class="flex flex-wrap gap-2">
+						{departments.map(({ data, anchorId }) => (
+							<li><a href={`#${anchorId}`} class="inline-flex min-h-10 items-center rounded-lg border border-text/15 bg-base/60 px-3 py-2 text-sm text-text transition-colors hover:border-accent/50 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">{data.department}</a></li>
+						))}
+					</ul>
+				) : (
+					<p class="text-sm text-text/70">部署の登録後、ここに目次が表示されます。</p>
+				)}
+			</nav>
+			{departments.length === 0 ? (
+				<p class="py-8 text-center text-sm text-text/70">部署紹介は準備中です。</p>
+			) : (
+				<div class="grid gap-5 md:grid-cols-2">
+					{departments.map(({ data, anchorId, membersByRole }) => (
+						<article id={anchorId} class="bracket-frame scroll-mt-6 overflow-hidden rounded-xl bg-base/45">
+							{data.image ? (
+								<img src={data.image} alt={`${data.department}の写真`} loading="lazy" class="aspect-[16/9] w-full object-cover" />
+							) : (
+								<div aria-hidden="true" class="halftone flex aspect-[16/9] items-center justify-center bg-base/50">
+									<span class="text-5xl font-medium tracking-widest text-accent/80">茨香祭</span>
+								</div>
+							)}
+							<div class="p-5 sm:p-6">
+								<h3 class="mb-3 text-lg font-medium text-text">{data.department}</h3>
+								<p class="whitespace-pre-line text-sm leading-7 text-text/80">{data.description}</p>
+								{data.members.length > 0 && (
+									<div class="mt-5 border-t border-text/15 pt-4">
+										<h4 class="mb-3 text-xs tracking-widest text-accent">MEMBERS</h4>
+										<div class="space-y-4">
+											{membersByRole.map(([role, members]) => (
+												<div>
+													<h5 class="mb-2 text-sm font-medium text-main">{role}</h5>
+													<ul class="flex flex-wrap gap-2">
+														{members.map((member) => (
+															<li class="rounded-md border border-text/15 bg-base/60 px-3 py-2 text-sm text-text">
+																<span>{member.name}</span>
+																<span class="ml-1 text-xs text-text/55">（{member.kana}）</span>
+															</li>
+														))}
+													</ul>
+												</div>
+											))}
+										</div>
+									</div>
+								)}
+							</div>
+						</article>
+					))}
+				</div>
+			)}
+		</section>
+	</main>
+
+	<SiteFooter />
+</Layout>
