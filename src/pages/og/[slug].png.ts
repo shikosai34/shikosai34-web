@@ -8,8 +8,8 @@ export const getStaticPaths: GetStaticPaths = () =>
 		props: { title },
 	}));
 
-export const GET: APIRoute = async ({ props }) => {
-	const png = await renderOgImage(props.title as string);
+export const GET: APIRoute = async () => {
+	const png = await renderOgImage();
 	return new Response(new Uint8Array(png), {
 		headers: { 'Content-Type': 'image/png' },
 	});

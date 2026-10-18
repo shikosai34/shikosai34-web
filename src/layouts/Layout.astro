@@ -32,13 +32,22 @@ const {
 const siteOrigin = Astro.site ?? Astro.url;
 const canonicalURL = new URL(Astro.url.pathname, siteOrigin);
 
-// 固定ページ（src/lib/og-pages.ts に登録済みのもの）はページ名入りの OGP 画像を使う。
-// トップページ・404・circle/event/news の個別記事などはベースの /ogp.png にフォールバックする。
+// 固定ページ（src/lib/og-pages.ts に登録済みのもの）は /og/{slug}.png、
+// サークルの個別ページはそのサークルの画像入りの /og/circle/{slug}.png を使う。
+// トップページ・404・event/news の個別記事などはベースの /ogp.png にフォールバックする。
 const ogPageSlug = Astro.url.pathname.replace(/^\/|\/$/g, '');
-const ogImageURL = new URL(
-	ogPageSlug in ogPageTitles ? `/og/${ogPageSlug}.png` : '/ogp.png',
-	siteOrigin
-);
+const isCircleDetail = /^circle\/[^/]+$/.test(ogPageSlug);
+const ogImagePath = isCircleDetail || ogPageSlug in ogPageTitles ? `/og/${ogPageSlug}.png` : '/ogp.png';
+const ogImageURL = new URL(ogImagePath, siteOrigin);
+
+// SNS のシェアカードで画像の下に出る og:title には、ページの階層を「親 › 子」で出す。
+// 先頭のパスが og-pages.ts に登録された固定ページなら、サイト名 › 一覧ページ名（› 個別記事名）にする。
+// 個別記事名は title の「 | 」より前を使う。登録外のページ（トップ・404 など）は title のまま。
+const pathSegments = Astro.url.pathname.split('/').filter(Boolean);
+const parentTitle = ogPageTitles[pathSegments[0]];
+const ogTitle = parentTitle
+	? ['第34回 茨香祭', parentTitle, ...(pathSegments.length > 1 ? [title.split(' | ')[0]] : [])].join(' › ')
+	: title;
 
 // 検索結果でサイト名を「第34回 茨香祭」と出させるための構造化データ。
 // Google はトップページの WebSite だけを見るので、トップでのみ出す。
@@ -68,7 +77,7 @@ const websiteJsonLd = {
 		<meta name="description" content={description} />
 		<link rel="canonical" href={canonicalURL} />
 		<meta property="og:site_name" content="第34回 茨香祭" />
-		<meta property="og:title" content={title} />
+		<meta property="og:title" content={ogTitle} />
 		<meta property="og:description" content={description} />
 		<meta property="og:type" content="website" />
 		<meta property="og:url" content={canonicalURL} />
