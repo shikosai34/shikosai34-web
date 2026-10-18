@@ -25,6 +25,8 @@ interface Props {
 	onHover: (key: string | null) => void;
 	/** カーソルの下の部屋（詳細のツールチップ用）。null で外れた */
 	onPoint: (room: PlanRoom | null, clientX?: number, clientY?: number) => void;
+	/** 部屋を押した・タップした（情報のポップアップを開く）。位置は画面の座標 */
+	onPick: (room: PlanRoom, clientX: number, clientY: number) => void;
 	onGoFloor: (floor: number) => void;
 	className?: string;
 }
@@ -53,6 +55,7 @@ export default function FloorPlan({
 	onSelect,
 	onHover,
 	onPoint,
+	onPick,
 	onGoFloor,
 	className = '',
 }: Props) {
@@ -93,10 +96,10 @@ export default function FloorPlan({
 					exhibits={room.key ? (exhibits[room.key] ?? []) : []}
 					active={!!room.key && room.key === activeKey}
 					dimmed={!!selectedKey && room.key !== selectedKey && room.kind === 'room'}
-					onSelect={onSelect}
 					onHover={onHover}
 					onPoint={onPoint}
-				/>
+					onPick={onPick}
+					/>
 			))}
 
 			{/* 壁 */}
@@ -120,9 +123,9 @@ interface RoomProps {
 	exhibits: ExhibitsByRoom[string];
 	active: boolean;
 	dimmed: boolean;
-	onSelect: (key: string | null) => void;
 	onHover: (key: string | null) => void;
 	onPoint: (room: PlanRoom | null, clientX?: number, clientY?: number) => void;
+	onPick: (room: PlanRoom, clientX: number, clientY: number) => void;
 }
 
 /**
@@ -138,7 +141,7 @@ function textWidth(text: string, fontSize: number): number {
 /** 行の高さ（px）。フォントの大きさ × 1.3 */
 const lineHeight = (fontSize: number) => fontSize * 1.3;
 
-function Room({ room, use, exhibits, active, dimmed, onSelect, onHover, onPoint }: RoomProps) {
+function Room({ room, use, exhibits, active, dimmed, onHover, onPoint, onPick }: RoomProps) {
 	const [x0, y0, x1, y1] = room.bbox.map((v) => v * S);
 	const w = x1 - x0;
 	const h = y1 - y0;
@@ -202,15 +205,18 @@ function Room({ room, use, exhibits, active, dimmed, onSelect, onHover, onPoint 
 	const onKeyDown = (e: KeyboardEvent) => {
 		if (e.key === 'Enter' || e.key === ' ') {
 			e.preventDefault();
-			onSelect(room.key);
+			// キーボードでは、部屋の中央にポップアップを開く
+			const box = e.currentTarget.getBoundingClientRect();
+			onPick(room, box.left + box.width / 2, box.top + box.height / 2);
 		}
 	};
 
 	return (
 		<g
 			{...(hasDetail && {
-				onPointerMove: (e) => onPoint(room, e.clientX, e.clientY),
-				onPointerDown: (e) => onPoint(room, e.clientX, e.clientY),
+				// 押せる部屋はマウスで当てたときだけツールチップ。タップはポップアップを開くので出さない
+				onPointerMove: (e) => (e.pointerType === 'mouse' || !selectable) && onPoint(room, e.clientX, e.clientY),
+				onPointerDown: (e) => (e.pointerType === 'mouse' || !selectable) && onPoint(room, e.clientX, e.clientY),
 				onPointerLeave: () => onPoint(null),
 			})}
 			{...(selectable && {
@@ -220,7 +226,7 @@ function Room({ room, use, exhibits, active, dimmed, onSelect, onHover, onPoint 
 				'aria-pressed': active,
 				onClick: (e) => {
 					e.stopPropagation();
-					onSelect(room.key);
+					onPick(room, e.clientX, e.clientY);
 				},
 				onKeyDown,
 				onMouseEnter: () => onHover(room.key),

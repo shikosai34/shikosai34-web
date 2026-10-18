@@ -98,6 +98,10 @@ export interface MapExhibit {
 	time?: string;
 	/** 会場の中での場所（グラウンドの「G-12」など）。会場をまとめて見せる一覧で添える */
 	spot?: string;
+	/** 紹介文の頭の 1 文（ポップアップ用） */
+	summary?: string;
+	/** 実施時間（サークルの「両日 10:00〜16:00」など） */
+	schedule?: string;
 }
 
 /** 部屋キー → そこで行われる出展 */

@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { EXHIBIT_GROUPS, PLAN_SCALE, type ExhibitsByRoom, type Plan, type PlanRoom } from '../../lib/map';
 import { MAP_ROOMS, type Weather } from '../../lib/map-rooms';
-import { FloorExhibitList, RoomDetail, type FloorExhibit } from './ExhibitPanel';
+import ExhibitPopover from './ExhibitPopover';
+import { FloorExhibitList, type FloorExhibit } from './ExhibitPanel';
 import FloorPlan from './FloorPlan';
 import FloorStack from './FloorStack';
 import RoomTooltip from './RoomTooltip';
@@ -9,8 +10,9 @@ import WeatherToggle from './WeatherToggle';
 import { usePanZoom } from './usePanZoom';
 
 /*
- * 建物のフロア画面（2D）。左に階の積み重ね、中央に平面図、右（モバイルでは下）に出展一覧。
- * 階を移ると、上の階へは上から・下の階へは下から図面が入ってくる。
+  * 建物のフロア画面（2D）。左に階の積み重ね、中央に平面図、右（モバイルでは下）に出展一覧。
+  * 階はホイール・縦のスワイプ・PageUp/PageDown・階の積み重ね図で移る。移ると、上の階へは上から・
+  * 下の階へは下から図面が入ってくる。部屋をタップすると、その場所の近くへサークルの情報が開く。
  */
 
 interface Props {
@@ -42,6 +44,8 @@ export default function FloorPlanView({ plan, exhibits, weather, onWeatherChange
 	const [direction, setDirection] = useState<'up' | 'down' | null>(null);
 	/** カーソルの下の部屋と、図面の枠の中での位置（詳細のツールチップ用） */
 	const [tip, setTip] = useState<{ room: PlanRoom; x: number; y: number } | null>(null);
+	/** 開いているポップアップ（部屋と、図面の枠の中での位置） */
+	const [popup, setPopup] = useState<{ room: PlanRoom; x: number; y: number } | null>(null);
 
 	useEffect(() => onChange(floor, selectedKey), [floor, selectedKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -56,6 +60,11 @@ export default function FloorPlanView({ plan, exhibits, weather, onWeatherChange
 		return () => window.removeEventListener('keydown', onKey);
 	}, [selectedKey, onClose]);
 
+	// 部屋の選択がなくなったらポップアップも閉じる
+	useEffect(() => {
+		if (!selectedKey) setPopup(null);
+	}, [selectedKey]);
+
 	const goFloor = (f: number) => {
 		if (f === floor) return;
 		setDirection(f > floor ? 'up' : 'down');
@@ -64,6 +73,23 @@ export default function FloorPlanView({ plan, exhibits, weather, onWeatherChange
 		setHoveredKey(null);
 		setTip(null);
 	};
+	/** 1 つ上（1）・下（-1）の階へ。いちばん上・下ならそのまま */
+	const stepFloor = (direction: 1 | -1) => {
+		const next = floorNumbers[floorNumbers.indexOf(floor) + direction];
+		if (next !== undefined) goFloor(next);
+	};
+
+	// PageUp / PageDown でも階を移す
+	useEffect(() => {
+		const onKey = (e: KeyboardEvent) => {
+			if (e.key === 'PageUp') stepFloor(1);
+			else if (e.key === 'PageDown') stepFloor(-1);
+			else return;
+			e.preventDefault();
+		};
+		window.addEventListener('keydown', onKey);
+		return () => window.removeEventListener('keydown', onKey);
+	}); // eslint-disable-line react-hooks/exhaustive-deps -- stepFloor は毎回作り直すので、描画のたびに付け直す
 
 	const current = floors.find((f) => f.floor === floor) ?? floors[0];
 
@@ -76,7 +102,40 @@ export default function FloorPlanView({ plan, exhibits, weather, onWeatherChange
 		const cy = (current.bbox[1] + current.bbox[3]) / 2;
 		return [(cx - w / 2) * S, (cy - h / 2) * S, w * S, h * S];
 	}, [floors, current]);
-	const panZoom = usePanZoom(baseBox, floor);
+	const panZoom = usePanZoom(baseBox, floor, { onNavigate: stepFloor });
+
+	/** 部屋をタップした位置（画面の座標）に、情報のポップアップを開く。枠の外へ出ないよう位置を寄せる */
+	const pickRoom = (room: PlanRoom, clientX: number, clientY: number) => {
+		const box = panZoom.ref.current?.getBoundingClientRect();
+		if (!room.key || !box) return;
+		setSelectedKey(room.key);
+		setTip(null);
+		setPopup({
+			room,
+			x: Math.min(Math.max(clientX - box.left, 0), box.width),
+			y: Math.min(Math.max(clientY - box.top, 0), box.height),
+		});
+	};
+
+	/** 部屋のキーから、その部屋の中央にポップアップを開く（出展一覧・URL から開くとき） */
+	const openRoom = (key: string) => {
+		const room = floors.flatMap((f) => f.rooms).find((r) => r.key === key);
+		const svg = panZoom.ref.current?.querySelector('svg');
+		const ctm = svg?.getScreenCTM();
+		if (!room || !svg || !ctm) return setSelectedKey(key);
+		const point = svg.createSVGPoint();
+		point.x = ((room.bbox[0] + room.bbox[2]) / 2) * S;
+		point.y = ((room.bbox[1] + room.bbox[3]) / 2) * S;
+		const at = point.matrixTransform(ctm);
+		pickRoom(room, at.x, at.y);
+	};
+
+	// URL で部屋が指定されていれば、描画のあとにその部屋のポップアップを開く
+	useEffect(() => {
+		if (!initialRoom) return;
+		const id = requestAnimationFrame(() => openRoom(initialRoom));
+		return () => cancelAnimationFrame(id);
+	}, []); // eslint-disable-line react-hooks/exhaustive-deps
 
 	const pointRoom = (room: PlanRoom | null, clientX?: number, clientY?: number) => {
 		const box = panZoom.ref.current?.getBoundingClientRect();
@@ -89,7 +148,7 @@ export default function FloorPlanView({ plan, exhibits, weather, onWeatherChange
 			.filter((room) => room.floor === f)
 			.flatMap((room) => (exhibits[room.key] ?? []).map((item) => ({ item, room })));
 	const counts = Object.fromEntries(floorNumbers.map((f) => [f, floorItems(f).length]));
-	const selectedRoom = roomsInPlan.find((r) => r.key === selectedKey);
+
 
 	return (
 		// 上端（pt-20）はヘッダーのロゴ・メニューが重なるので空けておく
@@ -132,9 +191,9 @@ export default function FloorPlanView({ plan, exhibits, weather, onWeatherChange
 						<FloorStack floors={floors} current={floor} counts={counts} onSelect={goFloor} className="w-full" />
 						{/* 1 行ずつ短く区切り、欄の幅で折り返さないようにする */}
 						<ul className="flex flex-col gap-0.5 whitespace-nowrap text-xs text-text/60">
-							<li>部屋にカーソルで詳細</li>
-							<li>階を押して移動</li>
-							<li>ホイールで拡大</li>
+							<li>部屋を押すと詳細</li>
+							<li>ホイールで階を移動</li>
+							<li>Ctrl＋ホイールで拡大</li>
 							<li>ドラッグで移動</li>
 						</ul>
 					</div>
@@ -162,10 +221,11 @@ export default function FloorPlanView({ plan, exhibits, weather, onWeatherChange
 							onSelect={(key) => setSelectedKey(key)}
 							onHover={setHoveredKey}
 							onPoint={pointRoom}
+							onPick={pickRoom}
 							onGoFloor={goFloor}
 							className={`h-full w-full ${direction ? `map-floor-enter-${direction}` : ''}`}
 						/>
-						{tip && (
+						{tip && !popup && (
 							<RoomTooltip
 								room={tip.room}
 								use={tip.room.use?.[weather]}
@@ -175,6 +235,22 @@ export default function FloorPlanView({ plan, exhibits, weather, onWeatherChange
 								width={panZoom.ref.current?.clientWidth ?? 0}
 								height={panZoom.ref.current?.clientHeight ?? 0}
 							/>
+						)}
+						{popup && (
+							<ExhibitPopover
+								badge={popup.room.number}
+								title={popup.room.name ?? popup.room.number ?? ''}
+								use={popup.room.use?.[weather]}
+								items={popup.room.key ? (exhibits[popup.room.key] ?? []) : []}
+								x={popup.x}
+								y={popup.y}
+								width={panZoom.ref.current?.clientWidth ?? 0}
+								height={panZoom.ref.current?.clientHeight ?? 0}
+								onClose={() => setSelectedKey(null)}
+							/>
+						)}
+						{floors.length > 1 && panZoom.zoom <= 1 && (
+							<p className="pointer-events-none absolute bottom-2 left-2 text-[11px] text-text/50 md:hidden">上下にスワイプで階を移動</p>
 						)}
 						<div className="absolute right-1 bottom-1 flex flex-col gap-1" role="group" aria-label="図面の拡大・縮小">
 							<ZoomButton label="拡大" onClick={panZoom.zoomIn}>＋</ZoomButton>
@@ -199,17 +275,13 @@ export default function FloorPlanView({ plan, exhibits, weather, onWeatherChange
 				</div>
 				<div className="flex-1 overflow-y-auto p-3" aria-live="polite">
 					<WeatherToggle weather={weather} onChange={onWeatherChange} className="mb-3 md:hidden" />
-					{selectedRoom ? (
-						<RoomDetail room={selectedRoom} items={exhibits[selectedRoom.key] ?? []} onBack={() => setSelectedKey(null)} />
-					) : (
-						<FloorExhibitList
-							title={`${plan.building} ${floor}F の出展`}
-							items={floorItems(floor)}
-							hoveredKey={hoveredKey}
-							onHover={setHoveredKey}
-							onSelect={setSelectedKey}
-						/>
-					)}
+					<FloorExhibitList
+						title={`${plan.building} ${floor}F の出展`}
+						items={floorItems(floor)}
+						hoveredKey={selectedKey ?? hoveredKey}
+						onHover={setHoveredKey}
+						onSelect={openRoom}
+					/>
 				</div>
 			</aside>
 		</div>
