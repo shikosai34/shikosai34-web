@@ -1,0 +1,46 @@
+---
+/*
+ * トップページの「ご来場の前に」。よくある質問・注意事項・アクセスへの導線。
+ * 見た目は index.astro の「会場・サークル案内」のカードにそろえている。
+ */
+const guides = [
+	{
+		href: '/faq/',
+		label: 'FAQ',
+		title: 'よくある質問',
+		description: '開催に関する疑問にお答えします。',
+		cta: 'よくある質問を見る →',
+	},
+	{
+		href: '/cautions/',
+		label: 'CAUTIONS',
+		title: '注意事項',
+		description: 'ご来場時のルールとお願いをまとめます。ページは現在準備中です。',
+		cta: '注意事項のページへ →',
+	},
+	{
+		href: '/access/',
+		label: 'ACCESS',
+		title: 'アクセス',
+		description: 'バス・タクシーでの行き方をご案内します。',
+		cta: 'アクセスを見る →',
+	},
+];
+---
+
+<section class="surface-panel mt-6 rounded-2xl p-5 sm:p-6" aria-labelledby="visitor-guide-title">
+	<div class="mb-5">
+		<h2 id="visitor-guide-title" class="text-xl font-medium tracking-wide text-text">ご来場の前に</h2>
+		<p class="mt-1 text-xs tracking-[0.2em] text-accent/80">INFORMATION</p>
+	</div>
+	<div class="grid gap-4 sm:grid-cols-3">
+		{guides.map((guide) => (
+			<a href={guide.href} class="bracket-frame group rounded-xl bg-base/45 p-5 transition-colors hover:border-accent/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:p-6">
+				<p class="mb-3 text-xs tracking-[0.2em] text-accent">{guide.label}</p>
+				<h3 class="text-lg font-medium text-text group-hover:text-accent">{guide.title}</h3>
+				<p class="mt-2 text-sm leading-7 text-text/75">{guide.description}</p>
+				<p class="mt-4 text-sm text-accent underline underline-offset-4 group-hover:no-underline">{guide.cta}</p>
+			</a>
+		))}
+	</div>
+</section>
