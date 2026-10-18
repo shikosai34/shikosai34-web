@@ -286,7 +286,7 @@ const REGULAR_TIMES: Record<ScheduleKind, Record<string, OperatorTime[]>> = {
 	},
 };
 
-/** バス運賃（片道・行き帰りとも同額）。茨城交通の運賃（2026/10/04 時点）。改定されたら見直す。 */
+/** バス運賃（片道・行き帰りとも同額）。茨城交通の運賃（2026/10/18 時点）。改定されたら見直す。 */
 export const BUS_FARES = [
 	{
 		id: 'kosen',
@@ -299,7 +299,10 @@ export const BUS_FARES = [
 	{
 		id: 'fukayatsu',
 		route: '勝田駅〜深谷津（茨城交通）',
-		prices: [{ label: '大人・小人とも', price: '100円' }],
+		prices: [
+			{ label: '大人', price: '250円' },
+			{ label: '小人', price: '130円' },
+		],
 	},
 	{
 		id: 'fukayatsu-smile',
