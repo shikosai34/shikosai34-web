@@ -3,6 +3,7 @@ import '@fontsource/kiwi-maru/400.css';
 import '@fontsource/kiwi-maru/500.css';
 import '../styles/global.css';
 import EdgeKasumi from '../components/layout/EdgeKasumi';
+import { ogPageTitles } from '../lib/og-pages';
 
 interface Props {
 	title?: string;
@@ -30,7 +31,14 @@ const {
 // site 未設定の環境（古い設定で起動した dev サーバーなど）でも落ちないようリクエスト元にフォールバックする。
 const siteOrigin = Astro.site ?? Astro.url;
 const canonicalURL = new URL(Astro.url.pathname, siteOrigin);
-const ogImageURL = new URL('/ogp.png', siteOrigin);
+
+// 固定ページ（src/lib/og-pages.ts に登録済みのもの）はページ名入りの OGP 画像を使う。
+// トップページ・404・circle/event/news の個別記事などはベースの /ogp.png にフォールバックする。
+const ogPageSlug = Astro.url.pathname.replace(/^\/|\/$/g, '');
+const ogImageURL = new URL(
+	ogPageSlug in ogPageTitles ? `/og/${ogPageSlug}.png` : '/ogp.png',
+	siteOrigin
+);
 
 // 検索結果でサイト名を「第34回 茨香祭」と出させるための構造化データ。
 // Google はトップページの WebSite だけを見るので、トップでのみ出す。
