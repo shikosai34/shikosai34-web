@@ -155,31 +155,35 @@ function TimetableSection({ timetable }: { timetable: BusTimetable }) {
 }
 
 /** ダイヤ種別の切り替え。 */
-const SCHEDULE_KINDS: { kind: ScheduleKind; label: string }[] = [
-	{ kind: 'weekday', label: '平日ダイヤ' },
-	{ kind: 'weekend', label: '土日祝ダイヤ' },
+/** 時刻表の切り替え。festival は臨時便が出る10/24（土日祝ダイヤ＋臨時便）。 */
+type TimetableView = ScheduleKind | 'festival';
+
+const TIMETABLE_VIEWS: { view: TimetableView; label: string }[] = [
+	{ view: 'weekday', label: '平日ダイヤ' },
+	{ view: 'weekend', label: '土日祝ダイヤ' },
+	{ view: 'festival', label: '10/24（土）' },
 ];
 
 /**
  * 全系統・全便の時刻表ダイアログ。
  *
- * 平日ダイヤと土日祝ダイヤを切り替えられる。開いた直後は今日のダイヤ
- * （scheduleKind）を表示する。臨時便は運行日が決まっているため、平日ダイヤの
- * 表には載せない。面は後ろのページが透けないよう不透明にする。
+ * 平日ダイヤ・土日祝ダイヤ・10/24（土）を切り替えられる。開いた直後は今日に
+ * 当たる表（defaultView）を表示する。臨時便は運行日が決まっているため、
+ * 10/24（土）の表にだけ載せる。面は後ろのページが透けないよう不透明にする。
  */
 function TimetableDialog({
 	dialogRef,
 	isShuttleDay: shuttleDay,
-	scheduleKind,
+	defaultView,
 }: {
 	dialogRef: RefObject<HTMLDialogElement | null>;
 	isShuttleDay: boolean;
-	scheduleKind: ScheduleKind;
+	defaultView: TimetableView;
 }) {
-	const [selectedKind, setSelectedKind] = useState<ScheduleKind | null>(null);
-	const kind = selectedKind ?? scheduleKind;
-	const timetables = getBusTimetables(kind).map((timetable) =>
-		kind === 'weekday' ? { ...timetable, departures: timetable.departures.filter((departure) => !departure.extra) } : timetable,
+	const [selectedView, setSelectedView] = useState<TimetableView | null>(null);
+	const view = selectedView ?? defaultView;
+	const timetables = getBusTimetables(view === 'weekday' ? 'weekday' : 'weekend').map((timetable) =>
+		view === 'festival' ? timetable : { ...timetable, departures: timetable.departures.filter((departure) => !departure.extra) },
 	);
 	const directions: { label: string; timetables: BusTimetable[] }[] = [
 		{ label: '往路（勝田駅 → 高専方面）', timetables: timetables.filter((t) => t.direction === '往路') },
@@ -220,12 +224,12 @@ function TimetableDialog({
 								ダイヤ
 							</h3>
 							<div role="group" aria-label="ダイヤを選択" className="flex flex-wrap gap-2">
-								{SCHEDULE_KINDS.map((option) => (
+								{TIMETABLE_VIEWS.map((option) => (
 									<button
-										key={option.kind}
+										key={option.view}
 										type="button"
-										aria-pressed={kind === option.kind}
-										onClick={() => setSelectedKind(option.kind)}
+										aria-pressed={view === option.view}
+										onClick={() => setSelectedView(option.view)}
 										className="min-h-10 rounded-full border border-text/30 px-3 py-1.5 text-sm text-text transition-colors hover:border-main aria-pressed:border-main aria-pressed:bg-main aria-pressed:font-medium aria-pressed:text-on-main focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
 									>
 										{option.label}
@@ -377,7 +381,7 @@ export default function BusDepartureBoard() {
 				</button>
 			</div>
 
-			<TimetableDialog dialogRef={dialogRef} isShuttleDay={today} scheduleKind={now ? getScheduleKind(now) : 'weekend'} />
+			<TimetableDialog dialogRef={dialogRef} isShuttleDay={today} defaultView={now ? (today ? 'festival' : getScheduleKind(now)) : 'weekend'} />
 		</section>
 	);
 }
