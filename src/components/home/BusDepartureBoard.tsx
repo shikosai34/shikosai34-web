@@ -123,6 +123,10 @@ function TimetableSection({ timetable }: { timetable: BusTimetable }) {
 				</h4>
 				<span className="text-sm text-accent">下車：{timetable.stop}</span>
 			</div>
+			<p className="mt-1 text-xs leading-relaxed text-text/70">
+				{timetable.stopNote}
+				{timetable.caveat}
+			</p>
 			{headsigns.length > 0 && (
 				<p className="mt-1 text-xs leading-relaxed text-text/70">
 					行先表示：<span className="font-medium text-text">{headsigns.join('／')}</span>
@@ -211,9 +215,8 @@ function TimetableDialog({ dialogRef, isShuttleDay: shuttleDay }: { dialogRef: R
 							<ul className="list-disc space-y-1 pl-5 text-xs leading-relaxed text-text/80">
 								<li>左の「9時」などが時、枠の中の数字が出発時刻の分です。</li>
 								<li>
-									茨城高専へは、勝田駅前2番のりばの<span className="font-medium text-text">「海浜公園南口行」「中央研修所行」「東中根団地行」</span>（本郷台団地経由）に乗り、「茨城高専前」で降ります。往路は下車後に北へ、復路は正門を出て南へ進むと乗り場です。
+									茨城高専へは、勝田駅前2番のりばの<span className="font-medium text-text">「海浜公園南口行」「中央研修所行」「東中根団地行」</span>（本郷台団地経由）に乗り、「茨城高専前」で降ります。
 								</li>
-								<li>「足崎団地行」など深谷津の便は茨城高専前を通らず、高専から離れています。スマイルあおぞらバスは往路のみ載せています。</li>
 								<li>
 									{shuttleDay ? '臨時便は本日運行します。' : '臨時便は茨香祭当日のみ運行します。'}
 									時刻は出発時刻の予定で、遅延は反映されません。
