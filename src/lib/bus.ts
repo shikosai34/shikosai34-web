@@ -15,9 +15,13 @@
  *     を持つ。どちらを使うかは出発日の曜日から自動で決める
  *     （getScheduleKind）。時刻は茨城交通の時刻表検索システム
  *     （bus.ibako.co.jp、2026/10/15 時点）から転記。
- *       - 勝田駅前 → 茨城高専前・海浜公園南口行き（no=1052, des_no=3）
+ *       - 勝田駅前 2番のりば → 茨城高専前に停まる便（no=1052）。行先は「海浜公園南口行」
+ *         「中央研修所行」「東中根団地行（市役所・本郷台団地経由）」の 3 種類で、すべて
+ *         茨城高専前を通る。「21 東中根団地行（薬師台経由）」は通らないので含めない。
+ *         便ごとの行先表示は OperatorTime.headsign に持つ（2026/10/19 に再確認）。
  *       - 勝田駅前 → 深谷津・足崎団地行き（no=1052, des_no=6）
- *       - 茨城高専前 → 勝田駅前行き（no=436, des_no=1）
+ *       - 茨城高専前 → 勝田駅方面（no=436, de=2）。市役所経由・薬師台経由の勝田駅前行きと、
+ *         勝田駅を通る茨大前営業所行きを含める。
  *       - 深谷津 → 勝田駅前行き（no=3710, des_no=1）
  *     平日の「市役所経由 茨城高専」直行（no=1052, des_no=7）は 8:32 の
  *     1 本のみで、海浜公園南口行きと合わせて茨城高専前発着の便として扱う。
@@ -73,11 +77,6 @@ export interface BusRoute {
 	stopNote: string;
 	/** 臨時便（茨城高専スクールバス）の出発時刻。曜日によらず当日共通。 */
 	shuttleTimes: string[];
-	/**
-	 * 車両の行先表示（「〜〜行」）。事業者ごとに異なるので事業者で引く。
-	 * 臨時便（スクールバス）は表示が確認できていないため持たない。
-	 */
-	headsigns: Partial<Record<BusOperator, string>>;
 	/** 時刻表の下に添える注記（便が少ない・事業者が複数ある系統向け）。 */
 	caveat?: string;
 }
@@ -91,7 +90,6 @@ const ROUTE_BASE: Omit<BusRoute, 'shuttleTimes'>[] = [
 		from: '勝田駅',
 		stop: '茨城高専前',
 		stopNote: '下車後、北へ進むと正門です。',
-		headsigns: { ibako: '海浜公園南口行' },
 	},
 	{
 		id: 'outbound-fukayatsu',
@@ -100,7 +98,6 @@ const ROUTE_BASE: Omit<BusRoute, 'shuttleTimes'>[] = [
 		from: '勝田駅',
 		stop: '深谷津',
 		stopNote: '茨城高専前は通りません。',
-		headsigns: { ibako: '足崎団地行', smile: '勝田北・勝田中央コース' },
 		caveat: 'スマイルあおぞらバス（勝田北・勝田中央コース）の便を含みます。',
 	},
 	{
@@ -110,7 +107,6 @@ const ROUTE_BASE: Omit<BusRoute, 'shuttleTimes'>[] = [
 		from: '茨城高専前',
 		stop: '勝田駅',
 		stopNote: '正門を出て南へ進むと乗り場です。',
-		headsigns: { ibako: '勝田駅前行' },
 	},
 	{
 		id: 'inbound-fukayatsu',
@@ -119,7 +115,6 @@ const ROUTE_BASE: Omit<BusRoute, 'shuttleTimes'>[] = [
 		from: '深谷津',
 		stop: '勝田駅',
 		stopNote: '茨城高専前からは離れています。',
-		headsigns: { ibako: '勝田駅前行' },
 		caveat: 'スマイルあおぞらバスは深谷津からの直行復路がないため含みません。',
 	},
 ];
@@ -141,14 +136,20 @@ export const BUS_ROUTES: BusRoute[] = buildRoutes();
 interface OperatorTime {
 	time: string;
 	operator: BusOperator;
+	/**
+	 * 車両の行先表示（「〜〜行」）。同じ系統でも便ごとに違うので時刻ごとに持つ。
+	 * 臨時便（スクールバス）は表示が確認できていないため持たない。
+	 */
+	headsign: string;
 }
 
-function ibako(times: string[]): OperatorTime[] {
-	return times.map((time) => ({ time, operator: 'ibako' }));
+function ibako(headsign: string, times: string[]): OperatorTime[] {
+	return times.map((time) => ({ time, operator: 'ibako', headsign }));
 }
 
+/** スマイルあおぞらバスはコース名を行先表示の代わりに載せる。 */
 function smile(times: string[]): OperatorTime[] {
-	return times.map((time) => ({ time, operator: 'smile' }));
+	return times.map((time) => ({ time, operator: 'smile', headsign: '勝田北・勝田中央コース' }));
 }
 
 /**
@@ -162,35 +163,26 @@ function smile(times: string[]): OperatorTime[] {
 const REGULAR_TIMES: Record<ScheduleKind, Record<string, OperatorTime[]>> = {
 	weekday: {
 		// 勝田駅前 → 海浜公園南口（茨城高専前経由）de_no=3。市役所経由茨城高専直行(des_no=7)の 8:32 を含む。
-		'outbound-kosen': ibako([
-			'8:32',
-			'9:00',
-			'9:26',
-			'9:40',
-			'10:00',
-			'10:20',
-			'10:40',
-			'11:00',
-			'11:20',
-			'11:40',
-			'12:00',
-			'12:20',
-			'12:40',
-			'13:10',
-			'13:40',
-			'14:10',
-			'14:40',
-			'15:10',
-			'15:40',
-			'16:10',
-		]),
+		'outbound-kosen': [
+			// 勝田駅前 2番のりば発の、茨城高専前に停まる便（bus.ibako.co.jp no=1052, de=2。2026/10/19 時点）。
+			// 海浜公園南口行（市役所・海浜公園西口・中央研修所経由）
+			...ibako('海浜公園南口行', ['9:00', '9:26', '9:40', '10:00', '10:20', '10:40', '11:00', '11:20', '11:40', '12:00', '12:20', '12:40', '13:10', '13:40', '14:10', '14:40', '15:10', '15:40', '16:10']),
+			// 中央研修所行（市役所・海浜公園西口経由）
+			...ibako('中央研修所行', ['8:10', '8:15', '8:32', '17:05', '17:30', '19:05']),
+			// 東中根団地行（市役所・本郷台団地経由）。「東中」は東中根団地中央止まり。
+			...ibako('東中根団地行', ['7:28', '8:00', '17:50', '18:15', '18:52', '19:34', '20:05']),
+			// 市役所経由の茨城高専行（学校休業日は運休）
+			...ibako('茨城高専行', ['8:32']),
+		],
 		// 勝田駅前 → 足崎団地（深谷津経由）des_no=6 ＋ スマイルあおぞらバス 勝田北・勝田中央コース（深谷津 往路のみ）
 		'outbound-fukayatsu': [
-			...ibako(['6:56', '7:37', '7:55', '8:15', '8:28', '16:25', '16:55', '17:24', '18:10', '19:10', '19:50']),
+			...ibako('足崎団地行', ['6:56', '7:37', '7:55', '8:15', '8:28', '16:25', '16:55', '17:24', '18:10', '19:10', '19:50']),
 			...smile(['7:31', '8:14', '8:31', '10:17', '11:21', '12:51', '14:37', '15:41', '17:31', '18:52']),
 		],
 		// 茨城高専前 → 勝田駅前 des_no=1
-		'inbound-kosen': ibako([
+		'inbound-kosen': [
+			// 茨城高専前発（bus.ibako.co.jp no=436, de=2。2026/10/19 時点）。市役所経由 勝田駅前行
+			...ibako('勝田駅前行', [
 			'7:00',
 			'7:24',
 			'7:49',
@@ -228,36 +220,31 @@ const REGULAR_TIMES: Record<ScheduleKind, Record<string, OperatorTime[]>> = {
 			'20:17',
 			'20:47',
 		]),
+			// 薬師台経由 勝田駅前行（21）
+			...ibako('勝田駅前行', ['6:06']),
+			// 薬師台・勝田駅・水戸駅経由 茨大前営業所行（21。勝田駅に停まる）
+			...ibako('茨大前営業所行', ['6:45', '8:23', '9:09']),
+		],
 		// 深谷津 → 勝田駅前 des_no=1
-		'inbound-fukayatsu': ibako(['6:14', '7:19', '8:00', '8:38', '8:51', '16:48', '17:18', '17:47', '18:33', '19:33']),
+		'inbound-fukayatsu': ibako('勝田駅前行', ['6:14', '7:19', '8:00', '8:38', '8:51', '16:48', '17:18', '17:47', '18:33', '19:33']),
 	},
 	weekend: {
-		'outbound-kosen': ibako([
-			'9:00',
-			'9:40',
-			'10:00',
-			'10:20',
-			'10:40',
-			'11:00',
-			'11:20',
-			'11:40',
-			'12:00',
-			'12:20',
-			'12:40',
-			'13:10',
-			'13:40',
-			'14:10',
-			'14:25',
-			'14:40',
-			'15:10',
-			'15:40',
-			'16:10',
-		]),
+		'outbound-kosen': [
+			// 勝田駅前 2番のりば発の、茨城高専前に停まる便（bus.ibako.co.jp no=1052, de=2。2026/10/19 時点）。
+			// 海浜公園南口行（市役所・海浜公園西口・中央研修所経由）
+			...ibako('海浜公園南口行', ['9:00', '9:26', '9:40', '10:00', '10:20', '10:40', '11:00', '11:20', '11:40', '12:00', '12:20', '12:40', '13:10', '13:40', '14:10', '14:25', '14:40', '15:10', '15:40', '16:10']),
+			// 中央研修所行（市役所・海浜公園西口経由）
+			...ibako('中央研修所行', ['8:10', '8:32', '17:05', '17:30', '19:05']),
+			// 東中根団地行（市役所・本郷台団地経由）。「東中」は東中根団地中央止まり。
+			...ibako('東中根団地行', ['18:15']),
+		],
 		'outbound-fukayatsu': [
-			...ibako(['6:56', '8:15', '17:24', '19:10', '19:50']),
+			...ibako('足崎団地行', ['6:56', '8:15', '17:24', '19:10', '19:50']),
 			...smile(['7:31', '8:14', '8:31', '10:17', '11:21', '12:51', '14:37', '15:41', '17:31', '18:52']),
 		],
-		'inbound-kosen': ibako([
+		'inbound-kosen': [
+			// 茨城高専前発（bus.ibako.co.jp no=436, de=2。2026/10/19 時点）。市役所経由 勝田駅前行
+			...ibako('勝田駅前行', [
 			'7:24',
 			'8:39',
 			'8:58',
@@ -291,7 +278,12 @@ const REGULAR_TIMES: Record<ScheduleKind, Record<string, OperatorTime[]>> = {
 			'20:17',
 			'20:47',
 		]),
-		'inbound-fukayatsu': ibako(['7:03', '8:22', '17:31', '19:17']),
+			// 薬師台経由 勝田駅前行（21）
+			...ibako('勝田駅前行', ['9:09']),
+			// 薬師台・勝田駅・水戸駅経由 茨大前営業所行（21。勝田駅に停まる）
+			...ibako('茨大前営業所行', ['6:45', '8:23']),
+		],
+		'inbound-fukayatsu': ibako('勝田駅前行', ['7:03', '8:22', '17:31', '19:17']),
 	},
 };
 
@@ -350,12 +342,7 @@ export function getBusTimetables(kind: ScheduleKind, routes: BusRoute[] = BUS_RO
 	return routes.map((route) => ({
 		...route,
 		departures: [
-			...(regularByRoute[route.id] ?? []).map(({ time, operator }) => ({
-				time,
-				extra: false,
-				operator,
-				headsign: route.headsigns[operator],
-			})),
+			...(regularByRoute[route.id] ?? []).map(({ time, operator, headsign }) => ({ time, extra: false, operator, headsign })),
 			...route.shuttleTimes.map((time) => ({ time, extra: true })),
 		].sort((a, b) => toMinutes(a.time) - toMinutes(b.time)),
 	}));

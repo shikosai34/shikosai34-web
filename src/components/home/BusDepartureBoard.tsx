@@ -5,7 +5,6 @@ import {
 	getUpcomingDepartures,
 	SHUTTLE_SERVICE_DATES,
 	type BusDeparture,
-	type BusOperator,
 	type BusTimetable,
 	type DepartureStop,
 	type UpcomingDeparture,
@@ -111,10 +110,12 @@ function DepartureChip({ departure }: { departure: BusDeparture }) {
 
 /** 時刻表ダイアログの 1 系統分。経路見出しと、時ごとに分を並べた表。 */
 function TimetableSection({ timetable }: { timetable: BusTimetable }) {
-	// 車両に出る行先表示。この系統に実際に便がある事業者の分だけ出す。
-	const headsigns = (Object.keys(timetable.headsigns) as BusOperator[])
-		.filter((operator) => timetable.departures.some((departure) => departure.operator === operator))
-		.map((operator) => ({ operator, headsign: timetable.headsigns[operator] }));
+	// 車両に出る行先表示。この系統の便に実際にあるものを、便数の多い順に出す。
+	const headsignCounts = new Map<string, number>();
+	for (const departure of timetable.departures) {
+		if (departure.headsign) headsignCounts.set(departure.headsign, (headsignCounts.get(departure.headsign) ?? 0) + 1);
+	}
+	const headsigns = [...headsignCounts.entries()].sort((x, y) => y[1] - x[1]).map(([headsign]) => headsign);
 
 	return (
 		<section aria-labelledby={`timetable-${timetable.id}`} className="rounded-xl border border-text/15 p-3 sm:p-4">
@@ -125,14 +126,9 @@ function TimetableSection({ timetable }: { timetable: BusTimetable }) {
 				<span className="text-sm text-accent">下車：{timetable.stop}</span>
 			</div>
 			{headsigns.length > 0 && (
-				<ul className="mt-1 space-y-0.5 text-xs text-text/70">
-					{headsigns.map(({ operator, headsign }) => (
-						<li key={operator}>
-							行先表示：<span className="font-medium text-text">{headsign}</span>
-							{headsigns.length > 1 ? `（${operator === 'smile' ? 'ス' : '印なし'}）` : ''}
-						</li>
-					))}
-				</ul>
+				<p className="mt-1 text-xs leading-relaxed text-text/70">
+					行先表示：<span className="font-medium text-text">{headsigns.join('／')}</span>
+				</p>
 			)}
 			{timetable.departures.length > 0 ? (
 				<dl className="mt-3 divide-y divide-text/10 border-y border-text/10">
@@ -140,8 +136,8 @@ function TimetableSection({ timetable }: { timetable: BusTimetable }) {
 						<div key={`${timetable.id}-${hour}`} className="flex items-start gap-3 py-2">
 							<dt className="w-10 shrink-0 pt-1 text-right text-sm font-medium tabular-nums text-text">{hour}時</dt>
 							<dd className="flex flex-1 flex-wrap gap-1.5">
-								{items.map((departure) => (
-									<DepartureChip key={`${timetable.id}-${departure.time}-${departure.extra}`} departure={departure} />
+								{items.map((departure, index) => (
+									<DepartureChip key={`${timetable.id}-${departure.time}-${index}`} departure={departure} />
 								))}
 							</dd>
 						</div>
@@ -217,9 +213,9 @@ function TimetableDialog({ dialogRef, isShuttleDay: shuttleDay }: { dialogRef: R
 							<ul className="list-disc space-y-1 pl-5 text-xs leading-relaxed text-text/80">
 								<li>左の「9時」などが時、枠の中の数字が出発時刻の分です。</li>
 								<li>
-									茨城高専へは<span className="font-medium text-text">「茨城高専前」</span>に停まる便をご利用ください。往路は下車後に北へ、復路は正門を出て南へ進むと乗り場です。
+									茨城高専へは、勝田駅前2番のりばの<span className="font-medium text-text">「海浜公園南口行」「中央研修所行」「東中根団地行」</span>（本郷台団地経由）に乗り、「茨城高専前」で降ります。往路は下車後に北へ、復路は正門を出て南へ進むと乗り場です。
 								</li>
-								<li>「深谷津」の便は茨城高専前を通らず、高専から離れています。スマイルあおぞらバスは往路のみ載せています。</li>
+								<li>「足崎団地行」など深谷津の便は茨城高専前を通らず、高専から離れています。スマイルあおぞらバスは往路のみ載せています。</li>
 								<li>
 									{shuttleDay ? '臨時便は本日運行します。' : '臨時便は茨香祭当日のみ運行します。'}
 									時刻は出発時刻の予定で、遅延は反映されません。
