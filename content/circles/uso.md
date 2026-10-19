@@ -19,6 +19,8 @@ details: |-
 
   ステッカー3種　1枚300円
   嘘おみくじ　一回100円
+scheduleDay1: 出店あり
+scheduleDay2: 出店あり
 fesflowPlanned: false
 image: https://assets.34.shikosai.net/news/0a751267-8b9f-4f7e-8759-1a197f7c68a1.webp
 otherImages:
