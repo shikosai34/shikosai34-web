@@ -1,0 +1,70 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import SiteHeader from '../../components/layout/SiteHeader.astro';
+import SectionHeading from '../../components/ui/SectionHeading';
+
+const areas = ['大教室', '図書館棟', '8号館', 'グラウンド', '1号館'];
+---
+
+<Layout
+	title="スタンプラリー | 第34回 茨香祭"
+	description="FesFlowでお買い物をして、対象エリア3か所以上のスタンプを集めよう。"
+>
+	<SiteHeader />
+
+	<main class="mx-auto w-full max-w-3xl px-4 pb-16 sm:px-6">
+		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
+			<SectionHeading title="スタンプラリー" icon="sparkles" subtitle="STAMP RALLY" />
+
+			<div class="bracket-frame mt-7 rounded-xl p-5 text-center sm:p-8">
+				<p class="text-xs tracking-[0.3em] text-accent">SHOP, COLLECT & GET A STICKER</p>
+				<p class="mt-3 text-lg font-medium leading-relaxed sm:text-xl">
+					お買い物を楽しみながら、<br class="sm:hidden" />3エリア以上のスタンプを集めよう！
+				</p>
+				<div class="mx-auto mt-5 flex h-20 w-20 items-center justify-center rounded-full border-2 border-main text-3xl font-medium text-main">
+					3<span class="ml-1 text-sm">AREA</span>
+				</div>
+			</div>
+
+			<div class="mt-8">
+				<SectionHeading title="参加方法" icon="info" subtitle="HOW TO JOIN" />
+				<ol class="grid gap-3 sm:grid-cols-3">
+					<li class="rounded-xl border border-text/15 bg-base/50 p-4">
+						<p class="text-xs tracking-[0.2em] text-accent">STEP 01</p>
+						<h2 class="mt-2 text-base font-medium text-text">FesFlowでお買い物</h2>
+						<p class="mt-2 text-sm leading-relaxed text-text/80">購入したサークルのサークルカットがスタンプになります。</p>
+					</li>
+					<li class="rounded-xl border border-text/15 bg-base/50 p-4">
+						<p class="text-xs tracking-[0.2em] text-accent">STEP 02</p>
+						<h2 class="mt-2 text-base font-medium text-text">3エリア以上で集める</h2>
+						<p class="mt-2 text-sm leading-relaxed text-text/80">下の対象エリアのうち、異なる3か所以上でスタンプを1つずつ集めよう。</p>
+					</li>
+					<li class="rounded-xl border border-text/15 bg-base/50 p-4">
+						<p class="text-xs tracking-[0.2em] text-accent">STEP 03</p>
+						<h2 class="mt-2 text-base font-medium text-text">インフォメーションへ</h2>
+						<p class="mt-2 text-sm leading-relaxed text-text/80">集め終わったらインフォメーションでリストバンドを提示して、ステッカーと交換！</p>
+					</li>
+				</ol>
+			</div>
+
+			<div class="mt-8">
+				<SectionHeading title="対象エリア" icon="map" subtitle="STAMP SPOTS" />
+				<ul class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+					{areas.map((area, index) => (
+						<li class="flex min-h-14 items-center gap-3 rounded-lg border border-accent/25 bg-accent/5 px-4 py-3">
+							<span class="text-xs tracking-widest text-accent">0{index + 1}</span>
+							<span class="font-medium">{area}</span>
+						</li>
+					))}
+				</ul>
+			</div>
+
+			<p class="mt-6 rounded-lg bg-main/10 px-4 py-3 text-sm leading-relaxed text-text/85">
+				ステッカー交換の際は、リストバンドをご提示ください。
+			</p>
+		</section>
+	</main>
+
+	<SiteFooter />
+</Layout>
