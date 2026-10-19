@@ -48,7 +48,7 @@ function DepartureRow({ order, departure }: { order: string; departure: Upcoming
 			<span className="w-6 shrink-0 text-center text-xs font-medium text-text/50">{order}</span>
 			<div className="min-w-0 flex-1">
 				<p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-text">
-					<span className="whitespace-nowrap">{departure.headsign ?? '臨時バス'}</span>
+					{departure.headsign ? <span className="whitespace-nowrap">{departure.headsign}</span> : null}
 					{departure.extra ? (
 						<span className="rounded-full bg-main px-2 py-0.5 text-xs font-medium text-on-main">臨時便</span>
 					) : departure.operator === 'smile' ? (
@@ -240,15 +240,15 @@ function TimetableDialog({
 							<ul className="space-y-2 text-sm text-text">
 								<li className="flex items-center gap-3">
 									<DepartureChip departure={{ time: '9:15', extra: false, operator: 'ibako' }} />
-									<span>印なし：茨城交通の定期便</span>
+									<span>茨城交通の定期便（印なし）</span>
 								</li>
 								<li className="flex items-center gap-3">
 									<DepartureChip departure={{ time: '9:35', extra: true }} />
-									<span>臨：臨時便</span>
+									<span>臨時便（臨）</span>
 								</li>
 								<li className="flex items-center gap-3">
 									<DepartureChip departure={{ time: '8:14', extra: false, operator: 'smile' }} />
-									<span>ス：スマイルあおぞらバス</span>
+									<span>スマイルあおぞらバス（ス）</span>
 								</li>
 							</ul>
 							<ul className="list-disc space-y-1 pl-5 text-xs leading-relaxed text-text/80">
