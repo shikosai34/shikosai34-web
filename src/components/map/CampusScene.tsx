@@ -3,7 +3,7 @@ import { Canvas, useFrame, useThree, type ThreeEvent } from '@react-three/fiber'
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import * as THREE from 'three';
-import { PLAN_FILES, project } from '../../lib/map';
+import { PLAN_FILES, project, ROUTE_COLORS, type RouteData } from '../../lib/map';
 import type { MapRoom, Weather } from '../../lib/map-rooms';
 
 /*
@@ -654,6 +654,202 @@ function SlotTents({ slots, counts, selected, onPick }: { slots: MapRoom[]; coun
 }
 
 // ---------------------------------------------------------------------------
+// 動線・立入禁止区域（地面に描く）
+// ---------------------------------------------------------------------------
+
+/** 動線を描く高さ（地面の面・道より上） */
+const ROUTE_Y = 0.35;
+/** 矢印の間隔（m）と流れる速さ（m/秒） */
+const CHEVRON_SPACING = 12;
+const CHEVRON_SPEED = 6;
+
+/** 折れ線（平面の [東, 北]）の長さと、先頭からの距離で位置・向きを引くための表 */
+function pathOf(points: [number, number][]) {
+	const pts = points.map((p) => project(p));
+	const lengths = pts.slice(1).map((p, i) => Math.hypot(p[0] - pts[i][0], p[1] - pts[i][1]));
+	const total = lengths.reduce((a, b) => a + b, 0);
+	/** 先頭から d m の位置と進む向き（平面でのラジアン） */
+	const at = (d: number) => {
+		let t = Math.min(Math.max(d, 0), total);
+		let i = 0;
+		while (i < lengths.length - 1 && t > lengths[i]) t -= lengths[i++];
+		const f = lengths[i] === 0 ? 0 : t / lengths[i];
+		const [ax, ay] = pts[i];
+		const [bx, by] = pts[i + 1];
+		return { x: ax + (bx - ax) * f, y: ay + (by - ay) * f, angle: Math.atan2(by - ay, bx - ax) };
+	};
+	return { pts, total, at };
+}
+
+/**
+ * 動線。地面に光る帯を敷き、進む向きに矢印（シェブロン）を流す。
+ * 動きを減らす設定のときは、矢印を動かさず等間隔に置いたままにする。
+ */
+function RouteLayer({ routes, animate }: { routes: RouteData['routes']; animate: boolean }) {
+	const shapes = useMemo(() => routes.map((r) => ({ route: r, path: pathOf(r.points) })), [routes]);
+	/** 全部の線の矢印を 1 つの InstancedMesh にまとめる。数は線の長さから決まる */
+	const slots = useMemo(
+		() =>
+			shapes.flatMap(({ route, path }) => {
+				if (!route.arrow || path.total < CHEVRON_SPACING / 2) return [];
+				const count = Math.max(1, Math.floor(path.total / CHEVRON_SPACING));
+				return Array.from({ length: count }, (_, i) => ({ route, path, i, count, step: path.total / count }));
+			}),
+		[shapes],
+	);
+	const mesh = useRef<THREE.InstancedMesh>(null);
+	const chevron = useMemo(() => {
+		// 進行方向（+x）を指す山形。地面に寝かせた形（x 軸まわりに倒す）で作っておく。
+		// メッシュ自体を回すと、置き場所（インスタンスの位置）まで一緒に回ってしまうため
+		const s = new THREE.Shape();
+		s.moveTo(2.2, 0);
+		s.lineTo(-1.2, 2.2);
+		s.lineTo(-0.2, 0);
+		s.lineTo(-1.2, -2.2);
+		s.closePath();
+		return new THREE.ShapeGeometry(s).rotateX(-Math.PI / 2);
+	}, []);
+	useEffect(() => () => chevron.dispose(), [chevron]);
+
+	const place = (time: number) => {
+		const m = new THREE.Matrix4();
+		const color = new THREE.Color();
+		slots.forEach(({ route, path, i, step }, n) => {
+			const d = (i * step + (animate ? time * CHEVRON_SPEED : 0)) % path.total;
+			const { x, y, angle } = path.at(d);
+			// 平面の北は three の -z。向きも z の反転に合わせる（y 軸まわりの回転は逆向き）
+			m.compose(new THREE.Vector3(x, ROUTE_Y + 0.05, -y), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), angle), new THREE.Vector3(1, 1, 1));
+			mesh.current?.setMatrixAt(n, m);
+			mesh.current?.setColorAt(n, color.set(ROUTE_COLORS[route.kind]).multiplyScalar(2.2));
+		});
+		if (mesh.current) {
+			mesh.current.instanceMatrix.needsUpdate = true;
+			if (mesh.current.instanceColor) mesh.current.instanceColor.needsUpdate = true;
+		}
+	};
+	useEffect(() => place(0), [slots, animate]); // eslint-disable-line react-hooks/exhaustive-deps
+	useFrame(({ clock }) => {
+		if (animate) place(clock.elapsedTime);
+	});
+
+	return (
+		<group>
+			{shapes.map(({ route, path }) => (
+				<group key={route.id}>
+					{/* 帯（地面に平たく敷く） */}
+					<Line
+						points={path.pts.map(([x, y]) => [x, ROUTE_Y, -y])}
+						color={ROUTE_COLORS[route.kind]}
+						lineWidth={1.8}
+						worldUnits
+						transparent
+						opacity={0.55}
+						toneMapped={false}
+					/>
+					{/* 帯の芯。帯より細く明るく、動線が光って見えるようにする */}
+					<Line points={path.pts.map(([x, y]) => [x, ROUTE_Y + 0.02, -y])} color="#ffffff" lineWidth={0.35} worldUnits transparent opacity={0.5} toneMapped={false} />
+				</group>
+			))}
+			{slots.length > 0 && (
+				<instancedMesh key={slots.length} ref={mesh} args={[chevron, undefined, slots.length]} frustumCulled={false}>
+					<meshBasicMaterial toneMapped={false} side={THREE.DoubleSide} />
+				</instancedMesh>
+			)}
+		</group>
+	);
+}
+
+/** ゲート・正門・案内の目印（◆）。地面に置く */
+function RouteMarkers({ markers }: { markers: RouteData['markers'] }) {
+	return (
+		<group>
+			{markers.map((m, i) => {
+				const [x, y] = project(m.at);
+				if (m.kind === 'diamond') {
+					return (
+						<mesh key={i} position={[x, 1.2, -y]} rotation={[0, Math.PI / 4, 0]}>
+							<boxGeometry args={[1.6, 2.4, 1.6]} />
+							<meshBasicMaterial color={COLOR.accent} toneMapped={false} />
+						</mesh>
+					);
+				}
+				return (
+					<group key={i} position={[x, 0, -y]}>
+						<mesh position={[0, 1.6, 0]}>
+							<boxGeometry args={[m.kind === 'main-gate' ? 4 : 1.4, 3.2, 1.4]} />
+							<meshBasicMaterial color={ROUTE_COLORS.red} toneMapped={false} />
+						</mesh>
+						{m.name && (
+							<Html position={[0, 5.5, 0]} center zIndexRange={[8, 0]} style={{ pointerEvents: 'none' }}>
+								<div className="whitespace-nowrap rounded-sm border border-glitch/70 bg-base/85 px-1.5 text-xs text-text">{m.name}</div>
+							</Html>
+						)}
+					</group>
+				);
+			})}
+		</group>
+	);
+}
+
+/** ハザード柄（斜めの縞）。立入禁止区域の床に貼る */
+function makeHazardTexture(): THREE.Texture {
+	const canvas = document.createElement('canvas');
+	canvas.width = canvas.height = 64;
+	const ctx = canvas.getContext('2d')!;
+	ctx.fillStyle = '#2a0a12';
+	ctx.fillRect(0, 0, 64, 64);
+	ctx.fillStyle = ROUTE_COLORS.red;
+	for (let i = -1; i <= 2; i++) {
+		ctx.beginPath();
+		ctx.moveTo(i * 32, 64);
+		ctx.lineTo(i * 32 + 16, 64);
+		ctx.lineTo(i * 32 + 16 + 64, 0);
+		ctx.lineTo(i * 32 + 64, 0);
+		ctx.closePath();
+		ctx.fill();
+	}
+	const tex = new THREE.CanvasTexture(canvas);
+	tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+	tex.colorSpace = THREE.SRGBColorSpace;
+	return tex;
+}
+
+/**
+ * 立入禁止区域。床にハザード柄を貼り、赤い縁と名前で示す。
+ * 面が色だけだと見落とすので、「入れない」と分かる縞にする。
+ */
+function RestrictedLayer({ areas }: { areas: RouteData['restricted'] }) {
+	const texture = useMemo(() => {
+		const tex = makeHazardTexture();
+		tex.repeat.set(1 / 4, 1 / 4); // ShapeGeometry の UV は m 単位。1 タイル = 4m
+		return tex;
+	}, []);
+	useEffect(() => () => texture.dispose(), [texture]);
+
+	return (
+		<group>
+			{areas.map((a) => {
+				const ring = a.points.map((p) => project(p));
+				const shape = shapeOf(ring);
+				const [cx, cy] = centroid([...ring, ring[0]]);
+				return (
+					<group key={a.id}>
+						<mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, ROUTE_Y - 0.1, 0]}>
+							<shapeGeometry args={[shape]} />
+							<meshBasicMaterial map={texture} transparent opacity={0.8} toneMapped={false} depthWrite={false} />
+						</mesh>
+						<Line points={[...ring, ring[0]].map(([x, y]) => [x, ROUTE_Y + 0.05, -y])} color={ROUTE_COLORS.red} lineWidth={0.5} worldUnits toneMapped={false} />
+						<Html position={[cx, 4, -cy]} center zIndexRange={[8, 0]} style={{ pointerEvents: 'none' }}>
+							<div className="whitespace-nowrap rounded-sm border border-glitch bg-base/90 px-1.5 text-xs font-medium text-text">立入禁止{a.name ? `（${a.name}）` : ''}</div>
+						</Html>
+					</group>
+				);
+			})}
+		</group>
+	);
+}
+
+// ---------------------------------------------------------------------------
 // カメラ
 // ---------------------------------------------------------------------------
 
@@ -761,6 +957,8 @@ interface Props {
 	counts: Record<string, number>;
 	/** 屋外の会場（ピンを立てる） */
 	places: MapRoom[];
+	/** 動線・立入禁止区域（その天候のもの）。null なら描かない */
+	routes?: RouteData | null;
 	/** 番号つきの固定のテント（グラウンドの G-1〜G-33 など） */
 	slots: MapRoom[];
 	/** 選んだテントの真上に出す吹き出し（部屋キーと中身）。なければ出さない */
@@ -779,7 +977,7 @@ interface Props {
 	onBackgroundClick: () => void;
 }
 
-export default function CampusScene({ campus, counts, places, slots, bubble, selected, camera, animate, lowPower, paused, weather, onPickBuilding, onPickPlace, onBackgroundClick }: Props) {
+export default function CampusScene({ campus, counts, places, routes, slots, bubble, selected, camera, animate, lowPower, paused, weather, onPickBuilding, onPickPlace, onBackgroundClick }: Props) {
 	const buildings = useMemo(() => buildingsOf(campus.features), [campus]);
 	const windows = useMemo(() => makeWindowTexture(), []);
 	const [hovered, setHovered] = useState<string | null>(null);
@@ -876,6 +1074,13 @@ export default function CampusScene({ campus, counts, places, slots, bubble, sel
 					</group>
 				))}
 
+			{routes && (
+				<>
+					<RouteLayer routes={routes.routes} animate={animate} />
+					<RouteMarkers markers={routes.markers} />
+					<RestrictedLayer areas={routes.restricted} />
+				</>
+			)}
 			<SlotTents slots={slots} counts={counts} selected={selected} onPick={onPickPlace} />
 			{bubble &&
 				(() => {

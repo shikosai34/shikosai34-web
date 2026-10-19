@@ -12,7 +12,7 @@
     "astro": "astro",
     "deploy": "astro build && wrangler deploy",
     "pages:deploy": "astro build && wrangler pages deploy ./dist",
-    "map:build": "bun scripts/map/build-campus.mjs && bun scripts/map/build-plans.mjs"
+    "map:build": "bun scripts/map/build-campus.mjs && bun scripts/map/build-plans.mjs && bun scripts/map/build-routes.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^6.0.4",

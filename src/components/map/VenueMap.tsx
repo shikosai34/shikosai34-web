@@ -3,14 +3,17 @@ import CloseIcon from '../icons/CloseIcon';
 import {
 	countExhibitsByBuilding,
 	loadPlan,
+	loadRoutes,
 	PLAN_FILES,
 	project,
 	readViewFromUrl,
 	readWeatherFromUrl,
+	ROUTE_COLORS,
 	viewToSearch,
 	type ExhibitsByRoom,
 	type MapView,
 	type Plan,
+	type RouteData,
 } from '../../lib/map';
 import { isRoomInWeather, MAP_ROOMS, type Weather } from '../../lib/map-rooms';
 import type { CameraRequest, CampusData } from './CampusScene';
@@ -78,6 +81,9 @@ export default function VenueMap({ exhibits: exhibitsByWeather, defaultWeather }
 	const lowPower = narrow || (navigator.hardwareConcurrency ?? 8) <= 4;
 
 	const [campus, setCampus] = useState<CampusData | null>(null);
+	const [routeData, setRouteData] = useState<RouteData | null>(null);
+	/** 動線・立入禁止区域を地図に出すか */
+	const [showRoutes, setShowRoutes] = useState(true);
 	const [loadError, setLoadError] = useState(false);
 	const [view, setView] = useState<MapView>(() => readViewFromUrl(location.search));
 	const [plan, setPlan] = useState<Plan | null>(null);
@@ -98,6 +104,7 @@ export default function VenueMap({ exhibits: exhibitsByWeather, defaultWeather }
 
 	useEffect(() => {
 		if (!webgl) return;
+		loadRoutes().then(setRouteData).catch(() => {});
 		fetch('/map/campus.geojson')
 			.then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
 			.then(setCampus)
@@ -202,6 +209,15 @@ export default function VenueMap({ exhibits: exhibitsByWeather, defaultWeather }
 		if (placeKey && !findPlace(placeKey)) closePlace();
 	}, [PLACES, SLOTS]); // eslint-disable-line react-hooks/exhaustive-deps
 
+	/** いまの天候の動線・立入禁止区域。なければ（雨天時の動線は未提供）出さない */
+	const routes = useMemo((): RouteData | null => {
+		if (!routeData) return null;
+		const routesNow = routeData.routes.filter((r) => r.weather === weather);
+		const markers = routeData.markers.filter((m) => m.weather === weather);
+		const restricted = routeData.restricted.filter((a) => !a.weather || a.weather === weather);
+		return routesNow.length || restricted.length ? { ...routeData, routes: routesNow, markers, restricted } : null;
+	}, [routeData, weather]);
+
 	const place = findPlace(placeKey);
 	/** 番号つきのテント（1 張り）を選んだときは、ダイアログではなくそのテントの真上に吹き出しで出す */
 	const bubble =
@@ -229,6 +245,7 @@ export default function VenueMap({ exhibits: exhibitsByWeather, defaultWeather }
 							campus={campus}
 							counts={counts}
 							places={PLACES}
+							routes={showRoutes ? routes : null}
 							slots={SLOTS}
 							bubble={bubble}
 							selected={selected}
@@ -301,7 +318,32 @@ export default function VenueMap({ exhibits: exhibitsByWeather, defaultWeather }
 							</p>
 						</>
 					)}
-					<WeatherToggle weather={weather} onChange={setWeather} className="pointer-events-auto mt-2" />
+					<div className="pointer-events-auto mt-2 flex flex-wrap items-center gap-2">
+						<WeatherToggle weather={weather} onChange={setWeather} />
+						{routes && (
+							<button
+								type="button"
+								role="switch"
+								aria-checked={showRoutes}
+								onClick={() => setShowRoutes((v) => !v)}
+								className={`whitespace-nowrap rounded-md border px-3 py-1 text-xs backdrop-blur-sm transition-colors ${showRoutes ? 'border-main bg-main/90 text-base' : 'border-accent/50 bg-base/85 text-text hover:text-main'}`}
+							>
+								{routes.routes.length > 0 && routes.restricted.length > 0 ? '動線・立入禁止' : routes.routes.length > 0 ? '動線' : '立入禁止'}
+							</button>
+						)}
+					</div>
+					{routes && showRoutes && (
+						<ul className="pointer-events-none mt-1.5 flex flex-wrap gap-x-3 text-xs text-text/80">
+							{(Object.keys(routes.legend) as (keyof RouteData['legend'])[])
+								.filter((kind) => routes.routes.some((r) => r.kind === kind))
+								.map((kind) => (
+									<li key={kind} className="flex items-center gap-1 whitespace-nowrap">
+										<span className="inline-block h-1.5 w-4 rounded-full" style={{ backgroundColor: ROUTE_COLORS[kind] }} aria-hidden="true" />
+										{routes.legend[kind]}
+									</li>
+								))}
+						</ul>
+					)}
 				</div>
 			)}
 

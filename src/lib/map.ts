@@ -132,6 +132,53 @@ export function countExhibitsByBuilding(exhibits: ExhibitsByRoom): Record<string
 }
 
 // ---------------------------------------------------------------------------
+// 動線・立入禁止区域（public/map/routes.json。scripts/map/build-routes.mjs が生成する）
+// ---------------------------------------------------------------------------
+
+export type RouteKind = 'yellow' | 'red';
+
+export interface MapRoute {
+	id: string;
+	kind: RouteKind;
+	weather: Weather;
+	/** 終点に進む向きを示す矢印を付けるか */
+	arrow: boolean;
+	/** 始点 → 終点の経緯度 */
+	points: [number, number][];
+}
+
+export interface RouteMarker {
+	kind: 'gate' | 'main-gate' | 'diamond';
+	weather: Weather;
+	name?: string;
+	at: [number, number];
+}
+
+export interface RestrictedArea {
+	id: string;
+	name?: string;
+	weather?: Weather;
+	points: [number, number][];
+}
+
+export interface RouteData {
+	/** 動線の色の意味（凡例） */
+	legend: Record<RouteKind, string>;
+	routes: MapRoute[];
+	markers: RouteMarker[];
+	restricted: RestrictedArea[];
+}
+
+/** 動線の色。サイトのパレットの橙（main）とマゼンタ寄りの赤（glitch の明るい側） */
+export const ROUTE_COLORS: Record<RouteKind, string> = { yellow: '#ffb347', red: '#ff4d6d' };
+
+export async function loadRoutes(): Promise<RouteData> {
+	const res = await fetch('/map/routes.json');
+	if (!res.ok) throw new Error('動線を読み込めませんでした');
+	return res.json();
+}
+
+// ---------------------------------------------------------------------------
 // 地図の座標
 // ---------------------------------------------------------------------------
 
