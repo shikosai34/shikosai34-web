@@ -34,7 +34,7 @@
  *
  * 平日ダイヤ（茨城交通）は実データを反映済み。
  *
- * 臨時便（茨城高専スクールバス）は 1 日目・2日目（10/24・10/25）のみ運行する。
+ * 臨時便は 1 日目（10/24）のみ運行する。
  * 時刻は出発時刻。曜日によらず、当日の臨時便時刻として扱う。
  *
  * 勝田駅から高専へ向かうバスは、下車する停留所が系統によって違うので系統ごとに表を分ける。
@@ -45,8 +45,8 @@
  * 遅延情報は取得手段がないため扱わない（時刻表どおりの予定として案内する）。
  */
 
-/** 臨時便（茨城高専スクールバス）の運行日。 */
-export const SHUTTLE_SERVICE_DATES = ['2026-10-24', '2026-10-25'];
+/** 臨時便の運行日。 */
+export const SHUTTLE_SERVICE_DATES = ['2026-10-24'];
 
 export type BusDirection = '往路' | '復路';
 
@@ -75,7 +75,7 @@ export interface BusRoute {
 	stop: string;
 	/** 停留所についての短い補足（乗り場や徒歩の案内）。 */
 	stopNote: string;
-	/** 臨時便（茨城高専スクールバス）の出発時刻。曜日によらず当日共通。 */
+	/** 臨時便の出発時刻。曜日によらず当日共通。 */
 	shuttleTimes: string[];
 	/** 時刻表の下に添える注記（便が少ない・事業者が複数ある系統向け）。 */
 	caveat?: string;
@@ -119,7 +119,7 @@ const ROUTE_BASE: Omit<BusRoute, 'shuttleTimes'>[] = [
 	},
 ];
 
-/** 臨時便（茨城高専スクールバス）の出発時刻。曜日によらず運行日共通。 */
+/** 臨時便の出発時刻。曜日によらず運行日共通。 */
 const SHUTTLE_TIMES: Record<string, string[]> = {
 	'outbound-kosen': ['9:35', '10:00', '10:25', '11:00', '11:30', '12:00', '12:30', '13:00'],
 	'outbound-fukayatsu': [],
@@ -138,7 +138,7 @@ interface OperatorTime {
 	operator: BusOperator;
 	/**
 	 * 車両の行先表示（「〜〜行」）。同じ系統でも便ごとに違うので時刻ごとに持つ。
-	 * 臨時便（スクールバス）は表示が確認できていないため持たない。
+	 * 臨時便は表示が確認できていないため持たない。
 	 */
 	headsign: string;
 }
@@ -315,7 +315,7 @@ export const BUS_FARES = [
 export interface BusDeparture {
 	/** "HH:mm" 形式の出発時刻。 */
 	time: string;
-	/** 茨城高専スクールバス（臨時便）なら true、定期便なら false。 */
+	/** 臨時便なら true、定期便なら false。 */
 	extra: boolean;
 	/** 定期便の運行事業者。臨時便（extra: true）では undefined。 */
 	operator?: BusOperator;

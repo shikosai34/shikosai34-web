@@ -3,10 +3,12 @@ import {
 	BUS_OPERATOR_LABELS,
 	BUS_ROUTES,
 	getBusTimetables,
+	getScheduleKind,
 	getUpcomingDepartures,
 	SHUTTLE_SERVICE_DATES,
 	type BusDeparture,
 	type BusTimetable,
+	type ScheduleKind,
 	type UpcomingDeparture,
 } from '../../lib/bus';
 import BusIcon from '../icons/BusIcon';
@@ -46,7 +48,7 @@ function DepartureRow({ order, departure }: { order: string; departure: Upcoming
 			<span className="w-6 shrink-0 text-center text-xs font-medium text-text/50">{order}</span>
 			<div className="min-w-0 flex-1">
 				<p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-text">
-					<span className="whitespace-nowrap">{departure.headsign ?? '茨城高専スクールバス'}</span>
+					<span className="whitespace-nowrap">{departure.headsign ?? '臨時バス'}</span>
 					{departure.extra ? (
 						<span className="rounded-full bg-main px-2 py-0.5 text-xs font-medium text-on-main">臨時便</span>
 					) : departure.operator === 'smile' ? (
@@ -152,17 +154,36 @@ function TimetableSection({ timetable }: { timetable: BusTimetable }) {
 	);
 }
 
+/** ダイヤ種別の切り替え。 */
+const SCHEDULE_KINDS: { kind: ScheduleKind; label: string }[] = [
+	{ kind: 'weekday', label: '平日ダイヤ' },
+	{ kind: 'weekend', label: '土日祝ダイヤ' },
+];
+
 /**
  * 全系統・全便の時刻表ダイアログ。
  *
- * 茨香祭の開催日（10/24・10/25）はどちらも土日祝ダイヤのため、平日ダイヤは
- * 載せず土日祝ダイヤのみ表示する。面は後ろのページが透けないよう不透明にする。
+ * 平日ダイヤと土日祝ダイヤを切り替えられる。開いた直後は今日のダイヤ
+ * （scheduleKind）を表示する。臨時便は運行日が決まっているため、平日ダイヤの
+ * 表には載せない。面は後ろのページが透けないよう不透明にする。
  */
-function TimetableDialog({ dialogRef, isShuttleDay: shuttleDay }: { dialogRef: RefObject<HTMLDialogElement | null>; isShuttleDay: boolean }) {
-	const weekendTimetables = getBusTimetables('weekend');
+function TimetableDialog({
+	dialogRef,
+	isShuttleDay: shuttleDay,
+	scheduleKind,
+}: {
+	dialogRef: RefObject<HTMLDialogElement | null>;
+	isShuttleDay: boolean;
+	scheduleKind: ScheduleKind;
+}) {
+	const [selectedKind, setSelectedKind] = useState<ScheduleKind | null>(null);
+	const kind = selectedKind ?? scheduleKind;
+	const timetables = getBusTimetables(kind).map((timetable) =>
+		kind === 'weekday' ? { ...timetable, departures: timetable.departures.filter((departure) => !departure.extra) } : timetable,
+	);
 	const directions: { label: string; timetables: BusTimetable[] }[] = [
-		{ label: '往路（勝田駅 → 高専方面）', timetables: weekendTimetables.filter((t) => t.direction === '往路') },
-		{ label: '復路（高専方面 → 勝田駅）', timetables: weekendTimetables.filter((t) => t.direction === '復路') },
+		{ label: '往路（勝田駅 → 高専方面）', timetables: timetables.filter((t) => t.direction === '往路') },
+		{ label: '復路（高専方面 → 勝田駅）', timetables: timetables.filter((t) => t.direction === '復路') },
 	];
 
 	return (
@@ -194,6 +215,24 @@ function TimetableDialog({ dialogRef, isShuttleDay: shuttleDay }: { dialogRef: R
 					</div>
 
 					<div className="space-y-6 p-4 pb-6 sm:p-6 sm:pb-8">
+						<div role="group" aria-label="ダイヤの種類" className="grid grid-cols-2 gap-2">
+							{SCHEDULE_KINDS.map((option) => (
+								<button
+									key={option.kind}
+									type="button"
+									aria-pressed={kind === option.kind}
+									onClick={() => setSelectedKind(option.kind)}
+									className={`rounded-full border px-3 py-2 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+										kind === option.kind
+											? 'border-accent bg-accent font-medium text-on-accent'
+											: 'border-text/30 text-text hover:border-accent hover:text-accent'
+									}`}
+								>
+									{option.label}
+								</button>
+							))}
+						</div>
+
 						<section aria-labelledby="timetable-guide" className="space-y-3 rounded-xl bg-text/5 p-3 sm:p-4">
 							<h3 id="timetable-guide" className="text-sm font-medium text-text">
 								見方
@@ -205,7 +244,7 @@ function TimetableDialog({ dialogRef, isShuttleDay: shuttleDay }: { dialogRef: R
 								</li>
 								<li className="flex items-center gap-3">
 									<DepartureChip departure={{ time: '9:35', extra: true }} />
-									<span>臨：茨城高専スクールバス（臨時便）</span>
+									<span>臨：臨時便</span>
 								</li>
 								<li className="flex items-center gap-3">
 									<DepartureChip departure={{ time: '8:14', extra: false, operator: 'smile' }} />
@@ -218,7 +257,7 @@ function TimetableDialog({ dialogRef, isShuttleDay: shuttleDay }: { dialogRef: R
 									茨城高専へは、勝田駅前2番のりばの<span className="font-medium text-text">「海浜公園南口行」「中央研修所行」「東中根団地行」</span>（本郷台団地経由）に乗り、「茨城高専前」で降ります。
 								</li>
 								<li>
-									{shuttleDay ? '臨時便は本日運行します。' : '臨時便は茨香祭当日のみ運行します。'}
+									{shuttleDay ? '臨時便は本日運行します。' : '臨時便は10月24日のみ運行します。'}
 									時刻は出発時刻の予定で、遅延は反映されません。
 								</li>
 								<li>
@@ -313,7 +352,7 @@ export default function BusDepartureBoard() {
 
 			<p className="mt-2 text-xs text-text/70">
 				茨城高専前に停まるバスだけを表示しています。
-				{today ? '' : '茨城高専スクールバス（臨時便）は茨香祭当日のみ運行します。'}
+				{today ? '' : '臨時便は10月24日のみ運行します。'}
 			</p>
 
 			<div className="mt-4 grid gap-6 sm:grid-cols-2">
@@ -333,7 +372,7 @@ export default function BusDepartureBoard() {
 				</button>
 			</div>
 
-			<TimetableDialog dialogRef={dialogRef} isShuttleDay={today} />
+			<TimetableDialog dialogRef={dialogRef} isShuttleDay={today} scheduleKind={now ? getScheduleKind(now) : 'weekend'} />
 		</section>
 	);
 }
