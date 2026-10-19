@@ -49,10 +49,10 @@ const busLinks = [
 	},
 ];
 
-// バスの時刻データ本体は lib/bus.ts にまとめている（トップページのバス発車
-// カウントダウンと共有するため）。経緯や出典のコメントもそちらを参照。
-// このページでは臨時便（茨城高専スクールバス）の案内のみ載せる。定期便を
-// 含む最新の発車案内はトップページの発車カウントダウンから確認できる。
+// バスの時刻データ本体は lib/bus.ts にまとめている（トップページの
+// 「次のバス」と共有するため）。経緯や出典のコメントもそちらを参照。
+// このページでは臨時便の案内のみ載せる。定期便を
+// 含む最新の発車案内はトップページの「次のバス」から確認できる。
 const shuttleRoutes = BUS_ROUTES.filter((route) => route.shuttleTimes.length > 0);
 ---
 
@@ -102,9 +102,9 @@ const shuttleRoutes = BUS_ROUTES.filter((route) => route.shuttleTimes.length > 0
 					</p>
 
 					<div class="mt-5 rounded-xl border-2 border-main bg-main/10 p-4" role="note">
-						<p class="font-medium text-text">臨時便は開催日（10月24日・25日）に運行します</p>
+						<p class="font-medium text-text">臨時便は10月24日のみ運行します</p>
 						<p class="mt-1 text-sm leading-relaxed text-text/80">
-							茨城交通の路線バス（定期便）に加えて、茨城高専スクールバスとして臨時便を増便します。時刻は出発時刻です。通常の定期便を含む最新の発車案内は、トップページのバス発車カウントダウンからもご確認いただけます。
+							茨城交通の路線バス（定期便）に加えて、臨時便を増便します。時刻は出発時刻です。通常の定期便を含む最新の発車案内は、トップページの「次のバス」からもご確認いただけます。
 						</p>
 					</div>
 
@@ -171,7 +171,7 @@ const shuttleRoutes = BUS_ROUTES.filter((route) => route.shuttleTimes.length > 0
 						}
 					</div>
 					<p class="mt-4 text-xs leading-relaxed text-text/60">
-						上記は茨城高専スクールバス（臨時便）のみの時刻です。茨城交通の定期便を含む最新の発車案内は、<a href="/" class="text-text underline hover:no-underline focus:outline-2 focus:outline-offset-2 focus:outline-accent">トップページのバス発車カウントダウン</a>からご確認ください。ダイヤが変更される場合があるため、下記の時刻表もあわせてご確認ください。
+						上記は臨時便のみの時刻です。茨城交通の定期便を含む最新の発車案内は、<a href="/" class="text-text underline hover:no-underline focus:outline-2 focus:outline-offset-2 focus:outline-accent">トップページの「次のバス」</a>からご確認ください。ダイヤが変更される場合があるため、下記の時刻表もあわせてご確認ください。
 					</p>
 
 					<ul class="mt-8 list-disc space-y-2 pl-5 text-sm marker:text-text/60">
