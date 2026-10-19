@@ -312,7 +312,7 @@ export default function BusDepartureBoard() {
 			</div>
 
 			<p className="mt-2 text-xs text-text/70">
-				茨城高専前に停まるバスだけを表示しています。時刻は出発時刻の予定で、遅延は反映されません。
+				茨城高専前に停まるバスだけを表示しています。
 				{today ? '' : '茨城高専スクールバス（臨時便）は茨香祭当日のみ運行します。'}
 			</p>
 
