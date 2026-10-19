@@ -258,7 +258,11 @@ function TimetableDialog({
 									茨城高専へは、勝田駅前2番のりばの<span className="font-medium text-text">「海浜公園南口行」「中央研修所行」「東中根団地行」</span>（本郷台団地経由）に乗り、「茨城高専前」で降ります。
 								</li>
 								<li>
-									{shuttleDay ? '臨時便は本日運行します。' : '臨時便は10月24日のみ運行します。'}
+									{shuttleDay ? (
+										'臨時便は本日運行します。'
+									) : (
+										<strong className="font-medium text-text">臨時便は10月24日のみ運行します。</strong>
+									)}
 									時刻は出発時刻の予定で、遅延は反映されません。
 								</li>
 								<li>
@@ -353,7 +357,7 @@ export default function BusDepartureBoard() {
 
 			<p className="mt-2 text-xs text-text/70">
 				茨城高専前に停まるバスだけを表示しています。
-				{today ? '' : '臨時便は10月24日のみ運行します。'}
+				{today ? null : <strong className="font-medium text-text">臨時便は10月24日のみ運行します。</strong>}
 			</p>
 
 			<div className="mt-4 grid gap-6 sm:grid-cols-2">
