@@ -44,10 +44,10 @@ function formatMinutesLeft(minutesLeft: number) {
 /** 発車標 1 行分（行先・時刻・残り時間）。 */
 function DepartureRow({ order, departure }: { order: string; departure: UpcomingDeparture }) {
 	return (
-		<li className="flex items-center gap-2 rounded-lg border border-text/15 bg-base px-3 py-2.5">
+		<li className="flex items-center gap-3 rounded-lg border border-text/15 bg-base px-3 py-2.5">
 			<span className="w-6 shrink-0 text-center text-xs font-medium text-text/50">{order}</span>
 			<div className="min-w-0 flex-1">
-				<p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-text">
+				<p className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-sm text-text">
 					{departure.headsign ? <span className="whitespace-nowrap">{departure.headsign}</span> : null}
 					{departure.extra ? (
 						<span className="rounded-full bg-main px-2 py-0.5 text-xs font-medium text-on-main">臨時便（臨）</span>
@@ -59,7 +59,7 @@ function DepartureRow({ order, departure }: { order: string; departure: Upcoming
 				</p>
 			</div>
 			<time className="shrink-0 font-primary text-lg font-medium tabular-nums text-text">{departure.time}</time>
-			<p className="shrink-0 text-right text-sm font-medium whitespace-nowrap tabular-nums text-accent">
+			<p className="w-20 shrink-0 text-right text-xs font-medium whitespace-nowrap tabular-nums text-accent">
 				{formatMinutesLeft(departure.minutesLeft)}
 			</p>
 		</li>
