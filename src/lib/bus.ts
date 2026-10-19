@@ -73,6 +73,11 @@ export interface BusRoute {
 	stopNote: string;
 	/** 臨時便（茨城高専スクールバス）の出発時刻。曜日によらず当日共通。 */
 	shuttleTimes: string[];
+	/**
+	 * 車両の行先表示（「〜〜行」）。事業者ごとに異なるので事業者で引く。
+	 * 臨時便（スクールバス）は表示が確認できていないため持たない。
+	 */
+	headsigns: Partial<Record<BusOperator, string>>;
 	/** 時刻表の下に添える注記（便が少ない・事業者が複数ある系統向け）。 */
 	caveat?: string;
 }
@@ -86,6 +91,7 @@ const ROUTE_BASE: Omit<BusRoute, 'shuttleTimes'>[] = [
 		from: '勝田駅',
 		stop: '茨城高専前',
 		stopNote: '下車後、北へ進むと正門です。',
+		headsigns: { ibako: '海浜公園南口行' },
 	},
 	{
 		id: 'outbound-fukayatsu',
@@ -94,6 +100,7 @@ const ROUTE_BASE: Omit<BusRoute, 'shuttleTimes'>[] = [
 		from: '勝田駅',
 		stop: '深谷津',
 		stopNote: '茨城高専前は通りません。',
+		headsigns: { ibako: '足崎団地行', smile: '勝田北・勝田中央コース' },
 		caveat: 'スマイルあおぞらバス（勝田北・勝田中央コース）の便を含みます。',
 	},
 	{
@@ -103,6 +110,7 @@ const ROUTE_BASE: Omit<BusRoute, 'shuttleTimes'>[] = [
 		from: '茨城高専前',
 		stop: '勝田駅',
 		stopNote: '正門を出て南へ進むと乗り場です。',
+		headsigns: { ibako: '勝田駅前行' },
 	},
 	{
 		id: 'inbound-fukayatsu',
@@ -111,6 +119,7 @@ const ROUTE_BASE: Omit<BusRoute, 'shuttleTimes'>[] = [
 		from: '深谷津',
 		stop: '勝田駅',
 		stopNote: '茨城高専前からは離れています。',
+		headsigns: { ibako: '勝田駅前行' },
 		caveat: 'スマイルあおぞらバスは深谷津からの直行復路がないため含みません。',
 	},
 ];
@@ -318,6 +327,8 @@ export interface BusDeparture {
 	extra: boolean;
 	/** 定期便の運行事業者。臨時便（extra: true）では undefined。 */
 	operator?: BusOperator;
+	/** 車両の行先表示。臨時便など不明な便では undefined。 */
+	headsign?: string;
 }
 
 export interface BusTimetable extends BusRoute {
@@ -339,7 +350,12 @@ export function getBusTimetables(kind: ScheduleKind, routes: BusRoute[] = BUS_RO
 	return routes.map((route) => ({
 		...route,
 		departures: [
-			...(regularByRoute[route.id] ?? []).map(({ time, operator }) => ({ time, extra: false, operator })),
+			...(regularByRoute[route.id] ?? []).map(({ time, operator }) => ({
+				time,
+				extra: false,
+				operator,
+				headsign: route.headsigns[operator],
+			})),
 			...route.shuttleTimes.map((time) => ({ time, extra: true })),
 		].sort((a, b) => toMinutes(a.time) - toMinutes(b.time)),
 	}));
@@ -381,6 +397,7 @@ export interface UpcomingDeparture {
 	time: string;
 	extra: boolean;
 	operator?: BusOperator;
+	headsign?: string;
 	/** 出発までの残り分数（切り上げ）。発車済みなら 0。 */
 	minutesLeft: number;
 	departureDate: Date;
@@ -429,6 +446,7 @@ export function getUpcomingDepartures(
 				time: departure.time,
 				extra: departure.extra,
 				operator: departure.operator,
+				headsign: departure.headsign,
 				minutesLeft: Math.max(0, Math.ceil((departureDate.getTime() - now.getTime()) / 60_000)),
 				departureDate,
 			};

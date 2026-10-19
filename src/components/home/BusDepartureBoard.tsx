@@ -5,6 +5,7 @@ import {
 	getUpcomingDepartures,
 	SHUTTLE_SERVICE_DATES,
 	type BusDeparture,
+	type BusOperator,
 	type BusTimetable,
 	type DepartureStop,
 	type UpcomingDeparture,
@@ -56,6 +57,7 @@ function DepartureRow({ order, departure }: { order: string; departure: Upcoming
 						</span>
 					) : null}
 				</p>
+				{departure.headsign ? <p className="mt-0.5 text-xs text-text/70">{departure.headsign}</p> : null}
 			</div>
 			<time className="shrink-0 font-primary text-lg font-medium tabular-nums text-text">{departure.time}</time>
 			<p className="w-20 shrink-0 text-right text-xs font-medium whitespace-nowrap tabular-nums text-accent">
@@ -109,6 +111,11 @@ function DepartureChip({ departure }: { departure: BusDeparture }) {
 
 /** 時刻表ダイアログの 1 系統分。経路見出しと、時ごとに分を並べた表。 */
 function TimetableSection({ timetable }: { timetable: BusTimetable }) {
+	// 車両に出る行先表示。この系統に実際に便がある事業者の分だけ出す。
+	const headsigns = (Object.keys(timetable.headsigns) as BusOperator[])
+		.filter((operator) => timetable.departures.some((departure) => departure.operator === operator))
+		.map((operator) => ({ operator, headsign: timetable.headsigns[operator] }));
+
 	return (
 		<section aria-labelledby={`timetable-${timetable.id}`} className="rounded-xl border border-text/15 p-3 sm:p-4">
 			<div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
@@ -117,6 +124,16 @@ function TimetableSection({ timetable }: { timetable: BusTimetable }) {
 				</h4>
 				<span className="text-sm text-accent">下車：{timetable.stop}</span>
 			</div>
+			{headsigns.length > 0 && (
+				<ul className="mt-1 space-y-0.5 text-xs text-text/70">
+					{headsigns.map(({ operator, headsign }) => (
+						<li key={operator}>
+							行先表示：<span className="font-medium text-text">{headsign}</span>
+							{headsigns.length > 1 ? `（${operator === 'smile' ? 'ス' : '印なし'}）` : ''}
+						</li>
+					))}
+				</ul>
+			)}
 			{timetable.departures.length > 0 ? (
 				<dl className="mt-3 divide-y divide-text/10 border-y border-text/10">
 					{groupByHour(timetable.departures).map(({ hour, items }) => (
