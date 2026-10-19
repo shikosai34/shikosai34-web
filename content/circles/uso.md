@@ -6,8 +6,8 @@ category: other
 location: デジタルアーツブース
 genre: culture
 summary: |-
-  茨城高専の七不思議(時)を頒布します
   嘘に関する福利厚生完備
+  会員募集中！
 highlights: |-
   嘘七不思議ツアーで2年前の文化祭を席巻！？
   あのサークルが帰ってきた！
