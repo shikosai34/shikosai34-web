@@ -62,12 +62,14 @@ export function FloorExhibitList({ title, items, hoveredKey, onHover, onSelect }
 
 interface DetailProps {
 	room: MapRoom;
+	/** その天候での使い道（インフォメーション・予選会場など）。名前の下に出す */
+	use?: string;
 	items: MapExhibit[];
 	/** 省略時は「一覧へ戻る」を出さない（屋外の会場など） */
 	onBack?: () => void;
 }
 
-export function RoomDetail({ room, items, onBack }: DetailProps) {
+export function RoomDetail({ room, use, items, onBack }: DetailProps) {
 	return (
 		<div className="flex flex-col gap-4">
 			{onBack && (
@@ -83,8 +85,10 @@ export function RoomDetail({ room, items, onBack }: DetailProps) {
 					{room.parent ? room.number : room.name}
 				</h3>
 			</div>
+			{use && <p className="text-sm font-medium text-glow-pink">{use}</p>}
 			{items.length === 0 ? (
-				<p className="text-sm text-text/60">この部屋の出展情報はありません。</p>
+				// 使い道（インフォメーションなど）があれば、出展がなくても「情報なし」とは書かない
+				use ? null : <p className="text-sm text-text/60">この部屋の出展情報はありません。</p>
 			) : (
 				<ul className="flex flex-col gap-3">
 					{items.map((item) => (

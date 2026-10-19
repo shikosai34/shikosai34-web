@@ -378,7 +378,7 @@ for (const [file, info] of Object.entries(CONFIG)) {
 // 屋外の場所（図面を持たず、3D 上のピンで示す）
 const outdoor = fs.existsSync(OUTDOOR_FILE) ? JSON.parse(fs.readFileSync(OUTDOOR_FILE, 'utf-8')) : {};
 for (const o of outdoor.places ?? []) {
-	roomIndex.push({ key: o.key, building: o.building ?? '屋外', floor: null, number: null, name: o.name, plan: null, at: o.at, ...(o.tents && { tents: o.tents }), ...(o.tentsInset !== undefined && { tentsInset: o.tentsInset }), ...(o.weather && { weather: o.weather }) });
+	roomIndex.push({ key: o.key, building: o.building ?? '屋外', floor: null, number: null, name: o.name, plan: null, at: o.at, ...(o.tents && { tents: o.tents }), ...(o.tentsInset !== undefined && { tentsInset: o.tentsInset }), ...(o.weather && { weather: o.weather }), ...(o.use && { use: o.use }), ...(o.cms === false && { cms: false }) });
 }
 
 // 番号つきの固定のテント（グラウンドの G-1〜G-33 など）。区画図の画像上の座標を、
@@ -472,7 +472,7 @@ for (const block of blocks) {
 	const indent = cms.slice(cms.lastIndexOf('\n', startAt) + 1, startAt);
 	const options = [
 		...block.extra,
-		...roomIndex.filter((r) => (!r.weather || r.weather === block.weather) && !aggregates.has(r.key)).map((r) => ({ label: optionLabel(r), value: r.key })),
+		...roomIndex.filter((r) => (!r.weather || r.weather === block.weather) && !aggregates.has(r.key) && r.cms !== false).map((r) => ({ label: optionLabel(r), value: r.key })),
 	];
 	const lines = options.map((o) => `${indent}- { label: ${q(o.label)}, value: ${q(o.value)} }`);
 	cms = `${cms.slice(0, startAt)}${START}\n${lines.join('\n')}\n${indent}${cms.slice(endAt)}`;

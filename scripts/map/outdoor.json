@@ -59,10 +59,24 @@
 			"building": "屋外",
 			"name": "グラウンド（ロボット部）",
 			"at": [
-				140.552452,
-				36.40031
+				140.5525121,
+				36.4002466
 			],
 			"weather": "sunny"
+		},
+		{
+			"key": "ground-info",
+			"building": "屋外",
+			"name": "インフォ",
+			"at": [
+				140.5524925,
+				36.4003294
+			],
+			"weather": "sunny",
+			"use": {
+				"sunny": "インフォメーション"
+			},
+			"cms": false
 		}
 	],
 	"numbered": [

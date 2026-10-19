@@ -3,7 +3,7 @@ import { Canvas, useFrame, useThree, type ThreeEvent } from '@react-three/fiber'
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import * as THREE from 'three';
-import { PLAN_FILES, project, ROUTE_COLORS, type RouteData } from '../../lib/map';
+import { EXTINGUISHER_COLOR, PLAN_FILES, project, ROUTE_COLORS, type RouteData } from '../../lib/map';
 import type { MapRoom, Weather } from '../../lib/map-rooms';
 
 /*
@@ -759,11 +759,42 @@ function RouteLayer({ routes, animate }: { routes: RouteData['routes']; animate:
 	);
 }
 
+/** 消火器。数が多いので 1 つの InstancedMesh にまとめ、赤い胴に青い光の輪を付けて遠くからも見えるようにする */
+function Extinguishers({ markers }: { markers: RouteData['markers'] }) {
+	const body = useRef<THREE.InstancedMesh>(null);
+	const ring = useRef<THREE.InstancedMesh>(null);
+	useEffect(() => {
+		const m = new THREE.Matrix4();
+		markers.forEach((marker, i) => {
+			const [x, y] = project(marker.at);
+			m.compose(new THREE.Vector3(x, 0.7, -y), new THREE.Quaternion(), new THREE.Vector3(1, 1, 1));
+			body.current?.setMatrixAt(i, m);
+			m.compose(new THREE.Vector3(x, 0.2, -y), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2), new THREE.Vector3(1, 1, 1));
+			ring.current?.setMatrixAt(i, m);
+		});
+		for (const mesh of [body.current, ring.current]) if (mesh) mesh.instanceMatrix.needsUpdate = true;
+	}, [markers]);
+	if (markers.length === 0) return null;
+	return (
+		<group key={markers.length}>
+			<instancedMesh ref={body} args={[undefined, undefined, markers.length]} frustumCulled={false}>
+				<cylinderGeometry args={[0.35, 0.35, 1.4, 10]} />
+				<meshBasicMaterial color="#ff4d4d" toneMapped={false} />
+			</instancedMesh>
+			<instancedMesh ref={ring} args={[undefined, undefined, markers.length]} frustumCulled={false}>
+				<ringGeometry args={[0.9, 1.5, 20]} />
+				<meshBasicMaterial color={EXTINGUISHER_COLOR} toneMapped={false} transparent opacity={0.9} side={THREE.DoubleSide} />
+			</instancedMesh>
+		</group>
+	);
+}
+
 /** ゲート・正門・案内の目印（◆）。地面に置く */
 function RouteMarkers({ markers }: { markers: RouteData['markers'] }) {
 	return (
 		<group>
 			{markers.map((m, i) => {
+				if (m.kind === 'extinguisher') return null;
 				const [x, y] = project(m.at);
 				if (m.kind === 'diamond') {
 					return (
@@ -959,6 +990,10 @@ interface Props {
 	places: MapRoom[];
 	/** 動線・立入禁止区域（その天候のもの）。null なら描かない */
 	routes?: RouteData | null;
+	/** 消火器を描くか（routes のうち kind が extinguisher の目印） */
+	showExtinguishers?: boolean;
+	/** 消火器の位置（その天候のもの） */
+	extinguishers?: RouteData['markers'];
 	/** 番号つきの固定のテント（グラウンドの G-1〜G-33 など） */
 	slots: MapRoom[];
 	/** 選んだテントの真上に出す吹き出し（部屋キーと中身）。なければ出さない */
@@ -977,7 +1012,7 @@ interface Props {
 	onBackgroundClick: () => void;
 }
 
-export default function CampusScene({ campus, counts, places, routes, slots, bubble, selected, camera, animate, lowPower, paused, weather, onPickBuilding, onPickPlace, onBackgroundClick }: Props) {
+export default function CampusScene({ campus, counts, places, routes, showExtinguishers, extinguishers, slots, bubble, selected, camera, animate, lowPower, paused, weather, onPickBuilding, onPickPlace, onBackgroundClick }: Props) {
 	const buildings = useMemo(() => buildingsOf(campus.features), [campus]);
 	const windows = useMemo(() => makeWindowTexture(), []);
 	const [hovered, setHovered] = useState<string | null>(null);
@@ -1074,6 +1109,7 @@ export default function CampusScene({ campus, counts, places, routes, slots, bub
 					</group>
 				))}
 
+			{showExtinguishers && extinguishers && <Extinguishers markers={extinguishers} />}
 			{routes && (
 				<>
 					<RouteLayer routes={routes.routes} animate={animate} />

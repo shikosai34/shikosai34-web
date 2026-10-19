@@ -3,6 +3,7 @@ import CloseIcon from '../icons/CloseIcon';
 import {
 	countExhibitsByBuilding,
 	loadPlan,
+	EXTINGUISHER_COLOR,
 	loadRoutes,
 	PLAN_FILES,
 	project,
@@ -84,6 +85,8 @@ export default function VenueMap({ exhibits: exhibitsByWeather, defaultWeather }
 	const [routeData, setRouteData] = useState<RouteData | null>(null);
 	/** 動線・立入禁止区域を地図に出すか */
 	const [showRoutes, setShowRoutes] = useState(true);
+	/** 消火器の位置を地図に出すか（数が多いので、最初は出さない） */
+	const [showExtinguishers, setShowExtinguishers] = useState(false);
 	const [loadError, setLoadError] = useState(false);
 	const [view, setView] = useState<MapView>(() => readViewFromUrl(location.search));
 	const [plan, setPlan] = useState<Plan | null>(null);
@@ -213,10 +216,13 @@ export default function VenueMap({ exhibits: exhibitsByWeather, defaultWeather }
 	const routes = useMemo((): RouteData | null => {
 		if (!routeData) return null;
 		const routesNow = routeData.routes.filter((r) => r.weather === weather);
-		const markers = routeData.markers.filter((m) => m.weather === weather);
+		const markers = routeData.markers.filter((m) => m.weather === weather && m.kind !== 'extinguisher');
 		const restricted = routeData.restricted.filter((a) => !a.weather || a.weather === weather);
 		return routesNow.length || restricted.length ? { ...routeData, routes: routesNow, markers, restricted } : null;
 	}, [routeData, weather]);
+
+	/** いまの天候の消火器の位置。なければ（雨天時は未提供）ボタンを出さない */
+	const extinguishers = useMemo(() => (routeData?.markers ?? []).filter((m) => m.kind === 'extinguisher' && m.weather === weather), [routeData, weather]);
 
 	const place = findPlace(placeKey);
 	/** 番号つきのテント（1 張り）を選んだときは、ダイアログではなくそのテントの真上に吹き出しで出す */
@@ -246,6 +252,8 @@ export default function VenueMap({ exhibits: exhibitsByWeather, defaultWeather }
 							counts={counts}
 							places={PLACES}
 							routes={showRoutes ? routes : null}
+							showExtinguishers={showExtinguishers}
+							extinguishers={extinguishers}
 							slots={SLOTS}
 							bubble={bubble}
 							selected={selected}
@@ -331,6 +339,17 @@ export default function VenueMap({ exhibits: exhibitsByWeather, defaultWeather }
 								{routes.routes.length > 0 && routes.restricted.length > 0 ? '動線・立入禁止' : routes.routes.length > 0 ? '動線' : '立入禁止'}
 							</button>
 						)}
+						{extinguishers.length > 0 && (
+							<button
+								type="button"
+								role="switch"
+								aria-checked={showExtinguishers}
+								onClick={() => setShowExtinguishers((v) => !v)}
+								className={`whitespace-nowrap rounded-md border px-3 py-1 text-xs backdrop-blur-sm transition-colors ${showExtinguishers ? 'border-[#4d8dff] bg-[#4d8dff]/90 text-base' : 'border-accent/50 bg-base/85 text-text hover:text-main'}`}
+							>
+								消火器
+							</button>
+						)}
 					</div>
 					{routes && showRoutes && (
 						<ul className="pointer-events-none mt-1.5 flex flex-wrap gap-x-3 text-xs text-text/80">
@@ -343,6 +362,12 @@ export default function VenueMap({ exhibits: exhibitsByWeather, defaultWeather }
 									</li>
 								))}
 						</ul>
+					)}
+					{showExtinguishers && extinguishers.length > 0 && (
+						<p className="pointer-events-none mt-1 flex items-center gap-1 whitespace-nowrap text-xs text-text/80">
+							<span className="inline-block h-2.5 w-2.5 rounded-full border-2" style={{ borderColor: EXTINGUISHER_COLOR }} aria-hidden="true" />
+							消火器（発電機・分電盤・火気を使う場所のそば）
+						</p>
 					)}
 				</div>
 			)}
@@ -371,7 +396,7 @@ export default function VenueMap({ exhibits: exhibitsByWeather, defaultWeather }
 					<button type="button" onClick={closePlace} aria-label="閉じる" className="absolute top-3 right-3 text-text/70 hover:text-main">
 						<CloseIcon className="h-5 w-5" />
 					</button>
-					<RoomDetail room={place} items={exhibits[place.key] ?? []} />
+					<RoomDetail room={place} use={place.use?.[weather]} items={exhibits[place.key] ?? []} />
 				</div>
 			)}
 

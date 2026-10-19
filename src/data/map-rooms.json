@@ -1320,6 +1320,23 @@
 		"weather": "sunny"
 	},
 	{
+		"key": "ground-info",
+		"building": "屋外",
+		"floor": null,
+		"number": null,
+		"name": "インフォ",
+		"plan": null,
+		"at": [
+			140.5524925,
+			36.4003294
+		],
+		"weather": "sunny",
+		"use": {
+			"sunny": "インフォメーション"
+		},
+		"cms": false
+	},
+	{
 		"key": "ground",
 		"building": "屋外",
 		"floor": null,
@@ -1340,8 +1357,8 @@
 		"name": "グラウンド（ロボット部）",
 		"plan": null,
 		"at": [
-			140.552452,
-			36.40031
+			140.5525121,
+			36.4002466
 		],
 		"weather": "sunny"
 	},

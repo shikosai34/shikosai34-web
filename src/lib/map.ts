@@ -148,7 +148,7 @@ export interface MapRoute {
 }
 
 export interface RouteMarker {
-	kind: 'gate' | 'main-gate' | 'diamond';
+	kind: 'gate' | 'main-gate' | 'diamond' | 'extinguisher';
 	weather: Weather;
 	name?: string;
 	at: [number, number];
@@ -168,6 +168,9 @@ export interface RouteData {
 	markers: RouteMarker[];
 	restricted: RestrictedArea[];
 }
+
+/** 消火器（消防用出展マップの消化器設置場所）の色。図の青い点に合わせる */
+export const EXTINGUISHER_COLOR = '#4d8dff';
 
 /** 動線の色。サイトのパレットの橙（main）とマゼンタ寄りの赤（glitch の明るい側） */
 export const ROUTE_COLORS: Record<RouteKind, string> = { yellow: '#ffb347', red: '#ff4d6d' };

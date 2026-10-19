@@ -52,34 +52,53 @@ function solve3(A, b) {
 	return x;
 }
 
+/** 画像 (x, y) → 平面 (E, N) のアフィン変換を最小二乗で求める。pairs は [{ px: [x, y], plane: [E, N] }] */
+function affineFit(pairs) {
+	const normal = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+	const rhsE = [0, 0, 0];
+	const rhsN = [0, 0, 0];
+	for (const { px: [x, y], plane: [e, n] } of pairs) {
+		const v = [x, y, 1];
+		for (let i = 0; i < 3; i++) {
+			for (let j = 0; j < 3; j++) normal[i][j] += v[i] * v[j];
+			rhsE[i] += v[i] * e;
+			rhsN[i] += v[i] * n;
+		}
+	}
+	const [ae, be, ce] = solve3(normal, rhsE);
+	const [an, bn, cn] = solve3(normal, rhsN);
+	const apply = ([x, y]) => [ae * x + be * y + ce, an * x + bn * y + cn];
+	return { apply, residuals: pairs.map(({ px, plane }) => Math.hypot(...apply(px).map((v, i) => v - plane[i]))) };
+}
+
 const pairs = Object.entries(source.calibration).map(([name, px]) => {
 	if (!centers[name]) throw new Error(`calibration の建物「${name}」が campus.geojson にありません`);
 	return { px, plane: centers[name] };
 });
-const normal = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
-const rhsE = [0, 0, 0];
-const rhsN = [0, 0, 0];
-for (const { px: [x, y], plane: [e, n] } of pairs) {
-	const v = [x, y, 1];
-	for (let i = 0; i < 3; i++) {
-		for (let j = 0; j < 3; j++) normal[i][j] += v[i] * v[j];
-		rhsE[i] += v[i] * e;
-		rhsN[i] += v[i] * n;
-	}
-}
-const [ae, be, ce] = solve3(normal, rhsE);
-const [an, bn, cn] = solve3(normal, rhsN);
-const toGeo = ([x, y]) => toLonLat([ae * x + be * y + ce, an * x + bn * y + cn]).map(round);
+const fitRoutes = affineFit(pairs);
+const toGeo = (px) => toLonLat(fitRoutes.apply(px)).map(round);
 
-const residuals = pairs.map(({ px: [x, y], plane: [e, n] }) => Math.hypot(ae * x + be * y + ce - e, an * x + bn * y + cn - n));
-console.log(`位置合わせの誤差（m）: ${residuals.map((r) => r.toFixed(1)).join(', ')}`);
-if (Math.max(...residuals) > 12) console.warn('⚠ 位置合わせの誤差が大きい建物があります（calibration の座標を見直してください）');
+console.log(`位置合わせの誤差（m）: ${fitRoutes.residuals.map((r) => r.toFixed(1)).join(', ')}`);
+if (Math.max(...fitRoutes.residuals) > 12) console.warn('⚠ 位置合わせの誤差が大きい建物があります（calibration の座標を見直してください）');
+
+// 消防用出展マップ（確定版）の消化器設置場所。グラウンドのテント（G-1〜G-33）の位置を基準に、図の画像 → 地図を合わせる
+const safety = JSON.parse(fs.readFileSync(path.join(ROOT, 'scripts/map/safety.json'), 'utf-8'));
+const rooms = JSON.parse(fs.readFileSync(path.join(ROOT, 'src/data/map-rooms.json'), 'utf-8'));
+const tentPairs = Object.entries(safety.tents).map(([key, px]) => {
+	const room = rooms.find((r) => r.key === key);
+	if (!room?.at) throw new Error(`消防用出展マップのテント「${key}」が src/data/map-rooms.json にありません（先に build-plans.mjs）`);
+	return { px, plane: toPlane(room.at) };
+});
+const fitTents = affineFit(tentPairs);
+console.log(`消防用出展マップの位置合わせの誤差（m）: 平均 ${(fitTents.residuals.reduce((a, b) => a + b, 0) / fitTents.residuals.length).toFixed(1)}、最大 ${Math.max(...fitTents.residuals).toFixed(1)}`);
+const toGeoSafety = (px) => toLonLat(fitTents.apply(px)).map(round);
+const extinguishers = (safety.extinguishers ?? []).map((px) => ({ kind: 'extinguisher', weather: safety.weather, at: toGeoSafety(px) }));
 
 const out = {
 	legend: source.legend,
 	routes: source.routes.map((r) => ({ id: r.id, kind: r.kind, weather: r.weather, arrow: r.arrow !== false, points: r.points.map(toGeo) })),
-	markers: source.markers.map((m) => ({ kind: m.kind, weather: m.weather, name: m.name, at: toGeo(m.at) })),
+	markers: [...source.markers.map((m) => ({ kind: m.kind, weather: m.weather, name: m.name, at: toGeo(m.at) })), ...extinguishers],
 	restricted: (source.restricted ?? []).map((a) => ({ id: a.id, name: a.name, weather: a.weather, points: a.points.map(toGeo) })),
 };
 fs.writeFileSync(OUT, `${JSON.stringify(out)}\n`);
-console.log(`public/map/routes.json: 動線 ${out.routes.length} 本、目印 ${out.markers.length}、立入禁止区域 ${out.restricted.length}`);
+console.log(`public/map/routes.json: 動線 ${out.routes.length} 本、目印 ${out.markers.length}（うち消火器 ${extinguishers.length}）、立入禁止区域 ${out.restricted.length}`);
