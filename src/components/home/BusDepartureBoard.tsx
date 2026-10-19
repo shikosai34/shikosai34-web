@@ -50,7 +50,7 @@ function DepartureRow({ order, departure }: { order: string; departure: Upcoming
 				<p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-text">
 					{departure.headsign ? <span className="whitespace-nowrap">{departure.headsign}</span> : null}
 					{departure.extra ? (
-						<span className="rounded-full bg-main px-2 py-0.5 text-xs font-medium text-on-main">臨時便</span>
+						<span className="rounded-full bg-main px-2 py-0.5 text-xs font-medium text-on-main">臨時便（臨）</span>
 					) : departure.operator === 'smile' ? (
 						<span className="rounded-full border border-text/30 px-2 py-0.5 text-xs font-medium text-text/70">
 							{BUS_OPERATOR_LABELS.smile}
