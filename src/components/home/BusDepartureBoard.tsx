@@ -4,6 +4,7 @@ import {
 	getBusTimetables,
 	getUpcomingDepartures,
 	SHUTTLE_SERVICE_DATES,
+	type BusDeparture,
 	type BusTimetable,
 	type DepartureStop,
 	type UpcomingDeparture,
@@ -64,39 +65,72 @@ function DepartureRow({ order, departure }: { order: string; departure: Upcoming
 	);
 }
 
-/** 時刻表ダイアログの 1 系統分。経路見出しと、全便を時刻順に並べたリスト。 */
+/** 時刻表チップの種別バッジ。色だけでなく文字でも臨時便・スマイルあおぞらバスを区別する。 */
+function departureBadge(departure: BusDeparture) {
+	if (departure.extra) return '臨';
+	if (departure.operator === 'smile') return 'ス';
+	return null;
+}
+
+/** 便を「時」ごとにまとめる。便のない時間帯は行にならない。 */
+function groupByHour(departures: BusDeparture[]) {
+	const groups: { hour: number; items: BusDeparture[] }[] = [];
+	for (const departure of departures) {
+		const hour = Number(departure.time.split(':')[0]);
+		const last = groups[groups.length - 1];
+		if (last && last.hour === hour) last.items.push(departure);
+		else groups.push({ hour, items: [departure] });
+	}
+	return groups;
+}
+
+/** 時刻表ダイアログの 1 系統分。経路見出しと、時ごとに分を並べた表。 */
 function TimetableSection({ timetable }: { timetable: BusTimetable }) {
 	return (
-		<section aria-labelledby={`timetable-${timetable.id}`}>
+		<section aria-labelledby={`timetable-${timetable.id}`} className="rounded-xl border border-text/15 p-3 sm:p-4">
 			<div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-				<h4 id={`timetable-${timetable.id}`} className="text-sm font-medium text-text">
+				<h4 id={`timetable-${timetable.id}`} className="text-base font-medium text-text">
 					{timetable.route}
 				</h4>
-				<span className="text-xs text-text/60">下車：{timetable.stop}</span>
+				<span className="text-sm text-accent">下車：{timetable.stop}</span>
 			</div>
-			<p className="mt-0.5 text-xs text-text/60">{timetable.stopNote}</p>
+			<p className="mt-1 text-xs leading-relaxed text-text/70">{timetable.stopNote}</p>
 			{timetable.departures.length > 0 ? (
-				<ul className="mt-2 flex flex-wrap gap-1.5">
-					{timetable.departures.map((departure) => (
-						<li
-							key={`${timetable.id}-${departure.time}`}
-							className={`rounded-md border px-2 py-1 text-xs tabular-nums ${
-								departure.extra
-									? 'border-main/40 bg-main/10 font-medium text-text'
-									: departure.operator === 'smile'
-										? 'border-text/20 bg-base text-text/80'
-										: 'border-text/15 bg-base text-text'
-							}`}
-						>
-							{departure.time}
-							{departure.extra ? '（臨）' : departure.operator === 'smile' ? '（ス）' : ''}
-						</li>
+				<dl className="mt-3 divide-y divide-text/10 border-y border-text/10">
+					{groupByHour(timetable.departures).map(({ hour, items }) => (
+						<div key={`${timetable.id}-${hour}`} className="flex items-start gap-3 py-2">
+							<dt className="w-10 shrink-0 pt-1 text-right text-sm font-medium tabular-nums text-text">{hour}時</dt>
+							<dd className="flex flex-1 flex-wrap gap-1.5">
+								{items.map((departure) => {
+									const badge = departureBadge(departure);
+									return (
+										<span
+											key={`${timetable.id}-${departure.time}-${departure.extra}`}
+											className={`flex h-8 w-14 items-center justify-center gap-0.5 rounded-md border text-sm tabular-nums ${
+												departure.extra
+													? 'border-main/50 bg-main/10 font-medium text-text'
+													: departure.operator === 'smile'
+														? 'border-text/30 text-text'
+														: 'border-text/15 text-text'
+											}`}
+										>
+											<time dateTime={departure.time}>{departure.time.split(':')[1]}</time>
+											{badge ? (
+												<span aria-label={departure.extra ? '臨時便' : 'スマイルあおぞらバス'} className="text-xs text-text/70">
+													{badge}
+												</span>
+											) : null}
+										</span>
+									);
+								})}
+							</dd>
+						</div>
 					))}
-				</ul>
+				</dl>
 			) : (
-				<p className="mt-2 text-xs text-text/60">この系統の便はありません。</p>
+				<p className="mt-3 text-sm text-text/70">この系統の便はありません。</p>
 			)}
-			{timetable.caveat && <p className="mt-2 text-xs leading-relaxed text-text/60">{timetable.caveat}</p>}
+			{timetable.caveat && <p className="mt-3 text-xs leading-relaxed text-text/70">{timetable.caveat}</p>}
 		</section>
 	);
 }
@@ -105,10 +139,14 @@ function TimetableSection({ timetable }: { timetable: BusTimetable }) {
  * 全系統・全便の時刻表ダイアログ。
  *
  * 茨香祭の開催日（10/24・10/25）はどちらも土日祝ダイヤのため、平日ダイヤは
- * 載せず土日祝ダイヤのみ表示する。
+ * 載せず土日祝ダイヤのみ表示する。面は後ろのページが透けないよう不透明にする。
  */
 function TimetableDialog({ dialogRef, isShuttleDay: shuttleDay }: { dialogRef: RefObject<HTMLDialogElement | null>; isShuttleDay: boolean }) {
 	const weekendTimetables = getBusTimetables('weekend');
+	const directions: { label: string; timetables: BusTimetable[] }[] = [
+		{ label: '往路（勝田駅 → 高専方面）', timetables: weekendTimetables.filter((t) => t.direction === '往路') },
+		{ label: '復路（高専方面 → 勝田駅）', timetables: weekendTimetables.filter((t) => t.direction === '復路') },
+	];
 
 	return (
 		<dialog
@@ -122,44 +160,59 @@ function TimetableDialog({ dialogRef, isShuttleDay: shuttleDay }: { dialogRef: R
 					if (event.target === event.currentTarget) dialogRef.current?.close();
 				}}
 			>
-				<div className="surface-panel max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl p-4 pt-5 pb-6 text-text sm:p-6">
-					<div className="mb-4 flex items-center justify-between gap-3">
+				<div className="max-h-[85dvh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-text/15 bg-base text-text shadow-2xl">
+					<div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-text/15 bg-base px-4 py-3 sm:px-6">
 						<div className="flex items-center gap-2">
 							<BusIcon className="h-6 w-6 shrink-0 text-accent" />
-							<h2 className="text-lg font-medium tracking-wide text-text">バス時刻表一覧</h2>
+							<h2 className="text-lg font-medium text-text">バス時刻表一覧</h2>
 						</div>
 						<button
 							type="button"
 							aria-label="閉じる"
 							onClick={() => dialogRef.current?.close()}
-							className="shrink-0 rounded-full p-1.5 text-text/70 transition-colors hover:bg-text/10 hover:text-text"
+							className="shrink-0 rounded-full p-2 text-text/70 transition-colors hover:bg-text/10 hover:text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
 						>
 							<CloseIcon className="h-5 w-5" />
 						</button>
 					</div>
 
-					<p className="text-xs text-text/60">
-						茨城交通（定期便）とスマイルあおぞらバス（表示は「ス」）の全便です。
-						{shuttleDay ? '本日は茨城高専スクールバス（表示は「臨」）も運行します。' : '茨城高専スクールバス（臨時便）は茨香祭当日のみ運行します。'}
-						時刻は出発時刻の予定で、遅延は反映されません。
-					</p>
+					<div className="space-y-6 p-4 pb-6 sm:p-6 sm:pb-8">
+						<div className="space-y-2">
+							<p className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-text">
+								<span>
+									<span className="font-medium">臨</span>＝茨城高専スクールバス
+								</span>
+								<span>
+									<span className="font-medium">ス</span>＝スマイルあおぞらバス
+								</span>
+							</p>
+							<p className="text-xs leading-relaxed text-text/70">
+								表の数字は出発時刻の「分」です。印のない便は茨城交通の定期便です。
+								{shuttleDay ? '' : '臨時便は茨香祭当日のみ運行します。'}
+								遅延は反映されません。
+							</p>
+						</div>
 
-					<div className="mt-5 space-y-4">
-						{weekendTimetables.map((timetable) => (
-							<TimetableSection key={timetable.id} timetable={timetable} />
+						{directions.map(({ label, timetables }) => (
+							<div key={label} className="space-y-3">
+								<h3 className="text-sm font-medium text-text/70">{label}</h3>
+								{timetables.map((timetable) => (
+									<TimetableSection key={timetable.id} timetable={timetable} />
+								))}
+							</div>
 						))}
-					</div>
 
-					<p className="mt-6 text-center text-xs leading-relaxed text-text/60">
-						乗り場・運賃など詳しい案内は
-						<a
-							href="/access"
-							className="text-accent underline underline-offset-4 hover:decoration-2 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-						>
-							アクセスページ
-						</a>
-						をご覧ください。
-					</p>
+						<p className="text-center text-xs leading-relaxed text-text/70">
+							乗り場・運賃など詳しい案内は
+							<a
+								href="/access"
+								className="text-accent underline underline-offset-4 hover:decoration-2 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+							>
+								アクセスページ
+							</a>
+							をご覧ください。
+						</p>
+					</div>
 				</div>
 			</div>
 		</dialog>
