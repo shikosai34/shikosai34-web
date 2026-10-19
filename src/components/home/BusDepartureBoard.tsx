@@ -215,18 +215,14 @@ function TimetableDialog({
 					</div>
 
 					<div className="space-y-6 p-4 pb-6 sm:p-6 sm:pb-8">
-						<div role="group" aria-label="ダイヤの種類" className="grid grid-cols-2 gap-2">
+						<div role="group" aria-label="ダイヤの種類" className="flex flex-wrap gap-2">
 							{SCHEDULE_KINDS.map((option) => (
 								<button
 									key={option.kind}
 									type="button"
 									aria-pressed={kind === option.kind}
 									onClick={() => setSelectedKind(option.kind)}
-									className={`rounded-full border px-3 py-2 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
-										kind === option.kind
-											? 'border-accent bg-accent font-medium text-on-accent'
-											: 'border-text/30 text-text hover:border-accent hover:text-accent'
-									}`}
+									className="min-h-10 rounded-full border border-text/30 px-3 py-1.5 text-sm text-text transition-colors hover:border-main aria-pressed:border-main aria-pressed:bg-main aria-pressed:font-medium aria-pressed:text-on-main focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
 								>
 									{option.label}
 								</button>
