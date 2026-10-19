@@ -215,19 +215,24 @@ function TimetableDialog({
 					</div>
 
 					<div className="space-y-6 p-4 pb-6 sm:p-6 sm:pb-8">
-						<div role="group" aria-label="ダイヤの種類" className="flex flex-wrap gap-2">
-							{SCHEDULE_KINDS.map((option) => (
-								<button
-									key={option.kind}
-									type="button"
-									aria-pressed={kind === option.kind}
-									onClick={() => setSelectedKind(option.kind)}
-									className="min-h-10 rounded-full border border-text/30 px-3 py-1.5 text-sm text-text transition-colors hover:border-main aria-pressed:border-main aria-pressed:bg-main aria-pressed:font-medium aria-pressed:text-on-main focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-								>
-									{option.label}
-								</button>
-							))}
-						</div>
+						<section aria-labelledby="schedule-kind-label">
+							<h3 id="schedule-kind-label" className="mb-2 text-xs font-medium text-text/70">
+								ダイヤ
+							</h3>
+							<div role="group" aria-label="ダイヤを選択" className="flex flex-wrap gap-2">
+								{SCHEDULE_KINDS.map((option) => (
+									<button
+										key={option.kind}
+										type="button"
+										aria-pressed={kind === option.kind}
+										onClick={() => setSelectedKind(option.kind)}
+										className="min-h-10 rounded-full border border-text/30 px-3 py-1.5 text-sm text-text transition-colors hover:border-main aria-pressed:border-main aria-pressed:bg-main aria-pressed:font-medium aria-pressed:text-on-main focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+									>
+										{option.label}
+									</button>
+								))}
+							</div>
+						</section>
 
 						<section aria-labelledby="timetable-guide" className="space-y-3 rounded-xl bg-text/5 p-3 sm:p-4">
 							<h3 id="timetable-guide" className="text-sm font-medium text-text">
