@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import {
 	BUS_OPERATOR_LABELS,
+	BUS_ROUTES,
 	getBusTimetables,
 	getUpcomingDepartures,
 	SHUTTLE_SERVICE_DATES,
 	type BusDeparture,
 	type BusTimetable,
-	type DepartureStop,
 	type UpcomingDeparture,
 } from '../../lib/bus';
 import BusIcon from '../icons/BusIcon';
@@ -15,11 +15,14 @@ import CloseIcon from '../icons/CloseIcon';
 /** 「次」「次々」の見出し。駅の発車標の「次」「次々」表記にならう。 */
 const ORDER_LABELS = ['次', '次々'];
 
-/** 発車標の列。左＝勝田駅発、右＝高専・深谷津発（復路側）。 */
-const COLUMNS: { heading: string; stops: DepartureStop[] }[] = [
-	{ heading: '勝田駅発', stops: ['勝田駅'] },
-	{ heading: '茨城高専前・深谷津発', stops: ['茨城高専前', '深谷津'] },
+/** 発車標の列。茨城高専に行く便・高専から帰る便に絞る（深谷津など高専前を通らない系統は載せない）。 */
+const COLUMNS: { heading: string; routeId: string; stop: '勝田駅' | '茨城高専前' }[] = [
+	{ heading: '勝田駅 → 茨城高専（行き）', routeId: 'outbound-kosen', stop: '勝田駅' },
+	{ heading: '茨城高専 → 勝田駅（帰り）', routeId: 'inbound-kosen', stop: '茨城高専前' },
 ];
+
+/** 発車標が対象にする系統。 */
+const BOARD_ROUTES = BUS_ROUTES.filter((route) => COLUMNS.some((column) => column.routeId === route.id));
 
 /** 当日（臨時便の運行日）かどうか。表示文言の出し分けに使う。 */
 function isShuttleDay(now: Date) {
@@ -36,30 +39,25 @@ function formatMinutesLeft(minutesLeft: number) {
 	return minutes === 0 ? `あと${hours}時間` : `あと${hours}時間${minutes}分`;
 }
 
-/** 発車標 1 行分（経路・時刻・残り時間）。 */
+/** 発車標 1 行分（行先・時刻・残り時間）。 */
 function DepartureRow({ order, departure }: { order: string; departure: UpcomingDeparture }) {
 	return (
-		<li className="flex items-center gap-3 rounded-lg border border-text/15 bg-base px-3 py-2.5">
+		<li className="flex items-center gap-2 rounded-lg border border-text/15 bg-base px-3 py-2.5">
 			<span className="w-6 shrink-0 text-center text-xs font-medium text-text/50">{order}</span>
 			<div className="min-w-0 flex-1">
-				<p className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-sm text-text">
-					<span className="truncate">{departure.from}</span>
-					<span aria-hidden="true" className="text-text/40">
-						→
-					</span>
-					<span className="truncate text-text/80">{departure.stop}</span>
+				<p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-text">
+					<span className="whitespace-nowrap">{departure.headsign ?? '茨城高専スクールバス'}</span>
 					{departure.extra ? (
-						<span className="rounded-full bg-main px-2 py-0.5 text-[10px] font-medium text-base">臨時便</span>
+						<span className="rounded-full bg-main px-2 py-0.5 text-xs font-medium text-on-main">臨時便</span>
 					) : departure.operator === 'smile' ? (
-						<span className="rounded-full border border-text/30 px-2 py-0.5 text-[10px] font-medium text-text/70">
+						<span className="rounded-full border border-text/30 px-2 py-0.5 text-xs font-medium text-text/70">
 							{BUS_OPERATOR_LABELS.smile}
 						</span>
 					) : null}
 				</p>
-				{departure.headsign ? <p className="mt-0.5 text-xs text-text/70">{departure.headsign}</p> : null}
 			</div>
 			<time className="shrink-0 font-primary text-lg font-medium tabular-nums text-text">{departure.time}</time>
-			<p className="w-20 shrink-0 text-right text-xs font-medium whitespace-nowrap tabular-nums text-accent">
+			<p className="shrink-0 text-right text-sm font-medium whitespace-nowrap tabular-nums text-accent">
 				{formatMinutesLeft(departure.minutesLeft)}
 			</p>
 		</li>
@@ -250,19 +248,14 @@ function TimetableDialog({ dialogRef, isShuttleDay: shuttleDay }: { dialogRef: R
 }
 
 /** 1 列分（勝田駅発 or 高専・深谷津発）。複数の出発地点の便を時刻順にまとめる。 */
-function DepartureColumn({ heading, stops, byStop }: { heading: string; stops: DepartureStop[]; byStop: Record<DepartureStop, UpcomingDeparture[]> }) {
-	const departures = stops
-		.flatMap((stop) => byStop[stop])
-		.sort((a, b) => a.departureDate.getTime() - b.departureDate.getTime())
-		.slice(0, ORDER_LABELS.length);
-
+function DepartureColumn({ heading, departures }: { heading: string; departures: UpcomingDeparture[] }) {
 	return (
 		<div>
 			<h3 className="text-sm font-medium text-text">{heading}</h3>
 			{departures.length > 0 ? (
 				<ul className="mt-2 space-y-2">
 					{departures.map((departure, index) => (
-						<DepartureRow key={`${departure.routeId}-${departure.time}`} order={ORDER_LABELS[index]} departure={departure} />
+						<DepartureRow key={`${departure.routeId}-${departure.time}-${index}`} order={ORDER_LABELS[index]} departure={departure} />
 					))}
 				</ul>
 			) : (
@@ -275,11 +268,14 @@ function DepartureColumn({ heading, stops, byStop }: { heading: string; stops: D
 }
 
 /**
- * トップページに常設する、駅の発車標ふうのバス発車カウントダウン。
+ * トップページに常設する「次のバス」案内。
  *
- * 「勝田駅発」「茨城高専前・深谷津発」の 2 列に分け、各列とも次発・次々発の
- * 2 本を時刻と残り時間つきで表示する。定期便は曜日から平日・休日ダイヤを
- * 自動判定し、茨香祭当日（SHUTTLE_SERVICE_DATES）は臨時便も合わせて出す。
+ * 茨城高専へ行く人・高専から帰る人が知りたいのは「次に乗れる、高専前に
+ * 停まるバス」なので、勝田駅発（高専前行き）と高専前発（勝田駅行き）の
+ * 2 列に絞り、各列とも次発・次々発の 2 本を行先・時刻・残り時間つきで出す。
+ * 深谷津など高専前を通らない系統は全便の時刻表ダイアログにだけ載せる。
+ * 定期便は曜日から平日・休日ダイヤを自動判定し、茨香祭当日
+ * （SHUTTLE_SERVICE_DATES）は臨時便も合わせて出す。
  * 遅延情報は取得手段がないため、時刻表どおりの予定として表示する。
  */
 export default function BusDepartureBoard() {
@@ -295,7 +291,9 @@ export default function BusDepartureBoard() {
 	}, []);
 
 	const today = now ? isShuttleDay(now) : false;
-	const byStop = now ? getUpcomingDepartures(now) : { 勝田駅: [], 茨城高専前: [], 深谷津: [] };
+	const byStop = now
+		? getUpcomingDepartures(now, { limit: ORDER_LABELS.length, routes: BOARD_ROUTES })
+		: { 勝田駅: [], 茨城高専前: [], 深谷津: [] };
 
 	const dialogRef = useRef<HTMLDialogElement>(null);
 	const openTimetableDialog = () => {
@@ -307,18 +305,17 @@ export default function BusDepartureBoard() {
 		<section className="surface-panel mt-6 rounded-2xl p-4 pt-6 pb-6 text-text sm:p-6">
 			<div className="flex items-center gap-2">
 				<BusIcon className="h-6 w-6 shrink-0 text-accent" />
-				<h2 className="text-lg font-medium tracking-wide text-text">バス発車カウントダウン</h2>
+				<h2 className="text-lg font-medium tracking-wide text-text">次のバス</h2>
 			</div>
 
-			<p className="mt-2 text-xs text-text/60">
-				{today
-					? '茨城高専スクールバス（臨時便）・茨城交通の定期便の両方を含みます。時刻は出発時刻の予定で、遅延は反映されません。'
-					: '茨城交通の定期便の時刻です。茨城高専スクールバス（臨時便）は茨香祭当日のみ運行します。'}
+			<p className="mt-2 text-xs text-text/70">
+				茨城高専前に停まるバスだけを表示しています。時刻は出発時刻の予定で、遅延は反映されません。
+				{today ? '' : '茨城高専スクールバス（臨時便）は茨香祭当日のみ運行します。'}
 			</p>
 
 			<div className="mt-4 grid gap-6 sm:grid-cols-2">
 				{COLUMNS.map((column) => (
-					<DepartureColumn key={column.heading} heading={column.heading} stops={column.stops} byStop={byStop} />
+					<DepartureColumn key={column.heading} heading={column.heading} departures={byStop[column.stop]} />
 				))}
 			</div>
 
@@ -329,7 +326,7 @@ export default function BusDepartureBoard() {
 					aria-haspopup="dialog"
 					className="inline-block rounded-full border border-text/30 px-4 py-2 text-sm text-text transition-colors hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
 				>
-					時刻表はこちら
+					全便の時刻表を見る
 				</button>
 			</div>
 
