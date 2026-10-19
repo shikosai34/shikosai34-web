@@ -84,6 +84,29 @@ function groupByHour(departures: BusDeparture[]) {
 	return groups;
 }
 
+/** 時刻表の 1 便分。分だけを固定幅で出し、臨時便・スマイルあおぞらバスは印を添える。 */
+function DepartureChip({ departure }: { departure: BusDeparture }) {
+	const badge = departureBadge(departure);
+	return (
+		<span
+			className={`flex h-8 w-14 items-center justify-center gap-0.5 rounded-md border text-sm tabular-nums ${
+				departure.extra
+					? 'border-main/50 bg-main/10 font-medium text-text'
+					: departure.operator === 'smile'
+						? 'border-text/30 text-text'
+						: 'border-text/15 text-text'
+			}`}
+		>
+			<time dateTime={departure.time}>{departure.time.split(':')[1]}</time>
+			{badge ? (
+				<span aria-label={departure.extra ? '臨時便' : 'スマイルあおぞらバス'} className="text-xs text-text/70">
+					{badge}
+				</span>
+			) : null}
+		</span>
+	);
+}
+
 /** 時刻表ダイアログの 1 系統分。経路見出しと、時ごとに分を並べた表。 */
 function TimetableSection({ timetable }: { timetable: BusTimetable }) {
 	return (
@@ -94,35 +117,15 @@ function TimetableSection({ timetable }: { timetable: BusTimetable }) {
 				</h4>
 				<span className="text-sm text-accent">下車：{timetable.stop}</span>
 			</div>
-			<p className="mt-1 text-xs leading-relaxed text-text/70">{timetable.stopNote}</p>
 			{timetable.departures.length > 0 ? (
 				<dl className="mt-3 divide-y divide-text/10 border-y border-text/10">
 					{groupByHour(timetable.departures).map(({ hour, items }) => (
 						<div key={`${timetable.id}-${hour}`} className="flex items-start gap-3 py-2">
 							<dt className="w-10 shrink-0 pt-1 text-right text-sm font-medium tabular-nums text-text">{hour}時</dt>
 							<dd className="flex flex-1 flex-wrap gap-1.5">
-								{items.map((departure) => {
-									const badge = departureBadge(departure);
-									return (
-										<span
-											key={`${timetable.id}-${departure.time}-${departure.extra}`}
-											className={`flex h-8 w-14 items-center justify-center gap-0.5 rounded-md border text-sm tabular-nums ${
-												departure.extra
-													? 'border-main/50 bg-main/10 font-medium text-text'
-													: departure.operator === 'smile'
-														? 'border-text/30 text-text'
-														: 'border-text/15 text-text'
-											}`}
-										>
-											<time dateTime={departure.time}>{departure.time.split(':')[1]}</time>
-											{badge ? (
-												<span aria-label={departure.extra ? '臨時便' : 'スマイルあおぞらバス'} className="text-xs text-text/70">
-													{badge}
-												</span>
-											) : null}
-										</span>
-									);
-								})}
+								{items.map((departure) => (
+									<DepartureChip key={`${timetable.id}-${departure.time}-${departure.extra}`} departure={departure} />
+								))}
 							</dd>
 						</div>
 					))}
@@ -130,7 +133,6 @@ function TimetableSection({ timetable }: { timetable: BusTimetable }) {
 			) : (
 				<p className="mt-3 text-sm text-text/70">この系統の便はありません。</p>
 			)}
-			{timetable.caveat && <p className="mt-3 text-xs leading-relaxed text-text/70">{timetable.caveat}</p>}
 		</section>
 	);
 }
@@ -177,21 +179,46 @@ function TimetableDialog({ dialogRef, isShuttleDay: shuttleDay }: { dialogRef: R
 					</div>
 
 					<div className="space-y-6 p-4 pb-6 sm:p-6 sm:pb-8">
-						<div className="space-y-2">
-							<p className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-text">
-								<span>
-									<span className="font-medium">臨</span>＝茨城高専スクールバス
-								</span>
-								<span>
-									<span className="font-medium">ス</span>＝スマイルあおぞらバス
-								</span>
-							</p>
-							<p className="text-xs leading-relaxed text-text/70">
-								表の数字は出発時刻の「分」です。印のない便は茨城交通の定期便です。
-								{shuttleDay ? '' : '臨時便は茨香祭当日のみ運行します。'}
-								遅延は反映されません。
-							</p>
-						</div>
+						<section aria-labelledby="timetable-guide" className="space-y-3 rounded-xl bg-text/5 p-3 sm:p-4">
+							<h3 id="timetable-guide" className="text-sm font-medium text-text">
+								見方
+							</h3>
+							<ul className="space-y-2 text-sm text-text">
+								<li className="flex items-center gap-3">
+									<DepartureChip departure={{ time: '9:15', extra: false, operator: 'ibako' }} />
+									<span>印なし：茨城交通の定期便</span>
+								</li>
+								<li className="flex items-center gap-3">
+									<DepartureChip departure={{ time: '9:35', extra: true }} />
+									<span>臨：茨城高専スクールバス（臨時便）</span>
+								</li>
+								<li className="flex items-center gap-3">
+									<DepartureChip departure={{ time: '8:14', extra: false, operator: 'smile' }} />
+									<span>ス：スマイルあおぞらバス</span>
+								</li>
+							</ul>
+							<ul className="list-disc space-y-1 pl-5 text-xs leading-relaxed text-text/80">
+								<li>左の「9時」などが時、枠の中の数字が出発時刻の分です。</li>
+								<li>
+									茨城高専へは<span className="font-medium text-text">「茨城高専前」</span>に停まる便をご利用ください。往路は下車後に北へ、復路は正門を出て南へ進むと乗り場です。
+								</li>
+								<li>「深谷津」の便は茨城高専前を通らず、高専から離れています。スマイルあおぞらバスは往路のみ載せています。</li>
+								<li>
+									{shuttleDay ? '臨時便は本日運行します。' : '臨時便は茨香祭当日のみ運行します。'}
+									時刻は出発時刻の予定で、遅延は反映されません。
+								</li>
+								<li>
+									乗り場・運賃は
+									<a
+										href="/access"
+										className="text-accent underline underline-offset-4 hover:decoration-2 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+									>
+										アクセスページ
+									</a>
+									をご覧ください。
+								</li>
+							</ul>
+						</section>
 
 						{directions.map(({ label, timetables }) => (
 							<div key={label} className="space-y-3">
@@ -202,16 +229,6 @@ function TimetableDialog({ dialogRef, isShuttleDay: shuttleDay }: { dialogRef: R
 							</div>
 						))}
 
-						<p className="text-center text-xs leading-relaxed text-text/70">
-							乗り場・運賃など詳しい案内は
-							<a
-								href="/access"
-								className="text-accent underline underline-offset-4 hover:decoration-2 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-							>
-								アクセスページ
-							</a>
-							をご覧ください。
-						</p>
 					</div>
 				</div>
 			</div>
