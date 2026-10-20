@@ -3,10 +3,11 @@ import SiteFooter from '../../components/layout/SiteFooter.astro';
 import SiteHeader from '../../components/layout/SiteHeader.astro';
 import SectionHeading from '../../components/ui/SectionHeading';
 import Layout from '../../layouts/Layout.astro';
-import { getSponsorGroups, getSponsorSizeClass } from '../../lib/sponsors';
+import { getSponsorGroups, getSponsorSizeClass, getVisibleGoodsSponsors } from '../../lib/sponsors';
 
 const groups = await getSponsorGroups();
 const maxAmount = groups[0]?.amount ?? 0;
+const goodsSponsors = await getVisibleGoodsSponsors();
 ---
 
 <Layout title="協賛 | 第34回 茨香祭">
@@ -17,10 +18,12 @@ const maxAmount = groups[0]?.amount ?? 0;
 			<SectionHeading title="Sponsor" icon="handshake" />
 
 			{
-				groups.length === 0 ? (
+				groups.length === 0 && goodsSponsors.length === 0 ? (
 					<p class="py-8 text-center text-sm text-text/70">協賛企業情報は準備中です。</p>
 				) : (
 					<>
+						{groups.length > 0 && (
+						<>
 						<p class="mb-12 text-sm leading-relaxed text-text/80">
 							第34回茨香祭を開催するにあたり、非常に多くの方々にご協賛をいただきました。
 							ここに深くお礼申し上げます。（敬称略・五十音順）
@@ -50,6 +53,40 @@ const maxAmount = groups[0]?.amount ?? 0;
 								</ul>
 							))}
 						</div>
+						</>
+						)}
+
+						{goodsSponsors.length > 0 && (
+							<div class={groups.length > 0 ? 'mt-16' : ''}>
+								<h2 class="mb-4 text-center text-lg font-medium text-text">物品協賛</h2>
+								<p class="mb-8 text-sm leading-relaxed text-text/80">
+									物品のご提供をいただきました。ありがとうございました。（敬称略・五十音順）
+								</p>
+								<ul class="grid gap-4 sm:grid-cols-2">
+									{goodsSponsors.map(({ data }) => {
+										const media = data.image ? (
+											<img src={data.image} alt={`${data.name}のロゴ・提供物`} loading="lazy" class="aspect-[3/2] w-full rounded-xl object-contain bg-white/60" />
+										) : null;
+										return (
+											<li class="flex flex-col gap-3 rounded-xl border border-text/10 p-4">
+												{data.url ? (
+													<a href={data.url} target="_blank" rel="noopener noreferrer" class="flex flex-col gap-3 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+														{media}
+														<span class="text-accent underline underline-offset-4">{data.name}</span>
+													</a>
+												) : (
+													<>
+														{media}
+														<span class="text-text">{data.name}</span>
+													</>
+												)}
+												{data.description && <p class="text-sm leading-relaxed text-text/80">{data.description}</p>}
+											</li>
+										);
+									})}
+								</ul>
+							</div>
+						)}
 					</>
 				)
 			}
