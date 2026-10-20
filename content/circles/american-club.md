@@ -18,7 +18,7 @@ image: https://assets.34.shikosai.net/news/47f054ee-951b-47ec-9ec5-e349a3ae6e91.
 otherImages:
   - https://assets.34.shikosai.net/news/e9837247-8474-4e22-b6f6-91aeba59b0b7.webp
 snsLinks:
-  - url: https://www.instagram.com/_yushi5m?igsi=MTVibWJ3cmJtNnRzMg%3D%3D
+  - url: https://www.instagram.com/_bist9ut.qemg?cplk=Z3lxcDVjbHNha20w
     label: Instagram
 ---
 まるで本場アメリカ！なダイナーを再現したここでは、華やかなノンアルカクテルと、生のDJパフォーマンス、目の前でのダンスパフォーマンスが楽しめるスポット。味覚・聴覚・視覚のすべてで、アメリカのリアルを。
