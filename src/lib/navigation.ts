@@ -27,6 +27,7 @@ export const navGroups: NavGroupItem[] = [
 			{ label: 'ステージ企画一覧', href: '/event' },
 			{ label: 'タイムテーブル', href: '/timetable' },
 			{ label: '花火', href: '/fireworks' },
+			{ label: '熊本コラボ', href: '/collab-kumamoto' },
 		],
 	},
 	{
