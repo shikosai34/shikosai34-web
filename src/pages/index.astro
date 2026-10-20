@@ -15,7 +15,7 @@ import Layout from '../layouts/Layout.astro';
 import { EVENT_VENUE_LABELS, getCompleteEvents } from '../lib/events';
 import { formatNewsDate } from '../lib/news';
 import { getVisibleNews } from '../lib/news-collection';
-import { getChannelVideos } from '../lib/videos';
+import { getFeaturedVideos } from '../lib/videos';
 import { getPosterFullImage, getPosterImage, posterAlt as posterAltText } from '../lib/poster';
 
 const [posterImage, posterFull] = await Promise.all([getPosterImage(), getPosterFullImage()]);
@@ -28,7 +28,7 @@ const latestNews = (await getVisibleNews()).slice(0, 3).map((entry) => ({
 	image: entry.data.image,
 }));
 
-const videos = await getChannelVideos();
+const videos = await getFeaturedVideos();
 
 const stageEvents = (await getCompleteEvents())
 	.filter((entry) => entry.data.venue === 'main-stage')
