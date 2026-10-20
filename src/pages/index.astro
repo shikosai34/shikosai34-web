@@ -7,6 +7,7 @@ import CountdownSection from '../components/home/CountdownSection';
 import ThemeModel from '../components/home/ThemeModel';
 import ThemeSection from '../components/home/ThemeSection';
 import NewsSection from '../components/home/NewsSection';
+import VideoSection from '../components/home/VideoSection';
 import StageEventSection from '../components/home/StageEventSection';
 import VisitorGuideSection from '../components/home/VisitorGuideSection.astro';
 import logoG from '../assets/logo/yokogaki/HOL_G-trimmed.png';
@@ -14,6 +15,7 @@ import Layout from '../layouts/Layout.astro';
 import { EVENT_VENUE_LABELS, getCompleteEvents } from '../lib/events';
 import { formatNewsDate } from '../lib/news';
 import { getVisibleNews } from '../lib/news-collection';
+import { getFeaturedVideos } from '../lib/videos';
 import { getPosterFullImage, getPosterImage, posterAlt as posterAltText } from '../lib/poster';
 
 const [posterImage, posterFull] = await Promise.all([getPosterImage(), getPosterFullImage()]);
@@ -25,6 +27,8 @@ const latestNews = (await getVisibleNews()).slice(0, 3).map((entry) => ({
 	category: entry.data.category,
 	image: entry.data.image,
 }));
+
+const videos = await getFeaturedVideos();
 
 const stageEvents = (await getCompleteEvents())
 	.filter((entry) => entry.data.venue === 'main-stage')
@@ -91,6 +95,7 @@ const stageEvents = (await getCompleteEvents())
 				<h2 id="staff-intro-title" class="text-xl font-medium tracking-wide text-text">実行委員紹介</h2>
 				<p class="mt-1 text-xs tracking-[0.2em] text-accent/80">STAFF</p>
 			</div>
+			<VideoSection client:visible videos={videos} />
 			<div class="grid gap-4 sm:grid-cols-2">
 				<a href="/greeting/" class="bracket-frame group rounded-xl bg-base/45 p-5 transition-colors hover:border-accent/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:p-6">
 					<p class="mb-3 text-xs tracking-[0.2em] text-accent">MESSAGES</p>

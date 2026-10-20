@@ -465,6 +465,38 @@ collections:
         widget: image-r2
         required: false
         hint: 'スマホの写真をそのままで大丈夫です。未設定の場合は写真なしで表示します。'
+      - label: 紹介動画（YouTube）
+        name: video
+        widget: string
+        required: false
+        hint: 'YouTube の動画 URL（例: https://www.youtube.com/watch?v=xxxxxxxxxxx、https://youtu.be/xxxxxxxxxxx）または 11 文字の動画 ID。未入力なら動画なしで表示します。'
+
+  - name: settings
+    label: サイト設定
+    description: 'サイト全体の設定です。'
+    files:
+      - name: video
+        label: 映像（YouTube）
+        file: content/settings/video.json
+        description: '再生リストまたはチャンネルの動画が、トップページの「実行委員紹介」に並びます（ビルド時に取得するため、変更はデプロイ後に反映されます）。'
+        fields:
+          - label: YouTube 再生リスト
+            name: playlist
+            widget: string
+            required: false
+            hint: '再生リストの URL（…list=PL… を含むもの）または ID（PL から始まる文字列）。入力すると、再生リストの並び順のまま表示します（見せたい順は YouTube 側で並べ替えてください）。「非公開」の再生リストは取得できないので、「公開」または「限定公開」にしてください。未入力ならチャンネルの最新動画を表示します。'
+          - label: YouTube チャンネル
+            name: channel
+            widget: string
+            hint: '再生リストが未入力のときに使います。チャンネル ID（UC から始まる 24 文字）、または @ハンドル（例: @example）。最新の動画から順に表示します。'
+          - label: 表示する本数
+            name: count
+            widget: number
+            value_type: int
+            min: 1
+            max: 15
+            default: 6
+            hint: '表示する本数（最大 15 本）。再生リストでは先頭から、チャンネルでは新しい順に数えます。'
 
   - name: faq
     label: よくある質問
