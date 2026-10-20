@@ -465,6 +465,33 @@ collections:
         widget: image-r2
         required: false
         hint: 'スマホの写真をそのままで大丈夫です。未設定の場合は写真なしで表示します。'
+      - label: 紹介動画（YouTube）
+        name: video
+        widget: string
+        required: false
+        hint: 'YouTube の動画 URL（例: https://www.youtube.com/watch?v=xxxxxxxxxxx、https://youtu.be/xxxxxxxxxxx）または 11 文字の動画 ID。未入力なら動画なしで表示します。'
+
+  - name: settings
+    label: サイト設定
+    description: 'サイト全体の設定です。'
+    files:
+      - name: video
+        label: 映像（YouTube チャンネル）
+        file: content/settings/video.json
+        description: '指定したチャンネルの最新動画がトップページの「Video」に並びます（ビルド時に取得）。'
+        fields:
+          - label: YouTube チャンネル
+            name: channel
+            widget: string
+            hint: 'チャンネル ID（UC から始まる 24 文字）、または @ハンドル（例: @example）。'
+          - label: 表示する本数
+            name: count
+            widget: number
+            value_type: int
+            min: 1
+            max: 15
+            default: 6
+            hint: '新しい順に何本表示するか（最大 15 本）。'
 
   - name: faq
     label: よくある質問

@@ -237,6 +237,8 @@ const staff = defineCollection({
 			.default([]),
 		description: z.string().min(1),
 		image: z.string().optional(),
+		/** 紹介動画の YouTube URL または動画 ID（任意）。 */
+		video: z.string().optional(),
 	}),
 });
 

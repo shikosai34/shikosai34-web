@@ -14,6 +14,13 @@ const PATHS = {
 			<path d="M8 6v8" />
 		</>
 	),
+	/** Video */
+	video: (
+		<>
+			<rect x="2" y="5" width="20" height="14" rx="3" />
+			<path d="m10 9.5 5 2.5-5 2.5z" />
+		</>
+	),
 	/** News */
 	newspaper: (
 		<>

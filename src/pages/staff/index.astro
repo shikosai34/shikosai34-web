@@ -3,7 +3,9 @@ import { getCollection } from 'astro:content';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
 import SiteHeader from '../../components/layout/SiteHeader.astro';
 import SectionHeading from '../../components/ui/SectionHeading';
+import YouTubeEmbed from '../../components/ui/YouTubeEmbed';
 import Layout from '../../layouts/Layout.astro';
+import { fetchYouTubeTitle, parseYouTubeId } from '../../lib/youtube';
 
 const cmsDepartments = await getCollection('staff');
 const demoDepartments = [
@@ -19,6 +21,7 @@ const demoDepartments = [
 			],
 			description: '役職ごとの表示確認用サンプルです。同じ「部長」のメンバーをまとめて表示しています。',
 			image: undefined,
+			video: undefined,
 		},
 	},
 	{
@@ -29,22 +32,26 @@ const demoDepartments = [
 			members: [{ role: '担当', name: '見本 三花', kana: 'みほん みか' }],
 			description: 'CMSに写真を登録していない場合の表示例です。',
 			image: undefined,
+			video: undefined,
 		},
 	},
 ];
 const departmentEntries = import.meta.env.DEV && cmsDepartments.length === 0 ? demoDepartments : cmsDepartments;
 
-const departments = departmentEntries
+const departments = await Promise.all(departmentEntries
 	.sort((a, b) => a.data.sortOrder - b.data.sortOrder || a.data.department.localeCompare(b.data.department, 'ja'))
-	.map((department, index) => {
+	.map(async (department, index) => {
 		const membersByRole = new Map<string, typeof department.data.members>();
 		for (const member of department.data.members) {
 			const members = membersByRole.get(member.role) ?? [];
 			members.push(member);
 			membersByRole.set(member.role, members);
 		}
-		return { ...department, anchorId: `department-${index + 1}`, membersByRole: [...membersByRole] };
-	});
+		const videoId = parseYouTubeId(department.data.video);
+		const videoTitle = videoId ? await fetchYouTubeTitle(videoId) : null;
+		if (department.data.video && !videoId) console.warn(`[staff] 動画の URL を解釈できませんでした: ${department.data.department}`);
+		return { ...department, videoId, videoTitle, anchorId: `department-${index + 1}`, membersByRole: [...membersByRole] };
+	}));
 ---
 
 <Layout title="部署紹介 | 第34回 茨香祭" description="第34回茨香祭をつくる実行委員会の各部署を紹介します。">
@@ -75,7 +82,7 @@ const departments = departmentEntries
 				<p class="py-8 text-center text-sm text-text/70">部署紹介は準備中です。</p>
 			) : (
 				<div class="grid gap-5 md:grid-cols-2">
-					{departments.map(({ data, anchorId, membersByRole }) => (
+					{departments.map(({ data, anchorId, membersByRole, videoId, videoTitle }) => (
 						<article id={anchorId} class="bracket-frame scroll-mt-6 overflow-hidden rounded-xl bg-base/45">
 							{data.image ? (
 								<img src={data.image} alt={`${data.department}の写真`} loading="lazy" class="aspect-[16/9] w-full object-cover" />
@@ -87,6 +94,16 @@ const departments = departmentEntries
 							<div class="p-5 sm:p-6">
 								<h3 class="mb-3 text-lg font-medium text-text">{data.department}</h3>
 								<p class="whitespace-pre-line text-sm leading-7 text-text/80">{data.description}</p>
+								{videoId && (
+									<div class="mt-5 border-t border-text/15 pt-4">
+										<h4 class="mb-1 text-xs tracking-widest text-accent">MOVIE</h4>
+										<p class="mb-3 text-sm font-medium text-main">{data.department}の紹介映像</p>
+										<div class="overflow-hidden rounded-xl border border-accent/40">
+											<YouTubeEmbed client:visible videoId={videoId} title={videoTitle ?? `${data.department}の紹介映像`} />
+										</div>
+										{videoTitle && <p class="mt-2 text-sm leading-6 text-text/80">{videoTitle}</p>}
+									</div>
+								)}
 								{data.members.length > 0 && (
 									<div class="mt-5 border-t border-text/15 pt-4">
 										<h4 class="mb-3 text-xs tracking-widest text-accent">MEMBERS</h4>
