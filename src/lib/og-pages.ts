@@ -12,6 +12,7 @@ export const ogPageTitles: Record<string, string> = {
 	decoration: '装飾',
 	event: 'イベント一覧',
 	faq: 'よくある質問',
+	fireworks: '花火',
 	goods: 'グッズ',
 	greeting: 'ご挨拶',
 	'main-visual': 'ビジュアル',
