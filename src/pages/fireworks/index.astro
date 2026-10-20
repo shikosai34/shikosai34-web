@@ -1,0 +1,100 @@
+---
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import SiteHeader from '../../components/layout/SiteHeader.astro';
+import SectionHeading from '../../components/ui/SectionHeading';
+import Layout from '../../layouts/Layout.astro';
+import { getCollectionOrEmpty } from '../../lib/content';
+import { formatEventTime } from '../../lib/events';
+
+// 打ち上げ時刻はステージ企画「花火公演」の開始時刻を正とする（近隣向けお知らせでは時刻が未記入のため）。
+const [fireworksEvent] = await getCollectionOrEmpty(
+	'events',
+	({ id, data }) => id === '2026-10-25-fireworks' && !data.draft,
+);
+const startTime = fireworksEvent ? formatEventTime(fireworksEvent.data.startAt) : undefined;
+
+const linkClass =
+	'text-accent underline underline-offset-4 hover:decoration-2 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
+---
+
+<Layout
+	title="花火 | 第34回 茨香祭"
+	description="第34回 茨香祭の花火打ち上げについて、日時・場所・ご覧いただく際のお願いをご案内します。"
+>
+	<SiteHeader />
+
+	<main class="mx-auto w-full max-w-3xl px-4 pb-16 sm:px-6">
+		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
+			<SectionHeading title="Fireworks" icon="sparkles" subtitle="花火" />
+
+			<div class="space-y-10 border-t border-text/40 pt-6">
+				<p class="text-sm leading-relaxed text-text/80">
+					茨香祭2日目の10月25日（日）に、茨城高専グラウンドで花火を打ち上げます。打ち上げ音や煙等で近隣の皆さまにご迷惑をおかけする場合がありますが、安全管理には十分配慮して実施いたします。何卒ご理解とご協力をお願いいたします。
+				</p>
+
+				<div class="rounded-xl border-2 border-main bg-main/10 p-4" role="note">
+					<p class="font-medium text-text">花火は構外からご覧ください</p>
+					<p class="mt-1 text-sm leading-relaxed text-text/80">
+						安全確保のため、当日は一般の方の本校構内への立入りはできません。
+					</p>
+				</div>
+
+				<section aria-labelledby="schedule-heading">
+					<h2 id="schedule-heading" class="border-b-2 border-text/25 pb-2 text-xl font-medium text-text">
+						打ち上げ概要
+					</h2>
+					<dl class="mt-4 space-y-3 text-sm leading-relaxed text-text/80">
+						<div>
+							<dt class="font-medium text-text">日時</dt>
+							<dd>
+								令和8年（2026年）10月25日（日）{startTime ? `${startTime}ごろから（公演時間は約10分の予定）` : ''}
+								<p class="mt-1">
+									天候や風向・風速等の状況により、打ち上げ時間の変更または中止となる場合があります。
+								</p>
+							</dd>
+						</div>
+						<div>
+							<dt class="font-medium text-text">場所</dt>
+							<dd>茨城工業高等専門学校 グラウンド</dd>
+						</div>
+						<div>
+							<dt class="font-medium text-text">内容</dt>
+							<dd>第34回茨香祭における花火の打ち上げ</dd>
+						</div>
+					</dl>
+				</section>
+
+				<section aria-labelledby="notice-heading">
+					<h2 id="notice-heading" class="border-b-2 border-text/25 pb-2 text-xl font-medium text-text">
+						ご覧いただく際のお願い
+					</h2>
+					<ul class="mt-4 list-disc space-y-2 pl-5 text-sm leading-relaxed text-text/80 marker:text-text/60">
+						<li>本校構内へは立ち入れません。<strong class="font-medium text-text">構外</strong>からご覧ください。</li>
+						<li>10月25日（日）は学内限定公開です。詳しくは<a href="/cautions" class={linkClass}>注意事項</a>をご覧ください。</li>
+						<li>
+							時間の変更・中止は、<strong class="font-medium text-text">当サイトや公式SNS</strong>でお知らせします。
+						</li>
+					</ul>
+				</section>
+
+				<section aria-labelledby="contact-heading">
+					<h2 id="contact-heading" class="border-b-2 border-text/25 pb-2 text-xl font-medium text-text">
+						お問い合わせ
+					</h2>
+					<p class="mt-4 text-sm leading-relaxed text-text/80">
+						ご不明な点は<a href="/contact" class={linkClass}>お問い合わせページ</a>の連絡先までご連絡ください。
+						{
+							fireworksEvent && (
+								<>
+									ステージ企画としての情報は<a href={`/event/${fireworksEvent.id}`} class={linkClass}>花火公演のページ</a>にも掲載しています。
+								</>
+							)
+						}
+					</p>
+				</section>
+			</div>
+		</section>
+	</main>
+
+	<SiteFooter />
+</Layout>
