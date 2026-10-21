@@ -37,12 +37,11 @@ const answers = await Promise.all(sortedEntries.map((entry) => render(entry)));
 									.map(({ entry, index }) => {
 										const { Content } = answers[index];
 										return (
-											<details class="group rounded-xl border border-white/10 bg-base/40 px-4 py-3 open:border-accent/40">
-												<summary class="flex cursor-pointer list-none items-start gap-3 font-medium text-text marker:hidden">
+											<article class="rounded-xl border border-accent/40 bg-base/40 px-4 py-3">
+												<h3 class="flex items-start gap-3 font-medium text-text">
 													<span class="shrink-0 text-accent" aria-hidden="true">Q.</span>
 													<span class="min-w-0 flex-1">{entry.data.question}</span>
-													<span class="mt-1 shrink-0 text-accent transition-transform group-open:rotate-180" aria-hidden="true">⌄</span>
-												</summary>
+												</h3>
 												<div class="faq-answer mt-4 border-t border-white/10 pt-4 pl-7 text-sm leading-7 text-text/80">
 													<Content />
 													{entry.data.referenceLinks.length > 0 && (
@@ -60,7 +59,7 @@ const answers = await Promise.all(sortedEntries.map((entry) => render(entry)));
 														</div>
 													)}
 												</div>
-											</details>
+											</article>
 										);
 									})}
 							</div>
