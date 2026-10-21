@@ -24,12 +24,12 @@ const goodsSponsors = await getVisibleGoodsSponsors();
 					<>
 						{groups.length > 0 && (
 						<>
-						<p class="mb-12 text-sm leading-relaxed text-text/80">
+						<p class="mb-6 text-sm leading-relaxed text-text/80">
 							第34回茨香祭を開催するにあたり、非常に多くの方々にご協賛をいただきました。
-							ここに深くお礼申し上げます。（敬称略・五十音順）
+							ここに深くお礼申し上げます。（敬称略）
 						</p>
 
-						<div class="flex flex-col items-center gap-10 text-center">
+						<div class="flex flex-col items-center gap-10 rounded-xl border border-text/20 bg-base px-6 pt-6 pb-10 text-center sm:px-8 sm:pt-8 sm:pb-12">
 							{groups.map(({ amount, sponsors }) => (
 								<ul
 									class={`flex flex-wrap items-baseline justify-center gap-x-6 gap-y-3 ${getSponsorSizeClass(amount, maxAmount)}`}
@@ -57,35 +57,43 @@ const goodsSponsors = await getVisibleGoodsSponsors();
 						)}
 
 						{goodsSponsors.length > 0 && (
-							<div class={groups.length > 0 ? 'mt-16' : ''}>
-								<h2 class="mb-4 text-center text-lg font-medium text-text">物品協賛</h2>
-								<p class="mb-8 text-sm leading-relaxed text-text/80">
-									物品のご提供をいただきました。ありがとうございました。（敬称略・五十音順）
+							<section
+								aria-labelledby="goods-sponsor-heading"
+								class={groups.length > 0 ? 'mt-14 text-left' : 'text-left'}
+							>
+								<h2
+									id="goods-sponsor-heading"
+									class="border-b-2 border-text/25 pb-2 text-xl font-medium text-text"
+								>
+									物品協賛
+								</h2>
+								<p class="mt-4 text-base leading-relaxed text-text/80">
+									物品のご提供をいただきました。ありがとうございました。（敬称略）
 								</p>
-								<ul class="grid gap-4 sm:grid-cols-2">
+								<ul class="mt-6 grid gap-4 sm:grid-cols-2">
 									{goodsSponsors.map(({ data }) => {
 										const media = data.image ? (
 											<img src={data.image} alt={`${data.name}のロゴ・提供物`} loading="lazy" class="aspect-[3/2] w-full rounded-xl object-contain bg-white/60" />
 										) : null;
 										return (
-											<li class="flex flex-col gap-3 rounded-xl border border-text/10 p-4">
+											<li class="flex flex-col gap-3 rounded-xl border border-text/20 bg-base p-4">
 												{data.url ? (
 													<a href={data.url} target="_blank" rel="noopener noreferrer" class="flex flex-col gap-3 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
 														{media}
-														<span class="text-accent underline underline-offset-4">{data.name}</span>
+														<span class="text-lg font-medium text-accent underline underline-offset-4">{data.name}</span>
 													</a>
 												) : (
 													<>
 														{media}
-														<span class="text-text">{data.name}</span>
+														<span class="text-lg font-medium text-text">{data.name}</span>
 													</>
 												)}
-												{data.description && <p class="text-sm leading-relaxed text-text/80">{data.description}</p>}
+												{data.description && <p class="text-base leading-relaxed text-text/80">{data.description}</p>}
 											</li>
 										);
 									})}
 								</ul>
-							</div>
+							</section>
 						)}
 					</>
 				)
