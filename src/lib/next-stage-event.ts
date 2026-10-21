@@ -1,10 +1,12 @@
 export interface HomeStageEventData {
 	href: string;
+	eventName: string;
 	title: string;
 	performer: string;
 	startAt: string;
 	endAt: string;
 	status: 'scheduled' | 'changed' | 'cancelled';
+	venue: string;
 }
 
 export type HomeStageEventState =

@@ -1,7 +1,14 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
-import { CIRCLE_CATEGORIES } from './lib/circles';
-import { EVENT_GENRES, EVENT_STATUSES, FESTIVAL_DAYS, getEventDayKey } from './lib/events';
+import { CIRCLE_CATEGORIES, CIRCLE_GENRES } from './lib/circles';
+import {
+	EVENT_GENRES,
+	EVENT_DISPLAY_MODES,
+	EVENT_STATUSES,
+	EVENT_VENUES,
+	FESTIVAL_DAYS,
+	getEventDayKey,
+} from './lib/events';
 import { NEWS_CATEGORIES } from './lib/news';
 import { MAP_ROOM_KEYS, NOT_IN_RAIN } from './lib/map-rooms';
 
@@ -44,7 +51,7 @@ const news = defineCollection({
 /**
  * サークル情報（`/circle`）。
  *
- * お知らせと同じく Decap CMS から Markdown で管理する。紹介文は本文（body）。
+ * お知らせと同じく Decap CMS から Markdown で管理する。詳細な紹介は本文（body）。
  * リポジトリ直下の `content/circles/` に置く。
  */
 const circles = defineCollection({
@@ -78,8 +85,20 @@ const circles = defineCollection({
 			.string()
 			.refine((key) => key === NOT_IN_RAIN || MAP_ROOM_KEYS.has(key), { message: '会場マップに存在しない部屋キーです。' })
 			.optional(),
-		/** 実施時間（自由記述） */
-		schedule: z.string().min(1),
+		/** 雨天時の場所または中止案内（任意）。 */
+		rainLocation: z.string().optional(),
+		/** サークルカテゴリ（文化・食品・技術）。学年・種別の `category` とは別軸。 */
+		genre: z.enum(CIRCLE_GENRES),
+		/** 紹介文（短文）。一覧カードと詳細冒頭に表示する。 */
+		summary: z.string().min(1),
+		/** 見所（任意） */
+		highlights: z.string().optional(),
+		/** 値段設定・企画詳細（任意） */
+		details: z.string().optional(),
+		/** 実施時間または出店有無（自由記述）。10月24日 */
+		scheduleDay1: z.string().optional(),
+		/** 実施時間または出店有無（自由記述）。10月25日 */
+		scheduleDay2: z.string().optional(),
 		/** FesFlow 導入予定（各団体の申告）。詳細ページのリンク表示判定に使う。 */
 		fesflowPlanned: z.boolean(),
 		/**
@@ -87,28 +106,35 @@ const circles = defineCollection({
 		 * ローカルパスまたは R2 の配信 URL。
 		 */
 		image: z.string().optional(),
+		/** その他画像（任意）。サムネイルとは別に詳細ページへ並べる。 */
+		otherImages: z.array(z.string()).default([]),
 		snsLinks: z
-			.array(z.object({ label: z.string().min(1), url: z.string().url() }))
+			.array(
+				z.object({
+					label: z.string().min(1),
+					url: z.string().url(),
+					/** note風リンクカードに使う画像（任意）。 */
+					previewImage: z.string().optional(),
+				}),
+			)
 			.default([]),
 
 		// 以下は実行委員会が後から付与する（§2.9.3）。収集時点では値がない。
 		/** 実際の FesFlow ページ URL */
 		fesflowUrl: z.string().url().optional(),
-		/** 掲載順を手動指定する場合の並び順 */
-		order: z.number().optional(),
 	}),
 });
 
 /**
- * 体育館ステージの企画（`/event`、`/timetable`）。
+ * ステージ企画（`/event`、`/timetable`）。
  *
- * CMS では開始・終了をタイムゾーン付き日時として入力する。会場は体育館のみのため
- * 編集項目にはせず、コンテンツ側で固定値を補う。
+ * CMS ではイベント名の中に複数の企画を登録できる。開始・終了はタイムゾーン付き日時。
  */
 const events = defineCollection({
 	loader: glob({ pattern: '**/[^_]*.md', base: './content/events' }),
 	schema: z
 		.object({
+			eventName: z.string().min(1),
 			title: z.string().min(1),
 			slug: z.string().optional(),
 			/** 出演団体名。個人名や連絡先は掲載しない。 */
@@ -117,9 +143,24 @@ const events = defineCollection({
 			endAt: z.coerce.date(),
 			genre: z.enum(EVENT_GENRES).default('other'),
 			status: z.enum(EVENT_STATUSES).default('scheduled'),
-			venue: z.literal('体育館').default('体育館'),
+			venue: z.enum(EVENT_VENUES).default('main-stage'),
 			image: z.string().optional(),
+			displayMode: z.enum(EVENT_DISPLAY_MODES).default('timed'),
+			/** 詳細ページに並べる追加画像（任意）。 */
+			otherImages: z.array(z.string()).default([]),
+			snsLinks: z
+				.array(
+					z.object({
+						label: z.string().min(1),
+						url: z.string().url(),
+						/** note風リンクカードに使う画像（任意）。 */
+						previewImage: z.string().optional(),
+					}),
+				)
+				.default([]),
 			description: z.string().optional(),
+			setlist: z.array(z.string().min(1)).default([]),
+			committeeOnly: z.boolean().default(false),
 			draft: z.boolean().default(false),
 		})
 		.superRefine((event, ctx) => {
@@ -137,7 +178,7 @@ const events = defineCollection({
 				ctx.addIssue({
 					code: 'custom',
 					path: ['startAt'],
-					message: '開始日時は開催日（2026年10月24日または25日）を指定してください。',
+					message: '開始日時は開催日（2026年10月23日〜25日）を指定してください。',
 				});
 			}
 			if (startDay !== endDay) {
@@ -150,4 +191,87 @@ const events = defineCollection({
 		}),
 });
 
-export const collections = { news, circles, events };
+/**
+ * 協賛企業（`/sponsor`）。
+ *
+ * お知らせなどと同じく Decap CMS から Markdown で管理する。
+ * リポジトリ直下の `content/sponsors/` に置く。本文（body）は使わない。
+ */
+const sponsors = defineCollection({
+	loader: glob({ pattern: '**/[^_]*.md', base: './content/sponsors' }),
+	schema: z.object({
+		/** 企業名 */
+		name: z.string().min(1),
+		/** 五十音順ソート用の読み仮名 */
+		nameKana: z.string().min(1),
+		/** 協賛金額（円）。表示には使わず、文字サイズの階級分けにのみ使用する。 */
+		amount: z.number().int().positive(),
+		/** 企業サイトの URL（任意）。ある場合は企業名からリンクする。 */
+		url: z.string().url().optional(),
+		/** 下書き。本番ビルドでは除外する。 */
+		draft: z.boolean().default(false),
+	}),
+});
+
+/**
+ * グッズ（`/goods`）。
+ *
+ * Decap CMS から Markdown で管理する。本文（body）は一覧カードのクリックで開く
+ * ポップアップの詳細説明文として表示する。リポジトリ直下の `content/goods/` に置く。
+ */
+const goods = defineCollection({
+	loader: glob({ pattern: '**/[^_]*.md', base: './content/goods' }),
+	schema: z.object({
+		/** グッズ名 */
+		name: z.string().min(1),
+		/** URL 識別子（任意）。未指定のときはファイル名。 */
+		slug: z.string().optional(),
+		/** 価格（円・税込）。 */
+		price: z.number().int().nonnegative(),
+		/** 画像（任意）。ローカルパスまたは R2 の配信 URL。 */
+		image: z.string().optional(),
+		/** 売り切れ。 */
+		soldOut: z.boolean().default(false),
+		/** 表示順（小さいほど先頭）。同順位は名前順。 */
+		order: z.number().int().default(100),
+		/** 下書き。本番ビルドでは除外する。 */
+		draft: z.boolean().default(false),
+	}),
+});
+
+/**
+ * 実行委員会の部署紹介（`/staff`）。
+ * 部署ごとの名簿・写真・紹介文を Decap CMS から管理する。
+ */
+const staff = defineCollection({
+	loader: glob({ pattern: '**/[^_]*.md', base: './content/staff' }),
+	schema: z.object({
+		/** 表示順。小さい番号を先に表示する。 */
+		sortOrder: z.number().int().nonnegative(),
+		department: z.string().min(1),
+		members: z
+			.array(z.object({ role: z.string().min(1), name: z.string().min(1), kana: z.string().min(1) }))
+			.default([]),
+		description: z.string().min(1),
+		image: z.string().optional(),
+		/** 紹介動画の YouTube URL または動画 ID（任意）。 */
+		video: z.string().optional(),
+	}),
+});
+
+/**
+ * よくある質問（`/faq`）。
+ * 質問とカテゴリ、参考リンクを frontmatter に、回答本文を Markdown で管理する。
+ */
+const faq = defineCollection({
+	loader: glob({ pattern: '**/[^_]*.md', base: './content/faq' }),
+	schema: z.object({
+		question: z.string().min(1),
+		category: z.string().min(1),
+		referenceLinks: z
+			.array(z.object({ label: z.string().min(1), url: z.string().url() }))
+			.default([]),
+	}),
+});
+
+export const collections = { news, circles, events, sponsors, goods, staff, faq };

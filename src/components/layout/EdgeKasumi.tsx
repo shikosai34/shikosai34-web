@@ -14,9 +14,8 @@ import KasumiCloud from '../ui/KasumiCloud';
  *
  * 雲はタイルの中ではなく、画面の外から覗いているように見せる。
  * そのため各雲を左右へ大きくはみ出させ、画面内には半分ほどだけ出す。
- * 雲はタイルの上に乗せる（z-10）。ヘッダー（z-[60]）やメニュー（z-50）
- * よりは下。幅の狭い画面では雲を小さくし、画面内には半分強を
- * 覗かせる。
+ * 雲は本文の背面に置く（z-[-1]）。幅の狭い画面では雲を小さくし、
+ * 画面内には半分強を覗かせる。
  *
  * 装飾なので aria-hidden。
  */
@@ -24,7 +23,7 @@ export default function EdgeKasumi() {
 	return (
 		<div
 			aria-hidden="true"
-			className="pointer-events-none fixed inset-0 z-10 overflow-hidden"
+			className="pointer-events-none fixed inset-0 z-[-1] overflow-hidden"
 		>
 			{/* 左端。上寄りに置く。 */}
 			<KasumiCloud
