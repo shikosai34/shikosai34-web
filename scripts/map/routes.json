@@ -1,0 +1,40 @@
+{
+	"_comment": "【晴天時】動線・出展場所一覧 の動線の図（2ページ目）を起こしたもの。座標は図の画像（150dpi、2000×1125）の中のピクセル [x, y]。calibration の建物の中心を実際の地図の建物に合わせて位置を求める（scripts/map/build-routes.mjs が public/map/routes.json に書き出す）。線は始点から終点へ進む向きで、終点が矢印。雨天時の動線の図はまだ受け取っていない。",
+	"calibration": {
+		"9号館": [1022, 116],
+		"実習工場": [1022, 310],
+		"第一体育館": [1036, 598],
+		"プール": [1104, 807],
+		"合宿所": [995, 981],
+		"武道館": [949, 771]
+	},
+	"routes": [
+		{ "id": "y-trunk", "kind": "yellow", "weather": "sunny", "points": [[860, 695], [860, 65], [530, 80]] },
+		{ "id": "y-5-east", "kind": "yellow", "weather": "sunny", "points": [[860, 65], [805, 105]] },
+		{ "id": "y-track", "kind": "yellow", "weather": "sunny", "points": [[860, 472], [1188, 472], [1188, 500], [1236, 500]] },
+		{ "id": "y-gym1", "kind": "yellow", "weather": "sunny", "points": [[860, 603], [885, 604]] },
+		{ "id": "y-loop", "kind": "yellow", "weather": "sunny", "points": [[860, 695], [737, 695], [737, 800]] },
+		{ "id": "y-hub-east", "kind": "yellow", "weather": "sunny", "points": [[580, 800], [772, 802]] },
+		{ "id": "y-hub-north", "kind": "yellow", "weather": "sunny", "points": [[580, 800], [580, 577]] },
+		{ "id": "y-hub-library", "kind": "yellow", "weather": "sunny", "points": [[580, 800], [520, 868]] },
+		{ "id": "y-hub-gate", "kind": "yellow", "weather": "sunny", "points": [[580, 800], [637, 838]], "arrow": false },
+		{ "id": "r-gate-1", "kind": "red", "weather": "sunny", "points": [[724, 1045], [724, 840], [663, 840]] },
+		{ "id": "r-track", "kind": "red", "weather": "sunny", "points": [[860, 695], [1188, 695], [1188, 925], [797, 925]] },
+		{ "id": "r-gate-2", "kind": "red", "weather": "sunny", "points": [[785, 927], [749, 927], [749, 1045]] },
+		{ "id": "r-track-stub", "kind": "red", "weather": "sunny", "points": [[1188, 797], [1237, 797]], "arrow": false }
+	],
+	"legend": {
+		"yellow": "順路（黄）",
+		"red": "赤の動線"
+	},
+	"markers": [
+		{ "kind": "gate", "weather": "sunny", "at": [648, 841], "name": "ゲート" },
+		{ "kind": "gate", "weather": "sunny", "at": [785, 927], "name": "ゲート" },
+		{ "kind": "main-gate", "weather": "sunny", "at": [737, 1075], "name": "正門" },
+		{ "kind": "diamond", "weather": "sunny", "at": [533, 117] },
+		{ "kind": "diamond", "weather": "sunny", "at": [1143, 243] },
+		{ "kind": "diamond", "weather": "sunny", "at": [913, 606] },
+		{ "kind": "diamond", "weather": "sunny", "at": [768, 1005] }
+	],
+	"restricted": []
+}

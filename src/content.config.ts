@@ -10,6 +10,7 @@ import {
 	getEventDayKey,
 } from './lib/events';
 import { NEWS_CATEGORIES } from './lib/news';
+import { MAP_ROOM_KEYS, NOT_IN_RAIN } from './lib/map-rooms';
 
 /**
  * お知らせ（`/news`）のコレクション。
@@ -68,6 +69,22 @@ const circles = defineCollection({
 		category: z.enum(CIRCLE_CATEGORIES),
 		/** 実施場所（教室名など） */
 		location: z.string().min(1),
+		/**
+		 * 会場マップ上の部屋キー（任意）。CMS の「マップ上の場所」で選ぶ。
+		 * 選択肢は scripts/map/build-plans.mjs が src/data/map-rooms.json から生成する。
+		 */
+		mapRoom: z
+			.string()
+			.refine((key) => MAP_ROOM_KEYS.has(key), { message: '会場マップに存在しない部屋キーです。' })
+			.optional(),
+		/**
+		 * 雨天時の部屋キー（任意）。空なら晴天時（mapRoom）と同じ場所、
+		 * "none" なら雨天時は出展しない。
+		 */
+		mapRoomRainy: z
+			.string()
+			.refine((key) => key === NOT_IN_RAIN || MAP_ROOM_KEYS.has(key), { message: '会場マップに存在しない部屋キーです。' })
+			.optional(),
 		/** 雨天時の場所または中止案内（任意）。 */
 		rainLocation: z.string().optional(),
 		/** サークルカテゴリ（文化・食品・技術）。学年・種別の `category` とは別軸。 */

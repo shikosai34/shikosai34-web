@@ -1,0 +1,112 @@
+---
+/**
+ * サークルページのミニマップ。出店場所を、ビルド時に作った静的な SVG で見せる（JS を読み込まない）。
+ * - 建物の中: 敷地のどの建物か ＋ その階の平面図で部屋を光らせる
+ * - グラウンドのテント: 敷地の全体 ＋ テントの並ぶ区画（番号つきの点で、選んだテントを大きく）
+ * - そのほかの屋外: 敷地の全体にピン
+ * 詳しい操作は /map に任せ、ここは「どこにあるか」が分かる大きさにとどめる。
+ */
+import { buildCampusMap, buildFloorMap } from '../../lib/minimap';
+import { formatMapRoom, type MapRoom } from '../../lib/map-rooms';
+
+interface Props {
+	room: MapRoom;
+}
+
+const { room } = Astro.props;
+const floor = buildFloorMap(room);
+const slotArea = !!room.parent;
+// 敷地の全体は常に。建物の中なら平面図、テントなら区画の拡大を隣に並べる
+const overview = buildCampusMap(room, 'campus', 1);
+const area = slotArea ? buildCampusMap(room, 'area', 1) : null;
+const label = formatMapRoom(room);
+---
+
+<div class:list={['grid gap-2', floor || area ? 'grid-cols-2' : 'grid-cols-1 max-w-[16rem]']}>
+	<svg
+		viewBox={overview.viewBox}
+		role="img"
+		aria-label={`${label} の敷地の中の位置`}
+		class="aspect-square w-full rounded-md border border-text/15 bg-base/60"
+	>
+		{
+			overview.layers.map((layer) => (
+				<polygon
+					points={layer.points}
+					class:list={[
+						layer.kind === 'campus' && 'fill-text/[0.03] stroke-accent/30',
+						layer.kind === 'plaza' && 'fill-text/[0.06] stroke-none',
+						layer.kind === 'pitch' && 'fill-accent/10 stroke-accent/30',
+						layer.kind === 'track' && 'fill-glitch/20 stroke-glow-pink/60',
+						layer.kind === 'building' && (layer.highlight ? 'fill-main/60 stroke-main' : 'fill-text/15 stroke-accent/40'),
+					]}
+					stroke-width="0.8"
+				/>
+			))
+		}
+		{overview.dots?.map((d) => <circle cx={d.x} cy={d.y} r={d.main ? 5 : 2.4} class={d.main ? 'fill-main stroke-base' : 'fill-accent/70'} stroke-width="1" />)}
+		{overview.marker && <circle cx={overview.marker.x} cy={overview.marker.y} r="7" class="fill-main stroke-base" stroke-width="1.5" />}
+		{
+			overview.buildingLabel && (
+				<text
+					x={overview.buildingLabel.x}
+					y={overview.buildingLabel.y}
+					font-size={overview.buildingLabel.size}
+					text-anchor="middle"
+					dominant-baseline="middle"
+					class="fill-text stroke-base [paint-order:stroke]"
+					stroke-width={overview.buildingLabel.size * 0.25}
+				>
+					{overview.buildingLabel.text}
+				</text>
+			)
+		}
+	</svg>
+
+	{
+		floor && (
+			<svg viewBox={floor.viewBox} role="img" aria-label={`${floor.building} ${floor.floor}階の平面図での位置`} class="aspect-square w-full rounded-md border border-text/15 bg-base/60 p-1">
+				{floor.rooms.map((r) => (
+					<polygon
+						points={r.points}
+						class:list={[r.target ? 'fill-main/60 stroke-main' : r.kind === 'corridor' ? 'fill-accent/5 stroke-none' : 'fill-text/10 stroke-none']}
+						stroke-width="1.2"
+					/>
+				))}
+				{floor.walls.map((w) => (
+					<rect x={w.x} y={w.y} width={w.w} height={w.h} class="fill-accent/60" />
+				))}
+			</svg>
+		)
+	}
+
+	{
+		area && (
+			<svg viewBox={area.viewBox} role="img" aria-label={`${label} のグラウンドでの位置`} class="aspect-square w-full rounded-md border border-text/15 bg-base/60">
+				{area.layers.map((layer) => (
+					<polygon
+						points={layer.points}
+						class:list={[
+							layer.kind === 'campus' && 'fill-text/[0.03] stroke-accent/30',
+							layer.kind === 'plaza' && 'fill-text/[0.06] stroke-none',
+							layer.kind === 'pitch' && 'fill-accent/10 stroke-accent/30',
+							layer.kind === 'track' && 'fill-glitch/20 stroke-glow-pink/60',
+							layer.kind === 'building' && 'fill-text/15 stroke-accent/40',
+						]}
+						stroke-width="0.8"
+					/>
+				))}
+				{area.dots?.map((d) => (
+					<g>
+						<circle cx={d.x} cy={d.y} r={d.main ? 4.2 : 2.6} class={d.main ? 'fill-main stroke-base' : 'fill-accent/70'} stroke-width="0.8" />
+						{d.main && d.label && (
+							<text x={d.x} y={d.y - 8} font-size="7" text-anchor="middle" class="fill-text stroke-base [paint-order:stroke]" stroke-width="2">
+								{d.label}
+							</text>
+						)}
+					</g>
+				))}
+			</svg>
+		)
+	}
+</div>
