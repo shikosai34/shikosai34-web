@@ -26,6 +26,7 @@ export const OG_PAGES: readonly OgPage[] = [
 	{ path: 'access', title: 'アクセス', summary: ['バス・タクシーなど、', '茨城高専へのアクセス方法をご案内します。'] },
 	{ path: 'cautions', title: '注意事項', summary: ['ご来場前にご確認いただきたい', '注意事項をまとめています。'] },
 	{ path: 'faq', title: 'よくある質問', summary: ['第34回 茨香祭について、', 'よくある質問と回答をご案内します。'] },
+	{ path: 'survey', title: '来場者アンケート', summary: ['ご来場の感想やご意見を、', 'アンケートフォームからお寄せください。'] },
 	{ path: 'fireworks', title: '花火', summary: ['10月25日（日）の花火打ち上げの', '日時・場所とお願いをご案内します。'] },
 	{ path: 'goods', title: 'グッズ', summary: ['グッズ情報は準備中です。'] },
 	{ path: 'decoration', title: '装飾', summary: ['装飾情報は準備中です。'] },
