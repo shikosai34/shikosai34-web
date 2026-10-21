@@ -197,6 +197,30 @@ const sponsors = defineCollection({
 });
 
 /**
+ * 物品協賛（`/sponsor` の「物品協賛」セクション）。
+ *
+ * 金銭協賛（`sponsors`）とは別に、物品・サービスの提供企業を Decap CMS から管理する。
+ * リポジトリ直下の `content/goods-sponsors/` に置く。本文（body）は使わない。
+ */
+const goodsSponsors = defineCollection({
+	loader: glob({ pattern: '**/[^_]*.md', base: './content/goods-sponsors' }),
+	schema: z.object({
+		/** 企業名 */
+		name: z.string().min(1),
+		/** 五十音順ソート用の読み仮名 */
+		nameKana: z.string().min(1),
+		/** ロゴ・提供物の画像（任意）。ローカルパスまたは R2 の配信 URL。 */
+		image: z.string().optional(),
+		/** 企業サイトの URL（任意）。ある場合は企業名・画像からリンクする。 */
+		url: z.string().url().optional(),
+		/** 提供物などの軽い説明文（任意）。 */
+		description: z.string().optional(),
+		/** 下書き。本番ビルドでは除外する。 */
+		draft: z.boolean().default(false),
+	}),
+});
+
+/**
  * グッズ（`/goods`）。
  *
  * Decap CMS から Markdown で管理する。本文（body）は一覧カードのクリックで開く
@@ -257,4 +281,4 @@ const faq = defineCollection({
 	}),
 });
 
-export const collections = { news, circles, events, sponsors, goods, staff, faq };
+export const collections = { news, circles, events, sponsors, 'goods-sponsors': goodsSponsors, goods, staff, faq };
