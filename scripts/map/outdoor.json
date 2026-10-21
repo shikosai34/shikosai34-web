@@ -9,7 +9,13 @@
 				140.55299,
 				36.40037
 			],
-			"weather": "sunny"
+			"weather": "sunny",
+			"aliases": [
+				"グラウンド",
+				"運動場",
+				"陸上競技場",
+				"グラウンド全体"
+			]
 		},
 		{
 			"key": "ground-baseball-side",
@@ -20,7 +26,13 @@
 				36.4016
 			],
 			"tents": "column",
-			"weather": "sunny"
+			"weather": "sunny",
+			"aliases": [
+				"野球場側",
+				"野球場",
+				"グラウンド野球場側",
+				"サッカー場"
+			]
 		},
 		{
 			"key": "courtyard",
@@ -32,7 +44,20 @@
 			],
 			"tents": "outline",
 			"tentsInset": 3,
-			"weather": "rainy"
+			"weather": "rainy",
+			"aliases": [
+				"時計塔周辺",
+				"時計塔",
+				"中庭"
+			],
+			"rainAliases": [
+				"4C",
+				"3M1",
+				"4I",
+				"2-1",
+				"2-5",
+				"専攻科2年"
+			]
 		},
 		{
 			"key": "gym2",
@@ -42,7 +67,11 @@
 				140.551764,
 				36.401155
 			],
-			"weather": "rainy"
+			"weather": "rainy",
+			"aliases": [
+				"第二体育館",
+				"第2体育館"
+			]
 		},
 		{
 			"key": "club-house",
@@ -52,7 +81,10 @@
 				140.550696,
 				36.399355
 			],
-			"weather": "rainy"
+			"weather": "rainy",
+			"aliases": [
+				"共用部室"
+			]
 		},
 		{
 			"key": "ground-robot",
@@ -62,7 +94,11 @@
 				140.5525121,
 				36.4002466
 			],
-			"weather": "sunny"
+			"weather": "sunny",
+			"aliases": [
+				"グラウンドロボット部",
+				"ロボット部"
+			]
 		},
 		{
 			"key": "ground-info",
@@ -232,6 +268,11 @@
 					892,
 					465
 				]
+			],
+			"aliases": [
+				"グラウンド-{n}",
+				"グラウンド{n}",
+				"G{n}"
 			]
 		}
 	]

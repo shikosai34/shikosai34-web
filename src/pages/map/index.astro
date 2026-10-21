@@ -21,6 +21,8 @@ import {
 	getMapRoom,
 	isRoomInWeather,
 	MAP_ROOMS,
+	isCancelledInRain,
+	NOT_IN_RAIN,
 	roomKeyInWeather,
 	WEATHER_LABELS,
 	WEATHERS,
@@ -31,10 +33,10 @@ import {
 const STAGE_ROOM = 'gym1-stage';
 
 /**
- * サークルのその天候での部屋キー。晴天時だけの会場（グラウンドなど）のまま雨天時の場所が
+ * サークルのその天候での部屋キー（CMS で選んだ部屋、なければ「実施場所」の名前から探す）。晴天時だけの会場（グラウンドなど）のまま雨天時の場所が
  * 決まっていないときは、雨天時の地図には置かない（「地図に未登録の出展」に出す）。
  */
-function placedKey(circle: { mapRoom?: string; mapRoomRainy?: string }, weather: Weather): string | undefined {
+function placedKey(circle: Parameters<typeof roomKeyInWeather>[0], weather: Weather): string | undefined {
 	const key = roomKeyInWeather(circle, weather);
 	const room = getMapRoom(key);
 	return room && isRoomInWeather(room, weather) ? key : undefined;
@@ -118,13 +120,18 @@ for (const weather of WEATHERS) {
 const listings = WEATHERS.map((weather) => {
 	const groups: { building: string; rooms: typeof MAP_ROOMS }[] = [];
 	for (const room of MAP_ROOMS) {
-		if (!isRoomInWeather(room, weather) || AGGREGATE_KEYS.has(room.key) || !(exhibits[weather][room.key]?.length || room.use?.[weather])) continue;
+		if (!isRoomInWeather(room, weather)) continue;
+		// 番号つきのテントをまとめる会場（グラウンド）は、番号のあるテントのほうで一覧に出す。ここには番号のない出展だけ
+		const own = AGGREGATE_KEYS.has(room.key) ? (exhibits[weather][room.key] ?? []).filter((item) => !item.spot) : (exhibits[weather][room.key] ?? []);
+		if (!(own.length || room.use?.[weather])) continue;
 		const group = groups.find((g) => g.building === room.building);
 		if (group) group.rooms.push(room);
 		else groups.push({ building: room.building, rooms: [room] });
 	}
-	const unplaced = circles.filter((c) => !placedKey(c.data, weather) && !(weather === 'rainy' && c.data.mapRoomRainy === 'none'));
-	const absent = weather === 'rainy' ? circles.filter((c) => c.data.mapRoomRainy === 'none') : [];
+	/** 雨天時に出展しない（「雨天時は出展しない」を選んだ、または雨天時の場所に「中止」と書いた） */
+	const notInRain = (c: (typeof circles)[number]) => c.data.mapRoomRainy === NOT_IN_RAIN || isCancelledInRain(c.data.rainLocation);
+	const unplaced = circles.filter((c) => !placedKey(c.data, weather) && !(weather === 'rainy' && notInRain(c)));
+	const absent = weather === 'rainy' ? circles.filter(notInRain) : [];
 	return { weather, groups, unplaced, absent };
 });
 ---
@@ -195,7 +202,7 @@ const listings = WEATHERS.map((weather) => {
 													</dt>
 													<dd>
 														<ul class="mt-1 flex flex-col gap-0.5 pl-3">
-															{(exhibits[weather][room.key] ?? []).map((item) => (
+															{(AGGREGATE_KEYS.has(room.key) ? (exhibits[weather][room.key] ?? []).filter((item) => !item.spot) : (exhibits[weather][room.key] ?? [])).map((item) => (
 																<li class="text-sm text-text">
 																	<a href={item.href} class="underline hover:no-underline">
 																		{item.title}

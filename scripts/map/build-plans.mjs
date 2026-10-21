@@ -327,7 +327,7 @@ for (const [file, info] of Object.entries(CONFIG)) {
 				// 当日の使い道（予選会場・休憩所など、サークルの出展ではない場所）
 				...(label?.use && { use: normalizeUse(label.use) }),
 			});
-			if (key) roomIndex.push({ key, building: info.building, floor: f.floor, number: label.number ?? null, name: label.name, plan: file, ...(label.use && { use: normalizeUse(label.use) }) });
+			if (key) roomIndex.push({ key, building: info.building, floor: f.floor, number: label.number ?? null, name: label.name, plan: file, ...(label.use && { use: normalizeUse(label.use) }), ...(label.aliases && { aliases: label.aliases }), ...(label.rainAliases && { rainAliases: label.rainAliases }) });
 		});
 		delete f.rawRooms;
 	}
@@ -378,7 +378,7 @@ for (const [file, info] of Object.entries(CONFIG)) {
 // 屋外の場所（図面を持たず、3D 上のピンで示す）
 const outdoor = fs.existsSync(OUTDOOR_FILE) ? JSON.parse(fs.readFileSync(OUTDOOR_FILE, 'utf-8')) : {};
 for (const o of outdoor.places ?? []) {
-	roomIndex.push({ key: o.key, building: o.building ?? '屋外', floor: null, number: null, name: o.name, plan: null, at: o.at, ...(o.tents && { tents: o.tents }), ...(o.tentsInset !== undefined && { tentsInset: o.tentsInset }), ...(o.weather && { weather: o.weather }), ...(o.use && { use: o.use }), ...(o.cms === false && { cms: false }) });
+	roomIndex.push({ key: o.key, building: o.building ?? '屋外', floor: null, number: null, name: o.name, plan: null, at: o.at, ...(o.tents && { tents: o.tents }), ...(o.tentsInset !== undefined && { tentsInset: o.tentsInset }), ...(o.weather && { weather: o.weather }), ...(o.use && { use: o.use }), ...(o.cms === false && { cms: false }), ...(o.aliases && { aliases: o.aliases }), ...(o.rainAliases && { rainAliases: o.rainAliases }) });
 }
 
 // 番号つきの固定のテント（グラウンドの G-1〜G-33 など）。区画図の画像上の座標を、
@@ -431,6 +431,7 @@ for (const group of outdoor.numbered ?? []) {
 			angle: Math.round(Math.atan2(b[1] - a[1], b[0] - a[0]) * 1e4) / 1e4,
 			parent: group.parent,
 			...(group.weather && { weather: group.weather }),
+			...(group.aliases && { aliases: group.aliases.map((a) => a.replaceAll('{n}', String(i + 1))) }),
 		});
 	});
 }
@@ -439,6 +440,36 @@ for (const group of outdoor.numbered ?? []) {
 const planOrder = Object.keys(CONFIG);
 const orderOf = (r) => (r.plan ? planOrder.indexOf(r.plan) : planOrder.length);
 roomIndex.sort((a, b) => orderOf(a) - orderOf(b) || (a.floor ?? 0) - (b.floor ?? 0) || (a.number ? 0 : 1) - (b.number ? 0 : 1) || (a.number ?? '').localeCompare(b.number ?? '', 'ja', { numeric: true }) || a.name.localeCompare(b.name, 'ja'));
+
+/**
+ * サークルの「実施場所」から部屋を探す名前の正規化。src/lib/map-rooms.ts の normalizeLocation と同じ処理にする
+ * （全角を半角に、空白を除き、ハイフン・波ダッシュを統一する）。
+ */
+const normalizeLocation = (text) =>
+	text
+		.normalize('NFKC')
+		.toLowerCase()
+		.replace(/[\s\u3000]+/g, '')
+		.replace(/[\u2010-\u2015\u2212\u30fc]/g, (c) => (c === '\u30fc' ? c : '-'))
+		.replace(/[\u301c\u223c~]/g, '~');
+const owners = new Map();
+for (const r of roomIndex) {
+	for (const name of [r.key, r.number, r.name, ...(r.aliases ?? [])].filter(Boolean)) {
+		const k = normalizeLocation(name);
+		if (!owners.has(k)) owners.set(k, new Set());
+		owners.get(k).add(r.key);
+	}
+}
+// 別名（aliases）は、ほかの部屋の名前・別名とぶつかってはいけない。部屋の名前どうし（「教室」など）は重なっていてよい（使わない）
+for (const r of roomIndex) {
+	for (const alias of r.aliases ?? []) {
+		const others = [...(owners.get(normalizeLocation(alias)) ?? [])].filter((k) => k !== r.key);
+		if (others.length) {
+			console.warn(`⚠ 別名「${alias}」（${r.key}）が ${others.join(', ')} の名前・別名とぶつかっています`);
+			problems++;
+		}
+	}
+}
 
 const dupes = roomIndex.map((r) => r.key).filter((k, i, a) => a.indexOf(k) !== i);
 if (dupes.length) {

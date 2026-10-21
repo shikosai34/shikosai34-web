@@ -133,7 +133,7 @@ collections:
         name: mapRoom
         widget: select
         required: false
-        hint: '会場マップで示す部屋。選ぶと /map とサークル詳細の「マップで見る」に反映されます。一覧にない場所は実行委員会に連絡してください。'
+        hint: '会場マップで示す部屋。空欄なら「実施場所」の名前（1-1・つながる〜む・グラウンド-12 など）から自動で探します。見つからないときや、別の場所にしたいときだけ選んでください。'
         options:
           # >>> GENERATED: map-rooms (bun scripts/map/build-plans.mjs)
           - { label: '1号館 1F 1-109 SCS室兼音楽室', value: '1-109' }
@@ -278,7 +278,7 @@ collections:
         name: mapRoomRainy
         widget: select
         required: false
-        hint: '雨天時に場所が変わる場合だけ選びます。空欄なら晴天時と同じ場所です。雨天時に出展しない場合は「雨天時は出展しない」を選んでください。'
+        hint: '空欄なら「雨天時の場所」の名前（時計塔周辺・第二体育館など）から自動で探し、書いていなければ晴天時と同じ場所にします。見つからないときだけ選んでください。雨天時に出展しない場合は「雨天時は出展しない」を選ぶか、雨天時の場所に「中止」と書いてください。'
         options:
           # >>> GENERATED: map-rooms-rainy (bun scripts/map/build-plans.mjs)
           - { label: '雨天時は出展しない', value: 'none' }
