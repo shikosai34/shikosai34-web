@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { getCachedOgImage } from '../lib/og/cache';
 import { renderOgImage } from '../lib/og-image';
 
 /**
@@ -7,8 +8,8 @@ import { renderOgImage } from '../lib/og-image';
  * 静的ファイルにせずビルド時に生成して、ほかのページの画像とデザインがずれないようにする。
  */
 export const GET: APIRoute = async () => {
-	const png = await renderOgImage();
-	return new Response(new Uint8Array(png), {
+	const jpeg = await getCachedOgImage('legacy-default', null, () => renderOgImage());
+	return new Response(new Uint8Array(jpeg), {
 		headers: { 'Content-Type': 'image/jpeg' },
 	});
 };
