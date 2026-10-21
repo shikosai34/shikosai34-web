@@ -1,5 +1,113 @@
 ---
-import PlaceholderPage from '../../components/ui/PlaceholderPage.astro';
+import { render } from 'astro:content';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import SiteHeader from '../../components/layout/SiteHeader.astro';
+import SectionHeading from '../../components/ui/SectionHeading';
+import Layout from '../../layouts/Layout.astro';
+import { formatPrice, getVisibleGoods } from '../../lib/goods';
+
+const goods = await getVisibleGoods();
+const items = await Promise.all(
+	goods.map(async (entry) => ({ entry, Content: (await render(entry)).Content })),
+);
 ---
 
-<PlaceholderPage title="グッズ" heading="Goods" icon="bag" message="グッズ情報は準備中です。" />
+<Layout title="グッズ | 第34回 茨香祭">
+	<SiteHeader />
+
+	<main class="mx-auto w-full max-w-5xl px-4 pb-16 sm:px-6">
+		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
+			<SectionHeading title="Goods" icon="bag" />
+
+			{
+				items.length === 0 ? (
+					<p class="py-8 text-center text-sm text-text/70">グッズ情報は準備中です。</p>
+				) : (
+					<ul class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+						{items.map(({ entry, Content }) => {
+							const { name, price, image, soldOut } = entry.data;
+							return (
+								<li>
+									<button
+										type="button"
+										class="goods-open flex h-full w-full flex-col overflow-hidden rounded-xl border border-base bg-base text-left text-text transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+										data-dialog={`goods-${entry.id}`}
+									>
+										<div class="relative">
+											{image ? (
+												<img
+													src={image}
+													alt=""
+													loading="lazy"
+													class:list={['aspect-square w-full object-cover', soldOut && 'opacity-50']}
+												/>
+											) : (
+												<div
+													class="kikko flex aspect-square w-full items-center justify-center bg-text/5 text-xs text-text/60"
+													aria-hidden="true"
+												>
+													画像準備中
+												</div>
+											)}
+											{soldOut && (
+												<span class="absolute top-2 left-2 rounded bg-text px-2 py-0.5 text-xs font-medium text-base">
+													売り切れ
+												</span>
+											)}
+										</div>
+										<div class="flex flex-1 flex-col gap-1 p-3">
+											<h3 class="font-medium">{name}</h3>
+											<p class="mt-auto text-sm">{formatPrice(price)}</p>
+										</div>
+									</button>
+
+									<dialog
+										id={`goods-${entry.id}`}
+										aria-label={name}
+										class="goods-dialog m-auto w-[min(32rem,calc(100%-2rem))] max-h-[85vh] overflow-y-auto rounded-2xl border border-base bg-base p-0 text-text backdrop:bg-black/50"
+									>
+										{image && <img src={image} alt={name} class="aspect-square w-full object-cover" />}
+										<div class="p-5">
+											<div class="flex items-start justify-between gap-3">
+												<h2 class="text-lg font-medium">{name}</h2>
+												<button
+													type="button"
+													class="goods-close shrink-0 rounded-full border border-text/30 px-3 py-1 text-sm"
+												>
+													閉じる
+												</button>
+											</div>
+											<p class="mt-1 text-sm">
+												{formatPrice(price)}
+												{soldOut && <span class="ml-2 font-medium">売り切れ</span>}
+											</p>
+											<div class="mt-4 space-y-3 text-sm leading-relaxed text-text/90">
+												<Content />
+											</div>
+										</div>
+									</dialog>
+								</li>
+							);
+						})}
+					</ul>
+				)
+			}
+		</section>
+	</main>
+
+	<SiteFooter />
+</Layout>
+
+<script>
+	document.querySelectorAll<HTMLButtonElement>('.goods-open').forEach((button) => {
+		const dialog = document.getElementById(button.dataset.dialog ?? '') as HTMLDialogElement | null;
+		button.addEventListener('click', () => dialog?.showModal());
+	});
+	document.querySelectorAll<HTMLDialogElement>('.goods-dialog').forEach((dialog) => {
+		dialog.querySelector('.goods-close')?.addEventListener('click', () => dialog.close());
+		// 背景（::backdrop）クリックで閉じる
+		dialog.addEventListener('click', (e) => {
+			if (e.target === dialog) dialog.close();
+		});
+	});
+</script>

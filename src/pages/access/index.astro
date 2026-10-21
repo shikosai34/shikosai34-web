@@ -1,5 +1,250 @@
 ---
-import PlaceholderPage from '../../components/ui/PlaceholderPage.astro';
+import { Image } from 'astro:assets';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import SiteHeader from '../../components/layout/SiteHeader.astro';
+import SectionHeading from '../../components/ui/SectionHeading';
+import Layout from '../../layouts/Layout.astro';
+import busImage from '../../assets/access/access_bus.png';
+import taxiImage from '../../assets/access/access_taxi.png';
+import { BUS_FARES, BUS_ROUTES } from '../../lib/bus';
+
+const address = '〒312-8508 茨城県ひたちなか市中根866';
+
+// バス運賃（片道）。茨城交通の運賃（2026/10/04 時点）。改定されたら見直す。
+// 勝田駅〜深谷津（スマイルあおぞらバス）は往復とも年齢を問わず 100 円。
+const busFares = BUS_FARES;
+
+const mapEmbedUrl =
+	'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4022.053516903501!2d140.55073074446793!3d36.39699021221313!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60222faa16bfeb1b%3A0x8ee69992b50722b8!2z6Iyo5Z-O5bel5qWt6auY562J5bCC6ZaA5a2m5qCh!5e0!3m2!1sja!2sjp!4v1729150639038!5m2!1sja!2sjp';
+
+const mapLinks = [
+	{ label: 'Google Map', href: 'https://maps.app.goo.gl/ZqS8dawqKPTDENz19' },
+	{
+		label: 'Apple Map',
+		href: 'https://maps.apple.com/?address=%E3%80%92312-0011,%20%E8%8C%A8%E5%9F%8E%E7%9C%8C%E3%81%B2%E3%81%9F%E3%81%A1%E3%81%AA%E3%81%8B%E5%B8%82,%20%E4%B8%AD%E6%A0%B9866&auid=7819629652125356506&ll=36.400508,140.551520&lsp=9902&q=%E8%8C%A8%E5%9F%8E%E5%B7%A5%E6%A5%AD%E9%AB%98%E7%AD%89%E5%B0%82%E9%96%80%E5%AD%A6%E6%A0%A1',
+	},
+];
+
+const busLinks = [
+	{ label: 'アクセス（茨城高専ホームページ）', href: 'https://www.ibaraki-ct.ac.jp/access/' },
+	{
+		label: '茨城交通路線バス時刻表 勝田駅前（茨城高専前・深谷津方面とも）',
+		href: 'http://bus.ibako.co.jp/timetable/result/?no=1052&de=2&week=1',
+	},
+	{
+		label: '茨城交通路線バス時刻表 茨城高専前（勝田駅方面）',
+		href: 'http://bus.ibako.co.jp/timetable/result/?no=436&de=2&week=1',
+	},
+	{
+		label: '茨城交通路線バス時刻表 深谷津（勝田駅方面）',
+		href: 'http://bus.ibako.co.jp/timetable/result/?no=3710&de=2&f_from_type=1&f_from_genre=&f_from=%E6%B7%B1%E8%B0%B7%E6%B4%A5',
+	},
+	{
+		label: '茨城交通路線バス時刻表 深谷津（足崎団地方面）',
+		href: 'http://bus.ibako.co.jp/timetable/result/?no=3710&de=1&f_from_type=1&f_from_genre=&f_from=%E6%B7%B1%E8%B0%B7%E6%B4%A5',
+	},
+	{
+		label: 'ひたちなかコミュニティバス時刻表 深谷津',
+		href: 'http://bus.ibako.co.jp/timetable/result/?no=20280&de=1&f_from_type=1&f_from_genre=&f_from=%E6%B7%B1%E8%B0%B7%E6%B4%A5',
+	},
+];
+
+// バスの時刻データ本体は lib/bus.ts にまとめている（トップページの
+// 「次のバス」と共有するため）。経緯や出典のコメントもそちらを参照。
+// このページでは臨時便の案内のみ載せる。定期便を
+// 含む最新の発車案内はトップページの「次のバス」から確認できる。
+const shuttleRoutes = BUS_ROUTES.filter((route) => route.shuttleTimes.length > 0);
 ---
 
-<PlaceholderPage title="アクセス" heading="Access" icon="pin" message="アクセス情報は準備中です。" />
+<Layout title="アクセス | 第34回 茨香祭">
+	<SiteHeader />
+
+	<main class="mx-auto w-full max-w-3xl px-4 pb-16 sm:px-6">
+		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
+			<SectionHeading title="Access" icon="pin" />
+
+			<div class="space-y-10 border-t border-text/40 pt-6">
+				<div>
+					<div class="overflow-hidden rounded-xl border border-text/20">
+						<iframe
+							src={mapEmbedUrl}
+							title="茨城工業高等専門学校の地図"
+							style="border:0;"
+							allowfullscreen
+							loading="lazy"
+							referrerpolicy="no-referrer-when-downgrade"
+							class="aspect-square w-full sm:aspect-video"></iframe>
+					</div>
+					<p class="mt-3 text-center text-sm text-text/80">{address}</p>
+					<div class="mt-3 flex flex-wrap justify-center gap-2">
+						{
+							mapLinks.map((link) => (
+								<a
+									href={link.href}
+									target="_blank"
+									rel="noopener noreferrer"
+									class="rounded-full border border-text/30 px-3 py-1 text-sm text-text transition-colors hover:border-accent hover:text-accent focus:outline-2 focus:outline-offset-2 focus:outline-accent"
+								>
+									{link.label}
+								</a>
+							))
+						}
+					</div>
+				</div>
+
+				<section aria-labelledby="bus-heading">
+					<h2 id="bus-heading" class="border-b-2 border-text/25 pb-2 text-xl font-medium text-text">バスでのご来校</h2>
+					<p class="mt-4 text-sm leading-relaxed text-text/80">
+						JR勝田駅東口を出て左側にある、茨城交通バス2番乗り場から、定期便・臨時便のいずれかにお乗りください。<strong class="font-medium text-text">「茨城高専前」で下車</strong>し、北へ進むと正門となります。
+					</p>
+					<p class="mt-3 text-sm leading-relaxed text-text/80">
+						勝田駅からのバスは行き先によって停まる停留所が違い、<strong class="font-medium text-text">「深谷津」行きは茨城高専前を通りません</strong>。茨城高専前で下車してください。
+					</p>
+
+					<div class="mt-5 rounded-xl border-2 border-main bg-main/10 p-4" role="note">
+						<p class="font-medium text-text">臨時便は10月24日のみ運行します</p>
+						<p class="mt-1 text-sm leading-relaxed text-text/80">
+							茨城交通の路線バス（定期便）に加えて、臨時便を増便します。時刻は出発時刻です。通常の定期便を含む最新の発車案内は、トップページの「次のバス」からもご確認いただけます。
+						</p>
+					</div>
+
+					<div class="mt-5 rounded-xl border border-text/20 bg-base p-4">
+						<h3 class="text-base font-medium text-text">運賃（片道）</h3>
+						<div class="mt-3 space-y-4">
+							{
+								busFares.map((fare) => (
+									<div>
+										<p id={`fare-${fare.id}`} class="text-sm font-medium text-text/80">
+											{fare.route}
+										</p>
+										<dl
+											aria-labelledby={`fare-${fare.id}`}
+											class:list={['mt-2 grid gap-3', fare.prices.length > 1 ? 'grid-cols-2' : 'grid-cols-1']}
+										>
+											{fare.prices.map((item) => (
+												<div class="rounded-lg border border-text/15 px-3 py-2 text-center">
+													<dt class="text-xs text-text/70">{item.label}</dt>
+													<dd class="mt-0.5 text-lg font-medium text-text tabular-nums">{item.price}</dd>
+												</div>
+											))}
+										</dl>
+									</div>
+								))
+							}
+						</div>
+					</div>
+
+					<Image
+						src={busImage}
+						alt="勝田駅バスロータリー"
+						class="mx-auto mt-6 w-full max-w-xs rounded-xl"
+						widths={[370, 740]}
+						sizes="(min-width: 640px) 320px, 80vw"
+					/>
+
+					<h3 class="mt-8 text-base font-medium text-text">臨時便の時刻表（出発時刻）</h3>
+					<div class="mt-4 space-y-8 sm:grid sm:grid-cols-2 sm:items-start sm:gap-x-6 sm:gap-y-8 sm:space-y-0">
+						{
+							shuttleRoutes.map((bus) => (
+								<section aria-labelledby={`${bus.id}-heading`}>
+									<div class="mb-3 border-b-2 border-text/25 pb-2">
+										<p class="text-sm font-medium text-main">{bus.direction}</p>
+										<h4 id={`${bus.id}-heading`} class="text-base font-medium text-text">
+											{bus.route}
+										</h4>
+										<p class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-text/80">
+											<span class="rounded-full border border-text/30 px-2 py-0.5 text-xs font-medium text-text">
+												下車：{bus.stop}
+											</span>
+											<span class="text-xs text-text/60">{bus.stopNote}</span>
+										</p>
+									</div>
+									<ol class="divide-y divide-text/10 rounded-xl border border-text/20 bg-base">
+										{bus.shuttleTimes.map((time) => (
+											<li class="px-4 py-2 text-center font-medium tabular-nums text-text">
+												<time>{time}</time>
+											</li>
+										))}
+									</ol>
+								</section>
+							))
+						}
+					</div>
+					<p class="mt-4 text-xs leading-relaxed text-text/60">
+						上記は臨時便のみの時刻です。茨城交通の定期便を含む最新の発車案内は、<a href="/" class="text-text underline hover:no-underline focus:outline-2 focus:outline-offset-2 focus:outline-accent">トップページの「次のバス」</a>からご確認ください。ダイヤが変更される場合があるため、下記の時刻表もあわせてご確認ください。
+					</p>
+
+					<ul class="mt-8 list-disc space-y-2 pl-5 text-sm marker:text-text/60">
+						{
+							busLinks.map((link) => (
+								<li>
+									<a
+										href={link.href}
+										target="_blank"
+										rel="noopener noreferrer"
+										class="text-text underline hover:no-underline focus:outline-2 focus:outline-offset-2 focus:outline-accent"
+									>
+										{link.label}
+									</a>
+								</li>
+							))
+						}
+					</ul>
+				</section>
+
+				<section aria-labelledby="car-heading">
+					<h2 id="car-heading" class="border-b-2 border-text/25 pb-2 text-xl font-medium text-text">
+						車・タクシーでのご来校
+					</h2>
+
+					<div class="mt-5 rounded-xl border-2 border-main bg-main/10 p-4" role="note">
+						<p class="font-medium text-text">お車でのお越しはお控えください</p>
+						<ul class="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed text-text/80 marker:text-text/60">
+							<li>一般参加者駐車場は設置しません。上記の茨城交通路線バスなどの利用をご検討ください。</li>
+							<li>構内は自動車進入禁止です。タクシーでお越しの方は、正門の前で降車してください。</li>
+						</ul>
+					</div>
+
+					<Image
+						src={taxiImage}
+						alt="タクシーでのアクセス"
+						class="mx-auto mt-6 w-full max-w-xs rounded-xl"
+						widths={[370, 740]}
+						sizes="(min-width: 640px) 320px, 80vw"
+					/>
+				</section>
+
+				<section aria-labelledby="bicycle-heading">
+					<h2 id="bicycle-heading" class="border-b-2 border-text/25 pb-2 text-xl font-medium text-text">
+						自転車置き場
+					</h2>
+					<div class="mt-5 rounded-xl border-2 border-main bg-main/10 p-4" role="note">
+						<p class="flex items-center gap-2 font-medium text-text">
+							<span class="rounded-full bg-main px-2 py-0.5 text-xs font-medium text-base">一般の方</span>
+							自転車でご来校の方へ
+						</p>
+						<ul class="mt-3 list-disc space-y-1 pl-5 text-sm leading-relaxed text-text/80 marker:text-text/60">
+							<li>10月24日（土）の来場者用駐輪場は、図書館棟横の駐輪場です。</li>
+							<li>校内は危険防止のため、自転車を押して移動してください。</li>
+						</ul>
+					</div>
+
+					<div class="mt-4 rounded-xl border border-text/20 bg-base p-4" role="note">
+						<p class="flex items-center gap-2 font-medium text-text">
+							<span class="rounded-full bg-main px-2 py-0.5 text-xs font-medium text-base">学生向け連絡</span>
+							駐輪場の変更
+						</p>
+						<ul class="mt-3 list-disc space-y-1 pl-5 text-sm leading-relaxed text-text/80 marker:text-text/60">
+							<li>低学年駐輪場：10月24日（土）のみ使用禁止となります。代わりに野球場へ駐輪してください。詳細な案内は改めてメールにてご連絡いたします。10月25日（日）は通常通り低学年駐輪場を使用できます。</li>
+							<li>図書館棟横駐輪場：一般来場者専用となるため、10月23日（金）15:00までに必ず自転車を移動してください。</li>
+						</ul>
+						<p class="mt-3 text-sm leading-relaxed text-text/80">※期限までに残っている自転車は、一時的に移動する場合があります。</p>
+						<p class="mt-3 text-xs leading-relaxed text-text/60">この案内は茨城高専の在校生向けの連絡です。</p>
+					</div>
+				</section>
+			</div>
+		</section>
+	</main>
+
+	<SiteFooter />
+</Layout>

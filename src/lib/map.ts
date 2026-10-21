@@ -116,8 +116,9 @@ export const EXHIBIT_GROUPS: Record<ExhibitGroup, { label: string; color: string
 };
 
 export function exhibitGroupOfCategory(category: string): ExhibitGroup {
-	if (category.startsWith('grade')) return 'grade';
-	if (category === 'sports' || category === 'culture' || category === 'society') return 'club';
+	// 専攻科（「専攻科2年」など）は、学年のクラスと同じ扱い
+	if (category.startsWith('grade') || category === 'advanced') return 'grade';
+	if (category === 'sports' || category === 'culture') return 'club';
 	return 'other';
 }
 

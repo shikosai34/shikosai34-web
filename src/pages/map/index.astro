@@ -58,6 +58,15 @@ function summarize(markdown: string | undefined, max = 70): string | undefined {
 	return text.length > max ? `${text.slice(0, max)}…` : text;
 }
 
+/** 日ごとの実施時間を 1 行にまとめる（「10/24 9:00〜17:00 ／ 10/25 9:00〜16:00」。同じなら「両日 …」） */
+function scheduleOf(data: { scheduleDay1?: string; scheduleDay2?: string }): string | undefined {
+	const [d1, d2] = [data.scheduleDay1?.trim(), data.scheduleDay2?.trim()];
+	if (d1 && d2) return d1 === d2 ? `両日 ${d1}` : `10/24 ${d1} ／ 10/25 ${d2}`;
+	if (d1) return `10/24 ${d1}`;
+	if (d2) return `10/25 ${d2}`;
+	return undefined;
+}
+
 const circles = (await getCollectionOrEmpty('circles')).sort((a, b) =>
 	a.data.nameKana.localeCompare(b.data.nameKana, 'ja'),
 );
@@ -70,8 +79,8 @@ for (const circle of circles) {
 		group: exhibitGroupOfCategory(category),
 		href: `/circle/${circle.id}`,
 		image,
-		summary: summarize(circle.body),
-		schedule: circle.data.schedule,
+		summary: circle.data.summary,
+		schedule: scheduleOf(circle.data),
 	};
 	for (const weather of WEATHERS) {
 		const key = placedKey(circle.data, weather);

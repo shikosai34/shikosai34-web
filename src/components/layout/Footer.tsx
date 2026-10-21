@@ -1,28 +1,25 @@
 import InstagramIcon from '../icons/InstagramIcon';
-import NoteIcon from '../icons/NoteIcon';
 import XLogoIcon from '../icons/XLogoIcon';
 import FooterLinkColumn from './FooterLinkColumn';
 
 interface Props {
 	logoSrc: string;
 	kosenLogoSrc: string;
+	/** 協賛企業。金額に関係なく同じ大きさで並べる。 */
+	sponsors?: { name: string; url?: string }[];
 }
 
 const snsLinks = [
-	{ label: 'X（Twitter）', href: 'https://x.com/', icon: <XLogoIcon className="h-4 w-4" /> },
-	{ label: 'Instagram', href: 'https://instagram.com/', icon: <InstagramIcon className="h-4 w-4" /> },
-	{ label: 'note', href: 'https://note.com/', icon: <NoteIcon className="h-4 w-4" /> },
-];
-
-const circleLinks = [
-	{ label: '学年ごとに見る', href: '/circle?filter=grade' },
-	{ label: '区分ごとにみる', href: '/circle?filter=category' },
-	{ label: '種別ごとに見る', href: '/circle?filter=type' },
+	{ label: 'X（公式）', href: 'https://x.com/Shikosai34', icon: <XLogoIcon className="h-4 w-4" /> },
+	{ label: 'Instagram（公式）', href: 'https://www.instagram.com/shikosai34/', icon: <InstagramIcon className="h-4 w-4" /> },
+	{ label: 'Instagram（情報部）', href: 'https://www.instagram.com/shikosai34_tech/', icon: <InstagramIcon className="h-4 w-4" /> },
 ];
 
 const eventLinks = [
-	{ label: '1日目（10月24日）', href: '/timetable#day-1' },
-	{ label: '2日目（10月25日）', href: '/timetable#day-2' },
+	{ label: '1日目', href: '/timetable#day-1' },
+	{ label: '2日目', href: '/timetable#day-2' },
+	{ label: 'イベント一覧', href: '/event' },
+	{ label: 'サークル一覧', href: '/circle' },
 ];
 
 const otherLinks = [
@@ -32,7 +29,7 @@ const otherLinks = [
 	{ label: 'お問い合わせ', href: '/contact' },
 ];
 
-export default function Footer({ logoSrc, kosenLogoSrc }: Props) {
+export default function Footer({ logoSrc, kosenLogoSrc, sponsors = [] }: Props) {
 	return (
 		<footer
 			className="mt-14 border-t border-accent/20 bg-base px-6 pb-8 pt-10"
@@ -49,11 +46,34 @@ export default function Footer({ logoSrc, kosenLogoSrc }: Props) {
 	
 				<div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-8 md:flex md:flex-wrap md:justify-center md:gap-x-16">
 					<FooterLinkColumn heading="公式SNS" links={snsLinks} />
-					<FooterLinkColumn heading="サークル" links={circleLinks} />
 					<FooterLinkColumn heading="イベント" links={eventLinks} />
 					<FooterLinkColumn heading="その他のページ" links={otherLinks} />
 				</div>
 	
+				{sponsors.length > 0 && (
+					<div className="mt-10 border-t border-text/10 pt-6">
+						<p className="text-center text-xs text-text/60">協賛（五十音順・敬称略）</p>
+						<ul className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-text/70">
+							{sponsors.map(({ name, url }) => (
+								<li key={name}>
+									{url ? (
+										<a
+											href={url}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="underline underline-offset-2 hover:text-accent"
+										>
+											{name}
+										</a>
+									) : (
+										name
+									)}
+								</li>
+							))}
+						</ul>
+					</div>
+				)}
+
 				<div className="mt-10 border-t border-text/10 pt-6 text-xs leading-relaxed text-text/70 md:flex md:flex-col md:items-center md:text-center">
 					<img src={kosenLogoSrc} alt="茨城工業高等専門学校" className="h-15 w-auto" />
 					<p className="mt-2">〒312-8508 茨城県ひたちなか市中根866</p>

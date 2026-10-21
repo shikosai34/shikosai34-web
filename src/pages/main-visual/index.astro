@@ -115,22 +115,32 @@ const groups = [
 							class="w-full max-w-md md:max-w-none md:min-w-0 md:[flex:var(--ratio)_1_0%]"
 							style={`--ratio: ${item.width / item.height}`}
 						>
-							<a
-								href={item.src}
-								data-lightbox-group="character"
-								data-lightbox-index={index}
-								class="block overflow-hidden rounded-xl transition-transform hover:-translate-y-0.5"
-							>
-								<img
-									src={item.thumb}
-									alt=""
-									width={item.width}
-									height={item.height}
-									loading="lazy"
-									decoding="async"
-									class="w-full rounded-xl border border-text/80"
-								/>
-							</a>
+							<div class="relative overflow-hidden rounded-xl">
+								<a
+									href={item.src}
+									data-lightbox-group="character"
+									data-lightbox-index={index}
+									class="block rounded-xl transition-transform hover:-translate-y-0.5"
+								>
+									<img
+										src={item.thumb}
+										alt=""
+										width={item.width}
+										height={item.height}
+										loading="lazy"
+										decoding="async"
+										class="block w-full rounded-xl border border-text/80"
+									/>
+								</a>
+								{index === 0 && (
+									<a
+										href="https://ja.wikipedia.org/wiki/%E3%83%92%E3%82%BF%E3%83%81%E3%83%8A%E3%82%AB%E3%83%AA%E3%83%A5%E3%82%A6"
+										aria-label="ぽんずを押してヒタチナカリュウのWikipediaを見る"
+										title="ぽんずを押してみる"
+										class="absolute top-[62%] left-[59%] z-10 h-[24%] w-[34%] rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+									/>
+								)}
+							</div>
 						</li>
 					))
 				}

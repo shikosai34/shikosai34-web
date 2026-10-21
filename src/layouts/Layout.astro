@@ -2,8 +2,9 @@
 import '@fontsource/kiwi-maru/400.css';
 import '@fontsource/kiwi-maru/500.css';
 import '../styles/global.css';
-import LoadingScreen from '../components/layout/LoadingScreen.astro';
 import EdgeKasumi from '../components/layout/EdgeKasumi';
+import { ogPageTitles } from '../lib/og-pages';
+import { getPageOgImagePath } from '../lib/og/pages';
 
 interface Props {
 	title?: string;
@@ -18,20 +19,47 @@ interface Props {
 	 * 既定で全ページに出す。全画面の演出を持つページ（404 など）では切る。
 	 */
 	edgeKasumi?: boolean;
+	/**
+	 * OGP 画像のパス（サイト内の絶対パス）。
+	 * 未指定なら、固定ページは lib/og/pages.ts の画像、それ以外は共通の /ogp.jpg。
+	 * サークル詳細とトップは、それぞれのページから専用の画像を渡す。
+	 */
+	ogImage?: string;
 }
 
 const {
 	title = '茨香祭 | 第34回 茨城工業高等専門学校 文化祭',
 	description = '第34回 茨城工業高等専門学校 文化祭（茨香祭）の公式Webサイトです。テーマ「守破離」のもと、和風×サイバーパンクの新しい文化祭をお届けします。',
 	bodyClass = 'kikko bg-base text-text',
-	edgeKasumi = true
+	edgeKasumi = true,
+	ogImage = getPageOgImagePath(Astro.url.pathname) ?? '/ogp.jpg'
 } = Astro.props;
 
 // astro.config.mjs の site を基準に絶対 URL を組み立てる。
 // site 未設定の環境（古い設定で起動した dev サーバーなど）でも落ちないようリクエスト元にフォールバックする。
 const siteOrigin = Astro.site ?? Astro.url;
 const canonicalURL = new URL(Astro.url.pathname, siteOrigin);
-const ogImageURL = new URL('/ogp.png', siteOrigin);
+const ogImageURL = new URL(ogImage, siteOrigin);
+
+// SNS のシェアカードで画像の下に出る og:title には、ページの階層を「親 › 子」で出す。
+// 先頭のパスが og-pages.ts に登録された固定ページなら、サイト名 › 一覧ページ名（› 個別記事名）にする。
+// 個別記事名は title の「 | 」より前を使う。登録外のページ（トップ・404 など）は title のまま。
+const pathSegments = Astro.url.pathname.split('/').filter(Boolean);
+const parentTitle = ogPageTitles[pathSegments[0]];
+const ogTitle = parentTitle
+	? ['第34回 茨香祭', parentTitle, ...(pathSegments.length > 1 ? [title.split(' | ')[0]] : [])].join(' › ')
+	: title;
+
+// 検索結果でサイト名を「第34回 茨香祭」と出させるための構造化データ。
+// Google はトップページの WebSite だけを見るので、トップでのみ出す。
+const isHome = Astro.url.pathname === '/';
+const websiteJsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'WebSite',
+	name: '第34回 茨香祭',
+	alternateName: ['茨香祭', '第34回 茨城工業高等専門学校 文化祭'],
+	url: new URL('/', siteOrigin).href
+};
 ---
 
 <!doctype html>
@@ -39,8 +67,11 @@ const ogImageURL = new URL('/ogp.png', siteOrigin);
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="color-scheme" content="dark" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
+		<link rel="icon" href="/favicon.ico" sizes="any" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<meta name="theme-color" content="#0b3041" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 		
@@ -48,19 +79,22 @@ const ogImageURL = new URL('/ogp.png', siteOrigin);
 		<meta name="description" content={description} />
 		<link rel="canonical" href={canonicalURL} />
 		<meta property="og:site_name" content="第34回 茨香祭" />
-		<meta property="og:title" content={title} />
+		<meta property="og:title" content={ogTitle} />
 		<meta property="og:description" content={description} />
 		<meta property="og:type" content="website" />
 		<meta property="og:url" content={canonicalURL} />
 		<meta property="og:image" content={ogImageURL} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
 		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={ogTitle} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={ogImageURL} />
+		{isHome && (
+			<script type="application/ld+json" set:html={JSON.stringify(websiteJsonLd)} is:inline />
+		)}
 	</head>
-	<body class:list={[bodyClass ?? 'bg-text text-base']}>
-		{/*
-		 * 読み込み中の覆い。どのページから入っても出るよう Layout に置く。
-		 * サイト内のページ遷移では出さない（LoadingScreen 側で判定する）。
-		 */}
-		<LoadingScreen />
+	<body class:list={[bodyClass ?? 'bg-text text-base', 'isolate']}>
 		{/* 画面の左右端に固定する霞。スクロールしても残る。 */}
 		{edgeKasumi && <EdgeKasumi />}
 		<slot />

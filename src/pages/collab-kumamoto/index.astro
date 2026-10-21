@@ -1,0 +1,256 @@
+---
+import { Image } from 'astro:assets';
+import campusImage from '../../assets/collab-kumamoto/campus.jpg';
+import chairpersonImage from '../../assets/collab-kumamoto/chairperson.jpg';
+import experienceImage from '../../assets/collab-kumamoto/experience.jpg';
+import gateChairsImage from '../../assets/collab-kumamoto/gate-chairs.jpg';
+import liveImage from '../../assets/collab-kumamoto/live.jpg';
+import mainVisualImage from '../../assets/collab-kumamoto/main-visual.jpg';
+import stageImage from '../../assets/collab-kumamoto/stage.jpg';
+import stallImage from '../../assets/collab-kumamoto/stall.jpg';
+import themeLogoImage from '../../assets/collab-kumamoto/theme-logo.png';
+import Layout from '../../layouts/Layout.astro';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import SiteHeader from '../../components/layout/SiteHeader.astro';
+import SectionHeading from '../../components/ui/SectionHeading';
+
+const photos = [
+	{ src: stageImage, alt: '電波祭のステージに飾られた、ロケットと月のイラストの背景パネル', caption: 'ステージ', position: 'object-left' },
+	{ src: liveImage, alt: '紫の照明に照らされた会場で、観客が手を挙げて盛り上がっている様子', caption: '軽音ライブ' },
+	{ src: stallImage, alt: '模擬店で学生が鉄板で焼きそばを調理している様子', caption: '模擬店' },
+	{ src: experienceImage, alt: 'スクリーンに映したダーツのゲームを、お揃いのパーカーを着た学生が見ている様子', caption: '体験企画' },
+];
+---
+
+<Layout
+	title="熊本高専と茨城高専のコラボ | 第34回 茨香祭"
+	description="熊本高専 熊本キャンパスの電波祭と茨城高専の茨香祭。両校の交流から生まれたコラボ企画を紹介します。"
+>
+	<SiteHeader />
+
+	<main class="mx-auto w-full max-w-5xl px-4 pb-16 sm:px-6">
+		<article class="mx-auto max-w-3xl">
+			<div class="surface-panel mt-8 divide-y divide-accent/25 rounded-2xl p-5 sm:p-8">
+				<header class="py-8 first:pt-0 last:pb-0">
+					<SectionHeading title="Kumamoto" icon="handshake" subtitle="熊本高専コラボ" />
+					<div class="max-w-2xl space-y-4 text-base leading-relaxed text-text/85">
+						<p>
+							第34回茨香祭では、熊本高専の文化祭「電波祭」とのコラボ企画を実施します。
+						</p>
+						<p>
+							両校の文化祭実行委員長が国際交流プログラムで出会ったことをきっかけに、「離れた高専同士で一緒に面白い企画をつくりたい」という思いから、このコラボが始まりました。
+						</p>
+						<p>
+							映像や展示などを通して、熊本高専と茨城高専、それぞれの学校生活や文化祭の魅力を紹介します。距離を越えてつながる高専同士のコラボを、ぜひお楽しみください！
+						</p>
+					</div>
+				</header>
+
+				<section class="py-8 first:pt-0 last:pb-0" aria-labelledby="story-title">
+					<h2 id="story-title" class="text-lg font-medium text-text">コラボに至ったきっかけ</h2>
+					<div class="mt-5 space-y-4 text-base leading-relaxed text-text/85">
+						<p>
+							きっかけは、2024年12月、タイで開催された国際交流プログラム「TJ-SIF」で、両校の文化祭実行委員長が出会ったことでした。同じ年度に実行委員長を務めると分かり、文化祭でやってみたいことを話す中で、「一緒に何かできたら面白いね」と意気投合。昨年は茨香祭実行委員長の國井真帆さんが電波祭を訪れ、交流を重ねてきました。そして今年、両校の文化祭でコラボ企画を実施することになりました。
+						</p>
+					</div>
+					<figure class="mt-6">
+						<Image
+							src={gateChairsImage}
+							alt="電波祭の会場で、熊本高専の校舎を背景に、二人の学生が笑顔でポーズをとっている様子"
+							widths={[640, 1024, 1600]}
+							sizes="(min-width: 768px) 672px, calc(100vw - 72px)"
+							loading="lazy"
+							class="aspect-[4/3] w-full rounded-xl object-cover"
+						/>
+						<figcaption class="mt-2 text-xs text-text/65">電波祭の会場にて</figcaption>
+					</figure>
+				</section>
+
+				<section class="py-8 first:pt-0 last:pb-0" aria-labelledby="projects-title">
+					<h2 id="projects-title" class="text-lg font-medium text-text">両校でつくる、三つのコラボ企画</h2>
+					<p class="mt-3 text-base leading-relaxed text-text/80">
+						交流の輪は、ステージ企画から抽選会、記念グッズへと広がります。
+					</p>
+					<div class="mt-6 grid gap-4">
+						<article class="bracket-frame rounded-xl bg-base/45 p-5 sm:p-6">
+							<h3 class="text-lg font-medium text-text">高専くらべてみたら<br class="sm:hidden" />〜熊本高専×茨城高専〜</h3>
+							<p class="mt-3 text-base leading-relaxed text-text/80">両校がコラボした映像企画です。ステージイベントの収録企画としてお届けします。</p>
+						</article>
+						<article class="bracket-frame rounded-xl bg-base/45 p-5 sm:p-6">
+							<h3 class="text-lg font-medium text-text">大抽選会コラボ</h3>
+							<p class="mt-3 text-base leading-relaxed text-text/80">2日目の大抽選会に、熊本からの景品も登場予定です。</p>
+						</article>
+						<article class="bracket-frame rounded-xl bg-base/45 p-5 sm:p-6">
+							<h3 class="text-lg font-medium text-text">コラボグッズ</h3>
+							<p class="mt-3 text-base leading-relaxed text-text/80">両校の交流を記念したグッズを予定しています。詳細は決まり次第お知らせします。</p>
+						</article>
+					</div>
+				</section>
+
+				<section class="py-8 first:pt-0 last:pb-0" aria-labelledby="kumamoto-title">
+					<h2 id="kumamoto-title" class="text-lg font-medium text-text">熊本高専 熊本キャンパス</h2>
+					<div class="mt-5 space-y-4 text-base leading-relaxed text-text/85">
+						<p>
+							熊本高専熊本キャンパスは、熊本県合志市にある、情報・電子・通信などの技術を学ぶキャンパスです。地域と連携した活動や国際交流も盛んで、教室の外にも学びの機会があります。また、「熊本高専ファーストペンギンズプロジェクト」では、新しいことに自ら挑戦する姿勢を大切にしています。電波祭も、そんな挑戦の場の一つです。企画や広報、会場設営から当日の運営まで学生が担当し、学んだ技術やそれぞれの得意なことを生かして、自分たちの手でつくり上げています。
+						</p>
+					</div>
+					<figure class="mt-6">
+						<Image
+							src={campusImage}
+							alt="青空の下に建つ、熊本高専の校舎と「国立熊本高専」の看板"
+							widths={[640, 1024, 1600]}
+							sizes="(min-width: 768px) 672px, calc(100vw - 72px)"
+							loading="lazy"
+							class="aspect-[3/2] w-full rounded-xl object-cover"
+						/>
+						<figcaption class="mt-2 text-xs text-text/65">熊本高専の校舎</figcaption>
+					</figure>
+					<a href="https://kumamoto-nct.ac.jp/" target="_blank" rel="noopener noreferrer" class="external-link mt-4">
+						<span>熊本高専 公式サイト</span><span aria-hidden="true">↗</span>
+					</a>
+				</section>
+
+				<section class="py-8 first:pt-0 last:pb-0" aria-labelledby="denpasai-title">
+					<h2 id="denpasai-title" class="text-lg font-medium text-text">熊本高専の学園祭「電波祭」</h2>
+					<div class="mt-5 space-y-4 text-base leading-relaxed text-text/85">
+						<p>
+							電波祭は、熊本高専熊本キャンパスで開催する学生主体の学園祭です。今年は茨香祭と同じ10月24日（土）・25日（日）に開催します。テーマは「Yo soro（ヨーソロー）」。船を真っ直ぐ進める号令に、一人ひとりの「やってみたい」を大切にしながら、みんなで力を合わせて進もうという思いを込めました。
+						</p>
+					</div>
+					<div class="mx-auto mt-6 max-w-[15rem] sm:max-w-xs">
+						<div class="aspect-square rounded-xl bg-white p-4">
+							<Image
+								src={themeLogoImage}
+								alt="電波祭2026のテーマ「YO SORO」のロゴ"
+								width={500}
+								height={500}
+								loading="lazy"
+								class="size-full object-contain"
+							/>
+						</div>
+						<figure class="mt-3">
+							<Image
+								src={mainVisualImage}
+								alt="電波祭2026のメインビジュアル。海賊帽をかぶった人物が、荒波の中で舵を握り望遠鏡を持っているイラスト"
+								widths={[400, 640, 1000]}
+								sizes="(min-width: 640px) 320px, 240px"
+								loading="lazy"
+								class="aspect-[3/4] w-full rounded-xl object-cover"
+							/>
+							<figcaption class="mt-2 text-xs text-text/65">電波祭2026 メインビジュアル</figcaption>
+						</figure>
+					</div>
+					<div class="mt-6 space-y-4 text-base leading-relaxed text-text/85">
+						<p>
+							ステージイベントや模擬店、展示・体験企画、大抽選会など、学生が準備してきたさまざまな企画を楽しめます。今年は茨城高専とのコラボも加わり、例年とはひと味違う電波祭をお届けします！
+						</p>
+					</div>
+					<ul class="mt-6 grid grid-cols-2 gap-3 sm:gap-4" aria-label="電波祭2025の様子">
+						{
+							photos.map((photo) => (
+								<li>
+									<figure>
+										<Image
+											src={photo.src}
+											alt={photo.alt}
+											widths={[400, 640, 1000]}
+											sizes="(min-width: 768px) 320px, 50vw"
+											loading="lazy"
+											class={`aspect-[4/3] w-full rounded-xl object-cover ${photo.position ?? ''}`}
+										/>
+										<figcaption class="mt-2 text-xs text-text/65">{photo.caption}</figcaption>
+									</figure>
+								</li>
+							))
+						}
+					</ul>
+					<p class="mt-2 text-xs text-text/65">写真は2025年の電波祭の様子です。</p>
+				</section>
+
+				<section class="py-8 first:pt-0 last:pb-0" aria-labelledby="message-title">
+					<h2 id="message-title" class="text-lg font-medium text-text">電波祭実行委員長からのメッセージ</h2>
+					<div class="mt-5">
+						<div class="flex items-center gap-4">
+							<Image
+								src={chairpersonImage}
+								alt="電波祭2026 実行委員長 上村 怜士さん"
+								width={160}
+								height={160}
+								loading="lazy"
+								class="size-20 shrink-0 rounded-full object-cover object-[50%_25%] sm:size-24"
+							/>
+							<div>
+								<p class="text-sm text-accent">電波祭2026 実行委員長</p>
+								<h3 class="mt-1 text-base font-medium text-text">上村 怜士 さん</h3>
+							</div>
+						</div>
+						<blockquote class="mt-5 space-y-3 border-l-2 border-accent bg-base/45 px-5 py-5 text-base leading-relaxed text-text/85 sm:px-6">
+							<p>
+								茨香祭にお越しの皆さん、こんにちは！電波祭2026実行委員長の上村怜士です。
+							</p>
+							<p>
+								タイで茨香祭実行委員長の真帆と出会い、「一緒に文化祭で何かやろう」と話していたことが、こうして実現してとても嬉しいです。両校の学生にも、来場者の皆さんにも楽しんでもらいたいと思いながら、ここまで準備を進めてきました。このコラボを通して、少しでも熊本高専や電波祭に興味を持ってもらえたら嬉しいです。
+							</p>
+							<p>
+								今年は同日開催ですが、来年はぜひ熊本に遊びに来てください！電波祭の熱気を、今度は会場で感じてもらえたらと思います。
+							</p>
+							<p>
+								一緒に準備を進めてくださった茨城高専の皆さん、本当にありがとうございました！今回だけで終わらず、これからも両校の交流が続いていくことを願っています。
+							</p>
+						</blockquote>
+					</div>
+				</section>
+
+				<section class="py-8 first:pt-0 last:pb-0" aria-label="電波祭をもっと知る">
+					<SectionHeading title="電波祭をもっと知る" icon="image" />
+					<div class="mt-4 grid gap-3 sm:grid-cols-3">
+						<a href="https://denpasai.jp/" target="_blank" rel="noopener noreferrer" class="external-link link-card">
+							<span>電波祭サイト</span><span aria-hidden="true">↗</span>
+						</a>
+						<a href="https://www.instagram.com/denpa_sai/" target="_blank" rel="noopener noreferrer" class="external-link link-card">
+							<span>Instagram</span><span aria-hidden="true">↗</span>
+						</a>
+						<a href="https://www.tiktok.com/@denpa_sai" target="_blank" rel="noopener noreferrer" class="external-link link-card">
+							<span>TikTok</span><span aria-hidden="true">↗</span>
+						</a>
+					</div>
+				</section>
+			</div>
+		</article>
+	</main>
+
+	<SiteFooter />
+</Layout>
+
+<style>
+	.external-link {
+		display: inline-flex;
+		min-height: 2.75rem;
+		align-items: center;
+		gap: 0.375rem;
+		padding-block: 0.5rem;
+		color: var(--color-accent);
+		font-size: var(--text-sm);
+		line-height: var(--text-sm--line-height);
+		text-decoration: underline;
+		text-underline-offset: 4px;
+		transition: color 0.2s;
+	}
+
+	.external-link:hover {
+		color: var(--color-main);
+	}
+
+	.external-link:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 4px;
+	}
+
+	.link-card {
+		justify-content: space-between;
+		border: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+		border-radius: 0.75rem;
+		background: color-mix(in srgb, var(--color-base) 45%, transparent);
+		padding: 0.75rem 1rem;
+	}
+</style>
