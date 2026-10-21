@@ -92,7 +92,10 @@ function getPosterImage(): Promise<CenterImage> {
 async function getCircleImage(imageUrl: string, imageScale = 1): Promise<CenterImage> {
 	let source: Buffer;
 	if (/^https?:\/\//.test(imageUrl)) {
-		const res = await fetch(imageUrl, { signal: AbortSignal.timeout(15_000) });
+		const res = await fetch(imageUrl, {
+			headers: { 'User-Agent': 'OpenAI File Downloader, XaiImageApiFetch/1.0' },
+			signal: AbortSignal.timeout(15_000),
+		});
 		if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
 		source = Buffer.from(await res.arrayBuffer());
 	} else {
