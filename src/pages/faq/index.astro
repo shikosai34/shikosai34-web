@@ -47,7 +47,7 @@ const answers = await Promise.all(sortedEntries.map((entry) => render(entry)));
 								aria-controls={`faq-panel-${i}`}
 								aria-selected={i === 0 ? 'true' : 'false'}
 								tabindex={i === 0 ? 0 : -1}
-								class="min-h-10 flex-auto whitespace-nowrap rounded-full border border-text/30 px-2 py-1.5 text-xs text-text sm:px-4 sm:text-sm transition-colors hover:border-main aria-selected:border-main aria-selected:bg-main aria-selected:font-medium aria-selected:text-on-main focus:outline-2 focus:outline-offset-2 focus:outline-accent"
+								class="min-h-10 flex-auto whitespace-nowrap rounded-full border border-text/30 px-2 py-1.5 text-xs text-text sm:px-4 sm:text-sm transition-colors hover:border-main aria-selected:border-main aria-selected:bg-main aria-selected:font-medium aria-selected:text-on-main"
 							>
 								{category}
 							</button>
