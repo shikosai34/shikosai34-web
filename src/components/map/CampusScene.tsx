@@ -580,7 +580,20 @@ function Rain({ bounds, count, animate }: { bounds: MapBounds; count: number; an
  * 番号つきの固定のテント（グラウンドの G-1〜G-33 など）。区画図の位置どおりに全部描き、
  * 出展のあるテントは幕に明かりを灯す。近づくと番号を出し、押すとその番号の出展を開く。
  */
-function SlotTents({ slots, counts, selected, onPick }: { slots: MapRoom[]; counts: Record<string, number>; selected: string | null; onPick: (key: string) => void }) {
+function SlotTents({
+	slots,
+	counts,
+	selected,
+	roofs,
+	onPick,
+}: {
+	slots: MapRoom[];
+	counts: Record<string, number>;
+	selected: string | null;
+	/** 建物名 → 屋根の高さ。建物の中のテント（inside）は、建物の箱に隠れないよう屋根の上へ浮かべる */
+	roofs: Record<string, number>;
+	onPick: (key: string) => void;
+}) {
 	const canopy = useRef<THREE.InstancedMesh>(null);
 	const valance = useRef<THREE.InstancedMesh>(null);
 	const controls = useThree((s) => s.controls) as CameraControlsImpl | null;
@@ -598,13 +611,14 @@ function SlotTents({ slots, counts, selected, onPick }: { slots: MapRoom[]; coun
 			const [x, y] = project(slot.at!);
 			const yaw = new THREE.Quaternion().setFromAxisAngle(up, slot.angle ?? 0);
 			const roof = yaw.clone().multiply(new THREE.Quaternion().setFromAxisAngle(up, Math.PI / 4));
-			m.compose(new THREE.Vector3(x, 3.2, -y), roof, new THREE.Vector3(1, 1, 1));
+			const lift = slot.inside ? (roofs[slot.inside] ?? 0) + 0.6 : 0;
+			m.compose(new THREE.Vector3(x, 3.2 + lift, -y), roof, new THREE.Vector3(1, 1, 1));
 			canopy.current?.setMatrixAt(i, m);
-			m.compose(new THREE.Vector3(x, 1.9, -y), yaw, new THREE.Vector3(1, 1, 1));
+			m.compose(new THREE.Vector3(x, 1.9 + lift, -y), yaw, new THREE.Vector3(1, 1, 1));
 			valance.current?.setMatrixAt(i, m);
 		});
 		for (const mesh of [canopy.current, valance.current]) if (mesh) mesh.instanceMatrix.needsUpdate = true;
-	}, [slots]);
+	}, [slots, roofs]);
 
 	// 幕の色。出展のあるテントは明かり、空きは暗く、選んだテントは橙で強く
 	useEffect(() => {
@@ -638,7 +652,7 @@ function SlotTents({ slots, counts, selected, onPick }: { slots: MapRoom[]; coun
 					const [x, y] = project(slot.at!);
 					const chosen = slot.key === selected;
 					return (
-						<Html key={slot.key} position={[x, 4.8, -y]} center zIndexRange={[5, 0]} style={{ pointerEvents: 'none' }}>
+						<Html key={slot.key} position={[x, 4.8 + (slot.inside ? (roofs[slot.inside] ?? 0) + 0.6 : 0), -y]} center zIndexRange={[5, 0]} style={{ pointerEvents: 'none' }}>
 							<div
 								className={`whitespace-nowrap rounded-sm border px-1 text-[11px] leading-4 ${
 									chosen ? 'border-main bg-base text-main' : (counts[slot.key] ?? 0) > 0 ? 'border-accent/60 bg-base/85 text-text' : 'border-transparent bg-base/60 text-text/50'
@@ -1058,6 +1072,8 @@ export default function CampusScene({ campus, counts, places, routes, showExting
 	};
 
 	const air = ATMOSPHERE[weather];
+	/** 建物名 → 屋根の高さ（建物の中のテントを屋根の上に出すのに使う） */
+	const roofs = useMemo(() => Object.fromEntries(buildings.filter((b) => b.name).map((b) => [b.name!, b.height])), [buildings]);
 
 	/** 押せる建物（平面図があるか、屋外の会場を含む建物） */
 	const selectable = (name: string | null) => !!name && (name in PLAN_FILES || places.some((p) => p.building === name));
@@ -1117,7 +1133,7 @@ export default function CampusScene({ campus, counts, places, routes, showExting
 					<RestrictedLayer areas={routes.restricted} />
 				</>
 			)}
-			<SlotTents slots={slots} counts={counts} selected={selected} onPick={onPickPlace} />
+			<SlotTents slots={slots} counts={counts} selected={selected} roofs={roofs} onPick={onPickPlace} />
 			{bubble &&
 				(() => {
 					const slot = slots.find((s) => s.key === bubble.key);

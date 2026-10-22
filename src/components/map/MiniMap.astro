@@ -82,7 +82,7 @@ const label = formatMapRoom(room);
 
 	{
 		area && (
-			<svg viewBox={area.viewBox} role="img" aria-label={`${label} のグラウンドでの位置`} class="aspect-square w-full rounded-md border border-text/15 bg-base/60">
+			<svg viewBox={area.viewBox} role="img" aria-label={`${label} の${room.building}での位置`} class="aspect-square w-full rounded-md border border-text/15 bg-base/60">
 				{area.layers.map((layer) => (
 					<polygon
 						points={layer.points}
