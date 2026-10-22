@@ -1,0 +1,23 @@
+/*
+  クリアステッカー用の調整（このサイト独自）。
+  絵の背景が透明なので、本家のグレア（周囲が黒くなる）だと暗くなりすぎる。
+  グレアを明るく、虹の反射を強めにする。
+*/
+.holo-card[data-rarity="rare rainbow alt"] .holo-card__glare {
+  background-image: radial-gradient(
+    farthest-corner circle at var(--pointer-x) var(--pointer-y),
+    hsla(50, 30%, 96%, 0.9) 0%,
+    hsla(180, 30%, 70%, 0.35) 40%,
+    hsla(0, 0%, 0%, 0) 100%
+  );
+  filter: none;
+  opacity: calc(var(--card-opacity) * 0.55);
+}
+
+.holo-card[data-rarity="rare rainbow alt"] .holo-card__shine {
+  filter: brightness(calc((var(--pointer-from-center) * 0.4) + 0.55)) contrast(2.4) saturate(1.6);
+}
+
+.holo-card .holo-card__front {
+  background: hsla(200, 40%, 12%, 0.35);
+}
