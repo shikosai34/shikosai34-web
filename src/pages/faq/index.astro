@@ -5,8 +5,16 @@ import SiteFooter from '../../components/layout/SiteFooter.astro';
 import SiteHeader from '../../components/layout/SiteHeader.astro';
 import SectionHeading from '../../components/ui/SectionHeading';
 
+// 質問の種類（カテゴリ）の表示順。ここにないカテゴリは末尾に五十音順で並ぶ。
+const CATEGORY_ORDER = ['開催情報', 'アクセス', '会場・設備', '企画'];
+const categoryRank = (category: string) => {
+	const rank = CATEGORY_ORDER.indexOf(category);
+	return rank === -1 ? CATEGORY_ORDER.length : rank;
+};
+
 const entries = await getCollection('faq');
 const sortedEntries = entries.toSorted((a, b) =>
+	categoryRank(a.data.category) - categoryRank(b.data.category) ||
 	a.data.category.localeCompare(b.data.category, 'ja') ||
 	a.data.question.localeCompare(b.data.question, 'ja'),
 );
@@ -25,9 +33,9 @@ const answers = await Promise.all(sortedEntries.map((entry) => render(entry)));
 				<p class="py-8 text-center text-sm text-text/70">よくある質問は準備中です。</p>
 			) : (
 				<div class="space-y-8">
-					{categories.map((category) => (
-						<section aria-labelledby={`faq-${category}`}>
-							<h2 id={`faq-${category}`} class="mb-3 border-b border-accent/30 pb-2 text-lg font-medium text-accent">
+					{categories.map((category, i) => (
+						<section aria-labelledby={`faq-heading-${i}`}>
+							<h2 id={`faq-heading-${i}`} class="mb-3 border-b border-accent/30 pb-2 text-lg font-medium text-accent">
 								{category}
 							</h2>
 							<div class="space-y-3">
@@ -37,30 +45,32 @@ const answers = await Promise.all(sortedEntries.map((entry) => render(entry)));
 									.map(({ entry, index }) => {
 										const { Content } = answers[index];
 										return (
-											<details class="group rounded-xl border border-white/10 bg-base/40 px-4 py-3 open:border-accent/40">
-												<summary class="flex cursor-pointer list-none items-start gap-3 font-medium text-text marker:hidden">
+											<article class="rounded-xl border border-accent/40 bg-base/40 px-4 py-3">
+												<h3 class="flex items-start gap-3 font-medium text-text">
 													<span class="shrink-0 text-accent" aria-hidden="true">Q.</span>
 													<span class="min-w-0 flex-1">{entry.data.question}</span>
-													<span class="mt-1 shrink-0 text-accent transition-transform group-open:rotate-180" aria-hidden="true">⌄</span>
-												</summary>
-												<div class="faq-answer mt-4 border-t border-white/10 pt-4 pl-7 text-sm leading-7 text-text/80">
-													<Content />
-													{entry.data.referenceLinks.length > 0 && (
-														<div class="mt-4">
-															<p class="mb-1 text-xs font-medium text-text/60">参考リンク</p>
-															<ul class="space-y-1">
-																{entry.data.referenceLinks.map((link) => (
-																	<li>
-																		<a class="text-accent underline decoration-accent/40 underline-offset-4 hover:decoration-accent" href={link.url} target="_blank" rel="noreferrer">
-																			{link.label} <span aria-hidden="true">↗</span>
-																		</a>
-																	</li>
-																))}
-															</ul>
-														</div>
-													)}
+												</h3>
+												<div class="mt-4 flex items-start gap-3 border-t border-white/10 pt-4">
+													<span class="shrink-0 font-medium leading-7 text-main" aria-hidden="true">A.</span>
+													<div class="faq-answer min-w-0 flex-1 text-sm leading-7 text-text/80">
+														<Content />
+														{entry.data.referenceLinks.length > 0 && (
+															<div class="mt-4">
+																<p class="mb-1 text-xs font-medium text-text/60">参考リンク</p>
+																<ul class="space-y-1">
+																	{entry.data.referenceLinks.map((link) => (
+																		<li>
+																			<a class="text-accent underline decoration-accent/40 underline-offset-4 hover:decoration-accent" href={link.url} target="_blank" rel="noreferrer">
+																				{link.label} <span aria-hidden="true">↗</span>
+																			</a>
+																		</li>
+																	))}
+																</ul>
+															</div>
+														)}
+													</div>
 												</div>
-											</details>
+											</article>
 										);
 									})}
 							</div>
@@ -68,6 +78,10 @@ const answers = await Promise.all(sortedEntries.map((entry) => render(entry)));
 					))}
 				</div>
 			)}
+
+			<p class="mt-8 border-t border-white/10 pt-6 text-center text-sm leading-7 text-text/80">
+				お探しの質問が見つからない場合は、<a class="text-accent underline decoration-accent/40 underline-offset-4 hover:decoration-accent" href="/contact">お問い合わせページ</a>からお気軽にご連絡ください。
+			</p>
 		</section>
 	</main>
 
