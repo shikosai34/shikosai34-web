@@ -61,6 +61,18 @@ const stageEvents = (await getCompleteEvents())
 			posterFullHeight={Number(posterFull.attributes.height)}
 		/>
 
+		<a
+			href="/pamphlet/"
+			class="bracket-frame surface-panel group mt-6 flex flex-col gap-3 rounded-2xl p-5 transition-colors hover:border-accent/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-6"
+		>
+			<div>
+				<p class="mb-1 text-xs tracking-[0.2em] text-accent">PAMPHLET</p>
+				<h2 class="text-lg font-medium text-text group-hover:text-accent">デジタルパンフレットはこちら</h2>
+				<p class="mt-1 text-sm leading-7 text-text/75">公式パンフレットをブラウザでそのまま読めます。</p>
+			</div>
+			<span class="shrink-0 text-sm text-accent underline underline-offset-4 group-hover:no-underline">読む →</span>
+		</a>
+
 		<ThemeSection>
 			<ThemeModel slot="mark" client:only="react" />
 		</ThemeSection>
