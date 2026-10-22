@@ -67,9 +67,6 @@
 			"マルチメディア室",
 			"マルチメディアパソコン教室",
 			"1号館2階マルチメディアパソコン教室"
-		],
-		"rainAliases": [
-			"5E"
 		]
 	},
 	{
@@ -115,9 +112,6 @@
 		"plan": "bldg1",
 		"aliases": [
 			"語学演習室"
-		],
-		"rainAliases": [
-			"5M1"
 		]
 	},
 	{
@@ -151,9 +145,6 @@
 		"plan": "bldg1",
 		"aliases": [
 			"4M2"
-		],
-		"rainAliases": [
-			"5M2"
 		]
 	},
 	{
@@ -287,9 +278,6 @@
 		"name": "教室（4E）",
 		"plan": "bldg2-3",
 		"aliases": [
-			"4E"
-		],
-		"rainAliases": [
 			"4E"
 		]
 	},
@@ -504,9 +492,6 @@
 		"plan": "bldg7",
 		"aliases": [
 			"3I"
-		],
-		"rainAliases": [
-			"3I"
 		]
 	},
 	{
@@ -549,9 +534,6 @@
 		"name": "教室（5I）",
 		"plan": "bldg7",
 		"aliases": [
-			"5I"
-		],
-		"rainAliases": [
 			"5I"
 		]
 	},
@@ -908,6 +890,9 @@
 		"number": null,
 		"name": "視聴覚教室",
 		"plan": "library",
+		"use": {
+			"rainy": "休憩所"
+		},
 		"aliases": [
 			"視聴覚室",
 			"視聴覚教室"
@@ -1640,6 +1625,585 @@
 		]
 	},
 	{
+		"key": "gym2-1",
+		"building": "第二体育館",
+		"floor": null,
+		"number": "第二体育館-1",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5517018,
+			36.4012315
+		],
+		"angle": 0.1876,
+		"parent": "gym2",
+		"weather": "rainy",
+		"inside": "第二体育館",
+		"aliases": [
+			"第二体育館-1",
+			"第二体育館1",
+			"第2体育館-1",
+			"第2体育館1"
+		]
+	},
+	{
+		"key": "gym2-2",
+		"building": "第二体育館",
+		"floor": null,
+		"number": "第二体育館-2",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5517635,
+			36.401241
+		],
+		"angle": 0.1876,
+		"parent": "gym2",
+		"weather": "rainy",
+		"inside": "第二体育館",
+		"aliases": [
+			"第二体育館-2",
+			"第二体育館2",
+			"第2体育館-2",
+			"第2体育館2"
+		]
+	},
+	{
+		"key": "gym2-3",
+		"building": "第二体育館",
+		"floor": null,
+		"number": "第二体育館-3",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5518243,
+			36.4012503
+		],
+		"angle": 0.1876,
+		"parent": "gym2",
+		"weather": "rainy",
+		"inside": "第二体育館",
+		"aliases": [
+			"第二体育館-3",
+			"第二体育館3",
+			"第2体育館-3",
+			"第2体育館3"
+		]
+	},
+	{
+		"key": "gym2-4",
+		"building": "第二体育館",
+		"floor": null,
+		"number": "第二体育館-4",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5518851,
+			36.4012596
+		],
+		"angle": 0.1876,
+		"parent": "gym2",
+		"weather": "rainy",
+		"inside": "第二体育館",
+		"aliases": [
+			"第二体育館-4",
+			"第二体育館4",
+			"第2体育館-4",
+			"第2体育館4"
+		]
+	},
+	{
+		"key": "gym2-5",
+		"building": "第二体育館",
+		"floor": null,
+		"number": "第二体育館-5",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5519745,
+			36.4012532
+		],
+		"angle": 0.1876,
+		"parent": "gym2",
+		"weather": "rainy",
+		"inside": "第二体育館",
+		"aliases": [
+			"第二体育館-5",
+			"第二体育館5",
+			"第2体育館-5",
+			"第2体育館5"
+		]
+	},
+	{
+		"key": "gym2-6",
+		"building": "第二体育館",
+		"floor": null,
+		"number": "第二体育館-6",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5519866,
+			36.4012019
+		],
+		"angle": 0.1876,
+		"parent": "gym2",
+		"weather": "rainy",
+		"inside": "第二体育館",
+		"aliases": [
+			"第二体育館-6",
+			"第二体育館6",
+			"第2体育館-6",
+			"第2体育館6"
+		]
+	},
+	{
+		"key": "gym2-7",
+		"building": "第二体育館",
+		"floor": null,
+		"number": "第二体育館-7",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5519987,
+			36.4011506
+		],
+		"angle": 0.1876,
+		"parent": "gym2",
+		"weather": "rainy",
+		"inside": "第二体育館",
+		"aliases": [
+			"第二体育館-7",
+			"第二体育館7",
+			"第2体育館-7",
+			"第2体育館7"
+		]
+	},
+	{
+		"key": "gym2-8",
+		"building": "第二体育館",
+		"floor": null,
+		"number": "第二体育館-8",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5519298,
+			36.4010694
+		],
+		"angle": 0.1876,
+		"parent": "gym2",
+		"weather": "rainy",
+		"inside": "第二体育館",
+		"aliases": [
+			"第二体育館-8",
+			"第二体育館8",
+			"第2体育館-8",
+			"第2体育館8"
+		]
+	},
+	{
+		"key": "gym2-9",
+		"building": "第二体育館",
+		"floor": null,
+		"number": "第二体育館-9",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5518686,
+			36.40106
+		],
+		"angle": 0.1876,
+		"parent": "gym2",
+		"weather": "rainy",
+		"inside": "第二体育館",
+		"aliases": [
+			"第二体育館-9",
+			"第二体育館9",
+			"第2体育館-9",
+			"第2体育館9"
+		]
+	},
+	{
+		"key": "gym2-10",
+		"building": "第二体育館",
+		"floor": null,
+		"number": "第二体育館-10",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5518078,
+			36.4010507
+		],
+		"angle": 0.1876,
+		"parent": "gym2",
+		"weather": "rainy",
+		"inside": "第二体育館",
+		"aliases": [
+			"第二体育館-10",
+			"第二体育館10",
+			"第2体育館-10",
+			"第2体育館10"
+		]
+	},
+	{
+		"key": "gym2-11",
+		"building": "第二体育館",
+		"floor": null,
+		"number": "第二体育館-11",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5517465,
+			36.4010413
+		],
+		"angle": 0.1876,
+		"parent": "gym2",
+		"weather": "rainy",
+		"inside": "第二体育館",
+		"aliases": [
+			"第二体育館-11",
+			"第二体育館11",
+			"第2体育館-11",
+			"第2体育館11"
+		]
+	},
+	{
+		"key": "gym2-12",
+		"building": "第二体育館",
+		"floor": null,
+		"number": "第二体育館-12",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5519945,
+			36.4010945
+		],
+		"angle": 0.1876,
+		"parent": "gym2",
+		"weather": "rainy",
+		"inside": "第二体育館",
+		"aliases": [
+			"第二体育館-12",
+			"第二体育館12",
+			"第2体育館-12",
+			"第2体育館12"
+		]
+	},
+	{
+		"key": "courtyard-1",
+		"building": "中庭",
+		"floor": null,
+		"number": "中庭-1",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5514167,
+			36.3997595
+		],
+		"angle": 0.1783,
+		"parent": "courtyard",
+		"weather": "rainy",
+		"aliases": [
+			"中庭-1",
+			"中庭1",
+			"時計塔周辺-1",
+			"時計塔周辺1"
+		]
+	},
+	{
+		"key": "courtyard-2",
+		"building": "中庭",
+		"floor": null,
+		"number": "中庭-2",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5513493,
+			36.3997497
+		],
+		"angle": 0.1783,
+		"parent": "courtyard",
+		"weather": "rainy",
+		"aliases": [
+			"中庭-2",
+			"中庭2",
+			"時計塔周辺-2",
+			"時計塔周辺2"
+		]
+	},
+	{
+		"key": "courtyard-3",
+		"building": "中庭",
+		"floor": null,
+		"number": "中庭-3",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5512832,
+			36.3997691
+		],
+		"angle": 0.1783,
+		"parent": "courtyard",
+		"weather": "rainy",
+		"aliases": [
+			"中庭-3",
+			"中庭3",
+			"時計塔周辺-3",
+			"時計塔周辺3"
+		]
+	},
+	{
+		"key": "courtyard-4",
+		"building": "中庭",
+		"floor": null,
+		"number": "中庭-4",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5512662,
+			36.399868
+		],
+		"angle": 0.1783,
+		"parent": "courtyard",
+		"weather": "rainy",
+		"aliases": [
+			"中庭-4",
+			"中庭4",
+			"時計塔周辺-4",
+			"時計塔周辺4"
+		]
+	},
+	{
+		"key": "courtyard-5",
+		"building": "中庭",
+		"floor": null,
+		"number": "中庭-5",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5512964,
+			36.3999171
+		],
+		"angle": 0.1783,
+		"parent": "courtyard",
+		"weather": "rainy",
+		"aliases": [
+			"中庭-5",
+			"中庭5",
+			"時計塔周辺-5",
+			"時計塔周辺5"
+		]
+	},
+	{
+		"key": "courtyard-6",
+		"building": "中庭",
+		"floor": null,
+		"number": "中庭-6",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5513575,
+			36.399926
+		],
+		"angle": 0.1783,
+		"parent": "courtyard",
+		"weather": "rainy",
+		"aliases": [
+			"中庭-6",
+			"中庭6",
+			"時計塔周辺-6",
+			"時計塔周辺6"
+		]
+	},
+	{
+		"key": "courtyard-7",
+		"building": "中庭",
+		"floor": null,
+		"number": "中庭-7",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5514187,
+			36.3999349
+		],
+		"angle": 0.1783,
+		"parent": "courtyard",
+		"weather": "rainy",
+		"aliases": [
+			"中庭-7",
+			"中庭7",
+			"時計塔周辺-7",
+			"時計塔周辺7"
+		]
+	},
+	{
+		"key": "courtyard-8",
+		"building": "中庭",
+		"floor": null,
+		"number": "中庭-8",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5514799,
+			36.3999438
+		],
+		"angle": 0.1783,
+		"parent": "courtyard",
+		"weather": "rainy",
+		"aliases": [
+			"中庭-8",
+			"中庭8",
+			"時計塔周辺-8",
+			"時計塔周辺8"
+		]
+	},
+	{
+		"key": "courtyard-9",
+		"building": "中庭",
+		"floor": null,
+		"number": "中庭-9",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5515395,
+			36.3999525
+		],
+		"angle": 0.1783,
+		"parent": "courtyard",
+		"weather": "rainy",
+		"aliases": [
+			"中庭-9",
+			"中庭9",
+			"時計塔周辺-9",
+			"時計塔周辺9"
+		]
+	},
+	{
+		"key": "courtyard-10",
+		"building": "中庭",
+		"floor": null,
+		"number": "中庭-10",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5515959,
+			36.3999607
+		],
+		"angle": 0.1783,
+		"parent": "courtyard",
+		"weather": "rainy",
+		"aliases": [
+			"中庭-10",
+			"中庭10",
+			"時計塔周辺-10",
+			"時計塔周辺10"
+		]
+	},
+	{
+		"key": "courtyard-11",
+		"building": "中庭",
+		"floor": null,
+		"number": "中庭-11",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5516603,
+			36.3999701
+		],
+		"angle": 0.1783,
+		"parent": "courtyard",
+		"weather": "rainy",
+		"aliases": [
+			"中庭-11",
+			"中庭11",
+			"時計塔周辺-11",
+			"時計塔周辺11"
+		]
+	},
+	{
+		"key": "courtyard-12",
+		"building": "中庭",
+		"floor": null,
+		"number": "中庭-12",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.551723,
+			36.3999792
+		],
+		"angle": 0.1783,
+		"parent": "courtyard",
+		"weather": "rainy",
+		"aliases": [
+			"中庭-12",
+			"中庭12",
+			"時計塔周辺-12",
+			"時計塔周辺12"
+		]
+	},
+	{
+		"key": "courtyard-13",
+		"building": "中庭",
+		"floor": null,
+		"number": "中庭-13",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5518152,
+			36.4000322
+		],
+		"angle": 0.1783,
+		"parent": "courtyard",
+		"weather": "rainy",
+		"aliases": [
+			"中庭-13",
+			"中庭13",
+			"時計塔周辺-13",
+			"時計塔周辺13"
+		]
+	},
+	{
+		"key": "courtyard-14",
+		"building": "中庭",
+		"floor": null,
+		"number": "中庭-14",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5518344,
+			36.3999204
+		],
+		"angle": 0.1783,
+		"parent": "courtyard",
+		"weather": "rainy",
+		"aliases": [
+			"中庭-14",
+			"中庭14",
+			"時計塔周辺-14",
+			"時計塔周辺14"
+		]
+	},
+	{
+		"key": "courtyard-15",
+		"building": "中庭",
+		"floor": null,
+		"number": "中庭-15",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5518437,
+			36.3998665
+		],
+		"angle": 0.1783,
+		"parent": "courtyard",
+		"weather": "rainy",
+		"aliases": [
+			"中庭-15",
+			"中庭15",
+			"時計塔周辺-15",
+			"時計塔周辺15"
+		]
+	},
+	{
 		"key": "ground-info",
 		"building": "屋外",
 		"floor": null,
@@ -1756,21 +2320,11 @@
 			140.5515,
 			36.39987
 		],
-		"tents": "outline",
-		"tentsInset": 3,
 		"weather": "rainy",
 		"aliases": [
 			"時計塔周辺",
 			"時計塔",
 			"中庭"
-		],
-		"rainAliases": [
-			"4C",
-			"3M1",
-			"4I",
-			"2-1",
-			"2-5",
-			"専攻科2年"
 		]
 	}
 ]

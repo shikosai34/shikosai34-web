@@ -384,9 +384,34 @@ collections:
           - { label: '第一体育館 1F 競技場（ステージ）', value: 'gym1-stage' }
           - { label: '第一体育館 2F トレーニング場', value: 'gym1-training' }
           - { label: '武道館 1F 剣道・柔道競技室', value: 'budokan-hall' }
+          - { label: '第二体育館-1', value: 'gym2-1' }
+          - { label: '第二体育館-2', value: 'gym2-2' }
+          - { label: '第二体育館-3', value: 'gym2-3' }
+          - { label: '第二体育館-4', value: 'gym2-4' }
+          - { label: '第二体育館-5', value: 'gym2-5' }
+          - { label: '第二体育館-6', value: 'gym2-6' }
+          - { label: '第二体育館-7', value: 'gym2-7' }
+          - { label: '第二体育館-8', value: 'gym2-8' }
+          - { label: '第二体育館-9', value: 'gym2-9' }
+          - { label: '第二体育館-10', value: 'gym2-10' }
+          - { label: '第二体育館-11', value: 'gym2-11' }
+          - { label: '第二体育館-12', value: 'gym2-12' }
+          - { label: '中庭-1', value: 'courtyard-1' }
+          - { label: '中庭-2', value: 'courtyard-2' }
+          - { label: '中庭-3', value: 'courtyard-3' }
+          - { label: '中庭-4', value: 'courtyard-4' }
+          - { label: '中庭-5', value: 'courtyard-5' }
+          - { label: '中庭-6', value: 'courtyard-6' }
+          - { label: '中庭-7', value: 'courtyard-7' }
+          - { label: '中庭-8', value: 'courtyard-8' }
+          - { label: '中庭-9', value: 'courtyard-9' }
+          - { label: '中庭-10', value: 'courtyard-10' }
+          - { label: '中庭-11', value: 'courtyard-11' }
+          - { label: '中庭-12', value: 'courtyard-12' }
+          - { label: '中庭-13', value: 'courtyard-13' }
+          - { label: '中庭-14', value: 'courtyard-14' }
+          - { label: '中庭-15', value: 'courtyard-15' }
           - { label: '共用部室', value: 'club-house' }
-          - { label: '第二体育館', value: 'gym2' }
-          - { label: '屋外 中庭（1号館・第一体育館の間）', value: 'courtyard' }
           # <<< GENERATED: map-rooms-rainy
       - { label: 雨天時の場所・対応, name: rainLocation, widget: string, required: false, hint: '雨天時の場所、または中止などの対応。' }
       - label: サークルカテゴリ

@@ -121,9 +121,6 @@
 			"name": "教室（5I）",
 			"aliases": [
 				"5I"
-			],
-			"rainAliases": [
-				"5I"
 			]
 		},
 		{
@@ -255,9 +252,6 @@
 			"number": "7-201",
 			"name": "教室（3I）",
 			"aliases": [
-				"3I"
-			],
-			"rainAliases": [
 				"3I"
 			]
 		},
