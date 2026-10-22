@@ -11,6 +11,7 @@ details: |-
   コーヒー　200円
   コーヒー　300円
   コーヒー　400円
+scheduleDay1: 9:00~17:00
 scheduleDay2: 9:00〜15:00
 fesflowPlanned: false
 image: https://assets.34.shikosai.net/news/cdebd8af-3dd2-4716-b0e5-ad31315df508.webp

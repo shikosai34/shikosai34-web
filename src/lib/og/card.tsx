@@ -110,7 +110,10 @@ export async function loadMedia(
 	try {
 		let buffer: Buffer;
 		if (/^https?:\/\//.test(source)) {
-			const res = await fetch(source, { signal: AbortSignal.timeout(15_000) });
+			const res = await fetch(source, {
+				headers: { 'User-Agent': 'OpenAI File Downloader, XaiImageApiFetch/1.0' },
+				signal: AbortSignal.timeout(15_000),
+			});
 			if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
 			buffer = Buffer.from(await res.arrayBuffer());
 		} else if (source.startsWith(process.cwd())) {

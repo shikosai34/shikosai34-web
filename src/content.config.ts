@@ -10,6 +10,7 @@ import {
 	getEventDayKey,
 } from './lib/events';
 import { NEWS_CATEGORIES } from './lib/news';
+import { MAP_ROOM_KEYS, NOT_IN_RAIN } from './lib/map-rooms';
 
 /**
  * お知らせ（`/news`）のコレクション。
@@ -68,6 +69,22 @@ const circles = defineCollection({
 		category: z.enum(CIRCLE_CATEGORIES),
 		/** 実施場所（教室名など） */
 		location: z.string().min(1),
+		/**
+		 * 会場マップ上の部屋キー（任意）。CMS の「マップ上の場所」で選ぶ。
+		 * 選択肢は scripts/map/build-plans.mjs が src/data/map-rooms.json から生成する。
+		 */
+		mapRoom: z
+			.string()
+			.refine((key) => MAP_ROOM_KEYS.has(key), { message: '会場マップに存在しない部屋キーです。' })
+			.optional(),
+		/**
+		 * 雨天時の部屋キー（任意）。空なら晴天時（mapRoom）と同じ場所、
+		 * "none" なら雨天時は出展しない。
+		 */
+		mapRoomRainy: z
+			.string()
+			.refine((key) => key === NOT_IN_RAIN || MAP_ROOM_KEYS.has(key), { message: '会場マップに存在しない部屋キーです。' })
+			.optional(),
 		/** 雨天時の場所または中止案内（任意）。 */
 		rainLocation: z.string().optional(),
 		/** サークルカテゴリ（文化・食品・技術）。学年・種別の `category` とは別軸。 */
@@ -197,6 +214,30 @@ const sponsors = defineCollection({
 });
 
 /**
+ * 物品協賛（`/sponsor` の「物品協賛」セクション）。
+ *
+ * 金銭協賛（`sponsors`）とは別に、物品・サービスの提供企業を Decap CMS から管理する。
+ * リポジトリ直下の `content/goods-sponsors/` に置く。本文（body）は使わない。
+ */
+const goodsSponsors = defineCollection({
+	loader: glob({ pattern: '**/[^_]*.md', base: './content/goods-sponsors' }),
+	schema: z.object({
+		/** 企業名 */
+		name: z.string().min(1),
+		/** 五十音順ソート用の読み仮名 */
+		nameKana: z.string().min(1),
+		/** ロゴ・提供物の画像（任意）。ローカルパスまたは R2 の配信 URL。 */
+		image: z.string().optional(),
+		/** 企業サイトの URL（任意）。ある場合は企業名・画像からリンクする。 */
+		url: z.string().url().optional(),
+		/** 提供物などの軽い説明文（任意）。 */
+		description: z.string().optional(),
+		/** 下書き。本番ビルドでは除外する。 */
+		draft: z.boolean().default(false),
+	}),
+});
+
+/**
  * グッズ（`/goods`）。
  *
  * Decap CMS から Markdown で管理する。本文（body）は一覧カードのクリックで開く
@@ -237,6 +278,8 @@ const staff = defineCollection({
 			.default([]),
 		description: z.string().min(1),
 		image: z.string().optional(),
+		/** 紹介動画の YouTube URL または動画 ID（任意）。 */
+		video: z.string().optional(),
 	}),
 });
 
@@ -255,4 +298,4 @@ const faq = defineCollection({
 	}),
 });
 
-export const collections = { news, circles, events, sponsors, goods, staff, faq };
+export const collections = { news, circles, events, sponsors, 'goods-sponsors': goodsSponsors, goods, staff, faq };

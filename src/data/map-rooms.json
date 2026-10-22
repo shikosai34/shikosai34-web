@@ -1,0 +1,1776 @@
+[
+	{
+		"key": "1-109",
+		"building": "1号館",
+		"floor": 1,
+		"number": "1-109",
+		"name": "SCS室兼音楽室",
+		"plan": "bldg1"
+	},
+	{
+		"key": "1-113",
+		"building": "1号館",
+		"floor": 1,
+		"number": "1-113",
+		"name": "学生会室",
+		"plan": "bldg1"
+	},
+	{
+		"key": "bldg1-lobby",
+		"building": "1号館",
+		"floor": 1,
+		"number": null,
+		"name": "1号館ロビー（教務進学資料コーナー）",
+		"plan": "bldg1"
+	},
+	{
+		"key": "bldg1-me-lab",
+		"building": "1号館",
+		"floor": 1,
+		"number": null,
+		"name": "機械電気実験室",
+		"plan": "bldg1"
+	},
+	{
+		"key": "bldg1-mech-lab",
+		"building": "1号館",
+		"floor": 1,
+		"number": null,
+		"name": "機械力学実験室",
+		"plan": "bldg1"
+	},
+	{
+		"key": "bldg1-elec-lab",
+		"building": "1号館",
+		"floor": 1,
+		"number": null,
+		"name": "電気基礎実験室",
+		"plan": "bldg1"
+	},
+	{
+		"key": "1-215",
+		"building": "1号館",
+		"floor": 2,
+		"number": "1-215",
+		"name": "ゼミ室",
+		"plan": "bldg1"
+	},
+	{
+		"key": "1-217",
+		"building": "1号館",
+		"floor": 2,
+		"number": "1-217",
+		"name": "マルチメディアパソコン教室",
+		"plan": "bldg1",
+		"aliases": [
+			"マルチメディア",
+			"マルチメディア室",
+			"マルチメディアパソコン教室",
+			"1号館2階マルチメディアパソコン教室"
+		],
+		"rainAliases": [
+			"5E"
+		]
+	},
+	{
+		"key": "bldg1-physics-lab-1",
+		"building": "1号館",
+		"floor": 2,
+		"number": null,
+		"name": "物理第1実験室",
+		"plan": "bldg1",
+		"aliases": [
+			"物理実験室1",
+			"物理第1実験室",
+			"物理第一実験室"
+		]
+	},
+	{
+		"key": "bldg1-physics-lab-2",
+		"building": "1号館",
+		"floor": 2,
+		"number": null,
+		"name": "物理第2実験室",
+		"plan": "bldg1",
+		"aliases": [
+			"物理実験室2",
+			"物理第2実験室",
+			"物理第二実験室"
+		]
+	},
+	{
+		"key": "1-318",
+		"building": "1号館",
+		"floor": 3,
+		"number": "1-318",
+		"name": "課外活動室2",
+		"plan": "bldg1"
+	},
+	{
+		"key": "1-320",
+		"building": "1号館",
+		"floor": 3,
+		"number": "1-320",
+		"name": "語学演習室",
+		"plan": "bldg1",
+		"aliases": [
+			"語学演習室"
+		],
+		"rainAliases": [
+			"5M1"
+		]
+	},
+	{
+		"key": "1-321",
+		"building": "1号館",
+		"floor": 3,
+		"number": "1-321",
+		"name": "教室（5M2）",
+		"plan": "bldg1",
+		"aliases": [
+			"5M2"
+		]
+	},
+	{
+		"key": "1-322",
+		"building": "1号館",
+		"floor": 3,
+		"number": "1-322",
+		"name": "教室（5M1）",
+		"plan": "bldg1",
+		"aliases": [
+			"5M1"
+		]
+	},
+	{
+		"key": "1-324",
+		"building": "1号館",
+		"floor": 3,
+		"number": "1-324",
+		"name": "教室（4M2）",
+		"plan": "bldg1",
+		"aliases": [
+			"4M2"
+		],
+		"rainAliases": [
+			"5M2"
+		]
+	},
+	{
+		"key": "1-325",
+		"building": "1号館",
+		"floor": 3,
+		"number": "1-325",
+		"name": "教室（4M1）",
+		"plan": "bldg1",
+		"aliases": [
+			"4M1"
+		]
+	},
+	{
+		"key": "bldg1-mid-meeting",
+		"building": "1号館",
+		"floor": 3,
+		"number": null,
+		"name": "中会議室",
+		"plan": "bldg1"
+	},
+	{
+		"key": "bldg3-mech-system-lab",
+		"building": "2・3号館",
+		"floor": 1,
+		"number": null,
+		"name": "機械システム実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-lecture",
+		"building": "2・3号館",
+		"floor": 1,
+		"number": null,
+		"name": "講義室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-material-lab",
+		"building": "2・3号館",
+		"floor": 1,
+		"number": null,
+		"name": "材料実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-intelligent-lab",
+		"building": "2・3号館",
+		"floor": 1,
+		"number": null,
+		"name": "知能システム実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg2-elec-mech-lab",
+		"building": "2・3号館",
+		"floor": 1,
+		"number": null,
+		"name": "電気機械実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-fluid-lab",
+		"building": "2・3号館",
+		"floor": 1,
+		"number": null,
+		"name": "流体基礎実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-mech-motion-lab",
+		"building": "2・3号館",
+		"floor": 2,
+		"number": null,
+		"name": "機械運動実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-mech-basic-lab",
+		"building": "2・3号館",
+		"floor": 2,
+		"number": null,
+		"name": "機械基礎実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg2-info-proc-lab",
+		"building": "2・3号館",
+		"floor": 2,
+		"number": null,
+		"name": "情報処理実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-control-lab",
+		"building": "2・3号館",
+		"floor": 2,
+		"number": null,
+		"name": "制御工学実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-design-lab-1",
+		"building": "2・3号館",
+		"floor": 2,
+		"number": null,
+		"name": "設計工学実験室1",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-design-lab-2",
+		"building": "2・3号館",
+		"floor": 2,
+		"number": null,
+		"name": "設計工学実験室2",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg2-e-measure-lab",
+		"building": "2・3号館",
+		"floor": 2,
+		"number": null,
+		"name": "電子計測実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "2-308",
+		"building": "2・3号館",
+		"floor": 3,
+		"number": "2-308",
+		"name": "教室（4E）",
+		"plan": "bldg2-3",
+		"aliases": [
+			"4E"
+		],
+		"rainAliases": [
+			"4E"
+		]
+	},
+	{
+		"key": "2-309",
+		"building": "2・3号館",
+		"floor": 3,
+		"number": "2-309",
+		"name": "教室（5E）",
+		"plan": "bldg2-3",
+		"aliases": [
+			"5E"
+		]
+	},
+	{
+		"key": "3-309",
+		"building": "2・3号館",
+		"floor": 3,
+		"number": "3-309",
+		"name": "製図室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-info-eng-lab",
+		"building": "2・3号館",
+		"floor": 3,
+		"number": null,
+		"name": "情報工学実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-control-basic-lab",
+		"building": "2・3号館",
+		"floor": 3,
+		"number": null,
+		"name": "制御工学基礎実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-e-circuit-lab",
+		"building": "2・3号館",
+		"floor": 3,
+		"number": null,
+		"name": "電子回路実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-e-basic-lab",
+		"building": "2・3号館",
+		"floor": 3,
+		"number": null,
+		"name": "電子工学基礎実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "bldg3-e-eng-lab",
+		"building": "2・3号館",
+		"floor": 3,
+		"number": null,
+		"name": "電子工学実験室",
+		"plan": "bldg2-3"
+	},
+	{
+		"key": "4-107",
+		"building": "4号館",
+		"floor": 1,
+		"number": "4-107",
+		"name": "学生実験室1",
+		"plan": "bldg4",
+		"aliases": [
+			"4号館実験室1",
+			"学生実験室1"
+		]
+	},
+	{
+		"key": "4-210",
+		"building": "4号館",
+		"floor": 2,
+		"number": "4-210",
+		"name": "学生実験室2",
+		"plan": "bldg4",
+		"aliases": [
+			"4号館実験室2",
+			"学生実験室2"
+		]
+	},
+	{
+		"key": "bldg4-meeting-room",
+		"building": "4号館",
+		"floor": 2,
+		"number": null,
+		"name": "会議室",
+		"plan": "bldg4"
+	},
+	{
+		"key": "4-310",
+		"building": "4号館",
+		"floor": 3,
+		"number": "4-310",
+		"name": "学生実験室3",
+		"plan": "bldg4",
+		"aliases": [
+			"4号館実験室3",
+			"学生実験室3"
+		]
+	},
+	{
+		"key": "4-411",
+		"building": "4号館",
+		"floor": 4,
+		"number": "4-411",
+		"name": "学生実験室4",
+		"plan": "bldg4",
+		"aliases": [
+			"4号館実験室4",
+			"学生実験室4"
+		]
+	},
+	{
+		"key": "5-103",
+		"building": "5号館",
+		"floor": 1,
+		"number": "5-103",
+		"name": "教室（5C）",
+		"plan": "bldg5",
+		"use": {
+			"sunny": "予選会場"
+		},
+		"aliases": [
+			"5C"
+		]
+	},
+	{
+		"key": "5-104",
+		"building": "5号館",
+		"floor": 1,
+		"number": "5-104",
+		"name": "大教室",
+		"plan": "bldg5",
+		"use": {
+			"sunny": "休憩所"
+		}
+	},
+	{
+		"key": "5-201",
+		"building": "5号館",
+		"floor": 2,
+		"number": "5-201",
+		"name": "教室",
+		"plan": "bldg5"
+	},
+	{
+		"key": "5-202",
+		"building": "5号館",
+		"floor": 2,
+		"number": "5-202",
+		"name": "教室（4C）",
+		"plan": "bldg5",
+		"use": {
+			"sunny": "予選会場"
+		},
+		"aliases": [
+			"4C"
+		]
+	},
+	{
+		"key": "7-113",
+		"building": "7号館",
+		"floor": 1,
+		"number": "7-113",
+		"name": "情報工学演習室",
+		"plan": "bldg7"
+	},
+	{
+		"key": "bldg7-programming",
+		"building": "7号館",
+		"floor": 1,
+		"number": null,
+		"name": "プログラミング室",
+		"plan": "bldg7"
+	},
+	{
+		"key": "bldg7-optics-lab",
+		"building": "7号館",
+		"floor": 1,
+		"number": null,
+		"name": "光物性実験室",
+		"plan": "bldg7"
+	},
+	{
+		"key": "bldg7-e-property-lab",
+		"building": "7号館",
+		"floor": 1,
+		"number": null,
+		"name": "電子物性実験室",
+		"plan": "bldg7"
+	},
+	{
+		"key": "bldg7-semiconductor-lab",
+		"building": "7号館",
+		"floor": 1,
+		"number": null,
+		"name": "半導体材料実験室",
+		"plan": "bldg7"
+	},
+	{
+		"key": "7-201",
+		"building": "7号館",
+		"floor": 2,
+		"number": "7-201",
+		"name": "教室（3I）",
+		"plan": "bldg7",
+		"aliases": [
+			"3I"
+		],
+		"rainAliases": [
+			"3I"
+		]
+	},
+	{
+		"key": "bldg7-seminar",
+		"building": "7号館",
+		"floor": 2,
+		"number": null,
+		"name": "会議室・ゼミ室",
+		"plan": "bldg7"
+	},
+	{
+		"key": "bldg7-e-lab",
+		"building": "7号館",
+		"floor": 2,
+		"number": null,
+		"name": "電子工学実験室・共通スペース",
+		"plan": "bldg7"
+	},
+	{
+		"key": "bldg7-precision-lab",
+		"building": "7号館",
+		"floor": 2,
+		"number": null,
+		"name": "電子工学精密実験室",
+		"plan": "bldg7"
+	},
+	{
+		"key": "bldg7-basic-lab",
+		"building": "7号館",
+		"floor": 2,
+		"number": null,
+		"name": "電子情報基礎実験室",
+		"plan": "bldg7"
+	},
+	{
+		"key": "7-301",
+		"building": "7号館",
+		"floor": 3,
+		"number": "7-301",
+		"name": "教室（5I）",
+		"plan": "bldg7",
+		"aliases": [
+			"5I"
+		],
+		"rainAliases": [
+			"5I"
+		]
+	},
+	{
+		"key": "7-302",
+		"building": "7号館",
+		"floor": 3,
+		"number": "7-302",
+		"name": "教室（4I）",
+		"plan": "bldg7",
+		"aliases": [
+			"4I"
+		]
+	},
+	{
+		"key": "bldg7-transmission-lab",
+		"building": "7号館",
+		"floor": 3,
+		"number": null,
+		"name": "情報伝送実験室",
+		"plan": "bldg7"
+	},
+	{
+		"key": "bldg7-applied-lab",
+		"building": "7号館",
+		"floor": 3,
+		"number": null,
+		"name": "電子情報応用実験室・共通スペース",
+		"plan": "bldg7"
+	},
+	{
+		"key": "bldg7-e-fab-lab",
+		"building": "7号館",
+		"floor": 3,
+		"number": null,
+		"name": "電子情報製作実験室",
+		"plan": "bldg7"
+	},
+	{
+		"key": "bldg7-logic-lab",
+		"building": "7号館",
+		"floor": 3,
+		"number": null,
+		"name": "論理設計演習室",
+		"plan": "bldg7"
+	},
+	{
+		"key": "8-101",
+		"building": "8号館",
+		"floor": 1,
+		"number": "8-101",
+		"name": "3年機械・制御系1組教室",
+		"plan": "bldg8",
+		"aliases": [
+			"3M1"
+		]
+	},
+	{
+		"key": "8-102",
+		"building": "8号館",
+		"floor": 1,
+		"number": "8-102",
+		"name": "3年機械・制御系2組教室",
+		"plan": "bldg8",
+		"aliases": [
+			"3M2"
+		]
+	},
+	{
+		"key": "8-103",
+		"building": "8号館",
+		"floor": 1,
+		"number": "8-103",
+		"name": "3年電気・電子系教室",
+		"plan": "bldg8",
+		"aliases": [
+			"3E"
+		]
+	},
+	{
+		"key": "8-104",
+		"building": "8号館",
+		"floor": 1,
+		"number": "8-104",
+		"name": "3年化学・生物・環境系教室",
+		"plan": "bldg8",
+		"aliases": [
+			"3C"
+		]
+	},
+	{
+		"key": "bldg8-lounge",
+		"building": "8号館",
+		"floor": 1,
+		"number": null,
+		"name": "8号館ロビー（ラウンジ）",
+		"plan": "bldg8",
+		"aliases": [
+			"8号館1階ロビー",
+			"8号館ロビー",
+			"8号館ラウンジ"
+		]
+	},
+	{
+		"key": "8-201",
+		"building": "8号館",
+		"floor": 2,
+		"number": "8-201",
+		"name": "2年1組教室",
+		"plan": "bldg8",
+		"aliases": [
+			"2-1"
+		]
+	},
+	{
+		"key": "8-202",
+		"building": "8号館",
+		"floor": 2,
+		"number": "8-202",
+		"name": "2年2組教室",
+		"plan": "bldg8",
+		"aliases": [
+			"2-2"
+		]
+	},
+	{
+		"key": "8-203",
+		"building": "8号館",
+		"floor": 2,
+		"number": "8-203",
+		"name": "2年3組教室",
+		"plan": "bldg8",
+		"aliases": [
+			"2-3"
+		]
+	},
+	{
+		"key": "8-204",
+		"building": "8号館",
+		"floor": 2,
+		"number": "8-204",
+		"name": "2年4組教室",
+		"plan": "bldg8",
+		"aliases": [
+			"2-4"
+		]
+	},
+	{
+		"key": "8-205",
+		"building": "8号館",
+		"floor": 2,
+		"number": "8-205",
+		"name": "2年5組教室",
+		"plan": "bldg8",
+		"aliases": [
+			"2-5"
+		]
+	},
+	{
+		"key": "8-206",
+		"building": "8号館",
+		"floor": 2,
+		"number": "8-206",
+		"name": "ゼミ室",
+		"plan": "bldg8",
+		"aliases": [
+			"8号館2階ゼミ室",
+			"8号館ゼミ室"
+		]
+	},
+	{
+		"key": "8-301",
+		"building": "8号館",
+		"floor": 3,
+		"number": "8-301",
+		"name": "1年1組教室",
+		"plan": "bldg8",
+		"aliases": [
+			"1-1"
+		]
+	},
+	{
+		"key": "8-302",
+		"building": "8号館",
+		"floor": 3,
+		"number": "8-302",
+		"name": "1年2組教室",
+		"plan": "bldg8",
+		"aliases": [
+			"1-2"
+		]
+	},
+	{
+		"key": "8-303",
+		"building": "8号館",
+		"floor": 3,
+		"number": "8-303",
+		"name": "1年3組教室",
+		"plan": "bldg8",
+		"aliases": [
+			"1-3"
+		]
+	},
+	{
+		"key": "8-304",
+		"building": "8号館",
+		"floor": 3,
+		"number": "8-304",
+		"name": "1年4組教室",
+		"plan": "bldg8",
+		"aliases": [
+			"1-4"
+		]
+	},
+	{
+		"key": "8-305",
+		"building": "8号館",
+		"floor": 3,
+		"number": "8-305",
+		"name": "1年5組教室",
+		"plan": "bldg8",
+		"aliases": [
+			"1-5"
+		]
+	},
+	{
+		"key": "10-103",
+		"building": "10号館",
+		"floor": 1,
+		"number": "10-103",
+		"name": "講義室",
+		"plan": "bldg10"
+	},
+	{
+		"key": "10-104",
+		"building": "10号館",
+		"floor": 1,
+		"number": "10-104",
+		"name": "講義室",
+		"plan": "bldg10"
+	},
+	{
+		"key": "10-105",
+		"building": "10号館",
+		"floor": 1,
+		"number": "10-105",
+		"name": "ゼミ室",
+		"plan": "bldg10"
+	},
+	{
+		"key": "10-106",
+		"building": "10号館",
+		"floor": 1,
+		"number": "10-106",
+		"name": "ゼミ室",
+		"plan": "bldg10"
+	},
+	{
+		"key": "bldg10-maker",
+		"building": "10号館",
+		"floor": 1,
+		"number": null,
+		"name": "みんなの工作",
+		"plan": "bldg10"
+	},
+	{
+		"key": "bldg10-lobby",
+		"building": "10号館",
+		"floor": 1,
+		"number": null,
+		"name": "ロビー",
+		"plan": "bldg10"
+	},
+	{
+		"key": "bldg10-m-system-lab",
+		"building": "10号館",
+		"floor": 2,
+		"number": null,
+		"name": "機械システム実験室",
+		"plan": "bldg10"
+	},
+	{
+		"key": "bldg10-material-lab",
+		"building": "10号館",
+		"floor": 2,
+		"number": null,
+		"name": "機能性素材実験室",
+		"plan": "bldg10"
+	},
+	{
+		"key": "bldg10-e-system-lab",
+		"building": "10号館",
+		"floor": 2,
+		"number": null,
+		"name": "電子システム実験室",
+		"plan": "bldg10"
+	},
+	{
+		"key": "bldg10-meeting",
+		"building": "10号館",
+		"floor": 3,
+		"number": null,
+		"name": "ミーティング室",
+		"plan": "bldg10"
+	},
+	{
+		"key": "bldg10-media-lab-1",
+		"building": "10号館",
+		"floor": 3,
+		"number": null,
+		"name": "メディアデザインラボ1",
+		"plan": "bldg10"
+	},
+	{
+		"key": "bldg10-media-lab-2",
+		"building": "10号館",
+		"floor": 3,
+		"number": null,
+		"name": "メディアデザインラボ2",
+		"plan": "bldg10"
+	},
+	{
+		"key": "bldg10-media-lab-3",
+		"building": "10号館",
+		"floor": 3,
+		"number": null,
+		"name": "メディアデザインラボ3",
+		"plan": "bldg10"
+	},
+	{
+		"key": "bldg10-info-lab",
+		"building": "10号館",
+		"floor": 3,
+		"number": null,
+		"name": "情報処理室",
+		"plan": "bldg10"
+	},
+	{
+		"key": "library-seminar-space",
+		"building": "図書館棟",
+		"floor": 1,
+		"number": null,
+		"name": "JX金属つながる〜む",
+		"plan": "library",
+		"aliases": [
+			"つながる〜む",
+			"JX金属つながる〜む"
+		]
+	},
+	{
+		"key": "av-room",
+		"building": "図書館棟",
+		"floor": 1,
+		"number": null,
+		"name": "視聴覚教室",
+		"plan": "library",
+		"aliases": [
+			"視聴覚室",
+			"視聴覚教室"
+		]
+	},
+	{
+		"key": "venture-lab",
+		"building": "図書館棟",
+		"floor": 2,
+		"number": null,
+		"name": "課外活動室1（ベンチャーラボ）",
+		"plan": "library",
+		"aliases": [
+			"ベンチャーラボ",
+			"課外活動室1"
+		]
+	},
+	{
+		"key": "library",
+		"building": "図書館棟",
+		"floor": 2,
+		"number": null,
+		"name": "図書館（閲覧室）",
+		"plan": "library",
+		"aliases": [
+			"図書館",
+			"図書館棟2F図書館",
+			"図書館棟図書館",
+			"図書館2F"
+		]
+	},
+	{
+		"key": "ibayu-hall",
+		"building": "茨友会館",
+		"floor": 1,
+		"number": null,
+		"name": "ホール・カフェスペース",
+		"plan": "ibayu"
+	},
+	{
+		"key": "ibayu-dining",
+		"building": "茨友会館",
+		"floor": 1,
+		"number": null,
+		"name": "新日本電工あつまる食堂",
+		"plan": "ibayu"
+	},
+	{
+		"key": "gym1-stage",
+		"building": "第一体育館",
+		"floor": 1,
+		"number": null,
+		"name": "競技場（ステージ）",
+		"plan": "gym1"
+	},
+	{
+		"key": "gym1-training",
+		"building": "第一体育館",
+		"floor": 2,
+		"number": null,
+		"name": "トレーニング場",
+		"plan": "gym1"
+	},
+	{
+		"key": "budokan-hall",
+		"building": "武道館",
+		"floor": 1,
+		"number": null,
+		"name": "剣道・柔道競技室",
+		"plan": "budokan"
+	},
+	{
+		"key": "G-1",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-1",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5526011,
+			36.4006863
+		],
+		"angle": -1.8241,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-1",
+			"グラウンド1",
+			"G1"
+		]
+	},
+	{
+		"key": "G-2",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-2",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5525868,
+			36.4006417
+		],
+		"angle": -1.8241,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-2",
+			"グラウンド2",
+			"G2"
+		]
+	},
+	{
+		"key": "G-3",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-3",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5525856,
+			36.4005977
+		],
+		"angle": -1.5708,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-3",
+			"グラウンド3",
+			"G3"
+		]
+	},
+	{
+		"key": "G-4",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-4",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5525891,
+			36.4005526
+		],
+		"angle": -1.3653,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-4",
+			"グラウンド4",
+			"G4"
+		]
+	},
+	{
+		"key": "G-5",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-5",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5526007,
+			36.4005079
+		],
+		"angle": -1.3653,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-5",
+			"グラウンド5",
+			"G5"
+		]
+	},
+	{
+		"key": "G-6",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-6",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5526129,
+			36.4004605
+		],
+		"angle": -1.3653,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-6",
+			"グラウンド6",
+			"G6"
+		]
+	},
+	{
+		"key": "G-7",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-7",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5526778,
+			36.4002092
+		],
+		"angle": -1.3653,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-7",
+			"グラウンド7",
+			"G7"
+		]
+	},
+	{
+		"key": "G-8",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-8",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5526893,
+			36.4001645
+		],
+		"angle": -1.3653,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-8",
+			"グラウンド8",
+			"G8"
+		]
+	},
+	{
+		"key": "G-9",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-9",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5527011,
+			36.4001188
+		],
+		"angle": -1.3653,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-9",
+			"グラウンド9",
+			"G9"
+		]
+	},
+	{
+		"key": "G-10",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-10",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5527266,
+			36.40002
+		],
+		"angle": -1.3653,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-10",
+			"グラウンド10",
+			"G10"
+		]
+	},
+	{
+		"key": "G-11",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-11",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5527345,
+			36.3999892
+		],
+		"angle": -0.8635,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-11",
+			"グラウンド11",
+			"G11"
+		]
+	},
+	{
+		"key": "G-12",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-12",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5527649,
+			36.3999606
+		],
+		"angle": -0.8635,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-12",
+			"グラウンド12",
+			"G12"
+		]
+	},
+	{
+		"key": "G-13",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-13",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5528077,
+			36.3999233
+		],
+		"angle": -0.4294,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-13",
+			"グラウンド13",
+			"G13"
+		]
+	},
+	{
+		"key": "G-14",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-14",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5529303,
+			36.3998823
+		],
+		"angle": -0.0683,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-14",
+			"グラウンド14",
+			"G14"
+		]
+	},
+	{
+		"key": "G-15",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-15",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.553001,
+			36.3998784
+		],
+		"angle": -0.0683,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-15",
+			"グラウンド15",
+			"G15"
+		]
+	},
+	{
+		"key": "G-16",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-16",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5530746,
+			36.3998771
+		],
+		"angle": 0.1542,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-16",
+			"グラウンド16",
+			"G16"
+		]
+	},
+	{
+		"key": "G-17",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-17",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5531381,
+			36.3998851
+		],
+		"angle": 0.1542,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-17",
+			"グラウンド17",
+			"G17"
+		]
+	},
+	{
+		"key": "G-18",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-18",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5532651,
+			36.3999196
+		],
+		"angle": 0.4981,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-18",
+			"グラウンド18",
+			"G18"
+		]
+	},
+	{
+		"key": "G-19",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-19",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5533247,
+			36.3999505
+		],
+		"angle": 0.7641,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-19",
+			"グラウンド19",
+			"G19"
+		]
+	},
+	{
+		"key": "G-20",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-20",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5533719,
+			36.3999871
+		],
+		"angle": 0.7641,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-20",
+			"グラウンド20",
+			"G20"
+		]
+	},
+	{
+		"key": "G-21",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-21",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5534141,
+			36.4000376
+		],
+		"angle": 1.1055,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-21",
+			"グラウンド21",
+			"G21"
+		]
+	},
+	{
+		"key": "G-22",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-22",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5534305,
+			36.4001434
+		],
+		"angle": 1.5708,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-22",
+			"グラウンド22",
+			"G22"
+		]
+	},
+	{
+		"key": "G-23",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-23",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5534228,
+			36.4001929
+		],
+		"angle": 1.7601,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-23",
+			"グラウンド23",
+			"G23"
+		]
+	},
+	{
+		"key": "G-24",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-24",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5534111,
+			36.4002422
+		],
+		"angle": 1.7601,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-24",
+			"グラウンド24",
+			"G24"
+		]
+	},
+	{
+		"key": "G-25",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-25",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5533994,
+			36.4002916
+		],
+		"angle": 1.7601,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-25",
+			"グラウンド25",
+			"G25"
+		]
+	},
+	{
+		"key": "G-26",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-26",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5533881,
+			36.4003393
+		],
+		"angle": 1.7601,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-26",
+			"グラウンド26",
+			"G26"
+		]
+	},
+	{
+		"key": "G-27",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-27",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5533766,
+			36.4003878
+		],
+		"angle": 1.7601,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-27",
+			"グラウンド27",
+			"G27"
+		]
+	},
+	{
+		"key": "G-28",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-28",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5533653,
+			36.4004354
+		],
+		"angle": 1.7601,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-28",
+			"グラウンド28",
+			"G28"
+		]
+	},
+	{
+		"key": "G-29",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-29",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.553354,
+			36.4004831
+		],
+		"angle": 1.7601,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-29",
+			"グラウンド29",
+			"G29"
+		]
+	},
+	{
+		"key": "G-30",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-30",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5533427,
+			36.4005307
+		],
+		"angle": 1.7601,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-30",
+			"グラウンド30",
+			"G30"
+		]
+	},
+	{
+		"key": "G-31",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-31",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.553332,
+			36.4005757
+		],
+		"angle": 1.7601,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-31",
+			"グラウンド31",
+			"G31"
+		]
+	},
+	{
+		"key": "G-32",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-32",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5533217,
+			36.4006191
+		],
+		"angle": 1.7601,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-32",
+			"グラウンド32",
+			"G32"
+		]
+	},
+	{
+		"key": "G-33",
+		"building": "グラウンド",
+		"floor": null,
+		"number": "G-33",
+		"name": "テント",
+		"plan": null,
+		"at": [
+			140.5533104,
+			36.4006667
+		],
+		"angle": 1.7601,
+		"parent": "ground",
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド-33",
+			"グラウンド33",
+			"G33"
+		]
+	},
+	{
+		"key": "ground-info",
+		"building": "屋外",
+		"floor": null,
+		"number": null,
+		"name": "インフォ",
+		"plan": null,
+		"at": [
+			140.5524925,
+			36.4003294
+		],
+		"weather": "sunny",
+		"use": {
+			"sunny": "インフォメーション"
+		},
+		"cms": false
+	},
+	{
+		"key": "ground",
+		"building": "屋外",
+		"floor": null,
+		"number": null,
+		"name": "グラウンド",
+		"plan": null,
+		"at": [
+			140.55299,
+			36.40037
+		],
+		"weather": "sunny",
+		"aliases": [
+			"グラウンド",
+			"運動場",
+			"陸上競技場",
+			"グラウンド全体"
+		]
+	},
+	{
+		"key": "ground-robot",
+		"building": "屋外",
+		"floor": null,
+		"number": null,
+		"name": "グラウンド（ロボット部）",
+		"plan": null,
+		"at": [
+			140.5525121,
+			36.4002466
+		],
+		"weather": "sunny",
+		"aliases": [
+			"グラウンドロボット部",
+			"ロボット部"
+		]
+	},
+	{
+		"key": "ground-baseball-side",
+		"building": "屋外",
+		"floor": null,
+		"number": null,
+		"name": "グラウンド（野球場側）",
+		"plan": null,
+		"at": [
+			140.55222,
+			36.4016
+		],
+		"tents": "column",
+		"weather": "sunny",
+		"aliases": [
+			"野球場側",
+			"野球場",
+			"グラウンド野球場側",
+			"サッカー場"
+		]
+	},
+	{
+		"key": "club-house",
+		"building": "共用部室",
+		"floor": null,
+		"number": null,
+		"name": "共用部室",
+		"plan": null,
+		"at": [
+			140.550696,
+			36.399355
+		],
+		"weather": "rainy",
+		"aliases": [
+			"共用部室"
+		]
+	},
+	{
+		"key": "gym2",
+		"building": "第二体育館",
+		"floor": null,
+		"number": null,
+		"name": "第二体育館",
+		"plan": null,
+		"at": [
+			140.551764,
+			36.401155
+		],
+		"weather": "rainy",
+		"aliases": [
+			"第二体育館",
+			"第2体育館"
+		]
+	},
+	{
+		"key": "courtyard",
+		"building": "屋外",
+		"floor": null,
+		"number": null,
+		"name": "中庭（1号館・第一体育館の間）",
+		"plan": null,
+		"at": [
+			140.5515,
+			36.39987
+		],
+		"tents": "outline",
+		"tentsInset": 3,
+		"weather": "rainy",
+		"aliases": [
+			"時計塔周辺",
+			"時計塔",
+			"中庭"
+		],
+		"rainAliases": [
+			"4C",
+			"3M1",
+			"4I",
+			"2-1",
+			"2-5",
+			"専攻科2年"
+		]
+	}
+]

@@ -44,3 +44,13 @@ export function getSponsorSizeClass(amount: number, maxAmount: number): string {
 	if (ratio >= 0.15) return 'text-lg';
 	return 'text-sm';
 }
+
+export type GoodsSponsorEntry = CollectionEntry<'goods-sponsors'>;
+
+/** 物品協賛の企業を五十音順で返す。本番ビルドでは下書きを除外する。 */
+export async function getVisibleGoodsSponsors(): Promise<GoodsSponsorEntry[]> {
+	const sponsors = await getCollectionOrEmpty('goods-sponsors', ({ data }) =>
+		import.meta.env.PROD ? !data.draft : true,
+	);
+	return sponsors.sort((a, b) => a.data.nameKana.localeCompare(b.data.nameKana, 'ja'));
+}

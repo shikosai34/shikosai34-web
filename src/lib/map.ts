@@ -1,0 +1,242 @@
+/**
+ * 会場マップ（/map）の共通の型と定数。
+ * `astro:content` に依存しないため React からも読み込める。
+ *
+ * データは scripts/map/ のスクリプトが生成する。
+ * - public/map/campus.geojson … 3D の地面と建物（build-campus.mjs）
+ * - public/map/plans/<file>.json … 各館の平面図（build-plans.mjs）
+ */
+import { MAP_ROOMS, type MapRoom, type RoomUse, type Weather } from './map-rooms';
+
+// ---------------------------------------------------------------------------
+// 平面図
+// ---------------------------------------------------------------------------
+
+export type PlanRoomKind = 'room' | 'corridor' | 'stairs' | 'toilet';
+
+export interface PlanRoom {
+	/** 部屋キーを持つ部屋はそのキー、ほかは図面ごとの連番 */
+	id: string;
+	/** 部屋キー（サークルの mapRoom と対応）。出展場所にならない部屋は null */
+	key: string | null;
+	number: string | null;
+	name: string | null;
+	kind: PlanRoomKind;
+	/** 輪郭（SVG 座標） */
+	points: [number, number][];
+	bbox: [number, number, number, number];
+	/** 矩形でない部屋の名前を置く位置（SVG 座標）。なければ外接矩形の左上に置く */
+	labelAt?: [number, number];
+	/** 当日の使い道（予選会場・休憩所など、サークルの出展ではない場所）。天候ごと */
+	use?: RoomUse;
+}
+
+export interface PlanMarker {
+	at: [number, number];
+	type: 'stairs' | 'entrance' | 'exit';
+	text?: string;
+}
+
+export interface PlanFloor {
+	floor: number;
+	bbox: [number, number, number, number];
+	/** 壁（SVG 座標の矩形 [x0, y0, x1, y1]） */
+	walls: [number, number, number, number][];
+	rooms: PlanRoom[];
+	markers: PlanMarker[];
+}
+
+export interface Plan {
+	building: string;
+	floors: PlanFloor[];
+}
+
+/**
+ * 平面図を描くときの拡大率。図面の座標は小さい（1 部屋 ≒ 60 単位）ので、
+ * 部屋の中の文字が読める大きさになるよう拡大して描く。
+ */
+export const PLAN_SCALE = 2;
+
+/** 平面図を持つ建物 → public/map/plans/<file>.json（scripts/map/build-plans.mjs の CONFIG と揃える） */
+export const PLAN_FILES: Record<string, string> = {
+	'1号館': 'bldg1',
+	'2・3号館': 'bldg2-3',
+	'4号館': 'bldg4',
+	'5号館': 'bldg5',
+	'7号館': 'bldg7',
+	'8号館': 'bldg8',
+	'10号館': 'bldg10',
+	図書館棟: 'library',
+	茨友会館: 'ibayu',
+	第一体育館: 'gym1',
+	武道館: 'budokan',
+};
+
+export async function loadPlan(building: string): Promise<Plan> {
+	const res = await fetch(`/map/plans/${PLAN_FILES[building]}.json`);
+	if (!res.ok) throw new Error(`平面図を読み込めませんでした（${building}）`);
+	return res.json();
+}
+
+// ---------------------------------------------------------------------------
+// 出展
+// ---------------------------------------------------------------------------
+
+/** 地図の凡例の区分。サークルのカテゴリ（学年・種別）とステージ企画をまとめたもの */
+export type ExhibitGroup = 'grade' | 'club' | 'stage' | 'other';
+
+export interface MapExhibit {
+	id: string;
+	/** 企画名（ステージ企画）・団体名（サークル） */
+	title: string;
+	/** 出演団体・カテゴリなどの補足 */
+	subtitle: string;
+	group: ExhibitGroup;
+	href: string;
+	image?: string;
+	/** ステージ企画の時間（「10/24 13:00〜13:30」） */
+	time?: string;
+	/** 会場の中での場所（グラウンドの「G-12」など）。会場をまとめて見せる一覧で添える */
+	spot?: string;
+	/** 紹介文の頭の 1 文（ポップアップ用） */
+	summary?: string;
+	/** 実施時間（サークルの「両日 10:00〜16:00」など） */
+	schedule?: string;
+}
+
+/** 部屋キー → そこで行われる出展 */
+export type ExhibitsByRoom = Record<string, MapExhibit[]>;
+
+/** 凡例。色は global.css のパレット（main / accent / glow-pink / text）に揃える */
+export const EXHIBIT_GROUPS: Record<ExhibitGroup, { label: string; color: string }> = {
+	grade: { label: 'クラス・学年', color: '#ff9933' },
+	club: { label: '部活・同好会', color: '#00ffcc' },
+	stage: { label: 'ステージ', color: '#ff6ea8' },
+	other: { label: 'その他', color: '#e8e8e8' },
+};
+
+export function exhibitGroupOfCategory(category: string): ExhibitGroup {
+	// 専攻科（「専攻科2年」など）は、学年のクラスと同じ扱い
+	if (category.startsWith('grade') || category === 'advanced') return 'grade';
+	if (category === 'sports' || category === 'culture') return 'club';
+	return 'other';
+}
+
+/** 建物ごとの出展数 */
+export function countExhibitsByBuilding(exhibits: ExhibitsByRoom): Record<string, number> {
+	const counts: Record<string, number> = {};
+	for (const room of MAP_ROOMS) {
+		const n = exhibits[room.key]?.length ?? 0;
+		if (n) counts[room.building] = (counts[room.building] ?? 0) + n;
+	}
+	return counts;
+}
+
+// ---------------------------------------------------------------------------
+// 動線・立入禁止区域（public/map/routes.json。scripts/map/build-routes.mjs が生成する）
+// ---------------------------------------------------------------------------
+
+export type RouteKind = 'yellow' | 'red';
+
+export interface MapRoute {
+	id: string;
+	kind: RouteKind;
+	weather: Weather;
+	/** 終点に進む向きを示す矢印を付けるか */
+	arrow: boolean;
+	/** 始点 → 終点の経緯度 */
+	points: [number, number][];
+}
+
+export interface RouteMarker {
+	kind: 'gate' | 'main-gate' | 'diamond' | 'extinguisher';
+	weather: Weather;
+	name?: string;
+	at: [number, number];
+}
+
+export interface RestrictedArea {
+	id: string;
+	name?: string;
+	weather?: Weather;
+	points: [number, number][];
+}
+
+export interface RouteData {
+	/** 動線の色の意味（凡例） */
+	legend: Record<RouteKind, string>;
+	routes: MapRoute[];
+	markers: RouteMarker[];
+	restricted: RestrictedArea[];
+}
+
+/** 消火器（消防用出展マップの消化器設置場所）の色。図の青い点に合わせる */
+export const EXTINGUISHER_COLOR = '#4d8dff';
+
+/** 動線の色。サイトのパレットの橙（main）とマゼンタ寄りの赤（glitch の明るい側） */
+export const ROUTE_COLORS: Record<RouteKind, string> = { yellow: '#ffb347', red: '#ff4d6d' };
+
+export async function loadRoutes(): Promise<RouteData> {
+	const res = await fetch('/map/routes.json');
+	if (!res.ok) throw new Error('動線を読み込めませんでした');
+	return res.json();
+}
+
+// ---------------------------------------------------------------------------
+// 地図の座標
+// ---------------------------------------------------------------------------
+
+/** 3D 空間の原点にする経緯度（scripts/map/build-campus.mjs の CENTER と揃える）。1 単位 = 1m */
+export const MAP_CENTER: [number, number] = [140.5509, 36.4002];
+const M_PER_DEG_LAT = 110950;
+const M_PER_DEG_LON = 111320 * Math.cos((MAP_CENTER[1] * Math.PI) / 180);
+
+/** 経緯度 → 平面上の [東, 北]（m） */
+export function project([lon, lat]: [number, number]): [number, number] {
+	return [(lon - MAP_CENTER[0]) * M_PER_DEG_LON, (lat - MAP_CENTER[1]) * M_PER_DEG_LAT];
+}
+
+// ---------------------------------------------------------------------------
+// URL
+// ---------------------------------------------------------------------------
+
+/** 地図の表示状態。building が null なら全体（3D）を見ている */
+export interface MapView {
+	building: string | null;
+	floor?: number;
+	room?: string;
+}
+
+/** ?weather=rainy なら雨天時の配置を出す */
+export function readWeatherFromUrl(search: string): Weather | null {
+	const w = new URLSearchParams(search).get('weather');
+	return w === 'rainy' || w === 'sunny' ? w : null;
+}
+
+/** ?room=<部屋キー> または ?building=<建物名>&floor=<階> を読む */
+export function readViewFromUrl(search: string): MapView {
+	const params = new URLSearchParams(search);
+	const room: MapRoom | undefined = MAP_ROOMS.find((r) => r.key === params.get('room'));
+	if (room) {
+		return { building: room.plan ? room.building : null, floor: room.floor ?? undefined, room: room.key };
+	}
+	const building = params.get('building');
+	if (building && building in PLAN_FILES) {
+		const floor = Number(params.get('floor'));
+		return { building, floor: Number.isInteger(floor) && floor > 0 ? floor : undefined };
+	}
+	return { building: null };
+}
+
+/** 表示状態を URL の ?以降にする。雨天時の配置を見ているときは weather=rainy を付ける */
+export function viewToSearch(view: MapView, weather: Weather = 'sunny'): string {
+	const params = new URLSearchParams();
+	if (view.room) params.set('room', view.room);
+	else if (view.building) {
+		params.set('building', view.building);
+		if (view.floor) params.set('floor', String(view.floor));
+	}
+	if (weather === 'rainy') params.set('weather', 'rainy');
+	const search = params.toString();
+	return search ? `?${search}` : '';
+}
