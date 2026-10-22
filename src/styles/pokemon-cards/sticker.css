@@ -21,3 +21,20 @@
 .holo-card .holo-card__front {
   background: hsla(200, 40%, 12%, 0.35);
 }
+
+/*
+  本家の Card.svelte が :root に置いている初期値。
+  ハイドレーション前は JS が値を入れないため、ないと反射の層が不透明のまま表示されて一瞬光る。
+*/
+.holo-card {
+  --pointer-x: 50%;
+  --pointer-y: 50%;
+  --card-opacity: 0;
+  --rotate-x: 0deg;
+  --rotate-y: 0deg;
+  --background-x: 50%;
+  --background-y: 50%;
+  --pointer-from-center: 0;
+  --pointer-from-top: 0.5;
+  --pointer-from-left: 0.5;
+}
