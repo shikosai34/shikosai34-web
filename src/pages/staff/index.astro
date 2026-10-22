@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
 import SiteHeader from '../../components/layout/SiteHeader.astro';
+import DepartmentHeading from '../../components/staff/DepartmentHeading.astro';
 import SectionHeading from '../../components/ui/SectionHeading';
 import YouTubeEmbed from '../../components/ui/YouTubeEmbed';
 import Layout from '../../layouts/Layout.astro';
@@ -19,6 +20,8 @@ const demoDepartments = [
 				{ role: '副部長', name: 'サンプル 花子', kana: 'さんぷる はなこ' },
 				{ role: '部長', name: 'テスト 次郎', kana: 'てすと じろう' },
 			],
+			englishName: 'Planning Division',
+			bannerImage: undefined,
 			description: '役職ごとの表示確認用サンプルです。同じ「部長」のメンバーをまとめて表示しています。',
 			image: undefined,
 			video: undefined,
@@ -30,6 +33,8 @@ const demoDepartments = [
 			sortOrder: 2,
 			department: '広報部（ローカルデモ）',
 			members: [{ role: '担当', name: '見本 三花', kana: 'みほん みか' }],
+			englishName: undefined,
+			bannerImage: undefined,
 			description: 'CMSに写真を登録していない場合の表示例です。',
 			image: undefined,
 			video: undefined,
@@ -84,15 +89,11 @@ const departments = await Promise.all(departmentEntries
 				<div class="grid gap-5 md:grid-cols-2">
 					{departments.map(({ data, anchorId, membersByRole, videoId, videoTitle }) => (
 						<article id={anchorId} class="bracket-frame scroll-mt-6 overflow-hidden rounded-xl bg-base/45">
-							{data.image ? (
-								<img src={data.image} alt={`${data.department}の写真`} loading="lazy" class="aspect-[16/9] w-full object-cover" />
-							) : (
-								<div aria-hidden="true" class="halftone flex aspect-[16/9] items-center justify-center bg-base/50">
-									<span class="text-5xl font-medium tracking-widest text-accent/80">茨香祭</span>
-								</div>
-							)}
+							<DepartmentHeading department={data.department} englishName={data.englishName} bannerImage={data.bannerImage} />
 							<div class="p-5 sm:p-6">
-								<h3 class="mb-3 text-lg font-medium text-text">{data.department}</h3>
+								{data.image && (
+									<img src={data.image} alt={`${data.department}の写真`} loading="lazy" class="mb-5 aspect-[16/9] w-full rounded-lg object-cover" />
+								)}
 								<p class="whitespace-pre-line text-sm leading-7 text-text/80">{data.description}</p>
 								{videoId && (
 									<div class="mt-5 border-t border-text/15 pt-4">
