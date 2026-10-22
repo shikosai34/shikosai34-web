@@ -22,6 +22,7 @@ export const OG_PAGES: readonly OgPage[] = [
 	{ path: 'news', title: 'お知らせ', summary: ['茨香祭の最新情報をお届けします。'] },
 	{ path: 'circle', title: 'サークル一覧', summary: ['クラスや部活動・同好会による出展を、', '学年や種別から探せます。'] },
 	{ path: 'event', title: 'ステージ企画一覧', summary: ['ステージで行われる企画の一覧をご紹介します。'] },
+	{ path: 'pamphlet', title: 'デジタルパンフレット', summary: ['公式パンフレットを、', 'ブラウザでそのまま読めます。'] },
 	{ path: 'map', title: '会場マップ', summary: ['校内の会場マップをご案内します。'] },
 	{ path: 'access', title: 'アクセス', summary: ['バス・タクシーなど、', '茨城高専へのアクセス方法をご案内します。'] },
 	{ path: 'cautions', title: '注意事項', summary: ['ご来場前にご確認いただきたい', '注意事項をまとめています。'] },

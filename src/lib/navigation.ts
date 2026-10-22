@@ -34,6 +34,7 @@ export const navGroups: NavGroupItem[] = [
 	{
 		heading: '来場案内',
 		links: [
+			{ label: 'デジタルパンフレット', href: '/pamphlet' },
 			{ label: '会場マップ', href: '/map' },
 			{ label: 'アクセス', href: '/access' },
 			{ label: '注意事項', href: '/cautions' },

@@ -1,0 +1,27 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import SiteHeader from '../../components/layout/SiteHeader.astro';
+import PamphletViewer from '../../components/pamphlet/PamphletViewer';
+import SectionHeading from '../../components/ui/SectionHeading';
+---
+
+<Layout
+	title="デジタルパンフレット | 第34回 茨香祭"
+	description="第34回茨香祭の公式パンフレットを、ブラウザでそのまま読めます。サークル一覧・会場マップ・タイムテーブルなどを掲載しています。"
+>
+	<SiteHeader />
+
+	<main class="mx-auto w-full max-w-5xl px-4 pb-16 sm:px-6">
+		<section class="surface-panel mt-8 rounded-2xl p-5 sm:p-8" aria-labelledby="pamphlet-title">
+			<SectionHeading title="Pamphlet" icon="newspaper" subtitle="デジタルパンフレット" />
+			<h1 id="pamphlet-title" class="sr-only">デジタルパンフレット</h1>
+			<p class="mb-6 max-w-2xl text-base leading-relaxed text-text/85">
+				第34回茨香祭の公式パンフレットです。サークル一覧、会場マップ、タイムテーブルなどを、当日の手元でも確認できます。
+			</p>
+			<PamphletViewer client:only="react" file="/pamphlet/pamphlet-2026.pdf" />
+		</section>
+	</main>
+
+	<SiteFooter />
+</Layout>
