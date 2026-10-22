@@ -7,7 +7,10 @@ location: グラウンド-33
 rainLocation: 時計塔周辺
 genre: food
 summary: サクふわ食感がたまらない！剣道部特製のあつあつ揚げパン、ぜひご賞味あれ！
-details: 揚げパン（きな粉、ココア、シュガー）(200円、2つセットで300円)
+details: |-
+  揚げパン(きな粉、ココア、シュガー)
+  1個　200円　3個セット　500円
+  ホイップクリームトッピング  100円
 scheduleDay1: 9:00〜17:00
 scheduleDay2: 9:00〜15:00
 fesflowPlanned: false
