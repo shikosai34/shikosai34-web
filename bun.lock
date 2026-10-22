@@ -8,6 +8,8 @@
         "@astrojs/react": "^6.0.4",
         "@astrojs/sitemap": "^3.7.4",
         "@fontsource/kiwi-maru": "^5.3.0",
+        "@fontsource/oxanium": "^5.3.0",
+        "@fontsource/yusei-magic": "^5.3.0",
         "@react-three/drei": "^10.7.8",
         "@react-three/fiber": "^9.7.0",
         "@react-three/postprocessing": "^3.1.2",
@@ -231,6 +233,10 @@
     "@esbuild/win32-x64": ["@esbuild/win32-x64@0.28.1", "", { "os": "win32", "cpu": "x64" }, "sha512-bm4Mowrv+GXMlpWX++EcXw/iLyd1o3+bJkC2DkWXYVvgZCqD/bSj9ctZeAMC3cIxgjRVR2Dufaiu4YPxr5gW1A=="],
 
     "@fontsource/kiwi-maru": ["@fontsource/kiwi-maru@5.3.0", "", {}, "sha512-8zcSONeRZPzSWdkP+uoNoEVciJn985ZDB57zwRer9dGZ/1+/pnQYkyCz5OEbnoXvbFyVnA0Dx0r+lv6tu+wTGA=="],
+
+    "@fontsource/oxanium": ["@fontsource/oxanium@5.3.0", "", {}, "sha512-MpTsBMyPvlorqKkMVoaN8zctjty1vwO7WSOkNYhUj+oE6EEzL9I/j2EoEHLEEWIgTIRYwdxGMNLegBcvnc4nbQ=="],
+
+    "@fontsource/yusei-magic": ["@fontsource/yusei-magic@5.3.0", "", {}, "sha512-1gSpUCpFQUmCUfh7YkKTjBC89wXnijwKZO3cfIMBx/Rlb7WjfHfIjK8PilB2/tOeq68ezAd8ODWNrg/zere2JA=="],
 
     "@img/colour": ["@img/colour@1.1.0", "", {}, "sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ=="],
 

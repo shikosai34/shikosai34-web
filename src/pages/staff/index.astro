@@ -89,7 +89,7 @@ const departments = await Promise.all(departmentEntries
 				<div class="grid gap-5 md:grid-cols-2">
 					{departments.map(({ data, anchorId, membersByRole, videoId, videoTitle }) => (
 						<article id={anchorId} class="bracket-frame scroll-mt-6 overflow-hidden rounded-xl bg-base/45">
-							<DepartmentHeading department={data.department} englishName={data.englishName} bannerImage={data.bannerImage} idPrefix={anchorId} />
+							<DepartmentHeading department={data.department} englishName={data.englishName} bannerImage={data.bannerImage} />
 							<div class="p-5 sm:p-6">
 								{data.image && (
 									<img src={data.image} alt={`${data.department}の写真`} loading="lazy" class="mb-5 aspect-[16/9] w-full rounded-lg object-cover" />

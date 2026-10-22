@@ -5,75 +5,38 @@
  * 部署ごとに完成したバナー画像（bannerImage、16:9）があれば、それをそのまま表示する。
  * 画像の中の文字は読み上げられないので、部署名と英語名は見えない見出しとして添える。
  *
- * 画像がない部署は、同じ構図をコードで描く。部署名を大きく置き、
- * 斜めに伸びるオレンジの光線（舞台照明）と六角形の線画、霞、ロゴで飾る。
- * 文字は光線にまたがるため、同じ文字を 2 枚重ね、
- * 光線の外は白系・光線の中は濃紺と clip-path で出し分ける
- * （どちらの面でも DESIGN.md のコントラストの組み合わせになる）。
- *
- * 大きさはバナー自身の幅を基準（cqw）にして、カードが 1 列でも 2 列でも
- * 同じ見た目で拡縮する。装飾はすべて aria-hidden。
+ * 画像がない部署は、同じ背景（光線・照明機材・六角形・霞・ロゴ。画像は共通の 1 枚）の上に、
+ * 部署名・二重線・英語名を重ねて、完成画像と同じ見た目にする。
+ * 書体は完成画像に近いもの（日本語: Yusei Magic、英語: Oxanium）。
+ * 位置と大きさは完成画像（機材部）を測った値で、バナー自身の幅を基準（cqw）にしているので、
+ * カードが 1 列でも 2 列でも同じ見た目で拡縮する。
  */
-import { Image } from 'astro:assets';
-import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
-import KasumiCloud from '../ui/KasumiCloud';
+import '@fontsource/oxanium/500.css';
+import '@fontsource/yusei-magic/400.css';
 
 interface Props {
 	department: string;
 	englishName?: string;
 	bannerImage?: string;
-	/** 同じページに複数置くので、KasumiCloud の filter id が重ならないよう渡す。 */
-	idPrefix: string;
 }
 
-const { department, englishName, bannerImage, idPrefix } = Astro.props;
+const { department, englishName, bannerImage } = Astro.props;
 
 /*
- * 部署名の大きさ。名前が長い部署（当日運営部門など）でも、
- * バナー幅の 7 割に収まるように縮める。
+ * 部署名の大きさ。完成画像（3 文字）の大きさを上限に、名前が長い部署
+ * （当日運営部門など）でも幅 56% に収まるように縮める。二重線は部署名より少し広く引く。
+ * 完成画像の書体は縦長なので、Yusei Magic は大きめに出して横に 0.75 倍へ詰める（TITLE_SQUEEZE）。
  */
-const titleSize = Math.min(14, 70 / (Array.from(department).length * 1.06));
+const TITLE_SQUEEZE = 0.75;
+const titleChars = Array.from(department).length;
+const titleSize = Math.min(14, 56 / (titleChars * TITLE_SQUEEZE));
+const ruleWidth = Math.max(47.5, titleChars * titleSize * TITLE_SQUEEZE + 14);
 
-/* 英語名も同じく、長いもの（External Relations Division など）は縮めて幅に収める。 */
-const enSize = englishName ? Math.min(5.6, 76 / (Array.from(englishName).length * 0.6)) : 5.6;
-
-/*
- * 六角形の線画。尖った側を上にした正六角形を、蜂の巣状に並べる。
- * 座標は 160×90 の枠（バナーと同じ 16:9）の中の中心点。
- */
-const HEX_R = 10;
-const HEX_W = HEX_R * Math.sqrt(3);
-const hexPath = (cx: number, cy: number) => {
-	const pts = Array.from({ length: 6 }, (_, i) => {
-		const a = (Math.PI / 180) * (60 * i - 90);
-		return `${(cx + HEX_R * Math.cos(a)).toFixed(2)} ${(cy + HEX_R * Math.sin(a)).toFixed(2)}`;
-	});
-	return `M ${pts.join(' L ')} Z`;
-};
-const HEX_CENTERS: Array<[number, number]> = [
-	[4, 44],
-	[4 + HEX_W, 44],
-	[4 + HEX_W / 2, 59],
-	[4 + HEX_W * 1.5, 59],
-	[4, 74],
-	[4 + HEX_W, 74],
-	[4 + HEX_W * 2, 74],
-	[148, 52],
-	[148 - HEX_W, 52],
-	[148 - HEX_W / 2, 67],
-	[148 + HEX_W / 2, 67],
-	[148, 82],
-];
-const hexes = HEX_CENTERS.map(([x, y]) => hexPath(x, y)).join(' ');
-
-/* 文字の 2 枚重ね。光線の外（白系）と中（濃紺）。 */
-const layers = [
-	{ key: 'outside', hidden: false },
-	{ key: 'inside', hidden: true },
-] as const;
+/* 英語名も同じく、長いもの（Day-of Operations Division など）は縮めて幅に収める。 */
+const enSize = englishName ? Math.min(3.3, 60 / (Array.from(englishName).length * 0.6)) : 3.3;
 ---
 
-<div class="dept-banner" style={`--title-size: ${titleSize.toFixed(2)}cqw; --en-size: ${enSize.toFixed(2)}cqw;`}>
+<div class="dept-banner" style={`--title-size: ${titleSize.toFixed(2)}cqw; --squeeze: ${TITLE_SQUEEZE}; --rule-width: ${ruleWidth.toFixed(2)}cqw; --en-size: ${enSize.toFixed(2)}cqw;`}>
 	{bannerImage ? (
 		<>
 			<img src={bannerImage} alt="" width="1280" height="720" loading="lazy" decoding="async" class="dept-bg" />
@@ -81,79 +44,26 @@ const layers = [
 		</>
 	) : (
 		<>
-			<svg class="dept-hex" viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice" fill="none" stroke="currentColor" stroke-width="0.7" stroke-linejoin="round" aria-hidden="true">
-				<path d={hexes}></path>
-			</svg>
-
-			<KasumiCloud id={`${idPrefix}-l`} glow={false} className="dept-kasumi dept-kasumi--l" />
-			<KasumiCloud id={`${idPrefix}-r`} glow={false} flip className="dept-kasumi dept-kasumi--r" />
-
-			<div class="dept-beam" aria-hidden="true"></div>
-
-			<Image src={logoG} alt="" width={240} class="dept-logo" />
-
-			{layers.map(({ key, hidden }) => (
-				<div class:list={['dept-text', `dept-text--${key}`]} aria-hidden={hidden ? 'true' : undefined}>
-					<div class="dept-text-block">
-						{hidden ? <div class="dept-title">{department}</div> : <h3 class="dept-title">{department}</h3>}
-						<div class="dept-rule"></div>
-						{englishName && (hidden ? <div class="dept-en" lang="en">{englishName}</div> : <p class="dept-en" lang="en">{englishName}</p>)}
-					</div>
-				</div>
-			))}
+			<img src="/images/staff/department-banner-bg.webp" alt="" width="1920" height="1080" loading="lazy" decoding="async" class="dept-bg" />
+			<h3 class="dept-title">{department}</h3>
+			<div class="dept-rule" aria-hidden="true"></div>
+			{englishName && <p class="dept-en" lang="en">{englishName}</p>}
 		</>
 	)}
 </div>
 
 <style>
-	/*
-	 * 光線の形（バナー内の割合）。文字を出し分ける clip-path と同じ点を使う。
-	 * 先端（左下）から右上・右下へ開く帯。
-	 */
 	.dept-banner {
-		--beam: 8% 94%, 100% 12%, 100% 58%, 22% 100%;
 		position: relative;
 		overflow: hidden;
 		container-type: inline-size;
 		aspect-ratio: 16 / 9;
 		background-color: var(--color-base);
-		border-bottom: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+		color: #fff;
 	}
 
 	.dept-banner > * {
 		position: absolute;
-	}
-
-	.dept-hex {
-		inset: 0;
-		width: 100%;
-		height: 100%;
-		color: color-mix(in srgb, var(--color-accent) 30%, transparent);
-	}
-
-	.dept-banner :global(.dept-kasumi) {
-		position: absolute;
-		height: auto;
-	}
-
-	.dept-banner :global(.dept-kasumi--l) {
-		top: 2%;
-		left: -6%;
-		width: 44%;
-		color: color-mix(in srgb, var(--color-accent) 22%, transparent);
-	}
-
-	.dept-banner :global(.dept-kasumi--r) {
-		top: 4%;
-		right: -8%;
-		width: 40%;
-		color: color-mix(in srgb, var(--color-text) 16%, transparent);
-	}
-
-	.dept-beam {
-		inset: 0;
-		background-color: var(--color-main);
-		clip-path: polygon(var(--beam));
 	}
 
 	.dept-bg {
@@ -164,69 +74,42 @@ const layers = [
 		pointer-events: none;
 	}
 
-	.dept-banner :global(.dept-logo) {
-		position: absolute;
-		right: 4%;
-		bottom: 5%;
-		width: 24%;
-		height: auto;
-	}
-
-	.dept-text {
-		inset: 0;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		padding-bottom: 6%;
-	}
-
-	/* 光線の外: 白系の文字とシアンの線。 */
-	.dept-text--outside {
-		color: var(--color-text);
-		--rule-a: var(--color-accent);
-		--rule-b: color-mix(in srgb, var(--color-accent) 55%, var(--color-text));
-		clip-path: polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0, var(--beam), 8% 94%);
-	}
-
-	/* 光線の中: 濃紺の文字（オレンジの上で読める組み合わせ）。 */
-	.dept-text--inside {
-		color: var(--color-on-main);
-		--rule-a: var(--color-on-main);
-		--rule-b: var(--color-on-main);
-		clip-path: polygon(var(--beam));
-		pointer-events: none;
-	}
-
-	.dept-text-block {
-		display: inline-flex;
-		flex-direction: column;
-		align-items: center;
-		max-width: 92%;
+	/* 位置は完成画像（1280×720）での中心を割合にしたもの。 */
+	.dept-title,
+	.dept-en {
+		left: 50%;
+		margin: 0;
+		white-space: nowrap;
+		transform: translate(-50%, -50%);
 	}
 
 	.dept-title {
-		margin: 0;
+		transform: translate(-50%, -50%) scaleX(var(--squeeze));
+		top: 47.4%;
+		font-family: 'Yusei Magic', var(--font-primary);
 		font-size: var(--title-size);
-		font-weight: 500;
-		line-height: 1.15;
-		letter-spacing: 0.06em;
-		white-space: nowrap;
+		font-weight: 400;
+		line-height: 1;
+		letter-spacing: 0.04em;
 	}
 
-	/* 部署名の幅いっぱいに引く二重線。 */
+	/* 部署名の下の二重線。細い線 2 本（太さ 0.3cqw、間隔 0.4cqw）。 */
 	.dept-rule {
-		align-self: stretch;
-		height: 1.1cqw;
-		margin-top: 1.6cqw;
-		border-top: 0.45cqw solid var(--rule-a);
-		border-bottom: 0.45cqw solid var(--rule-b);
+		top: 62.1%;
+		left: 50%;
+		width: var(--rule-width);
+		height: 1cqw;
+		transform: translate(-50%, -50%);
+		border-top: 0.3cqw solid var(--color-accent);
+		border-bottom: 0.3cqw solid var(--color-accent);
 	}
 
 	.dept-en {
-		margin: 1.4cqw 0 0;
+		top: 67.4%;
+		font-family: 'Oxanium', var(--font-primary);
 		font-size: var(--en-size);
-		line-height: 1.2;
-		letter-spacing: 0.04em;
-		white-space: nowrap;
+		font-weight: 500;
+		line-height: 1;
+		letter-spacing: 0.03em;
 	}
 </style>
