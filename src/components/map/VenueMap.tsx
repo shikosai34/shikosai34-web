@@ -72,9 +72,14 @@ export default function VenueMap({ exhibits: exhibitsByWeather, defaultWeather }
 	const [weather, setWeather] = useState<Weather>(() => readWeatherFromUrl(location.search) ?? defaultWeather);
 	const exhibits = exhibitsByWeather[weather];
 	/** ピンを立てる会場（番号つきのテントは含まない） */
-	const PLACES = useMemo(() => ALL_PLACES.filter((p) => !p.parent && isRoomInWeather(p, weather)), [weather]);
+	/**
+	 * その天候で使う会場に加えて、サークルが場所を書いて出展が置かれた会場も出す
+	 * （雨天時の場所を書いていないサークルは、雨天時も実施場所のままなので、雨天時のグラウンドにも出展が並ぶ）
+	 */
+	const visible = useCallback((p: (typeof ALL_PLACES)[number]) => isRoomInWeather(p, weather) || (exhibitsByWeather[weather][p.key]?.length ?? 0) > 0, [weather, exhibitsByWeather]);
+	const PLACES = useMemo(() => ALL_PLACES.filter((p) => !p.parent && visible(p)), [visible]);
 	/** 番号つきのテント（グラウンドの G-1〜G-33 など） */
-	const SLOTS = useMemo(() => ALL_PLACES.filter((p) => p.parent && isRoomInWeather(p, weather)), [weather]);
+	const SLOTS = useMemo(() => ALL_PLACES.filter((p) => p.parent && visible(p)), [visible]);
 	const findPlace = useCallback((key: string | null) => (key ? [...PLACES, ...SLOTS].find((p) => p.key === key) : undefined), [PLACES, SLOTS]);
 	const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
 	const narrow = useMediaQuery('(max-width: 767px)');

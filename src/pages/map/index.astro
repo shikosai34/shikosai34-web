@@ -33,13 +33,15 @@ import {
 const STAGE_ROOM = 'gym1-stage';
 
 /**
- * サークルのその天候での部屋キー（CMS で選んだ部屋、なければ「実施場所」の名前から探す）。晴天時だけの会場（グラウンドなど）のまま雨天時の場所が
- * 決まっていないときは、雨天時の地図には置かない（「地図に未登録の出展」に出す）。
+ * サークルのその天候での部屋キー（CMS で選んだ部屋、なければ「実施場所」の名前から探す）。
+ * 雨天時の場所（rainLocation）が書かれていなければ、雨天時も実施場所と同じ場所にする。
+ * その場所が晴天時だけの会場（グラウンドなど）でも、書かれた場所のとおりに置く
+ * （その天候の地図には、出展のある会場として出る）。地図に見つからなければ undefined
+ * （「地図に未登録の出展」に出す）。
  */
 function placedKey(circle: Parameters<typeof roomKeyInWeather>[0], weather: Weather): string | undefined {
 	const key = roomKeyInWeather(circle, weather);
-	const room = getMapRoom(key);
-	return room && isRoomInWeather(room, weather) ? key : undefined;
+	return getMapRoom(key) ? key : undefined;
 }
 
 /** 天候ごとの「部屋キー → 出展」。晴天時はサークルの mapRoom、雨天時は mapRoomRainy（なければ mapRoom） */
@@ -120,7 +122,8 @@ for (const weather of WEATHERS) {
 const listings = WEATHERS.map((weather) => {
 	const groups: { building: string; rooms: typeof MAP_ROOMS }[] = [];
 	for (const room of MAP_ROOMS) {
-		if (!isRoomInWeather(room, weather)) continue;
+		// その天候の会場に加えて、サークルが場所を書いて出展が置かれた会場（雨天時のグラウンドなど）も載せる
+		if (!isRoomInWeather(room, weather) && !exhibits[weather][room.key]?.length) continue;
 		// 番号つきのテントをまとめる会場（グラウンド）は、番号のあるテントのほうで一覧に出す。ここには番号のない出展だけ
 		const own = AGGREGATE_KEYS.has(room.key) ? (exhibits[weather][room.key] ?? []).filter((item) => !item.spot) : (exhibits[weather][room.key] ?? []);
 		if (!(own.length || room.use?.[weather])) continue;
