@@ -3,8 +3,10 @@ name: coffee cafe
 nameKana: こーひーかふぇ
 slug: coffee-cafe
 category: other
-location: グラウンド-5
-rainLocation: 3M1
+location: グラウンド-8
+mapRoom: G-8
+mapRoomRainy: 8-101
+rainLocation: 8-101（3M1）
 genre: food
 summary: 焙煎度や産地の違う様々なコーヒー豆を使用したコーヒー専門店です。
 details: |-
