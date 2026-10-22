@@ -42,12 +42,7 @@ export default function PamphletViewer({ file }: Props) {
 			<div ref={frameRef} className="w-full">
 				{failed ? (
 					<div className="rounded-xl bg-base/45 p-8 text-center text-base leading-relaxed text-text/85">
-						<p>パンフレットを表示できませんでした。</p>
-						<p className="mt-2">
-							<a href={file} className="text-accent underline underline-offset-4 hover:no-underline">
-								PDF を直接開く
-							</a>
-						</p>
+						<p>パンフレットを表示できませんでした。時間をおいて、もう一度お試しください。</p>
 					</div>
 				) : (
 					<Document
