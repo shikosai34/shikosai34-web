@@ -18,6 +18,8 @@
 
 本文の基本サイズは 16px とする。情報の重要度が下がる箇所に限って 15px または 13px を使う。長文には `leading-relaxed` を付ける。
 
+- 例外: `/staff` の部署カード冒頭（`DepartmentHeading`）の部署名と英語名は、バナー幅を基準にした大きさ（`cqw`）にする。光線（`bg-main`）にまたがるため、文字を 2 枚重ねて光線の外は `text-text`、中は `text-on-main` に出し分ける。詳細は [`docs/design/03-design.md`](docs/design/03-design.md) の 3.7.1 を参照。
+
 ## Color and contrast
 
 - 色は `src/styles/global.css` の既存トークンを使う: `base` `#0B3041`、`text` `#E8E8E8`、`main` `#FF9933`、`accent` `#00FFCC`。

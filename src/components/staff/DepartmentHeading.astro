@@ -1,0 +1,250 @@
+---
+/*
+ * 部署紹介カードの見出しバナー（/staff）。
+ *
+ * 部署名を大きく置き、斜めに伸びるオレンジの光線（舞台照明）と六角形の線画、霞、ロゴで飾る。
+ * 部署ごとに変えるのは、部署名・英語名・背景画像。英語名と背景画像は CMS で任意に設定できる。
+ *
+ * 背景画像（bannerImage、16:9・文字なし）があれば、それを敷いて文字を重ねる。
+ * 光線・ロゴ・照明機材などの絵はすべて画像に含まれる。文字は光線にまたがるため、
+ * 濃紺の縁取りで浮かせる（global.css の .outlined-text）。
+ *
+ * 背景画像がない部署は、同じ構図をコードで描く（光線・六角形・霞・ロゴ）。
+ * こちらは光線の位置が分かっているので、同じ文字を 2 枚重ね、
+ * 光線の外は白系・光線の中は濃紺と clip-path で出し分ける
+ * （どちらの面でも DESIGN.md のコントラストの組み合わせになる）。
+ *
+ * 大きさはバナー自身の幅を基準（cqw）にして、カードが 1 列でも 2 列でも
+ * 同じ見た目で拡縮する。装飾はすべて aria-hidden。
+ */
+import { Image } from 'astro:assets';
+import logoG from '../../assets/logo/yokogaki/HOL_G-trimmed.png';
+import KasumiCloud from '../ui/KasumiCloud';
+
+interface Props {
+	department: string;
+	englishName?: string;
+	bannerImage?: string;
+	/** 同じページに複数置くので、KasumiCloud の filter id が重ならないよう渡す。 */
+	idPrefix: string;
+}
+
+const { department, englishName, bannerImage, idPrefix } = Astro.props;
+
+/*
+ * 部署名の大きさ。名前が長い部署（当日運営部門など）でも、
+ * バナー幅の 7 割に収まるように縮める。
+ */
+const titleSize = Math.min(14, 70 / (Array.from(department).length * 1.06));
+
+/* 英語名も同じく、長いもの（External Relations Division など）は縮めて幅に収める。 */
+const enSize = englishName ? Math.min(5.6, 76 / (Array.from(englishName).length * 0.6)) : 5.6;
+
+/*
+ * 六角形の線画。尖った側を上にした正六角形を、蜂の巣状に並べる。
+ * 座標は 160×90 の枠（バナーと同じ 16:9）の中の中心点。
+ */
+const HEX_R = 10;
+const HEX_W = HEX_R * Math.sqrt(3);
+const hexPath = (cx: number, cy: number) => {
+	const pts = Array.from({ length: 6 }, (_, i) => {
+		const a = (Math.PI / 180) * (60 * i - 90);
+		return `${(cx + HEX_R * Math.cos(a)).toFixed(2)} ${(cy + HEX_R * Math.sin(a)).toFixed(2)}`;
+	});
+	return `M ${pts.join(' L ')} Z`;
+};
+const HEX_CENTERS: Array<[number, number]> = [
+	[4, 44],
+	[4 + HEX_W, 44],
+	[4 + HEX_W / 2, 59],
+	[4 + HEX_W * 1.5, 59],
+	[4, 74],
+	[4 + HEX_W, 74],
+	[4 + HEX_W * 2, 74],
+	[148, 52],
+	[148 - HEX_W, 52],
+	[148 - HEX_W / 2, 67],
+	[148 + HEX_W / 2, 67],
+	[148, 82],
+];
+const hexes = HEX_CENTERS.map(([x, y]) => hexPath(x, y)).join(' ');
+
+/*
+ * 文字の重ね方。背景画像があれば 1 枚（縁取り）、なければ 2 枚重ねて
+ * 光線の外（白系）と中（濃紺）に出し分ける。
+ */
+const layers = bannerImage
+	? ([{ key: 'plain', hidden: false }] as const)
+	: ([
+			{ key: 'outside', hidden: false },
+			{ key: 'inside', hidden: true },
+		] as const);
+---
+
+<div class="dept-banner" style={`--title-size: ${titleSize.toFixed(2)}cqw; --en-size: ${enSize.toFixed(2)}cqw;`}>
+	{bannerImage ? (
+		<img src={bannerImage} alt="" width="1920" height="1080" loading="lazy" decoding="async" class="dept-bg" />
+	) : (
+		<>
+			<svg class="dept-hex" viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice" fill="none" stroke="currentColor" stroke-width="0.7" stroke-linejoin="round" aria-hidden="true">
+				<path d={hexes}></path>
+			</svg>
+
+			<KasumiCloud id={`${idPrefix}-l`} glow={false} className="dept-kasumi dept-kasumi--l" />
+			<KasumiCloud id={`${idPrefix}-r`} glow={false} flip className="dept-kasumi dept-kasumi--r" />
+
+			<div class="dept-beam" aria-hidden="true"></div>
+
+			<Image src={logoG} alt="" width={240} class="dept-logo" />
+		</>
+	)}
+
+	{layers.map(({ key, hidden }) => (
+		<div class:list={['dept-text', `dept-text--${key}`]} aria-hidden={hidden ? 'true' : undefined}>
+			<div class="dept-text-block">
+				{hidden ? <div class="dept-title">{department}</div> : <h3 class="dept-title">{department}</h3>}
+				<div class="dept-rule"></div>
+				{englishName && (hidden ? <div class="dept-en" lang="en">{englishName}</div> : <p class="dept-en" lang="en">{englishName}</p>)}
+			</div>
+		</div>
+	))}
+</div>
+
+<style>
+	/*
+	 * 光線の形（バナー内の割合）。文字を出し分ける clip-path と同じ点を使う。
+	 * 先端（左下）から右上・右下へ開く帯。
+	 */
+	.dept-banner {
+		--beam: 8% 94%, 100% 12%, 100% 58%, 22% 100%;
+		position: relative;
+		overflow: hidden;
+		container-type: inline-size;
+		aspect-ratio: 16 / 9;
+		background-color: var(--color-base);
+		border-bottom: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+	}
+
+	.dept-banner > * {
+		position: absolute;
+	}
+
+	.dept-hex {
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		color: color-mix(in srgb, var(--color-accent) 30%, transparent);
+	}
+
+	.dept-banner :global(.dept-kasumi) {
+		position: absolute;
+		height: auto;
+	}
+
+	.dept-banner :global(.dept-kasumi--l) {
+		top: 2%;
+		left: -6%;
+		width: 44%;
+		color: color-mix(in srgb, var(--color-accent) 22%, transparent);
+	}
+
+	.dept-banner :global(.dept-kasumi--r) {
+		top: 4%;
+		right: -8%;
+		width: 40%;
+		color: color-mix(in srgb, var(--color-text) 16%, transparent);
+	}
+
+	.dept-beam {
+		inset: 0;
+		background-color: var(--color-main);
+		clip-path: polygon(var(--beam));
+	}
+
+	.dept-bg {
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		pointer-events: none;
+	}
+
+	.dept-banner :global(.dept-logo) {
+		position: absolute;
+		right: 4%;
+		bottom: 5%;
+		width: 24%;
+		height: auto;
+	}
+
+	.dept-text {
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding-bottom: 6%;
+	}
+
+	/* 光線の外: 白系の文字とシアンの線。 */
+	.dept-text--outside {
+		color: var(--color-text);
+		--rule-a: var(--color-accent);
+		--rule-b: color-mix(in srgb, var(--color-accent) 55%, var(--color-text));
+		clip-path: polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0, var(--beam), 8% 94%);
+	}
+
+	/* 背景画像の上: 白系の文字を濃紺の縁で浮かせる。 */
+	.dept-text--plain {
+		color: var(--color-text);
+		--rule-a: var(--color-accent);
+		--rule-b: var(--color-accent);
+	}
+
+	.dept-text--plain .dept-title,
+	.dept-text--plain .dept-en {
+		paint-order: stroke fill;
+		-webkit-text-stroke: 1.2cqw var(--color-base);
+	}
+
+	/* 光線の中: 濃紺の文字（オレンジの上で読める組み合わせ）。 */
+	.dept-text--inside {
+		color: var(--color-on-main);
+		--rule-a: var(--color-on-main);
+		--rule-b: var(--color-on-main);
+		clip-path: polygon(var(--beam));
+		pointer-events: none;
+	}
+
+	.dept-text-block {
+		display: inline-flex;
+		flex-direction: column;
+		align-items: center;
+		max-width: 92%;
+	}
+
+	.dept-title {
+		margin: 0;
+		font-size: var(--title-size);
+		font-weight: 500;
+		line-height: 1.15;
+		letter-spacing: 0.06em;
+		white-space: nowrap;
+	}
+
+	/* 部署名の幅いっぱいに引く二重線。 */
+	.dept-rule {
+		align-self: stretch;
+		height: 1.1cqw;
+		margin-top: 1.6cqw;
+		border-top: 0.45cqw solid var(--rule-a);
+		border-bottom: 0.45cqw solid var(--rule-b);
+	}
+
+	.dept-en {
+		margin: 1.4cqw 0 0;
+		font-size: var(--en-size);
+		line-height: 1.2;
+		letter-spacing: 0.04em;
+		white-space: nowrap;
+	}
+</style>

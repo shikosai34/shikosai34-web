@@ -745,6 +745,16 @@ collections:
         min: 0
         hint: '小さい番号の部署が先に表示されます。'
       - { label: 部署名, name: department, widget: string }
+      - label: 英語名
+        name: englishName
+        widget: string
+        required: false
+        hint: '見出しバナーの部署名の下に表示します。例: Equipment Division。未入力なら表示しません。'
+      - label: 見出しバナーの背景画像
+        name: bannerImage
+        widget: image-r2
+        required: false
+        hint: '部署名の後ろに敷く 16:9 の画像です。部署名と英語名は入れないでください（文字はサイト側で重ねます）。未設定の場合は、オレンジの光線の背景で表示します。'
       - label: 部署の名簿
         name: members
         widget: list
