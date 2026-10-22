@@ -70,19 +70,23 @@ export default function PamphletViewer({ file }: Props) {
 		setIndex(next);
 	};
 
-	const onKeyDown = (event: KeyboardEvent) => {
-		const direction = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
-		if (direction === 0) return;
-		event.preventDefault();
+	const move = (direction: 1 | -1) => {
 		const target = Math.min(numPages - 1, Math.max(0, (targetRef.current ?? indexRef.current) + direction));
 		targetRef.current = target;
 		scrollerRef.current?.scrollTo({ left: target * step, behavior: 'smooth' });
 	};
 
+	const onKeyDown = (event: KeyboardEvent) => {
+		const direction = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
+		if (direction === 0) return;
+		event.preventDefault();
+		move(direction);
+	};
+
 	return (
 		<div className="flex flex-col items-center gap-3">
 			{/* セクションの左右の余白（p-5 / sm:p-8）の分まで広げて、ページを大きく見せる。 */}
-			<div ref={frameRef} className="-mx-5 self-stretch sm:-mx-8">
+			<div ref={frameRef} className="relative -mx-5 self-stretch sm:-mx-8">
 				{failed ? (
 					<div className="rounded-xl bg-base/45 p-8 text-center text-base leading-relaxed text-text/85">
 						<p>パンフレットを表示できませんでした。時間をおいて、もう一度お試しください。</p>
@@ -139,6 +143,13 @@ export default function PamphletViewer({ file }: Props) {
 						)}
 					</Document>
 				)}
+
+				{!failed && numPages > 0 && pageWidth > 0 ? (
+					<>
+						<ArrowButton side="prev" disabled={index === 0} onClick={() => move(-1)} />
+						<ArrowButton side="next" disabled={index === numPages - 1} onClick={() => move(1)} />
+					</>
+				) : null}
 			</div>
 
 			{!failed && numPages > 0 ? (
@@ -147,6 +158,23 @@ export default function PamphletViewer({ file }: Props) {
 				</p>
 			) : null}
 		</div>
+	);
+}
+
+/** Kindle のように、ページの左右の端に置く薄い矢印。 */
+function ArrowButton({ side, disabled, onClick }: { side: 'prev' | 'next'; disabled: boolean; onClick: () => void }) {
+	return (
+		<button
+			type="button"
+			aria-label={side === 'prev' ? '前のページ' : '次のページ'}
+			disabled={disabled}
+			onClick={onClick}
+			className={`absolute top-1/2 z-10 flex h-16 w-9 -translate-y-1/2 items-center justify-center bg-base/55 text-text backdrop-blur-sm transition-opacity hover:bg-base/80 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:pointer-events-none disabled:opacity-0 sm:h-20 sm:w-11 ${side === 'prev' ? 'left-0 rounded-r-xl' : 'right-0 rounded-l-xl'}`}
+		>
+			<svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+				<path d={side === 'prev' ? 'M15 5l-7 7 7 7' : 'M9 5l7 7-7 7'} />
+			</svg>
+		</button>
 	);
 }
 
