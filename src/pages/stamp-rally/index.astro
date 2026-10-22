@@ -3,13 +3,30 @@ import Layout from '../../layouts/Layout.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
 import SiteHeader from '../../components/layout/SiteHeader.astro';
 import SectionHeading from '../../components/ui/SectionHeading';
+import StickerCard from '../../components/stamp-rally/StickerCard';
+import stickerImage from '../../assets/stamp-rally/clear-sticker.webp';
 
 const areas = ['大教室', '図書館棟', '8号館', 'グラウンド', '1号館'];
+
+const steps = [
+	{
+		title: 'FesFlowでお買い物',
+		body: '買ったサークルの<span class="inline-block">サークルカットを</span><span class="inline-block">スタンプとして</span><span class="inline-block">集めることができます。</span>',
+	},
+	{
+		title: '3エリア以上で集める',
+		body: '下の5か所のうち、<span class="inline-block">3か所以上で、</span><span class="inline-block">それぞれスタンプを</span><span class="inline-block">1つずつ集めてください。</span>',
+	},
+	{
+		title: 'ステッカーをGET',
+		body: 'インフォメーションへ行き、<span class="inline-block">スタンプの獲得画面を見せると</span><span class="inline-block">ステッカーがもらえます。</span>',
+	},
+];
 ---
 
 <Layout
 	title="スタンプラリー | 第34回 茨香祭"
-	description="FesFlowでお買い物をして、対象エリア3か所以上のスタンプを集めよう。"
+	description="FesFlowでお買い物をして、対象エリア3か所以上でスタンプを集めると、オリジナルクリアステッカーがもらえます。"
 >
 	<SiteHeader />
 
@@ -17,51 +34,60 @@ const areas = ['大教室', '図書館棟', '8号館', 'グラウンド', '1号�
 		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
 			<SectionHeading title="スタンプラリー" icon="sparkles" subtitle="STAMP RALLY" />
 
-			<div class="bracket-frame mt-7 rounded-xl p-5 text-center sm:p-8">
-				<p class="text-xs tracking-[0.3em] text-accent">SHOP, COLLECT & GET A STICKER</p>
-				<p class="mt-3 text-lg font-medium leading-relaxed sm:text-xl">
-					お買い物を楽しみながら、<br class="sm:hidden" />3エリア以上のスタンプを集めよう！
+			<div class="bracket-frame mt-7 rounded-xl px-5 py-7 text-center sm:px-8 sm:py-9">
+				<p class="text-lg font-medium leading-relaxed sm:text-xl">
+					<span class="inline-block">サークルを回って</span>
+					<span class="inline-block">オリジナルクリアステッカーを</span>
+					<span class="inline-block text-main">GETしよう！</span>
 				</p>
-				<div class="mx-auto mt-5 flex h-20 w-20 items-center justify-center rounded-full border-2 border-main text-3xl font-medium text-main">
-					3<span class="ml-1 text-sm">AREA</span>
+			</div>
+
+			<div class="mt-8">
+				<SectionHeading title="もらえるステッカー" icon="badge" subtitle="CLEAR STICKER" />
+				<div class="mt-5">
+					<StickerCard
+						client:visible
+						src={stickerImage.src}
+						width={stickerImage.width}
+						height={stickerImage.height}
+						alt="第34回茨香祭 オリジナルクリアステッカー。テーマ「守破離」のビジュアルが描かれている。"
+					/>
 				</div>
 			</div>
 
 			<div class="mt-8">
 				<SectionHeading title="参加方法" icon="info" subtitle="HOW TO JOIN" />
-				<ol class="grid gap-3 sm:grid-cols-3">
-					<li class="rounded-xl border border-text/15 bg-base/50 p-4">
-						<p class="text-xs tracking-[0.2em] text-accent">STEP 01</p>
-						<h2 class="mt-2 text-base font-medium text-text">FesFlowでお買い物</h2>
-						<p class="mt-2 text-sm leading-relaxed text-text/80">購入したサークルのサークルカットがスタンプになります。</p>
-					</li>
-					<li class="rounded-xl border border-text/15 bg-base/50 p-4">
-						<p class="text-xs tracking-[0.2em] text-accent">STEP 02</p>
-						<h2 class="mt-2 text-base font-medium text-text">3エリア以上で集める</h2>
-						<p class="mt-2 text-sm leading-relaxed text-text/80">下の対象エリアのうち、異なる3か所以上でスタンプを1つずつ集めよう。</p>
-					</li>
-					<li class="rounded-xl border border-text/15 bg-base/50 p-4">
-						<p class="text-xs tracking-[0.2em] text-accent">STEP 03</p>
-						<h2 class="mt-2 text-base font-medium text-text">インフォメーションへ</h2>
-						<p class="mt-2 text-sm leading-relaxed text-text/80">集め終わったらインフォメーションでリストバンドを提示して、ステッカーと交換！</p>
-					</li>
+				<ol class="mt-5">
+					{steps.map((step, index) => (
+						<li class="relative flex gap-4 pb-6 last:pb-0">
+							{index < steps.length - 1 && (
+								<span class="absolute top-10 bottom-0 left-[1.125rem] w-px bg-accent/30" aria-hidden="true" />
+							)}
+							<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-accent/60 bg-base text-sm font-medium text-accent">
+								{index + 1}
+							</span>
+							<div class="min-w-0 pt-1">
+								<h3 class="text-base font-medium text-text">{step.title}</h3>
+								<p class="mt-1 text-sm leading-relaxed text-text/80" set:html={step.body} />
+							</div>
+						</li>
+					))}
 				</ol>
 			</div>
 
 			<div class="mt-8">
 				<SectionHeading title="対象エリア" icon="map" subtitle="STAMP SPOTS" />
-				<ul class="grid grid-cols-2 gap-3 sm:grid-cols-3">
-					{areas.map((area, index) => (
-						<li class="flex min-h-14 items-center gap-3 rounded-lg border border-accent/25 bg-accent/5 px-4 py-3">
-							<span class="text-xs tracking-widest text-accent">0{index + 1}</span>
-							<span class="font-medium">{area}</span>
+				<ul class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
+					{areas.map((area) => (
+						<li class="flex min-h-14 items-center rounded-lg border border-accent/25 bg-accent/5 px-4 py-3 font-medium">
+							{area}
 						</li>
 					))}
 				</ul>
 			</div>
 
-			<p class="mt-6 rounded-lg bg-main/10 px-4 py-3 text-sm leading-relaxed text-text/85">
-				ステッカー交換の際は、リストバンドをご提示ください。
+			<p class="mt-8 text-xs leading-relaxed text-text/70">
+				※FesFlowは、情報部が開発した文化祭の模擬店運営と来場者の楽しさを支えるシステムです。注文・売上管理から事前注文、スタンプラリーまでをひとつにまとめ、運営をスムーズにします。
 			</p>
 		</section>
 	</main>
