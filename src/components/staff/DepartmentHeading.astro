@@ -7,12 +7,11 @@
  *
  * 画像がない部署は、同じ背景（光線・照明機材・六角形・霞・ロゴ。画像は共通の 1 枚）の上に、
  * 部署名・二重線・英語名を重ねて、完成画像と同じ見た目にする。
- * 書体は完成画像に近いもの（日本語: Yusei Magic、英語: Oxanium）。
+ * 書体は、部署名がサイト共通の Kiwi Maru のまま、英語名だけ完成画像に近い Oxanium。
  * 位置と大きさは完成画像（機材部）を測った値で、バナー自身の幅を基準（cqw）にしているので、
  * カードが 1 列でも 2 列でも同じ見た目で拡縮する。
  */
 import '@fontsource/oxanium/500.css';
-import '@fontsource/yusei-magic/400.css';
 
 interface Props {
 	department: string;
@@ -24,19 +23,17 @@ const { department, englishName, bannerImage } = Astro.props;
 
 /*
  * 部署名の大きさ。完成画像（3 文字）の大きさを上限に、名前が長い部署
- * （当日運営部門など）でも幅 56% に収まるように縮める。二重線は部署名より少し広く引く。
- * 完成画像の書体は縦長なので、Yusei Magic は大きめに出して横に 0.75 倍へ詰める（TITLE_SQUEEZE）。
+ * （当日運営部門など）でも幅 58% に収まるように縮める。二重線は部署名より少し広く引く。
  */
-const TITLE_SQUEEZE = 0.75;
 const titleChars = Array.from(department).length;
-const titleSize = Math.min(14, 56 / (titleChars * TITLE_SQUEEZE));
-const ruleWidth = Math.max(47.5, titleChars * titleSize * TITLE_SQUEEZE + 14);
+const titleSize = Math.min(11.6, 58 / titleChars);
+const ruleWidth = Math.max(47.5, titleChars * titleSize + 14);
 
 /* 英語名も同じく、長いもの（Day-of Operations Division など）は縮めて幅に収める。 */
 const enSize = englishName ? Math.min(3.3, 60 / (Array.from(englishName).length * 0.6)) : 3.3;
 ---
 
-<div class="dept-banner" style={`--title-size: ${titleSize.toFixed(2)}cqw; --squeeze: ${TITLE_SQUEEZE}; --rule-width: ${ruleWidth.toFixed(2)}cqw; --en-size: ${enSize.toFixed(2)}cqw;`}>
+<div class="dept-banner" style={`--title-size: ${titleSize.toFixed(2)}cqw; --rule-width: ${ruleWidth.toFixed(2)}cqw; --en-size: ${enSize.toFixed(2)}cqw;`}>
 	{bannerImage ? (
 		<>
 			<img src={bannerImage} alt="" width="1280" height="720" loading="lazy" decoding="async" class="dept-bg" />
@@ -84,11 +81,9 @@ const enSize = englishName ? Math.min(3.3, 60 / (Array.from(englishName).length 
 	}
 
 	.dept-title {
-		transform: translate(-50%, -50%) scaleX(var(--squeeze));
-		top: 47.4%;
-		font-family: 'Yusei Magic', var(--font-primary);
+		top: 48.6%;
 		font-size: var(--title-size);
-		font-weight: 400;
+		font-weight: 500;
 		line-height: 1;
 		letter-spacing: 0.04em;
 	}
@@ -106,8 +101,8 @@ const enSize = englishName ? Math.min(3.3, 60 / (Array.from(englishName).length 
 
 	.dept-en {
 		top: 67.4%;
-		font-family: 'Oxanium', var(--font-primary);
 		font-size: var(--en-size);
+		font-family: 'Oxanium', var(--font-primary);
 		font-weight: 500;
 		line-height: 1;
 		letter-spacing: 0.03em;

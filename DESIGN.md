@@ -18,7 +18,7 @@
 
 本文の基本サイズは 16px とする。情報の重要度が下がる箇所に限って 15px または 13px を使う。長文には `leading-relaxed` を付ける。
 
-- 例外: `/staff` の部署カード冒頭（`DepartmentHeading`）は、部署ごとの完成バナー画像（`bannerImage`）の見た目に合わせる。画像がない部署は、共通の背景画像（`public/images/staff/department-banner-bg.webp`）の上に、部署名（Yusei Magic）と英語名（Oxanium）を白で重ねる。この 2 書体はこのバナーだけに使い、他の箇所には使わない。大きさはバナー幅を基準にした値（`cqw`）にする。光線（`bg-main`）に白い文字を重ねるのも、完成画像と揃えるための例外。詳細は [`docs/design/03-design.md`](docs/design/03-design.md) の 3.7.1 を参照。
+- 例外: `/staff` の部署カード冒頭（`DepartmentHeading`）は、部署ごとの完成バナー画像（`bannerImage`）の見た目に合わせる。画像がない部署は、共通の背景画像（`public/images/staff/department-banner-bg.webp`）の上に、部署名と英語名を白で重ねる。書体は、部署名が他のページと同じ Kiwi Maru、英語名だけ完成画像に近い Oxanium（このバナーだけに使う）。大きさはバナー幅を基準にした値（`cqw`）にする。光線（`bg-main`）に白い文字を重ねるのも、完成画像と揃えるための例外。詳細は [`docs/design/03-design.md`](docs/design/03-design.md) の 3.7.1 を参照。
 
 ## Color and contrast
 
