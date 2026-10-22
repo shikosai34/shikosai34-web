@@ -14,22 +14,25 @@ const address = '〒312-8508 茨城県ひたちなか市中根866';
 // 勝田駅〜深谷津（スマイルあおぞらバス）は往復とも小学生以上 100 円、小学生未満は無料。
 const busFares = BUS_FARES;
 
-// 高専へ向かうバスのルート（勝田駅2番のりば発）。運賃は busFares から引く。
+// 高専へ向かうバスのルート（茨城交通は勝田駅2番のりば、スマイルあおぞらバスは1番のりば発）。運賃は busFares から引く。
 const busCourses = [
 	{
 		operator: '茨城交通',
+		platform: '2番のりば',
 		stop: '茨城高専前',
 		note: '下車後、北へ進むと正門です。',
 		fareId: 'kosen',
 	},
 	{
 		operator: '茨城交通',
+		platform: '2番のりば',
 		stop: '深谷津',
 		note: '深谷津は高専の裏手にあるバス停です。',
 		fareId: 'fukayatsu',
 	},
 	{
 		operator: 'スマイルあおぞらバス',
+		platform: '1番のりば',
 		stop: '深谷津',
 		note: '深谷津は高専の裏手にあるバス停です。',
 		fareId: 'fukayatsu-smile',
@@ -120,14 +123,14 @@ const shuttleRoutes = BUS_ROUTES.filter((route) => route.shuttleTimes.length > 0
 				<section aria-labelledby="bus-heading">
 					<h2 id="bus-heading" class="border-b-2 border-text/25 pb-2 text-xl font-medium text-text">バスでのご来校</h2>
 					<p class="mt-4 text-sm leading-relaxed text-text/80">
-						高専へのバスルートは3つあります。JR勝田駅東口を出て左側の2番のりばから乗車してください。運賃は片道です。
+						高専へのバスルートは3つあります。JR勝田駅東口から乗車してください。運賃は片道です。
 					</p>
 					<ul class="mt-3 space-y-3">
 						{
 							busCourses.map((course) => (
 								<li class="rounded-xl border border-text/20 bg-base p-4">
 									<p class="font-medium text-text">
-										{course.operator} 勝田駅2番のりば → <strong class="font-medium text-main">{course.stop}</strong>
+										{course.operator} 勝田駅{course.platform} → <strong class="font-medium text-main">{course.stop}</strong>
 									</p>
 									<p class="mt-1 text-sm leading-relaxed text-text/80">{course.note}</p>
 									<p class="mt-2 text-sm text-text/80">
