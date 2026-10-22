@@ -750,11 +750,11 @@ collections:
         widget: string
         required: false
         hint: '見出しバナーの部署名の下に表示します。例: Equipment Division。未入力なら表示しません。'
-      - label: 見出しバナーの背景画像
+      - label: 見出しバナーの画像
         name: bannerImage
         widget: image-r2
         required: false
-        hint: '部署名の後ろに敷く 16:9 の画像です。部署名と英語名は入れないでください（文字はサイト側で重ねます）。未設定の場合は、オレンジの光線の背景で表示します。'
+        hint: '部署名・英語名を入れた完成済みの 16:9 の画像です。そのまま見出しとして表示します。未設定の場合は、部署名と英語名を使ってオレンジの光線のバナーを自動で作ります。'
       - label: 部署の名簿
         name: members
         widget: list

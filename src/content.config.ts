@@ -278,7 +278,7 @@ const staff = defineCollection({
 			.default([]),
 		/** 見出しバナーに添える英語名（例: Equipment Division）。未入力なら表示しない。 */
 		englishName: z.string().optional(),
-		/** 見出しバナーの背景画像（16:9、文字なし）。未設定ならコードで描いた光線の背景で表示する。 */
+		/** 見出しバナーの完成画像（16:9、文字入り）。未設定ならコードで描いた光線のバナーで表示する。 */
 		bannerImage: z.string().optional(),
 		description: z.string().min(1),
 		image: z.string().optional(),

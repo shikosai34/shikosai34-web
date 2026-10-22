@@ -2,15 +2,12 @@
 /*
  * 部署紹介カードの見出しバナー（/staff）。
  *
- * 部署名を大きく置き、斜めに伸びるオレンジの光線（舞台照明）と六角形の線画、霞、ロゴで飾る。
- * 部署ごとに変えるのは、部署名・英語名・背景画像。英語名と背景画像は CMS で任意に設定できる。
+ * 部署ごとに完成したバナー画像（bannerImage、16:9）があれば、それをそのまま表示する。
+ * 画像の中の文字は読み上げられないので、部署名と英語名は見えない見出しとして添える。
  *
- * 背景画像（bannerImage、16:9・文字なし）があれば、それを敷いて文字を重ねる。
- * 光線・ロゴ・照明機材などの絵はすべて画像に含まれる。文字は光線にまたがるため、
- * 濃紺の縁取りで浮かせる（global.css の .outlined-text）。
- *
- * 背景画像がない部署は、同じ構図をコードで描く（光線・六角形・霞・ロゴ）。
- * こちらは光線の位置が分かっているので、同じ文字を 2 枚重ね、
+ * 画像がない部署は、同じ構図をコードで描く。部署名を大きく置き、
+ * 斜めに伸びるオレンジの光線（舞台照明）と六角形の線画、霞、ロゴで飾る。
+ * 文字は光線にまたがるため、同じ文字を 2 枚重ね、
  * 光線の外は白系・光線の中は濃紺と clip-path で出し分ける
  * （どちらの面でも DESIGN.md のコントラストの組み合わせになる）。
  *
@@ -69,21 +66,19 @@ const HEX_CENTERS: Array<[number, number]> = [
 ];
 const hexes = HEX_CENTERS.map(([x, y]) => hexPath(x, y)).join(' ');
 
-/*
- * 文字の重ね方。背景画像があれば 1 枚（縁取り）、なければ 2 枚重ねて
- * 光線の外（白系）と中（濃紺）に出し分ける。
- */
-const layers = bannerImage
-	? ([{ key: 'plain', hidden: false }] as const)
-	: ([
-			{ key: 'outside', hidden: false },
-			{ key: 'inside', hidden: true },
-		] as const);
+/* 文字の 2 枚重ね。光線の外（白系）と中（濃紺）。 */
+const layers = [
+	{ key: 'outside', hidden: false },
+	{ key: 'inside', hidden: true },
+] as const;
 ---
 
 <div class="dept-banner" style={`--title-size: ${titleSize.toFixed(2)}cqw; --en-size: ${enSize.toFixed(2)}cqw;`}>
 	{bannerImage ? (
-		<img src={bannerImage} alt="" width="1920" height="1080" loading="lazy" decoding="async" class="dept-bg" />
+		<>
+			<img src={bannerImage} alt="" width="1920" height="1080" loading="lazy" decoding="async" class="dept-bg" />
+			<h3 class="sr-only">{englishName ? `${department}（${englishName}）` : department}</h3>
+		</>
 	) : (
 		<>
 			<svg class="dept-hex" viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice" fill="none" stroke="currentColor" stroke-width="0.7" stroke-linejoin="round" aria-hidden="true">
@@ -96,18 +91,18 @@ const layers = bannerImage
 			<div class="dept-beam" aria-hidden="true"></div>
 
 			<Image src={logoG} alt="" width={240} class="dept-logo" />
+
+			{layers.map(({ key, hidden }) => (
+				<div class:list={['dept-text', `dept-text--${key}`]} aria-hidden={hidden ? 'true' : undefined}>
+					<div class="dept-text-block">
+						{hidden ? <div class="dept-title">{department}</div> : <h3 class="dept-title">{department}</h3>}
+						<div class="dept-rule"></div>
+						{englishName && (hidden ? <div class="dept-en" lang="en">{englishName}</div> : <p class="dept-en" lang="en">{englishName}</p>)}
+					</div>
+				</div>
+			))}
 		</>
 	)}
-
-	{layers.map(({ key, hidden }) => (
-		<div class:list={['dept-text', `dept-text--${key}`]} aria-hidden={hidden ? 'true' : undefined}>
-			<div class="dept-text-block">
-				{hidden ? <div class="dept-title">{department}</div> : <h3 class="dept-title">{department}</h3>}
-				<div class="dept-rule"></div>
-				{englishName && (hidden ? <div class="dept-en" lang="en">{englishName}</div> : <p class="dept-en" lang="en">{englishName}</p>)}
-			</div>
-		</div>
-	))}
 </div>
 
 <style>
@@ -191,19 +186,6 @@ const layers = bannerImage
 		--rule-a: var(--color-accent);
 		--rule-b: color-mix(in srgb, var(--color-accent) 55%, var(--color-text));
 		clip-path: polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0, var(--beam), 8% 94%);
-	}
-
-	/* 背景画像の上: 白系の文字を濃紺の縁で浮かせる。 */
-	.dept-text--plain {
-		color: var(--color-text);
-		--rule-a: var(--color-accent);
-		--rule-b: var(--color-accent);
-	}
-
-	.dept-text--plain .dept-title,
-	.dept-text--plain .dept-en {
-		paint-order: stroke fill;
-		-webkit-text-stroke: 1.2cqw var(--color-base);
 	}
 
 	/* 光線の中: 濃紺の文字（オレンジの上で読める組み合わせ）。 */
