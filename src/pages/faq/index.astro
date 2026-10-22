@@ -32,31 +32,10 @@ const answers = await Promise.all(sortedEntries.map((entry) => render(entry)));
 			{categories.length === 0 ? (
 				<p class="py-8 text-center text-sm text-text/70">よくある質問は準備中です。</p>
 			) : (
-				<div data-faq class="group/faq">
-					<div
-						role="tablist"
-						aria-label="質問の種類"
-						data-faq-tablist
-						class="mb-6 hidden gap-1.5 overflow-x-auto sm:gap-2 group-data-[enhanced]/faq:flex"
-					>
-						{categories.map((category, i) => (
-							<button
-								type="button"
-								role="tab"
-								id={`faq-tab-${i}`}
-								aria-controls={`faq-panel-${i}`}
-								aria-selected={i === 0 ? 'true' : 'false'}
-								tabindex={i === 0 ? 0 : -1}
-								class="min-h-10 flex-auto whitespace-nowrap rounded-full border border-text/30 px-2 py-1.5 text-xs text-text sm:px-4 sm:text-sm transition-colors hover:border-main aria-selected:border-main aria-selected:bg-main aria-selected:font-medium aria-selected:text-on-main"
-							>
-								{category}
-							</button>
-						))}
-					</div>
-					<div class="space-y-8">
+				<div class="space-y-8">
 					{categories.map((category, i) => (
-						<section id={`faq-panel-${i}`} data-faq-panel aria-labelledby={`faq-heading-${i}`}>
-							<h2 id={`faq-heading-${i}`} class="mb-3 border-b border-accent/30 pb-2 text-lg font-medium text-accent group-data-[enhanced]/faq:hidden">
+						<section aria-labelledby={`faq-heading-${i}`}>
+							<h2 id={`faq-heading-${i}`} class="mb-3 border-b border-accent/30 pb-2 text-lg font-medium text-accent">
 								{category}
 							</h2>
 							<div class="space-y-3">
@@ -97,7 +76,6 @@ const answers = await Promise.all(sortedEntries.map((entry) => render(entry)));
 							</div>
 						</section>
 					))}
-					</div>
 				</div>
 			)}
 
@@ -109,51 +87,6 @@ const answers = await Promise.all(sortedEntries.map((entry) => render(entry)));
 
 	<SiteFooter />
 </Layout>
-
-<script>
-	// JS が使えるときだけ、質問の種類ごとのタブ表示に切り替える。
-	// 使えない場合はすべての質問を種類ごとの見出し付きで並べて表示する。
-	const root = document.querySelector<HTMLElement>('[data-faq]');
-	if (root) {
-		const tablist = root.querySelector<HTMLElement>('[data-faq-tablist]')!;
-		const tabs = [...tablist.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
-		const panels = [...root.querySelectorAll<HTMLElement>('[data-faq-panel]')];
-
-		const select = (index: number, focus = false) => {
-			tabs.forEach((tab, i) => {
-				tab.setAttribute('aria-selected', String(i === index));
-				tab.tabIndex = i === index ? 0 : -1;
-			});
-			panels.forEach((panel, i) => {
-				panel.hidden = i !== index;
-			});
-			if (focus) tabs[index].focus();
-		};
-
-		tabs.forEach((tab, i) => {
-			tab.addEventListener('click', () => select(i));
-			tab.addEventListener('keydown', (event) => {
-				const last = tabs.length - 1;
-				const next =
-					event.key === 'ArrowRight' ? (i === last ? 0 : i + 1)
-					: event.key === 'ArrowLeft' ? (i === 0 ? last : i - 1)
-					: event.key === 'Home' ? 0
-					: event.key === 'End' ? last
-					: -1;
-				if (next === -1) return;
-				event.preventDefault();
-				select(next, true);
-			});
-		});
-
-		panels.forEach((panel, i) => {
-			panel.setAttribute('role', 'tabpanel');
-			panel.setAttribute('aria-labelledby', `faq-tab-${i}`);
-		});
-		root.dataset.enhanced = '';
-		select(0);
-	}
-</script>
 
 <style>
 	.faq-answer :global(p + p) {
