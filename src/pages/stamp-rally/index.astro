@@ -1,0 +1,112 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import SiteHeader from '../../components/layout/SiteHeader.astro';
+import SectionHeading from '../../components/ui/SectionHeading';
+import StickerCard from '../../components/stamp-rally/StickerCard';
+import stickerImage from '../../assets/stamp-rally/clear-sticker.webp';
+
+/** 対象エリアと、会場マップ（/map）で開く場所 */
+const areas = [
+	{ name: '大教室', href: '/map?room=5-104' },
+	{ name: '図書館棟', href: `/map?building=${encodeURIComponent('図書館棟')}` },
+	{ name: '8号館', href: `/map?building=${encodeURIComponent('8号館')}` },
+	{ name: 'グラウンド', href: '/map?room=ground' },
+	{ name: '1号館', href: `/map?building=${encodeURIComponent('1号館')}` },
+];
+
+const steps = [
+	{
+		title: 'FesFlowでお買い物',
+		body: '買ったサークルの<span class="inline-block">サークルカットを</span><span class="inline-block">スタンプとして</span><span class="inline-block">集めることができます。</span>',
+	},
+	{
+		title: '3エリア以上で集める',
+		body: '下の5か所のうち、<span class="inline-block">3か所以上で、</span><span class="inline-block">それぞれスタンプを</span><span class="inline-block">1つずつ集めてください。</span>',
+	},
+	{
+		title: 'ステッカーをGET',
+		body: 'インフォメーションへ行き、<span class="inline-block">リストバンドを見せると</span><span class="inline-block">ステッカーがもらえます。</span>',
+	},
+];
+---
+
+<Layout
+	title="スタンプラリー | 第34回 茨香祭"
+	description="FesFlowでお買い物をして、対象エリア3か所以上でスタンプを集めると、オリジナルクリアステッカーがもらえます。"
+>
+	<SiteHeader />
+
+	<main class="mx-auto w-full max-w-3xl px-4 pb-16 sm:px-6">
+		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
+			<SectionHeading title="スタンプラリー" icon="sparkles" subtitle="STAMP RALLY" />
+
+			<div class="bracket-frame mt-7 grid items-center gap-8 rounded-xl px-5 py-8 sm:grid-cols-[1fr_auto] sm:gap-10 sm:px-10 sm:py-10">
+				<div class="text-center sm:text-left">
+					<p class="text-lg font-medium leading-relaxed sm:text-xl">
+						<span class="inline-block">サークルを回って</span>
+						<span class="inline-block">オリジナルクリア</span><span class="inline-block">ステッカーを</span>
+						<span class="inline-block text-main">GETしよう！</span>
+					</p>
+					<p class="mt-4 text-sm leading-relaxed text-text/80">
+						FesFlowでお買い物をして、<span class="inline-block">対象エリア3か所以上で</span><span class="inline-block">スタンプを集めてください。</span>
+					</p>
+				</div>
+				<div>
+					<StickerCard
+						client:visible
+						src={stickerImage.src}
+						width={stickerImage.width}
+						height={stickerImage.height}
+						alt="第34回茨香祭 オリジナルクリアステッカー。テーマ「守破離」のビジュアルが描かれている。"
+					/>
+					<p class="mt-3 text-center text-xs leading-relaxed text-text/70">※画像はイメージです。</p>
+				</div>
+			</div>
+
+			<div class="mt-8">
+				<SectionHeading title="参加方法" icon="info" subtitle="HOW TO JOIN" />
+				<ol class="mt-5">
+					{steps.map((step, index) => (
+						<li class="relative flex gap-4 pb-6 last:pb-0">
+							{index < steps.length - 1 && (
+								<span class="absolute top-10 bottom-0 left-[1.125rem] w-px bg-accent/30" aria-hidden="true" />
+							)}
+							<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-accent/60 bg-base text-sm font-medium text-accent">
+								{index + 1}
+							</span>
+							<div class="min-w-0 pt-1">
+								<h3 class="text-base font-medium text-text">{step.title}</h3>
+								<p class="mt-1 text-sm leading-relaxed text-text/80" set:html={step.body} />
+							</div>
+						</li>
+					))}
+				</ol>
+			</div>
+
+			<div class="mt-8">
+				<SectionHeading title="対象エリア" icon="map" subtitle="STAMP SPOTS" />
+				<p class="mt-3 text-sm leading-relaxed text-text/80">タップすると、会場マップで場所を確認できます。</p>
+				<ul class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+					{areas.map((area) => (
+						<li>
+							<a
+								href={area.href}
+								class="flex min-h-14 items-center justify-between gap-2 rounded-lg border border-accent/25 bg-accent/5 px-4 py-3 font-medium text-text transition-colors hover:border-accent/60 hover:bg-accent/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+							>
+								{area.name}
+								<span class="text-accent" aria-hidden="true">›</span>
+							</a>
+						</li>
+					))}
+				</ul>
+			</div>
+
+			<p class="mt-8 text-xs leading-relaxed text-text/70">
+				※FesFlowは、情報部が開発した文化祭の模擬店運営と来場者の楽しさを支えるシステムです。注文・売上管理から事前注文、スタンプラリーまでをひとつにまとめ、運営をスムーズにします。
+			</p>
+		</section>
+	</main>
+
+	<SiteFooter />
+</Layout>
