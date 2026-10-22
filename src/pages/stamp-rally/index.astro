@@ -41,25 +41,24 @@ const steps = [
 		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
 			<SectionHeading title="スタンプラリー" icon="sparkles" subtitle="STAMP RALLY" />
 
-			<div class="bracket-frame mt-7 rounded-xl px-5 py-7 text-center sm:px-8 sm:py-9">
-				<p class="text-lg font-medium leading-relaxed sm:text-xl">
-					<span class="inline-block">サークルを回って</span>
-					<span class="inline-block">オリジナルクリアステッカーを</span>
-					<span class="inline-block text-main">GETしよう！</span>
-				</p>
-			</div>
-
-			<div class="mt-8">
-				<SectionHeading title="もらえるステッカー" icon="badge" subtitle="CLEAR STICKER" />
-				<div class="mt-5">
-					<StickerCard
-						client:visible
-						src={stickerImage.src}
-						width={stickerImage.width}
-						height={stickerImage.height}
-						alt="第34回茨香祭 オリジナルクリアステッカー。テーマ「守破離」のビジュアルが描かれている。"
-					/>
+			<div class="bracket-frame mt-7 grid items-center gap-8 rounded-xl px-5 py-8 sm:grid-cols-[1fr_auto] sm:gap-10 sm:px-10 sm:py-10">
+				<div class="text-center sm:text-left">
+					<p class="text-lg font-medium leading-relaxed sm:text-xl">
+						<span class="inline-block">サークルを回って</span>
+						<span class="inline-block">オリジナルクリア</span><span class="inline-block">ステッカーを</span>
+						<span class="inline-block text-main">GETしよう！</span>
+					</p>
+					<p class="mt-4 text-sm leading-relaxed text-text/80">
+						FesFlowでお買い物をして、<span class="inline-block">対象エリア3か所以上で</span><span class="inline-block">スタンプを集めてください。</span>
+					</p>
 				</div>
+				<StickerCard
+					client:visible
+					src={stickerImage.src}
+					width={stickerImage.width}
+					height={stickerImage.height}
+					alt="第34回茨香祭 オリジナルクリアステッカー。テーマ「守破離」のビジュアルが描かれている。"
+				/>
 			</div>
 
 			<div class="mt-8">

@@ -92,7 +92,7 @@ export default function StickerCard({ src, alt, width, height }: Props) {
 	return (
 		<div
 			ref={cardRef}
-			className="holo-card interactive mx-auto w-full max-w-[17rem]"
+			className="holo-card interactive mx-auto w-full max-w-[15rem] sm:max-w-[16rem]"
 			data-rarity="rare rainbow alt"
 			style={
 				{
