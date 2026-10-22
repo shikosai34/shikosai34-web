@@ -119,7 +119,8 @@ export function RoomDetail({ room, use, items, onBack }: DetailProps) {
 
 function Thumb({ item, className }: { item: MapExhibit; className: string }) {
 	return item.image ? (
-		<img src={item.image} alt="" loading="lazy" className={`${className} shrink-0 rounded-sm object-cover`} />
+		// サークルカットは正方形の枠に、切らずに収める
+		<img src={item.image} alt="" loading="lazy" className={`${className} shrink-0 rounded-sm bg-base/40 object-contain`} />
 	) : (
 		<span className={`${className} kikko block shrink-0 rounded-sm bg-text/5`} aria-hidden="true" />
 	);

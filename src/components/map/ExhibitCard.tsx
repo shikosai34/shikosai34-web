@@ -10,7 +10,8 @@ export default function ExhibitCard({ item }: { item: MapExhibit }) {
 	const when = item.time ?? item.schedule;
 	return (
 		<article className="flex flex-col gap-1.5">
-			{item.image && <img src={item.image} alt="" loading="lazy" className="h-24 w-full rounded-sm object-cover" />}
+			{/* サークルカットは正方形の枠に、切らずに収める */}
+			{item.image && <img src={item.image} alt="" loading="lazy" className="aspect-square w-28 self-start rounded-sm bg-base/40 object-contain" />}
 			<p className="flex items-center gap-2 text-xs text-text/80">
 				<span className="inline-block h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: group.color }} aria-hidden="true" />
 				{group.label}

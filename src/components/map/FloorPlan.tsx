@@ -182,13 +182,31 @@ function Room({ room, use, exhibits, active, dimmed, onHover, onPoint, onPick }:
 	const titleSize = w > 100 ? 12 : 11;
 	const more = exhibits.length > 1 ? ` ほか${exhibits.length - 1}件` : '';
 	const titleRoom = ih - (firstLine ? lineHeight(10) + 4 : 0);
-	const showImage = !!main?.image && titleRoom > 50;
-	const horizontal = w >= h * 1.3;
-	const imageW = showImage && horizontal ? Math.min(48, titleRoom) + 6 : 0;
-	const showTitle = !!main && titleRoom >= lineHeight(titleSize) && textWidth(main.title + more, titleSize) <= iw - imageW;
+	/*
+	 * サークルカットは、必ず正方形で、部屋の中に収まる大きさにする（はみ出さない・切れない）。
+	 * 部屋の空き（iw × titleRoom）から、次の順に配置を選ぶ。入らなければ画像は出さない（詳細はツールチップ）。
+	 *   1. 画像の右に出展名（横並び） 2. 画像の下に出展名（縦並び） 3. 画像だけ
+	 */
+	const MIN_IMAGE = 26;
+	const MAX_IMAGE = 72;
+	const GAP = 4;
+	const titleText = main ? main.title + more : '';
+	const titleW = main ? textWidth(titleText, titleSize) : 0;
+	let imageSize = 0;
+	let imageLayout: 'row' | 'column' | 'only' = 'only';
+	if (main?.image) {
+		const row = Math.min(titleRoom, MAX_IMAGE);
+		const column = Math.min(iw, titleRoom - lineHeight(titleSize) - GAP, MAX_IMAGE);
+		const only = Math.min(iw, titleRoom, MAX_IMAGE);
+		if (row >= MIN_IMAGE && titleW <= iw - row - GAP) [imageSize, imageLayout] = [row, 'row'];
+		else if (column >= MIN_IMAGE && titleW <= iw) [imageSize, imageLayout] = [column, 'column'];
+		else if (only >= MIN_IMAGE) [imageSize, imageLayout] = [only, 'only'];
+	}
+	const showImage = imageSize > 0;
+	const showTitle = !!main && titleRoom >= lineHeight(titleSize) && (imageLayout === 'only' && showImage ? false : titleW <= iw - (showImage && imageLayout === 'row' ? imageSize + GAP : 0));
 	// 出展名が入らないときは件数だけ出し、カーソルを当てれば見られることを示す
 	const countText = `●${exhibits.length}`;
-	const showCount = !!main && !showTitle && titleRoom >= lineHeight(11) && textWidth(countText, 11) <= iw;
+	const showCount = !!main && !showTitle && !showImage && titleRoom >= lineHeight(11) && textWidth(countText, 11) <= iw;
 	// 出展のない部屋は、当日の使い道（予選会場・休憩所など）を書く
 	const showUse = !main && !!use && titleRoom >= lineHeight(12) && textWidth(use, 12) <= iw;
 
@@ -286,12 +304,19 @@ function Room({ room, use, exhibits, active, dimmed, onHover, onPoint, onPick }:
 									</div>
 								)}
 								{(showTitle || showCount || showImage) && (
-									<div className={`mt-1 flex min-h-0 flex-1 gap-1.5 ${horizontal ? 'items-center' : 'flex-col items-start'}`}>
+									<div
+										className={`mt-1 flex min-h-0 flex-1 ${imageLayout === 'row' ? 'flex-row items-center' : 'flex-col items-start'}`}
+										style={{ gap: GAP }}
+									>
 										{showImage && (
+											// 正方形の枠に、画像を切らずに収める（contain）。枠は地の色を薄く敷く
 											<img
 												src={main!.image}
 												alt=""
-												className={`${horizontal ? 'aspect-square h-full max-h-[48px]' : 'min-h-0 w-full flex-1'} shrink-0 rounded-sm object-cover`}
+												width={imageSize}
+												height={imageSize}
+												className="shrink-0 rounded-sm bg-base/40 object-contain"
+												style={{ width: imageSize, height: imageSize }}
 											/>
 										)}
 										{showTitle && (
