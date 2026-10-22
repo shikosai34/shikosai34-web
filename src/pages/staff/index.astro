@@ -43,11 +43,6 @@ const demoDepartments = [
 ];
 const departmentEntries = import.meta.env.DEV && cmsDepartments.length === 0 ? demoDepartments : cmsDepartments;
 
-/*
- * 見出しに使う絵の優先順位: 背景画像（bannerImage）→ 既存の写真（image）→ コード描画のバナー。
- * コード描画は、画像が用意されていない部署のつなぎとしてだけ使う。
- * 写真は部署名の文字を重ねず、従来どおり 16:9 で表示して下に部署名を置く。
- */
 const departments = await Promise.all(departmentEntries
 	.sort((a, b) => a.data.sortOrder - b.data.sortOrder || a.data.department.localeCompare(b.data.department, 'ja'))
 	.map(async (department, index) => {
@@ -94,16 +89,10 @@ const departments = await Promise.all(departmentEntries
 				<div class="grid gap-5 md:grid-cols-2">
 					{departments.map(({ data, anchorId, membersByRole, videoId, videoTitle }) => (
 						<article id={anchorId} class="bracket-frame scroll-mt-6 overflow-hidden rounded-xl bg-base/45">
-							{data.image && !data.bannerImage ? (
-								<img src={data.image} alt={`${data.department}の写真`} loading="lazy" class="aspect-[16/9] w-full object-cover" />
-							) : (
-								<DepartmentHeading department={data.department} englishName={data.englishName} bannerImage={data.bannerImage} idPrefix={anchorId} />
-							)}
+							<DepartmentHeading department={data.department} englishName={data.englishName} bannerImage={data.bannerImage} idPrefix={anchorId} />
 							<div class="p-5 sm:p-6">
-								{data.image && !data.bannerImage ? (
-									<h3 class="mb-3 text-lg font-medium text-text">{data.department}</h3>
-								) : (
-									data.image && <img src={data.image} alt={`${data.department}の写真`} loading="lazy" class="mb-5 aspect-[16/9] w-full rounded-lg object-cover" />
+								{data.image && (
+									<img src={data.image} alt={`${data.department}の写真`} loading="lazy" class="mb-5 aspect-[16/9] w-full rounded-lg object-cover" />
 								)}
 								<p class="whitespace-pre-line text-sm leading-7 text-text/80">{data.description}</p>
 								{videoId && (
