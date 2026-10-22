@@ -313,14 +313,31 @@ const REGULAR_TIMES: Record<ScheduleKind, Record<string, OperatorTime[]>> = {
 	},
 };
 
-/** バス運賃（片道・行き帰りとも同額）。茨城交通の運賃（2026/10/18 時点）。改定されたら見直す。 */
-export const BUS_FARES = [
+export interface BusFarePrice {
+	label: string;
+	price: string;
+	/** 運賃の適用条件（人数制限など）。事業者ごとに条件が違うので、該当する運賃にだけ付ける。 */
+	condition?: string;
+}
+
+export interface BusFare {
+	id: string;
+	route: string;
+	prices: BusFarePrice[];
+}
+
+/**
+ * バス運賃（片道・行き帰りとも同額）。茨城交通の運賃（2026/10/18 時点）。改定されたら見直す。
+ * 未就学児は、茨城交通は 2 名まで無料、スマイルあおぞらバスは無料（人数の条件は別。混同しない）。
+ */
+export const BUS_FARES: BusFare[] = [
 	{
 		id: 'kosen',
 		route: '勝田駅〜茨城高専前',
 		prices: [
 			{ label: '大人', price: '240円' },
 			{ label: '小人', price: '120円' },
+			{ label: '未就学児', price: '無料', condition: '2名まで' },
 		],
 	},
 	{
@@ -329,6 +346,7 @@ export const BUS_FARES = [
 		prices: [
 			{ label: '大人', price: '250円' },
 			{ label: '小人', price: '130円' },
+			{ label: '未就学児', price: '無料', condition: '2名まで' },
 		],
 	},
 	{
@@ -339,7 +357,7 @@ export const BUS_FARES = [
 			{ label: '未就学児', price: '無料' },
 		],
 	},
-] as const;
+];
 
 export interface BusDeparture {
 	/** "HH:mm" 形式の出発時刻。 */

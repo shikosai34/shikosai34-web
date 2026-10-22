@@ -139,6 +139,7 @@ const shuttleRoutes = BUS_ROUTES.filter((route) => route.shuttleTimes.length > 0
 											<>
 												{index > 0 && ' / '}
 												{item.label} <span class="font-medium text-text tabular-nums">{item.price}</span>
+												{item.condition && `（${item.condition}）`}
 											</>
 										))}
 									</p>
