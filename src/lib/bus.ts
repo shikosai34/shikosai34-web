@@ -336,7 +336,7 @@ export const BUS_FARES = [
 		route: '勝田駅〜深谷津（スマイルあおぞらバス）',
 		prices: [
 			{ label: '小学生以上', price: '100円' },
-			{ label: '小学生未満', price: '無料' },
+			{ label: '未就学児', price: '無料' },
 		],
 	},
 ] as const;
