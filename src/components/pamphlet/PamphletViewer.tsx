@@ -15,9 +15,11 @@ const DEFAULT_ASPECT = 595.28 / 841.89;
 /** ページ同士の間隔（px）。 */
 const GAP = 16;
 /** スマホで次のページを少しのぞかせるため、1 ページを枠の何割の幅にするか。 */
-const PAGE_WIDTH_RATIO = 0.86;
-/** ビューアより下に確保する余白（ページ番号＋セクションの余白, px）。 */
-const BELOW_RESERVE = 100;
+const PAGE_WIDTH_RATIO = 0.92;
+/** PC で 1 ページを広げすぎない上限（px）。 */
+const MAX_PAGE_WIDTH = 640;
+/** 画面の高さから引く余白（px）。ページが画面の高さをはみ出しすぎないようにする。 */
+const HEIGHT_MARGIN = 80;
 /** 表示中のページから前後何ページ分まで canvas を描くか。離れたページは捨てる。 */
 const RENDER_RANGE = 2;
 
@@ -29,20 +31,14 @@ export default function PamphletViewer({ file }: Props) {
 	const targetRef = useRef<number | null>(null);
 	const [numPages, setNumPages] = useState(0);
 	const [index, setIndex] = useState(0);
-	const [size, setSize] = useState({ width: 0, height: 0, top: 0 });
+	const [size, setSize] = useState({ width: 0, height: 0 });
 	const [aspect, setAspect] = useState(DEFAULT_ASPECT);
 	const [failed, setFailed] = useState(false);
 
 	useEffect(() => {
 		const frame = frameRef.current;
 		if (!frame) return;
-		const update = () =>
-			setSize({
-				width: frame.clientWidth,
-				height: window.innerHeight,
-				// ビューアより上（ヘッダーや説明文）の高さ。ページが 1 画面に収まるよう差し引く。
-				top: frame.getBoundingClientRect().top + window.scrollY,
-			});
+		const update = () => setSize({ width: frame.clientWidth, height: window.innerHeight });
 		update();
 		const observer = new ResizeObserver(update);
 		observer.observe(frame);
@@ -53,9 +49,9 @@ export default function PamphletViewer({ file }: Props) {
 		};
 	}, []);
 
-	// 1 ページの幅は「画面に収まる高さ」と「枠の幅」の小さい方に合わせる。
-	const maxHeight = Math.max(360, size.height - size.top - BELOW_RESERVE);
-	const pageWidth = Math.floor(Math.min(size.width * PAGE_WIDTH_RATIO, maxHeight * aspect));
+	// 1 ページの幅は「枠の幅」「上限」「画面の高さ」のうち最も小さいものに合わせる。
+	const maxHeight = Math.max(360, size.height - HEIGHT_MARGIN);
+	const pageWidth = Math.floor(Math.min(size.width * PAGE_WIDTH_RATIO, MAX_PAGE_WIDTH, maxHeight * aspect));
 	const step = pageWidth + GAP;
 
 	// 画面サイズが変わってページ幅が変わっても、同じページが中央に残るようにする。
@@ -85,7 +81,8 @@ export default function PamphletViewer({ file }: Props) {
 
 	return (
 		<div className="flex flex-col items-center gap-3">
-			<div ref={frameRef} className="w-full">
+			{/* セクションの左右の余白（p-5 / sm:p-8）の分まで広げて、ページを大きく見せる。 */}
+			<div ref={frameRef} className="-mx-5 self-stretch sm:-mx-8">
 				{failed ? (
 					<div className="rounded-xl bg-base/45 p-8 text-center text-base leading-relaxed text-text/85">
 						<p>パンフレットを表示できませんでした。時間をおいて、もう一度お試しください。</p>
