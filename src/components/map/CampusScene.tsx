@@ -1,7 +1,7 @@
 import { CameraControls, CameraControlsImpl, Edges, Html, Line, Stars } from '@react-three/drei';
 import { Canvas, useFrame, useThree, type ThreeEvent } from '@react-three/fiber';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
 import * as THREE from 'three';
 import { EXTINGUISHER_COLOR, PLAN_FILES, project, ROUTE_COLORS, type RouteData } from '../../lib/map';
 import type { MapRoom, Weather } from '../../lib/map-rooms';
@@ -125,6 +125,114 @@ function makeWindowTexture(): THREE.Texture {
 	// ExtrudeGeometry の側面 UV はメートル単位なので、1m → 1/タイル幅 に直す
 	tex.repeat.set(1 / 3, 1 / FLOOR_HEIGHT);
 	return tex;
+}
+
+// ---------------------------------------------------------------------------
+// 地図の文字（建物名・会場名・テントの番号）
+// ---------------------------------------------------------------------------
+
+/*
+ * 文字は 3D の上に重ねた HTML。そのまま全部出すと、狭い画面（スマホ）や引いた視点では
+ * 重なって読めなくなる。そこで毎フレームではなく 10 回/秒ほどのペースで、画面上の位置と大きさから
+ * 「重ならずに出せる文字」を優先度の高い順に選び、選ばれなかった文字はふわっと消す（opacity の遷移）。
+ * 優先度は、選んでいる場所 > 出展のある押せる建物・会場 > ほかの押せる建物 > 押せない建物。
+ * 視点を寄せれば、重なりが解けて消えていた文字が順に浮かんでくる。
+ */
+
+interface LabelEntry {
+	id: string;
+	priority: number;
+	position: THREE.Vector3;
+	/** カメラがこれより遠いと出さない（テントの番号など、寄ったときだけ読めればよい文字） */
+	maxDistance: number;
+	el: RefObject<HTMLDivElement | null>;
+}
+
+interface LabelContextValue {
+	registry: Map<string, LabelEntry>;
+	/** 画面が狭いとき（スマホ）は文字を小さくする */
+	compact: boolean;
+}
+
+const LabelContext = createContext<LabelContextValue | null>(null);
+
+/** 優先度（大きいほど先に場所を取る） */
+const LABEL_PRIORITY = { selected: 100, lit: 60, selectable: 40, tent: 30, plain: 10 } as const;
+
+function LabelManager({ children }: { children: ReactNode }) {
+	const size = useThree((s) => s.size);
+	const registry = useRef(new Map<string, LabelEntry>()).current;
+	const compact = size.width < 640;
+	const value = useMemo(() => ({ registry, compact }), [registry, compact]);
+	const tick = useRef(0);
+	const sizes = useRef(new WeakMap<HTMLElement, { w: number; h: number }>());
+
+	useFrame(({ camera }) => {
+		// 描き直すのは 6 フレームに 1 回（60fps なら 10 回/秒）。文字の出入りは CSS の遷移がなめらかにつなぐ
+		if (tick.current++ % 6 !== 0) return;
+		const pad = compact ? 3 : 5;
+		const placed: { x0: number; y0: number; x1: number; y1: number }[] = [];
+		const v = new THREE.Vector3();
+		const entries = [...registry.values()].sort((a, b) => b.priority - a.priority || (a.id < b.id ? -1 : 1));
+		for (const entry of entries) {
+			const el = entry.el.current;
+			if (!el) continue;
+			let box = sizes.current.get(el);
+			if (!box || box.w === 0) {
+				box = { w: el.offsetWidth, h: el.offsetHeight };
+				sizes.current.set(el, box);
+			}
+			v.copy(entry.position).project(camera);
+			const x = (v.x * 0.5 + 0.5) * size.width;
+			const y = (-v.y * 0.5 + 0.5) * size.height;
+			const rect = { x0: x - box.w / 2 - pad, x1: x + box.w / 2 + pad, y0: y - box.h / 2 - pad, y1: y + box.h / 2 + pad };
+			const onScreen = v.z < 1 && rect.x1 > 0 && rect.x0 < size.width && rect.y1 > 0 && rect.y0 < size.height;
+			const near = entry.position.distanceTo(camera.position) <= entry.maxDistance;
+			const free = !placed.some((p) => rect.x0 < p.x1 && rect.x1 > p.x0 && rect.y0 < p.y1 && rect.y1 > p.y0);
+			// 選んでいる場所の文字は、重なっていても必ず出す
+			const show = onScreen && near && (free || entry.priority >= LABEL_PRIORITY.selected);
+			if (show) placed.push(rect);
+			el.style.opacity = show ? '1' : '0';
+		}
+	});
+
+	return <LabelContext.Provider value={value}>{children}</LabelContext.Provider>;
+}
+
+/** 管理される文字。登録しておくと、LabelManager が重なりを見て出し入れする */
+function MapLabel({
+	id,
+	position,
+	priority,
+	maxDistance = Number.POSITIVE_INFINITY,
+	className,
+	children,
+}: {
+	id: string;
+	position: [number, number, number];
+	priority: number;
+	maxDistance?: number;
+	className: string;
+	children: ReactNode;
+}) {
+	const ctx = useContext(LabelContext)!;
+	const ref = useRef<HTMLDivElement>(null);
+	const vec = useMemo(() => new THREE.Vector3(...position), [position[0], position[1], position[2]]); // eslint-disable-line react-hooks/exhaustive-deps
+	useEffect(() => {
+		ctx.registry.set(id, { id, priority, position: vec, maxDistance, el: ref });
+		return () => {
+			ctx.registry.delete(id);
+		};
+	}, [ctx.registry, id, priority, vec, maxDistance]);
+
+	return (
+		<Html position={position} center zIndexRange={[10, 0]} style={{ pointerEvents: 'none' }}>
+			{/* 最初は見えない状態から始め、LabelManager が選んだものだけ浮かべる */}
+			<div ref={ref} className={`${className} whitespace-nowrap opacity-0 transition-opacity duration-300 motion-reduce:transition-none ${ctx.compact ? 'text-[10px] leading-4' : ''}`}>
+				{children}
+			</div>
+		</Html>
+	);
 }
 
 // ---------------------------------------------------------------------------
@@ -596,14 +704,7 @@ function SlotTents({
 }) {
 	const canopy = useRef<THREE.InstancedMesh>(null);
 	const valance = useRef<THREE.InstancedMesh>(null);
-	const controls = useThree((s) => s.controls) as CameraControlsImpl | null;
-	/** 番号を出すくらい近づいているか。毎フレーム見て、変わったときだけ描き直す */
-	const [near, setNear] = useState(false);
-	useFrame(() => {
-		if (controls && controls.distance < 150 !== near) setNear(!near);
-	});
-
-	// 位置と向き（テントの数は変わらないので、置き直すのは slots が変わったときだけ）
+		// 位置と向き（テントの数は変わらないので、置き直すのは slots が変わったときだけ）
 	useEffect(() => {
 		const m = new THREE.Matrix4();
 		const up = new THREE.Vector3(0, 1, 0);
@@ -647,22 +748,26 @@ function SlotTents({
 				<boxGeometry args={[4.2, 0.6, 4.2]} />
 				<meshBasicMaterial toneMapped={false} />
 			</instancedMesh>
-			{near &&
-				slots.map((slot) => {
-					const [x, y] = project(slot.at!);
-					const chosen = slot.key === selected;
-					return (
-						<Html key={slot.key} position={[x, 4.8 + (slot.inside ? (roofs[slot.inside] ?? 0) + 0.6 : 0), -y]} center zIndexRange={[5, 0]} style={{ pointerEvents: 'none' }}>
-							<div
-								className={`whitespace-nowrap rounded-sm border px-1 text-[11px] leading-4 ${
-									chosen ? 'border-main bg-base text-main' : (counts[slot.key] ?? 0) > 0 ? 'border-accent/60 bg-base/85 text-text' : 'border-transparent bg-base/60 text-text/50'
-								}`}
-							>
-								{slot.number}
-							</div>
-						</Html>
-					);
-				})}
+			{slots.map((slot) => {
+				const [x, y] = project(slot.at!);
+				const chosen = slot.key === selected;
+				const lit = (counts[slot.key] ?? 0) > 0;
+				return (
+					<MapLabel
+						key={slot.key}
+						id={`s-${slot.key}`}
+						position={[x, 4.8 + (slot.inside ? (roofs[slot.inside] ?? 0) + 0.6 : 0), -y]}
+						priority={chosen ? LABEL_PRIORITY.selected : LABEL_PRIORITY.tent + (lit ? 5 : 0)}
+						// 番号は、寄ったときだけ読めればよい
+						maxDistance={170}
+						className={`rounded-sm border px-1 text-[11px] leading-4 ${
+							chosen ? 'border-main bg-base text-main' : lit ? 'border-accent/60 bg-base/85 text-text' : 'border-transparent bg-base/60 text-text/50'
+						}`}
+					>
+						{slot.number}
+					</MapLabel>
+				);
+			})}
 		</group>
 	);
 }
@@ -819,15 +924,16 @@ function RouteMarkers({ markers }: { markers: RouteData['markers'] }) {
 					);
 				}
 				return (
-					<group key={i} position={[x, 0, -y]}>
-						<mesh position={[0, 1.6, 0]}>
+					<group key={i}>
+						<mesh position={[x, 1.6, -y]}>
 							<boxGeometry args={[m.kind === 'main-gate' ? 4 : 1.4, 3.2, 1.4]} />
 							<meshBasicMaterial color={ROUTE_COLORS.red} toneMapped={false} />
 						</mesh>
+						{/* 文字は入れ子にしない（MapLabel は世界の座標で重なりを見るため） */}
 						{m.name && (
-							<Html position={[0, 5.5, 0]} center zIndexRange={[8, 0]} style={{ pointerEvents: 'none' }}>
-								<div className="whitespace-nowrap rounded-sm border border-glitch/70 bg-base/85 px-1.5 text-xs text-text">{m.name}</div>
-							</Html>
+							<MapLabel id={`m-${i}`} position={[x, 5.5, -y]} priority={LABEL_PRIORITY.tent} className="rounded-sm border border-glitch/70 bg-base/85 px-1.5 text-xs text-text">
+								{m.name}
+							</MapLabel>
 						)}
 					</group>
 				);
@@ -884,9 +990,9 @@ function RestrictedLayer({ areas }: { areas: RouteData['restricted'] }) {
 							<meshBasicMaterial map={texture} transparent opacity={0.8} toneMapped={false} depthWrite={false} />
 						</mesh>
 						<Line points={[...ring, ring[0]].map(([x, y]) => [x, ROUTE_Y + 0.05, -y])} color={ROUTE_COLORS.red} lineWidth={0.5} worldUnits toneMapped={false} />
-						<Html position={[cx, 4, -cy]} center zIndexRange={[8, 0]} style={{ pointerEvents: 'none' }}>
-							<div className="whitespace-nowrap rounded-sm border border-glitch bg-base/90 px-1.5 text-xs font-medium text-text">立入禁止{a.name ? `（${a.name}）` : ''}</div>
-						</Html>
+						<MapLabel id={`r-${a.id}`} position={[cx, 4, -cy]} priority={LABEL_PRIORITY.lit} className="rounded-sm border border-glitch bg-base/90 px-1.5 text-xs font-medium text-text">
+							立入禁止{a.name ? `（${a.name}）` : ''}
+						</MapLabel>
 					</group>
 				);
 			})}
@@ -1087,6 +1193,7 @@ export default function CampusScene({ campus, counts, places, routes, showExting
 			onPointerMissed={onBackgroundClick}
 			aria-hidden="true"
 		>
+			<LabelManager>
 			<color attach="background" args={[air.sky]} />
 			<fog attach="fog" args={[air.sky, air.fogNear, air.fogFar]} />
 			{air.stars && <Stars radius={700} depth={120} count={lowPower ? 800 : 2000} factor={5} fade speed={animate ? 0.4 : 0} />}
@@ -1146,23 +1253,25 @@ export default function CampusScene({ campus, counts, places, routes, showExting
 					);
 				})()}
 
-			{/* 建物名 */}
+			{/* 建物名・会場名。重なるものは優先度の高いほうだけ出し、ほかはふわっと消える */}
 			{buildings
 				.filter((b) => b.name && !b.bridge)
 				.map((b) => {
 					const count = counts[b.name!] ?? 0;
 					const major = selectable(b.name);
+					const priority =
+						selected === b.name ? LABEL_PRIORITY.selected : major && count > 0 ? LABEL_PRIORITY.lit + Math.min(count, 30) / 10 : major ? LABEL_PRIORITY.selectable : LABEL_PRIORITY.plain;
 					return (
-						<Html key={`label-${b.id}`} position={[b.center[0], b.height + 2, -b.center[1]]} center zIndexRange={[10, 0]} style={{ pointerEvents: 'none' }}>
-							<div
-								className={`whitespace-nowrap rounded-sm border px-1.5 py-0.5 ${
-									major ? 'border-accent/70 bg-base/85 text-sm text-text' : 'border-transparent bg-base/50 text-xs text-text/60'
-								}`}
-							>
-								{b.name}
-								{count > 0 && <span className="ml-1 text-main">●{count}</span>}
-							</div>
-						</Html>
+						<MapLabel
+							key={`label-${b.id}`}
+							id={`b-${b.id}`}
+							position={[b.center[0], b.height + 2, -b.center[1]]}
+							priority={priority}
+							className={`rounded-sm border px-1.5 py-0.5 ${major ? 'border-accent/70 bg-base/85 text-sm text-text' : 'border-transparent bg-base/50 text-xs text-text/60'}`}
+						>
+							{b.name}
+							{count > 0 && <span className="ml-1 text-main">●{count}</span>}
+						</MapLabel>
 					);
 				})}
 			{places
@@ -1170,13 +1279,12 @@ export default function CampusScene({ campus, counts, places, routes, showExting
 				.map((p) => {
 					const [x, y] = project(p.at!);
 					const count = counts[p.key] ?? 0;
+					const priority = selected === p.key ? LABEL_PRIORITY.selected : count > 0 ? LABEL_PRIORITY.lit + Math.min(count, 30) / 10 : LABEL_PRIORITY.selectable;
 					return (
-						<Html key={`label-${p.key}`} position={[x, 10, -y]} center zIndexRange={[10, 0]} style={{ pointerEvents: 'none' }}>
-							<div className="whitespace-nowrap rounded-sm border border-glow-pink/70 bg-base/85 px-1.5 py-0.5 text-sm text-text">
-								{p.name}
-								{count > 0 && <span className="ml-1 text-main">●{count}</span>}
-							</div>
-						</Html>
+						<MapLabel key={`label-${p.key}`} id={`p-${p.key}`} position={[x, 10, -y]} priority={priority} className="rounded-sm border border-glow-pink/70 bg-base/85 px-1.5 py-0.5 text-sm text-text">
+							{p.name}
+							{count > 0 && <span className="ml-1 text-main">●{count}</span>}
+						</MapLabel>
 					);
 				})}
 
@@ -1187,6 +1295,7 @@ export default function CampusScene({ campus, counts, places, routes, showExting
 					<Bloom mipmapBlur intensity={0.9} luminanceThreshold={0.75} luminanceSmoothing={0.2} />
 				</EffectComposer>
 			)}
+			</LabelManager>
 		</Canvas>
 	);
 }
