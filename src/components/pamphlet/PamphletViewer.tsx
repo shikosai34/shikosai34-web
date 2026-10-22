@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import type { KeyboardEvent, PointerEvent } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import type { KeyboardEvent } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 
 // pdf.js のワーカーは、このビューアを開いたときだけ読み込む（トップなど他ページには影響しない）。
@@ -12,26 +12,23 @@ interface Props {
 
 /** A4 縦。PDF を読み込む前の仮の縦横比。 */
 const DEFAULT_ASPECT = 595.28 / 841.89;
-/** この幅以上なら見開きで表示する（px）。 */
-const SPREAD_MIN_WIDTH = 720;
-/** ビューアより下に確保する余白（ページ送りバー＋セクションの余白, px）。 */
-const BELOW_RESERVE = 130;
-/** スワイプとみなす最小の横移動量（px）。 */
-const SWIPE_DISTANCE = 48;
-
-/** 表紙だけ単独、以降は 2 ページずつ。最終ページが余れば単独。 */
-function spreadOf(page: number, numPages: number, spread: boolean): number[] {
-	if (!spread) return [page];
-	if (page === 1) return [1];
-	const left = page % 2 === 0 ? page : page - 1;
-	return left + 1 <= numPages ? [left, left + 1] : [left];
-}
+/** ページ同士の間隔（px）。 */
+const GAP = 16;
+/** スマホで次のページを少しのぞかせるため、1 ページを枠の何割の幅にするか。 */
+const PAGE_WIDTH_RATIO = 0.86;
+/** ビューアより下に確保する余白（ページ番号＋セクションの余白, px）。 */
+const BELOW_RESERVE = 100;
+/** 表示中のページから前後何ページ分まで canvas を描くか。離れたページは捨てる。 */
+const RENDER_RANGE = 2;
 
 export default function PamphletViewer({ file }: Props) {
 	const frameRef = useRef<HTMLDivElement>(null);
-	const swipeStart = useRef<{ x: number; y: number } | null>(null);
+	const scrollerRef = useRef<HTMLDivElement>(null);
+	const indexRef = useRef(0);
+	/** キーでスクロール中の移動先。連打しても、移動先から数えて進めるため。 */
+	const targetRef = useRef<number | null>(null);
 	const [numPages, setNumPages] = useState(0);
-	const [page, setPage] = useState(1);
+	const [index, setIndex] = useState(0);
 	const [size, setSize] = useState({ width: 0, height: 0, top: 0 });
 	const [aspect, setAspect] = useState(DEFAULT_ASPECT);
 	const [failed, setFailed] = useState(false);
@@ -56,53 +53,38 @@ export default function PamphletViewer({ file }: Props) {
 		};
 	}, []);
 
-	const spread = size.width >= SPREAD_MIN_WIDTH;
-	const current = spreadOf(page, numPages, spread);
-	const prevStart = current[0] - 1;
-	const nextStart = current[current.length - 1] + 1;
-	const hasPrev = prevStart >= 1;
-	const hasNext = nextStart <= numPages;
-
 	// 1 ページの幅は「画面に収まる高さ」と「枠の幅」の小さい方に合わせる。
 	const maxHeight = Math.max(360, size.height - size.top - BELOW_RESERVE);
-	const pageWidth = Math.floor(Math.min(size.width / (spread ? 2 : 1), maxHeight * aspect));
+	const pageWidth = Math.floor(Math.min(size.width * PAGE_WIDTH_RATIO, maxHeight * aspect));
+	const step = pageWidth + GAP;
 
-	const goPrev = useCallback(() => {
-		if (hasPrev) setPage(prevStart);
-	}, [hasPrev, prevStart]);
-	const goNext = useCallback(() => {
-		if (hasNext) setPage(nextStart);
-	}, [hasNext, nextStart]);
+	// 画面サイズが変わってページ幅が変わっても、同じページが中央に残るようにする。
+	useLayoutEffect(() => {
+		const scroller = scrollerRef.current;
+		if (scroller && pageWidth > 0) scroller.scrollTo({ left: indexRef.current * step, behavior: 'instant' });
+	}, [step, pageWidth, numPages]);
+
+	const onScroll = () => {
+		const scroller = scrollerRef.current;
+		if (!scroller || pageWidth <= 0) return;
+		const next = Math.min(numPages - 1, Math.max(0, Math.round(scroller.scrollLeft / step)));
+		if (next === targetRef.current) targetRef.current = null;
+		if (next === indexRef.current) return;
+		indexRef.current = next;
+		setIndex(next);
+	};
 
 	const onKeyDown = (event: KeyboardEvent) => {
-		if (event.key === 'ArrowLeft') goPrev();
-		else if (event.key === 'ArrowRight') goNext();
-		else return;
+		const direction = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
+		if (direction === 0) return;
 		event.preventDefault();
+		const target = Math.min(numPages - 1, Math.max(0, (targetRef.current ?? indexRef.current) + direction));
+		targetRef.current = target;
+		scrollerRef.current?.scrollTo({ left: target * step, behavior: 'smooth' });
 	};
-
-	const onPointerDown = (event: PointerEvent) => {
-		swipeStart.current = { x: event.clientX, y: event.clientY };
-	};
-	const onPointerUp = (event: PointerEvent) => {
-		const start = swipeStart.current;
-		swipeStart.current = null;
-		if (!start) return;
-		const dx = event.clientX - start.x;
-		const dy = event.clientY - start.y;
-		if (Math.abs(dx) < SWIPE_DISTANCE || Math.abs(dx) < Math.abs(dy)) return;
-		if (dx < 0) goNext();
-		else goPrev();
-	};
-
-	// 前後の見開きも先に描いておき、めくった瞬間に表示できるようにする（表示はしない）。
-	const prefetch = [
-		...(hasPrev ? spreadOf(prevStart, numPages, spread) : []),
-		...(hasNext ? spreadOf(nextStart, numPages, spread) : []),
-	];
 
 	return (
-		<div className="flex flex-col items-center gap-4">
+		<div className="flex flex-col items-center gap-3">
 			<div ref={frameRef} className="w-full">
 				{failed ? (
 					<div className="rounded-xl bg-base/45 p-8 text-center text-base leading-relaxed text-text/85">
@@ -118,37 +100,42 @@ export default function PamphletViewer({ file }: Props) {
 					>
 						{numPages > 0 && pageWidth > 0 ? (
 							<div
+								ref={scrollerRef}
 								role="group"
-								aria-roledescription="ページめくり"
-								aria-label="パンフレット。左右の矢印キー、またはスワイプでページをめくれます。"
+								aria-roledescription="横にスクロールして読むパンフレット"
+								aria-label="パンフレット。横にスワイプ、または左右の矢印キーでページを移動できます。"
 								tabIndex={0}
+								onScroll={onScroll}
 								onKeyDown={onKeyDown}
-								onPointerDown={onPointerDown}
-								onPointerUp={onPointerUp}
-								className="relative mx-auto flex select-none justify-center outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
-								style={{ touchAction: 'pan-y', width: pageWidth * current.length }}
+								className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain pb-3 outline-none [scrollbar-width:thin] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+								style={{
+									gap: GAP,
+									// 先頭と末尾のページも中央に止まれるよう、左右に余白を取る。
+									paddingInline: Math.max(0, (size.width - pageWidth) / 2),
+								}}
 							>
-								{current.map((n) => (
-									<Page
-										key={n}
-										pageNumber={n}
-										width={pageWidth}
-										renderTextLayer={false}
-										renderAnnotationLayer={false}
-										onLoadSuccess={(loaded) => setAspect(loaded.originalWidth / loaded.originalHeight)}
-										loading={<PagePlaceholder width={pageWidth} aspect={aspect} />}
-										className="shadow-lg"
-									/>
+								{Array.from({ length: numPages }, (_, i) => (
+									<div
+										key={i}
+										role="group"
+										aria-label={`パンフレット ${i + 1} / ${numPages} ページ`}
+										className="shrink-0 snap-center shadow-lg"
+										style={{ width: pageWidth, minHeight: pageWidth / aspect }}
+									>
+										{Math.abs(i - index) <= RENDER_RANGE ? (
+											<Page
+												pageNumber={i + 1}
+												width={pageWidth}
+												renderTextLayer={false}
+												renderAnnotationLayer={false}
+												onLoadSuccess={(loaded) => setAspect(loaded.originalWidth / loaded.originalHeight)}
+												loading={<PagePlaceholder width={pageWidth} aspect={aspect} />}
+											/>
+										) : (
+											<PagePlaceholder width={pageWidth} aspect={aspect} />
+										)}
+									</div>
 								))}
-
-								<EdgeButton side="prev" disabled={!hasPrev} onClick={goPrev} />
-								<EdgeButton side="next" disabled={!hasNext} onClick={goNext} />
-
-								<div aria-hidden="true" className="pointer-events-none absolute -left-[9999px] top-0 h-0 w-0 overflow-hidden">
-									{prefetch.map((n) => (
-										<Page key={n} pageNumber={n} width={pageWidth} renderTextLayer={false} renderAnnotationLayer={false} />
-									))}
-								</div>
 							</div>
 						) : (
 							<PagePlaceholder width={pageWidth} aspect={aspect} label="読み込み中…" />
@@ -158,57 +145,11 @@ export default function PamphletViewer({ file }: Props) {
 			</div>
 
 			{!failed && numPages > 0 ? (
-				<nav aria-label="ページ送り" className="flex items-center gap-4 text-text">
-					<BarButton label="前のページ" disabled={!hasPrev} onClick={goPrev}>
-						‹
-					</BarButton>
-					<p className="min-w-24 text-center text-sm tabular-nums" aria-live="polite">
-						{current.join('・')} / {numPages}
-					</p>
-					<BarButton label="次のページ" disabled={!hasNext} onClick={goNext}>
-						›
-					</BarButton>
-				</nav>
+				<p className="text-sm tabular-nums text-text/85" aria-live="polite">
+					{index + 1} / {numPages}
+				</p>
 			) : null}
 		</div>
-	);
-}
-
-/** ページの左右を押してもめくれるようにする、見えない当たり判定（スマホ向け）。 */
-function EdgeButton({ side, disabled, onClick }: { side: 'prev' | 'next'; disabled: boolean; onClick: () => void }) {
-	return (
-		<button
-			type="button"
-			tabIndex={-1}
-			aria-hidden="true"
-			disabled={disabled}
-			onClick={onClick}
-			className={`absolute inset-y-0 w-1/4 ${side === 'prev' ? 'left-0' : 'right-0'} ${disabled ? 'cursor-default' : 'cursor-pointer'}`}
-		/>
-	);
-}
-
-function BarButton({
-	label,
-	disabled,
-	onClick,
-	children,
-}: {
-	label: string;
-	disabled: boolean;
-	onClick: () => void;
-	children: string;
-}) {
-	return (
-		<button
-			type="button"
-			aria-label={label}
-			disabled={disabled}
-			onClick={onClick}
-			className="flex size-11 items-center justify-center rounded-full border border-text/25 text-2xl leading-none transition-colors hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-default disabled:opacity-30 disabled:hover:border-text/25 disabled:hover:text-text"
-		>
-			{children}
-		</button>
 	);
 }
 
