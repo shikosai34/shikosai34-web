@@ -18,6 +18,7 @@
   "dependencies": {
     "@astrojs/react": "^6.0.4",
     "@astrojs/sitemap": "^3.7.4",
+    "@fontsource/dseg7-classic": "^5.3.0",
     "@fontsource/kiwi-maru": "^5.3.0",
     "@fontsource/oxanium": "^5.3.0",
     "@react-three/drei": "^10.7.8",
