@@ -15,7 +15,7 @@ details: |-
   ＜ドリンク＞
   コーヒー、コーラ、カルピス、緑茶、etc...
 
-  各種＋50 円ドリンクセットを注文可能
+  各種＋100 円ドリンクセットを注文可能
 scheduleDay1: 9:00〜17:00
 scheduleDay2: 9:00〜15:00
 fesflowPlanned: false
