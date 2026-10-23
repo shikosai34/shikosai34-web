@@ -11,4 +11,5 @@ status: scheduled
 displayMode: timed
 committeeOnly: false
 draft: false
+description: "Rhythm Heartです！いつもとは少し違う私たちの姿を、ぜひ楽しんでください！会場で一緒に盛り上がりましょう！ぜひお楽しみに！！"
 ---

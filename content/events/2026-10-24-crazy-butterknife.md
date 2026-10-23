@@ -10,4 +10,12 @@ status: scheduled
 venue: main-stage
 committeeOnly: false
 draft: false
+snsLinks:
+  - label: "Instagram"
+    url: https://www.instagram.com/crazy_butter_knife
+description: "進路の決まってのびのびしている5年生5人組バンドです。"
 ---
+
+## ライブ前に聴いてほしいおすすめ曲
+
+- StaRt / Mrs. GREEN APPLE

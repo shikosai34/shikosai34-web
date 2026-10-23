@@ -9,4 +9,11 @@ genre: music
 status: scheduled
 venue: main-stage
 draft: false
+description: "3年生のバンドです。"
 ---
+
+## ライブ前に聴いてほしいおすすめ曲
+
+- ただ君に晴れ / ヨルシカ
+- お気に召すまま / Eve
+- コネクト / ClariS

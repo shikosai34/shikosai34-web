@@ -10,4 +10,5 @@ status: scheduled
 venue: main-stage
 committeeOnly: false
 draft: false
+description: "某番組のような大喜利形式のイベント！お題に自由に答えて、面白ければお菓子をゲット、滑ればお菓子を没収されます。いかに面白い回答をし、たくさんのお菓子をゲットするのは誰なのか、、、！"
 ---

@@ -10,4 +10,5 @@ status: scheduled
 venue: main-stage
 committeeOnly: false
 draft: false
+description: "高専生が本気でコスプレ！衣装と小道具を自作したり、演出を凝らしたりして、1人2〜3分のレッドカーペットパフォーマンスを披露します！！トークで笑わせる人、一発芸に挑む人、キャラクターになりきって演じる人など、見せ方は出演者それぞれです！"
 ---

@@ -11,3 +11,7 @@ venue: main-stage
 committeeOnly: false
 draft: false
 ---
+
+## ライブ前に聴いてほしいおすすめ曲
+
+- おやすみ泣き声さよなら歌姫

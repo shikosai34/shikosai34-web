@@ -10,4 +10,5 @@ status: scheduled
 venue: main-stage
 committeeOnly: false
 draft: false
+description: "一瞬の油断が命取り！勝利を確信したその瞬間、まさかの大逆転が待っているかも！？Nintendo Switch「大乱闘スマッシュブラザーズ SPECIAL」で繰り広げられる、1対1のガチンコバトル！最後の一撃まで勝敗のわからない、手に汗握る激闘を見逃すな！"
 ---

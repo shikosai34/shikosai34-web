@@ -9,4 +9,5 @@ genre: music
 status: scheduled
 venue: main-stage
 draft: false
+description: "キーボード・ドラム・ボーカルの奇妙な3人組。たった3人とは思えない音と熱量で、その空間を圧倒します。"
 ---
