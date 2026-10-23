@@ -18,4 +18,5 @@ description: "初めまして。四大欲求です。日々の生活のすぐそ
 
 ## ライブ前に聴いてほしいおすすめ曲
 
-- アカシア / BUMP OF CHICKEN
+<p>アカシア / BUMP OF CHICKEN</p>
+<iframe title="Spotify: アカシア" src="https://open.spotify.com/embed/track/0Jcx9VqsO4t20gYeznW7Uq" width="100%" height="152" frameborder="0" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>

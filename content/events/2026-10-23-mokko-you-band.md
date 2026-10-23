@@ -14,6 +14,11 @@ description: "3年生のバンドです。"
 
 ## ライブ前に聴いてほしいおすすめ曲
 
-- ただ君に晴れ / ヨルシカ
-- お気に召すまま / Eve
-- コネクト / ClariS
+<p>ただ君に晴れ / ヨルシカ</p>
+<iframe title="Spotify: ただ君に晴れ" src="https://open.spotify.com/embed/track/3wJHCry960drNlAUGrJLmz" width="100%" height="152" frameborder="0" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+
+<p>お気に召すまま / Eve</p>
+<iframe title="Spotify: お気に召すまま" src="https://open.spotify.com/embed/track/3B2aRA1azOMuxtfA0JutD7" width="100%" height="152" frameborder="0" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+
+<p>コネクト / ClariS</p>
+<iframe title="Spotify: コネクト" src="https://open.spotify.com/embed/track/1gckyQSFK373qKacpx87k3" width="100%" height="152" frameborder="0" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
