@@ -10,4 +10,5 @@ status: scheduled
 venue: main-stage
 committeeOnly: false
 draft: false
+description: "一瞬の判断、コンマ数秒の駆け引き、そして勝負を決める渾身の一撃！ゲーミングPCで繰り広げられる「STREET FIGHTER 6」の真剣勝負！読み合いを制するのは誰だ？己の技と戦略を武器に、頂点を懸けた熱きバトルが今、幕を開ける！"
 ---

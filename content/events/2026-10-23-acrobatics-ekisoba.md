@@ -12,4 +12,10 @@ displayMode: timed
 image: https://assets.34.shikosai.net/news/535b6e0e-4ed7-421e-9f0b-df451c9f276a.webp
 committeeOnly: false
 draft: false
+description: "こんにちは、「アクロバティック駅そば」です。私たちは6月に結成したばかりのできたてほやほや1年生バンドです。今回はこのバンドの初めてのライブです。アクロバティック??な演奏をみなさまに届けることができるよう精一杯演奏いたします。ぜひ、うまみあふれる我々の演奏を見に前夜祭の体育館に遊びに来てください！"
 ---
+
+## ライブ前に聴いてほしいおすすめ曲
+
+<p>ダンス・デカダンス / Chevon</p>
+<iframe title="Spotify: ダンス・デカダンス" src="https://open.spotify.com/embed/track/4sv99XEtTNvHjICj5ZfyjK" width="100%" height="152" frameborder="0" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>

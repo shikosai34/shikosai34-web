@@ -10,4 +10,8 @@ status: scheduled
 venue: main-stage
 committeeOnly: false
 draft: false
+snsLinks:
+  - label: "Instagram"
+    url: https://www.instagram.com/juuon_gakubu
+description: "バイオリン、チェロ、ピアノ、ドラムの編成でポップスやジャズ、クラシック等をやっています！よろしくお願いします！"
 ---

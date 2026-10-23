@@ -10,4 +10,8 @@ status: scheduled
 venue: main-stage
 committeeOnly: false
 draft: false
+snsLinks:
+  - label: "Instagram"
+    url: https://www.instagram.com/dou_gun_chiryou
+description: "「どうちょうあつりょくがんちりょう」と読みます。よろしくお願いします。"
 ---

@@ -11,3 +11,8 @@ venue: main-stage
 committeeOnly: false
 draft: false
 ---
+
+## ライブ前に聴いてほしいおすすめ曲
+
+<p>おやすみ泣き声さよなら歌姫 / クリープハイプ</p>
+<iframe title="Spotify: おやすみ泣き声、さよなら歌姫" src="https://open.spotify.com/embed/track/0TjUOvMQMfZVE2IsTCr0iw" width="100%" height="152" frameborder="0" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>

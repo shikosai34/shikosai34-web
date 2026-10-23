@@ -10,4 +10,5 @@ status: scheduled
 venue: main-stage
 committeeOnly: false
 draft: false
+description: "茨城高専のカラオケNo.1を決める大会！自分の十八番で高得点を目指せ！"
 ---

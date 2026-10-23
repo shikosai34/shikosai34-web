@@ -10,4 +10,5 @@ status: scheduled
 venue: main-stage
 committeeOnly: false
 draft: false
+description: "一番イカしたやつらは誰だ！Switchの「スプラトゥーン3」で一番イカしたやつを決める大会！仲間と力をあわせて、フィールドを自分たちの色で塗りまくれ！4人1チームで、地面を自分たちの色のインクでどれだけ塗れたか、その面積を競うゲーム！"
 ---
