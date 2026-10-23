@@ -1,0 +1,80 @@
+---
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import SiteHeader from '../../components/layout/SiteHeader.astro';
+import SectionHeading from '../../components/ui/SectionHeading';
+import Layout from '../../layouts/Layout.astro';
+import { SURVEY_FORM_EMBED_URL, getSurveyFormUrl } from '../../lib/survey';
+
+const embedUrl = SURVEY_FORM_EMBED_URL;
+const formUrl = getSurveyFormUrl(embedUrl);
+
+const linkClass =
+	'text-accent underline underline-offset-4 hover:decoration-2 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
+---
+
+<Layout
+	title="来場者アンケート | 第34回 茨香祭"
+	description="第34回 茨香祭にご来場いただいた皆さまへ。感想やご意見をお聞かせください。"
+>
+	<SiteHeader />
+
+	<main class="mx-auto w-full max-w-3xl px-4 pb-16 sm:px-6">
+		<section class="surface-panel mt-8 rounded-2xl p-4 pt-6 pb-6 sm:p-6">
+			<SectionHeading title="Survey" icon="clipboard" subtitle="来場者アンケート" />
+
+			<div class="space-y-10 border-t border-text/40 pt-6">
+				<p class="text-sm leading-relaxed text-text/80">
+					第34回茨香祭にご来場いただき、ありがとうございます。今後の茨香祭をより良いものにするため、感想やご意見をお聞かせください。回答は無記名で、所要時間は数分程度です。
+				</p>
+
+				<section aria-labelledby="form-heading">
+					<h2 id="form-heading" class="border-b-2 border-text/25 pb-2 text-xl font-medium text-text">
+						アンケートフォーム
+					</h2>
+
+					{
+						embedUrl ? (
+							<>
+								<div class="mt-4 overflow-hidden rounded-xl border border-text/20 bg-white">
+									<iframe
+										src={embedUrl}
+										title="第34回 茨香祭 来場者アンケート"
+										loading="lazy"
+										referrerpolicy="no-referrer-when-downgrade"
+										class="block h-[900px] w-full border-0"
+									>
+										読み込んでいます…
+									</iframe>
+								</div>
+								<p class="mt-3 text-sm leading-relaxed text-text/80">
+									フォームが表示されない場合は、
+									<a href={formUrl} target="_blank" rel="noopener noreferrer" class={linkClass}>
+										こちら（Googleフォーム）
+									</a>
+									から回答してください。
+								</p>
+							</>
+						) : (
+							<p class="py-8 text-center text-sm text-text/70">アンケートは準備中です。</p>
+						)
+					}
+				</section>
+
+				<section aria-labelledby="note-heading">
+					<h2 id="note-heading" class="border-b-2 border-text/25 pb-2 text-xl font-medium text-text">
+						ご回答にあたって
+					</h2>
+					<ul class="mt-4 list-disc space-y-2 pl-5 text-sm leading-relaxed text-text/80 marker:text-text/60">
+						<li>Googleアカウントへのログインは不要です。</li>
+						<li>いただいた回答は、茨香祭の運営の改善にのみ使用します。</li>
+						<li>
+							個人情報の取り扱いは<a href="/privacy" class={linkClass}>プライバシーポリシー</a>をご覧ください。
+						</li>
+					</ul>
+				</section>
+			</div>
+		</section>
+	</main>
+
+	<SiteFooter />
+</Layout>
