@@ -6,14 +6,16 @@ performer: クレイジーバターナイフ
 startAt: 2026-10-24T15:35:00+09:00
 endAt: 2026-10-24T16:00:00+09:00
 genre: music
-status: scheduled
 venue: main-stage
+status: scheduled
+displayMode: timed
+image: https://assets.34.shikosai.net/news/842e292e-f568-4483-b69b-683088b099c9.webp
+snsLinks:
+  - label: Instagram
+    url: https://www.instagram.com/crazy_butter_knife
+description: 進路の決まってのびのびしている5年生5人組バンドです。
 committeeOnly: false
 draft: false
-snsLinks:
-  - label: "Instagram"
-    url: https://www.instagram.com/crazy_butter_knife
-description: "進路の決まってのびのびしている5年生5人組バンドです。"
 ---
 
 ## ライブ前に聴いてほしいおすすめ曲
