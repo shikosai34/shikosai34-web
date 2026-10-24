@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
 import SiteHeader from '../../components/layout/SiteHeader.astro';
 import PamphletViewer from '../../components/pamphlet/PamphletViewer';
+import { buttonClassName } from '../../components/ui/Button';
 import SectionHeading from '../../components/ui/SectionHeading';
 ---
 
@@ -20,6 +21,18 @@ import SectionHeading from '../../components/ui/SectionHeading';
 				第34回茨香祭の公式パンフレットです。サークル一覧、会場マップ、タイムテーブルなどを、当日の手元でも確認できます。
 			</p>
 			<PamphletViewer client:only="react" file="/pamphlet/pamphlet-2026.pdf" />
+			<div class="mt-6 flex justify-center">
+				<a
+					href="/pamphlet/pamphlet-2026.pdf"
+					download="第34回茨香祭_パンフレット.pdf"
+					class={buttonClassName('main', 'justify-center')}
+				>
+					<svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14" />
+					</svg>
+					パンフレットをダウンロード（PDF）
+				</a>
+			</div>
 		</section>
 	</main>
 
