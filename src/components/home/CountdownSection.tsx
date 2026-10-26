@@ -60,10 +60,7 @@ export default function CountdownSection({ logoSrc }: Props) {
 	return (
 		<section className="surface-panel mt-6 rounded-2xl p-4 pt-6 pb-6 text-text sm:p-6">
 			{countdown?.finished ? (
-				<div className="flex items-center justify-center gap-3 text-2xl sm:gap-4 sm:text-4xl">
-					<img src={logoSrc} alt="茨香祭" className="h-[1.4em] w-auto" />
-					<p className="font-primary text-accent">開催中！</p>
-				</div>
+				<p className="text-center font-primary text-xl text-accent sm:text-4xl">茨香祭は終了しました</p>
 			) : (
 				<>
 					<div className="mb-4 flex items-center justify-center gap-3">
