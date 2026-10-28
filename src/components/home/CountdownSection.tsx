@@ -1,6 +1,10 @@
 import '@fontsource/dseg7-classic/400.css';
 import { useEffect, useState } from 'react';
 import { getCountdown, type Countdown } from '../../lib/countdown';
+import { buttonClassName } from '../ui/Button';
+
+/** 来場者アンケート（Google フォーム）。埋め込まず、別タブで開く。 */
+const SURVEY_URL = 'https://forms.gle/fy4BVzijibS4xcsBA';
 
 function pad(value: number) {
 	return String(value).padStart(2, '0');
@@ -60,7 +64,25 @@ export default function CountdownSection({ logoSrc }: Props) {
 	return (
 		<section className="surface-panel mt-6 rounded-2xl p-4 pt-6 pb-6 text-text sm:p-6">
 			{countdown?.finished ? (
-				<p className="text-center font-primary text-xl text-accent sm:text-4xl">茨香祭は終了しました</p>
+				<>
+					<p className="flex items-center justify-center gap-2 text-center font-primary text-xl text-accent sm:gap-3 sm:text-4xl">
+						<img src={logoSrc} alt="茨香祭" className="h-8 w-auto sm:h-14" />
+						<span>は終了しました</span>
+					</p>
+					<div className="mt-5 flex justify-center">
+						<a
+							href={SURVEY_URL}
+							target="_blank"
+							rel="noopener noreferrer"
+							className={buttonClassName('main', 'w-full justify-center py-4 text-base shadow-lg sm:w-auto sm:px-10 sm:text-lg')}
+						>
+							アンケートはこちら
+							<svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+								<path d="M5 12h14m0 0l-6-6m6 6l-6 6" />
+							</svg>
+						</a>
+					</div>
+				</>
 			) : (
 				<>
 					<div className="mb-4 flex items-center justify-center gap-3">
