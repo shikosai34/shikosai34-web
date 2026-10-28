@@ -103,30 +103,24 @@ export default function BreakingNewsHero({
 						 * 円と重ねるぶん、地は不透明にして紙面が透けないようにする。
 						 */}
 						<div className="bracket-frame stripes relative z-10 -mt-5 bg-base/55 px-4 py-3 backdrop-blur-[2px] sm:mx-auto sm:max-w-md lg:mx-0 lg:mt-0 lg:max-w-none lg:px-6 lg:py-5">
-							{/* ポスターの掲示と開催日がひと目で伝わる順に並べる。 */}
+							{/* 終了の告知と御礼を、ポスター掲示のときと同じネオンサインの見た目で出す。 */}
 
 							{/* 主文。地から浮かせるため縁取りする。 */}
-							{/*
-							 * ポスター掲示をピンクで、開催日をシアンで目立たせる。
-							 */}
 							<p className="outlined-text neon-text text-xl font-bold tracking-tight lg:text-3xl">
-								ポスター掲示中！
+								茨香祭は終了しました！
 							</p>
 
-							{/* 補足とハザード帯。 */}
+							{/* 開催日の補足とハザード帯。 */}
 							<div className="mt-2 flex items-center gap-3">
-								<p className="shrink-0 text-xs text-text/75">第34回 茨香祭 開催日</p>
+								<p className="shrink-0 text-xs text-text/75">第34回 茨香祭（10月24日・25日）</p>
 								<span className="hazard-stripes h-3 flex-1 opacity-70" aria-hidden="true" />
 							</div>
 
-							{/* 24・25日の両日開催を主表示し、25日の入場条件を補足する。 */}
-							<div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1 lg:mt-2">
-								<p className="outlined-text neon-text--cyan flex flex-wrap gap-x-2 text-xl font-bold tracking-tight text-accent sm:text-2xl lg:text-3xl">
-									<span className="whitespace-nowrap">10月24日(土)</span>
-									<span className="whitespace-nowrap">・25日(日)</span>
-								</p>
-								<p className="text-xs text-text/80">※25日(日)は学内限定</p>
-							</div>
+							<p className="outlined-text neon-text--cyan mt-1 text-xl font-bold tracking-tight text-accent sm:text-2xl lg:mt-2 lg:text-3xl">
+								ご来場いただき
+								<br className="sm:hidden" />
+								ありがとうございました！
+							</p>
 						</div>
 
 						{/*
