@@ -69,7 +69,8 @@ export default function CountdownSection({ logoSrc }: Props) {
 						<img src={logoSrc} alt="茨香祭" className="h-8 w-auto sm:h-14" />
 						<span>は終了しました</span>
 					</p>
-					<div className="mt-5 flex justify-center">
+					<p className="mt-4 text-center text-sm text-text/85 sm:text-base">来場者アンケートにご協力ください</p>
+					<div className="mt-3 flex justify-center">
 						<a
 							href={SURVEY_URL}
 							target="_blank"
