@@ -10,6 +10,7 @@ status: scheduled
 venue: main-stage
 committeeOnly: false
 draft: false
+description: "ジャズを中心にファンク、ブルースまで幅広く演奏。鳴きのギターと洒落込んだキーボードを、スウィングしたベースと巧みなドラムが支えるカルテット。"
 ---
 
 ## ライブ前に聴いてほしいおすすめ曲
