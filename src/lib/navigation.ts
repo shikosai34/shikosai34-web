@@ -39,6 +39,7 @@ export const navGroups: NavGroupItem[] = [
 			{ label: 'アクセス', href: '/access' },
 			{ label: '注意事項', href: '/cautions' },
 			{ label: 'よくある質問', href: '/faq' },
+			{ label: '来場者アンケート', href: '/survey' },
 		],
 	},
 	{

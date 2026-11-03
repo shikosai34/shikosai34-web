@@ -21,6 +21,7 @@ export const ogPageTitles: Record<string, string> = {
 	privacy: 'プライバシーポリシー',
 	sponsor: '協賛',
 	staff: '部署紹介',
+	survey: '来場者アンケート',
 	theme: 'テーマ',
 	timetable: 'タイムテーブル',
 };
